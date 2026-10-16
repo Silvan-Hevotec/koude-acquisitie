@@ -1,0 +1,2548 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Koude Acquisitie</title>
+<meta name="description" content="Bedrijven, acties en contactmomenten voor koude acquisitie.">
+<meta name="theme-color" content="#383E42">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: antraciet kopband met gele onderrand (huisstijl), invoerkaart, overzicht Alles / Acties / Vandaag / Archief, en de lijst als gelinieerde rijen die openklappen. Import en mail openen als kaarten boven de lijst. */
+:root {
+  color-scheme: light;
+  --bg: #EFF0F1;
+  --surface: #FFFFFF;
+  --sunken: #F6F7F7;
+  --ink: #22272B;
+  --muted: #586066;
+  --faint: #899096;
+  --line: #DCDFE1;
+  --line-strong: #C3C8CB;
+  --focus: #22272B;
+  --geel: #F6B800;
+  --geel-hover: #E3A900;
+  --geel-ink: #22272B;
+  --geel-soft: #FFF2C7;
+  --geel-soft-ink: #4A3A00;
+  --tab-on: #383E42;
+  --tab-on-ink: #FFFFFF;
+  --danger: #B3322F;
+  --danger-soft: #FBE6E5;
+  --band: #383E42;
+  --band-ink: #FFFFFF;
+  --band-muted: #BCC2C6;
+  --band-line: #5A6268;
+  --shadow: 0 1px 2px rgba(34, 39, 43, .06), 0 4px 16px rgba(34, 39, 43, .05);
+  --f-display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --f-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1B1F22; --surface: #24292D; --sunken: #202427; --ink: #ECEEEF; --muted: #A2A9AE; --faint: #737B82;
+    --line: #343A3F; --line-strong: #464D53; --focus: #F6B800;
+    --geel: #F6B800; --geel-hover: #FFC933; --geel-ink: #1B1F22; --geel-soft: #3B3212; --geel-soft-ink: #F7CD4F;
+    --tab-on: #ECEEEF; --tab-on-ink: #1B1F22;
+    --danger: #F28B87; --danger-soft: #3C1D1C;
+    --band: #2C3236; --band-ink: #FFFFFF; --band-muted: #AEB5BA; --band-line: #4A5258;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 16px rgba(0, 0, 0, .25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1B1F22; --surface: #24292D; --sunken: #202427; --ink: #ECEEEF; --muted: #A2A9AE; --faint: #737B82;
+  --line: #343A3F; --line-strong: #464D53; --focus: #F6B800;
+  --geel: #F6B800; --geel-hover: #FFC933; --geel-ink: #1B1F22; --geel-soft: #3B3212; --geel-soft-ink: #F7CD4F;
+  --tab-on: #ECEEEF; --tab-on-ink: #1B1F22;
+  --danger: #F28B87; --danger-soft: #3C1D1C;
+  --band: #2C3236; --band-ink: #FFFFFF; --band-muted: #AEB5BA; --band-line: #4A5258;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 16px rgba(0, 0, 0, .25);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.gutter {
+  max-width: 1120px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Kopband */
+.band { background: var(--band); color: var(--band-ink); border-bottom: 5px solid var(--geel); }
+.band-inner { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px 24px; padding-block: calc(22px + env(safe-area-inset-top, 0px)) 22px; }
+.band-text { display: grid; gap: 6px; min-width: 0; }
+.band-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.eyebrow { margin: 0; font: 500 12px/1.2 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--geel); }
+h1 { margin: 0; font: 800 clamp(30px, 4.6vw, 44px)/1 var(--f-display); font-stretch: 88%; letter-spacing: -.01em; text-wrap: balance; }
+.summary { margin: 0; color: var(--band-muted); }
+.summary strong { color: var(--band-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.band :focus-visible, .selbar :focus-visible { outline-color: var(--geel); }
+
+.wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 22px 80px; }
+body.selecting .wrap { padding-bottom: 170px; }
+
+/* Knoppen */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 40px; padding: 0 16px; border-radius: 8px;
+  border: 1px solid var(--line-strong); background: var(--surface);
+  font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; text-decoration: none; color: var(--ink);
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.btn:hover { border-color: var(--ink); }
+.btn.small { min-height: 32px; padding: 0 12px; font-size: 13px; }
+.btn.primary { background: var(--geel); border-color: var(--geel); color: var(--geel-ink); }
+.btn.primary:hover { background: var(--geel-hover); border-color: var(--geel-hover); }
+.btn.dark { background: var(--tab-on); border-color: var(--tab-on); color: var(--tab-on-ink); }
+.btn.dark:hover { opacity: .9; border-color: var(--tab-on); }
+.btn.on-band { background: transparent; border-color: var(--band-line); color: var(--band-ink); }
+.btn.on-band:hover, .btn.on-band[aria-expanded="true"] { border-color: var(--geel); background: transparent; color: var(--band-ink); }
+.btn.danger { background: transparent; border-color: transparent; color: var(--danger); }
+.btn.danger:hover { background: var(--danger-soft); }
+.btn.danger.armed { background: var(--danger); border-color: var(--danger); color: var(--surface); }
+.btn[aria-expanded="true"], .btn[aria-pressed="true"] { background: var(--tab-on); border-color: var(--tab-on); color: var(--tab-on-ink); }
+.btn:disabled, .btn.disabled { opacity: .5; cursor: not-allowed; }
+.btn.disabled { pointer-events: none; }
+.btn:disabled:hover { border-color: var(--line-strong); }
+.linkbtn { padding: 0; border: 0; background: none; cursor: pointer; font-weight: 600; text-decoration: underline; text-decoration-color: var(--geel); text-underline-offset: 3px; }
+.inline-link { color: inherit; font-weight: 600; text-decoration-color: var(--geel); text-underline-offset: 3px; }
+
+/* Kaarten */
+.card { display: grid; gap: 16px; min-width: 0; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.card-head h2, .add-title { margin: 0; font: 700 17px/1.2 var(--f-display); font-stretch: 92%; }
+
+/* Velden */
+.add {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: end;
+  padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
+}
+.add-title { grid-column: 1 / -1; }
+.add .span-when { grid-column: span 2; }
+.add .dupwarn { grid-column: 1 / 3; }
+.add .submit { grid-column: 3; display: flex; justify-content: flex-end; }
+.field { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.field > label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.opt { margin-left: 4px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--faint); font-size: 12px; }
+.input {
+  width: 100%; min-height: 40px; padding: 8px 11px; border-radius: 8px;
+  border: 1px solid var(--line-strong); background: var(--surface); font-size: 15px;
+}
+.input::placeholder { color: var(--faint); }
+.input:focus { outline: 2px solid var(--geel); outline-offset: 0; border-color: var(--focus); }
+.input[readonly], .input:disabled { background: var(--sunken); }
+.input:disabled { color: var(--faint); }
+textarea.input { min-height: 80px; resize: vertical; line-height: 1.45; }
+select.input { padding-right: 8px; }
+@media (max-width: 760px) {
+  .add { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .add .span-when, .add .dupwarn, .add .submit { grid-column: 1 / -1; }
+  .add .submit .btn { flex: 1; }
+}
+@media (max-width: 520px) { .add { grid-template-columns: minmax(0, 1fr); } }
+
+.when { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.qd {
+  min-height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line-strong);
+  background: var(--surface); font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.qd:hover { border-color: var(--ink); }
+.qd[aria-pressed="true"] { background: var(--geel); border-color: var(--geel); color: var(--geel-ink); }
+.qd:disabled { opacity: .45; cursor: not-allowed; }
+.when .input { flex: 1 1 150px; width: auto; min-width: 140px; }
+
+.check { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+.check input, .sel { width: 18px; height: 18px; margin: 0; accent-color: var(--geel); flex: none; cursor: pointer; }
+.sel:disabled { cursor: not-allowed; opacity: .4; }
+
+.notice, .warn, .dupwarn {
+  padding: 12px 16px; border-radius: 10px; background: var(--geel-soft); color: var(--ink);
+}
+.notice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.notice p { margin: 0; max-width: 68ch; }
+.warn, .dupwarn { margin: 0; font-size: 14px; padding: 10px 12px; }
+.hint { margin: 0; font-size: 13px; color: var(--muted); max-width: 70ch; }
+
+/* Overzicht */
+.overview { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.tools { display: flex; flex: 1 1 320px; justify-content: flex-end; gap: 8px; min-width: 0; }
+.tabs { display: inline-flex; max-width: 100%; overflow-x: auto; padding: 3px; gap: 3px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line-strong); }
+.tab {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 16px; border: 0; border-radius: 7px;
+  background: transparent; font-weight: 600; font-size: 14.5px; cursor: pointer; white-space: nowrap;
+}
+.tab:hover { background: var(--sunken); }
+.tab[aria-pressed="true"] { background: var(--tab-on); color: var(--tab-on-ink); }
+.tab .n, .chip .n { font: 500 12.5px/1 var(--f-mono); font-variant-numeric: tabular-nums; opacity: .7; }
+.tab .n.hot { opacity: 1; padding: 3px 7px; border-radius: 999px; background: var(--geel); color: var(--geel-ink); }
+.search { flex: 1 1 220px; max-width: 360px; }
+@media (max-width: 560px) {
+  .tabs { display: flex; width: 100%; }
+  .tab { flex: 1 1 auto; justify-content: center; padding: 0 8px; gap: 5px; font-size: 14px; }
+  .search { max-width: none; }
+  .tools { flex-wrap: wrap; }
+  .tools .btn { flex: 1; }
+}
+
+.filters { display: grid; gap: 8px; }
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px;
+  border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface);
+  font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.chip:hover { border-color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--geel); border-color: var(--geel); color: var(--geel-ink); font-weight: 600; }
+.chip.toggle[aria-pressed="true"] { background: var(--tab-on); border-color: var(--tab-on); color: var(--tab-on-ink); }
+.chip-group { display: inline-flex; }
+.chip-group .chip { border-top-right-radius: 0; border-bottom-right-radius: 0; padding-right: 10px; }
+.chip-x {
+  display: grid; place-items: center; width: 32px; min-height: 36px; padding: 0; cursor: pointer;
+  border: 1px solid var(--line-strong); border-left: 0; border-radius: 0 999px 999px 0; background: var(--surface); color: var(--muted);
+  font-size: 16px; line-height: 1;
+}
+.chip-x:hover { color: var(--danger); background: var(--danger-soft); }
+.sep { width: 1px; height: 22px; background: var(--line-strong); margin: 0 2px; }
+
+/* Lijst */
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.cols { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr) minmax(0, 1.3fr) minmax(0, 1.1fr) 196px; gap: 16px; align-items: center; }
+.list-head { padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--sunken); }
+.list-head span { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+#rows > * + * { border-top: 1px solid var(--line); }
+.group-head {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 16px; background: var(--sunken);
+  font: 700 13px/1.2 var(--f-display); font-stretch: 92%; letter-spacing: .05em; text-transform: uppercase;
+}
+.group-head::before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: var(--geel); flex: none; }
+.group-head.quiet::before { background: var(--line-strong); }
+.group-head .n { font: 500 12px/1 var(--f-mono); color: var(--muted); letter-spacing: 0; }
+.route {
+  margin-left: auto; font: 600 13px/1.2 var(--f-body); letter-spacing: 0; text-transform: none; color: var(--ink);
+  text-decoration: underline; text-decoration-color: var(--geel); text-decoration-thickness: 2px; text-underline-offset: 3px;
+}
+.row-main { padding: 12px 16px; min-height: 62px; cursor: pointer; }
+.row-main:hover, .row.open { background: var(--sunken); }
+.cell { min-width: 0; }
+.first { display: flex; align-items: flex-start; gap: 12px; }
+.first .sel { margin-top: 2px; }
+.bedrijf { display: grid; gap: 2px; justify-items: start; min-width: 0; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 4px; }
+.bedrijf .name { font: 700 16px/1.25 var(--f-display); font-stretch: 94%; overflow-wrap: anywhere; }
+.bedrijf .sub { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.row.nomail .bedrijf .name { color: var(--faint); }
+.meta { font: 400 12px/1.35 var(--f-mono); color: var(--muted); overflow-wrap: anywhere; }
+.tag {
+  display: inline-block; margin-left: 8px; padding: 1px 6px; border-radius: 4px; border: 1px dashed var(--line-strong);
+  font: 500 10.5px/1.4 var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); vertical-align: 2px;
+}
+.plaats { display: grid; gap: 2px; overflow-wrap: anywhere; }
+.contactinfo { display: grid; gap: 2px; justify-items: start; }
+.pick {
+  max-width: 100%; cursor: copy; font-size: 14px; overflow-wrap: anywhere; border-bottom: 1px dashed transparent;
+  -webkit-user-select: text; user-select: text; -webkit-touch-callout: default;
+}
+.pick:hover { border-bottom-color: var(--faint); }
+.pick.mono { font-family: var(--f-mono); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.callbox { display: grid; gap: 4px; justify-items: start; padding: 10px 14px; border-radius: 10px; background: var(--geel-soft); }
+.telline { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.call {
+  display: none; align-items: center; justify-content: center; min-height: 32px; padding: 0 14px; border-radius: 999px;
+  background: var(--geel); color: var(--geel-ink); font-size: 13.5px; font-weight: 700; text-decoration: none; white-space: nowrap;
+}
+.call.big { display: inline-flex; min-height: 48px; padding: 0 20px; font-size: 16px; }
+@media (pointer: coarse) { .call { display: inline-flex; } }
+.callbox .pick { font: 600 22px/1.25 var(--f-mono); font-variant-numeric: tabular-nums; }
+.touch-only { display: none; }
+@media (pointer: coarse) {
+  .touch-only { display: inline; }
+  .notice.touch-only { display: flex; }
+  .mouse-only { display: none; }
+}
+.faint { color: var(--faint); }
+.actie { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.atag {
+  display: inline-flex; align-items: center; min-height: 26px; padding: 0 10px; border-radius: 6px; border: 0; cursor: pointer;
+  background: var(--geel-soft); color: var(--geel-soft-ink); font-size: 13px; font-weight: 600; max-width: 100%; overflow-wrap: anywhere; text-align: left;
+}
+.atag:hover { background: var(--geel); color: var(--geel-ink); }
+.due {
+  display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+  font: 500 12px/1.4 var(--f-mono); color: var(--muted); background: var(--surface); border: 1px solid var(--line);
+}
+.due.late { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+.due.today { background: var(--geel); color: var(--geel-ink); border-color: transparent; }
+.acts { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.more { width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer; flex: none; }
+.more:hover { background: var(--line); }
+.chev { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
+.row.open .chev { transform: translateY(2px) rotate(-135deg); }
+
+@media (max-width: 760px) {
+  .list-head { display: none; }
+  .row-main.cols {
+    grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px;
+    grid-template-areas: "first first" "plaats plaats" "contact contact" "actie acts";
+  }
+  .row-main .first { grid-area: first; }
+  .row-main .plaats { grid-area: plaats; color: var(--muted); }
+  .row-main .contactinfo { grid-area: contact; }
+  .row-main .actie { grid-area: actie; margin-top: 4px; }
+  .row-main .acts { grid-area: acts; margin-top: 4px; }
+  .row-main .more, .row-main .cell.none { display: none; }
+}
+
+/* Detail en afronden */
+.panel { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 20px 28px; padding: 6px 16px 20px; }
+.pform { display: grid; gap: 14px; min-width: 0; }
+.pgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.span2 { grid-column: span 2; } .span4 { grid-column: 1 / -1; }
+.pactions, .btns { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pactions .push { margin-left: auto; }
+.log { display: grid; gap: 10px; align-content: start; min-width: 0; padding-left: 20px; border-left: 1px solid var(--line); }
+.log h3 { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.log ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.log li { display: grid; gap: 1px; overflow-wrap: anywhere; }
+.log time { font: 500 12px/1.3 var(--f-mono); color: var(--muted); }
+.log .t { color: var(--muted); font-size: 14px; }
+.log .none { margin: 0; font-size: 13.5px; color: var(--faint); }
+
+.finish { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 28px; padding: 8px 16px 20px; }
+.step { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.step h3 { margin: 0; font: 700 16px/1.2 var(--f-display); font-stretch: 94%; }
+.step h3 .faint { font-weight: 500; }
+.outcomes { display: flex; flex-wrap: wrap; gap: 6px; }
+.oc {
+  min-height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line-strong);
+  background: var(--surface); font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.oc:hover { border-color: var(--ink); }
+.oc[aria-pressed="true"] { background: var(--tab-on); border-color: var(--tab-on); color: var(--tab-on-ink); }
+.finish .pactions { grid-column: 1 / -1; }
+
+@media (max-width: 860px) {
+  .panel { grid-template-columns: minmax(0, 1fr); }
+  .log { padding-left: 0; border-left: 0; padding-top: 14px; border-top: 1px solid var(--line); }
+}
+@media (max-width: 760px) { .finish { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .pgrid { grid-template-columns: minmax(0, 1fr); } .pgrid > * { grid-column: 1 / -1; } }
+
+/* Import */
+.imp-src { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px 24px; }
+.file { font-size: 14px; max-width: 100%; }
+.imp-wrap { overflow: auto; max-height: 420px; border: 1px solid var(--line); border-radius: 8px; }
+.imp-table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 13.5px; }
+.imp-table th, .imp-table td { padding: 6px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; vertical-align: top; }
+.imp-table thead th { position: sticky; top: 0; z-index: 1; background: var(--sunken); }
+.imp-table select { min-height: 32px; padding: 0 6px; border-radius: 6px; border: 1px solid var(--line-strong); background: var(--surface); font-size: 13px; }
+.imp-table .colname { margin-top: 4px; font: 400 11.5px/1.3 var(--f-mono); color: var(--muted); }
+.imp-table .st { font-size: 12.5px; color: var(--muted); }
+.imp-table tr.st-bestaat .st, .imp-table tr.st-dubbel .st { color: var(--danger); }
+.imp-table tr.st-leeg td { color: var(--faint); }
+.imp-opts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 14px 24px; }
+.imp-sum { margin: 0; }
+.progress { display: grid; gap: 8px; }
+.bar { height: 10px; border-radius: 999px; background: var(--sunken); border: 1px solid var(--line); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--geel); transition: width .2s; }
+@media (max-width: 760px) { .imp-src, .imp-opts { grid-template-columns: minmax(0, 1fr); } }
+
+/* Mail */
+.mail-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 28px; }
+.mail-edit, .mail-out { display: grid; gap: 12px; align-content: start; min-width: 0; }
+textarea.mail-body { min-height: 240px; }
+.phs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+.ph { min-height: 28px; padding: 0 8px; border-radius: 6px; border: 1px dashed var(--line-strong); background: var(--surface); font: 500 12px/1 var(--f-mono); cursor: pointer; }
+.ph:hover { border-color: var(--ink); }
+.tplbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tplbar .input { flex: 1 1 200px; width: auto; min-height: 32px; padding: 4px 10px; font-size: 14px; }
+.preview { display: grid; gap: 8px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--sunken); }
+.preview .lbl { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.pv-subj { font-weight: 600; overflow-wrap: anywhere; }
+.pv-body { white-space: pre-wrap; font-size: 14px; max-height: 280px; overflow: auto; overflow-wrap: anywhere; }
+.steps { display: grid; gap: 14px; }
+.srow { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 6px 12px; align-items: start; }
+.srow p { margin: 2px 0 0; }
+.srow .btns, .srow > .hint { grid-column: 2; }
+.num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--geel); color: var(--geel-ink); font: 700 14px/1 var(--f-display); }
+.pers-head { display: grid; gap: 2px; overflow-wrap: anywhere; }
+.pers-head strong { font: 700 17px/1.25 var(--f-display); font-stretch: 94%; }
+.done-box { display: grid; gap: 10px; padding: 16px; border-radius: 10px; background: var(--geel-soft); }
+.done-box p { margin: 0; }
+@media (max-width: 860px) { .mail-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Selectiebalk */
+.selbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
+  background: var(--band); color: var(--band-ink); border-top: 4px solid var(--geel);
+  padding-top: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+}
+.selbar-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.selbar .count { margin-right: auto; font-weight: 600; }
+.selbar .hint { color: var(--band-muted); }
+
+.empty { display: grid; gap: 10px; justify-items: center; padding: 44px 16px; text-align: center; color: var(--muted); }
+.empty strong { color: var(--ink); font: 700 17px/1.3 var(--f-display); font-stretch: 94%; }
+.empty p { margin: 0; max-width: 52ch; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 20;
+  width: max-content; max-width: min(480px, calc(100% - 32px)); padding: 10px 16px; border-radius: 8px;
+  background: var(--band); color: var(--band-ink); border-left: 4px solid var(--geel); font-size: 14px; box-shadow: var(--shadow);
+  opacity: 0; pointer-events: none; transform: translate(-50%, 8px); transition: opacity .2s, transform .2s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+
+/* Nieuw bedrijf in- en uitklappen */
+.add-title button { all: unset; display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer; }
+.add-title button:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: 4px; }
+.add-title button::after { content: ""; width: 8px; height: 8px; margin-left: auto; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-135deg); transition: transform .15s; }
+.add.collapsed { gap: 0; }
+.add.collapsed > :not(.add-title) { display: none !important; }
+.add.collapsed .add-title button::after { transform: rotate(45deg); }
+
+/* Inloggen */
+.gate { min-height: 100vh; min-height: 100dvh; background: var(--bg); }
+.gate-band { background: var(--band); color: var(--band-ink); border-bottom: 5px solid var(--geel); }
+.gate-band .gutter { padding-block: calc(26px + env(safe-area-inset-top, 0px)) 22px; display: grid; gap: 6px; }
+.gate-main { display: grid; gap: 14px; padding-block: 22px 40px; max-width: 480px; }
+.gate .card .field + .field { margin-top: 2px; }
+
+/* Onderkant */
+.foot { display: grid; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+.foot-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gate-band"><div class="gutter"><p class="eyebrow">Koude Acquisitie</p><h1 id="gateTitle">Koude Acquisitie</h1></div></div>
+  <main class="gutter gate-main">
+    <form class="card" id="loginForm" autocomplete="on" novalidate hidden>
+      <div class="field"><label for="loginEmail">E-mailadres</label><input class="input" id="loginEmail" type="email" autocomplete="username" inputmode="email"></div>
+      <div class="field"><label for="loginPass">Wachtwoord</label><input class="input" id="loginPass" type="password" autocomplete="current-password"></div>
+      <p class="warn" id="loginErr" hidden></p>
+      <div class="pactions"><button type="submit" class="btn primary" id="loginBtn">Inloggen</button><button type="button" class="btn" id="forgotBtn">Wachtwoord vergeten</button></div>
+    </form>
+    <form class="card" id="newPassForm" novalidate hidden>
+      <div class="field"><label for="newPass">Nieuw wachtwoord</label><input class="input" id="newPass" type="password" autocomplete="new-password" minlength="8"></div>
+      <p class="hint">Minimaal 8 tekens.</p>
+      <p class="warn" id="newPassErr" hidden></p>
+      <div class="pactions"><button type="submit" class="btn primary" id="newPassBtn">Wachtwoord opslaan</button></div>
+    </form>
+    <form class="card" id="setupForm" novalidate hidden>
+      <p class="hint">De app is nog niet gekoppeld aan je database. Vul de twee gegevens uit Supabase in: <strong>Project Settings → API</strong>.</p>
+      <div class="field"><label for="setupUrl">Project URL</label><input class="input" id="setupUrl" type="url" placeholder="https://xxxx.supabase.co"></div>
+      <div class="field"><label for="setupKey">anon public key</label><textarea class="input" id="setupKey" rows="4" placeholder="eyJhbGciOi…"></textarea></div>
+      <div class="pactions"><button type="submit" class="btn primary">Opslaan en verder</button></div>
+    </form>
+    <p class="hint" id="gateMsg">Laden…</p>
+  </main>
+</div>
+
+
+<div id="app" hidden>
+<header class="band">
+  <div class="gutter band-inner">
+    <div class="band-text">
+      <p class="eyebrow" id="today">&nbsp;</p>
+      <h1>Koude Acquisitie</h1>
+      <p class="summary" id="summary">Lijst laden…</p>
+    </div>
+    <div class="band-actions">
+      <button type="button" class="btn on-band" id="installBtn" hidden>App installeren</button>
+      <button type="button" class="btn on-band" id="importBtn" hidden>Importeren uit Excel</button>
+    </div>
+  </div>
+</header>
+
+<main class="gutter wrap">
+  <section class="card" id="importPanel" aria-label="Importeren uit Excel" hidden></section>
+  <div class="notice" id="restoreNotice" hidden></div>
+
+  <form class="add" id="addForm" autocomplete="off" novalidate>
+    <h2 class="add-title"><button type="button" id="addToggle" aria-expanded="true">Nieuw bedrijf</button></h2>
+    <div class="field">
+      <label for="addBedrijf">Bedrijfsnaam</label>
+      <input class="input" id="addBedrijf" maxlength="120" placeholder="Bijv. Drukkerij De Vries">
+    </div>
+    <div class="field">
+      <label for="addContact">Contactpersoon<span class="opt">optioneel</span></label>
+      <input class="input" id="addContact" maxlength="120" placeholder="Naam">
+    </div>
+    <div class="field">
+      <label for="addEmail">E-mailadres<span class="opt">optioneel</span></label>
+      <input class="input" id="addEmail" type="email" maxlength="120" placeholder="naam@bedrijf.nl">
+    </div>
+    <div class="field">
+      <label for="addTelefoon">Telefoonnummer<span class="opt">optioneel</span></label>
+      <input class="input" id="addTelefoon" type="tel" maxlength="40" placeholder="Bijv. 06 12345678">
+    </div>
+    <div class="field">
+      <label for="addAdres">Adres<span class="opt">optioneel</span></label>
+      <input class="input" id="addAdres" maxlength="120" placeholder="Straat en huisnummer">
+    </div>
+    <div class="field">
+      <label for="addPlaats">Plaats<span class="opt">optioneel</span></label>
+      <input class="input" id="addPlaats" list="plaatsLijst" maxlength="60" placeholder="Bijv. Zwolle">
+    </div>
+    <div class="field">
+      <label for="addActie">Actie<span class="opt">optioneel</span></label>
+      <input class="input" id="addActie" list="actieLijst" maxlength="40" placeholder="Kies of typ, bijv. Bezoek">
+    </div>
+    <div class="field span-when">
+      <label for="addDatum">Wanneer<span class="opt">optioneel</span></label>
+      <div id="addWhen"></div>
+    </div>
+    <div class="dupwarn" id="dupWarn" hidden></div>
+    <div class="submit">
+      <button type="submit" class="btn primary" id="addBtn">Toevoegen</button>
+    </div>
+  </form>
+  <datalist id="actieLijst"></datalist>
+  <datalist id="plaatsLijst"></datalist>
+
+  <div class="notice" id="roNote" hidden>
+    <p>Je bekijkt deze lijst. Alleen de eigenaar en mensen met bewerkrechten kunnen bedrijven toevoegen of wijzigen.</p>
+  </div>
+
+  <div class="notice" id="exampleNotice" hidden>
+    <p><strong>Dit zijn voorbeelden.</strong> Ze laten zien hoe de lijst werkt. Verwijder ze zodra je je eigen bedrijven gaat invullen.</p>
+    <button type="button" class="btn" id="clearExamples">Voorbeelden verwijderen</button>
+  </div>
+
+  <div class="overview">
+    <div class="tabs" id="tabs" aria-label="Overzicht"></div>
+    <div class="tools">
+      <input class="input search" id="search" type="search" placeholder="Zoek op bedrijf, naam, plaats, e-mail of telefoon" aria-label="Zoeken">
+      <button type="button" class="btn" id="mailBtn" hidden>Mail versturen</button>
+    </div>
+  </div>
+
+  <div class="filters" id="filters" hidden>
+    <div class="chips" id="chips" aria-label="Filter op actie"></div>
+    <p class="hint">Elke actie die je bij een bedrijf invult, komt hier automatisch bij als filter.</p>
+  </div>
+
+  <section class="card" id="mailPanel" aria-label="Mail versturen" hidden></section>
+
+  <section class="list" aria-label="Bedrijven">
+    <div class="list-head cols" aria-hidden="true"><span>Bedrijf</span><span>Plaats</span><span>Telefoon en e-mail</span><span>Actie</span><span></span></div>
+    <div id="rows"><div class="empty"><p>Lijst laden…</p></div></div>
+  </section>
+
+  <footer class="foot">
+    <div class="foot-row">
+      <span class="meta" id="who"></span>
+      <div class="btns">
+        <button type="button" class="btn small" id="exportBtn">Exporteer naar CSV</button>
+        <button type="button" class="btn small" id="backupBtn">Back-up maken</button>
+        <button type="button" class="btn small" id="restoreBtn">Back-up terugzetten</button>
+        <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+        <button type="button" class="btn small" id="logoutBtn">Uitloggen</button>
+      </div>
+    </div>
+    <p class="hint">Met Back-up terugzetten zet je ook je lijst uit de Claude-app over.</p>
+  </footer>
+</main>
+
+<div class="selbar" id="selBar" hidden><div class="gutter selbar-inner" id="selInner"></div></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+
+<script src="config.js"></script>
+<script src="vendor/supabase.js"></script>
+<script>
+(() => {
+  const VIEWS = new Set(['alles', 'acties', 'vandaag', 'archief']);
+  const OUTCOMES = ['Geen gehoor', 'Terugbellen', 'Interesse', 'Geen interesse'];
+  const PLACEHOLDERS = ['{aanhef}', '{voornaam}', '{bedrijf}', '{plaats}'];
+  const MAX_LEADS = 1000;
+  const FREE_MAIL = new Set(['gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.nl', 'outlook.com', 'outlook.nl', 'live.nl', 'live.com', 'msn.com',
+    'icloud.com', 'me.com', 'yahoo.com', 'yahoo.nl', 'ziggo.nl', 'kpnmail.nl', 'kpnplanet.nl', 'planet.nl', 'home.nl', 'xs4all.nl', 'upcmail.nl',
+    'chello.nl', 'casema.nl', 'telfort.nl', 'online.nl', 'hetnet.nl', 'zeelandnet.nl', 'quicknet.nl', 'tele2.nl', 'caiway.nl', 'solcon.nl', 'gmx.com', 'gmx.net']);
+  const IMP_FIELDS = [['', 'Niet importeren'], ['bedrijf', 'Bedrijfsnaam'], ['contact', 'Contactpersoon'], ['email', 'E-mailadres'], ['telefoon', 'Telefoonnummer'],
+    ['adres', 'Adres'], ['huisnummer', 'Huisnummer'], ['postcode', 'Postcode'], ['plaats', 'Plaats'], ['actie', 'Actie'], ['notitie', 'Notitie']];
+  const IMP_HINTS = [
+    ['', /(contactmoment|gearchiveerd|gewijzigd|datum|geen mail|website|kvk|btw)/, true],
+    ['email', /e-?mail|^mail/, false],
+    ['bedrijf', /^(bedrijf|bedrijfsnaam|organisatie|onderneming|firma|handelsnaam|company|klant|naam bedrijf|statutaire naam)/, false],
+    ['telefoon', /^(tel|telefoon|phone|mobiel|gsm)/, false],
+    ['huisnummer', /^(huisnummer|huisnr|nr\.?|toevoeging)$/, true],
+    ['postcode', /^(postcode|zip)/, false],
+    ['adres', /(adres|straat|address)/, false],
+    ['plaats', /(plaats|stad|city|gemeente)/, false],
+    ['contact', /(contact|persoon|aanspreekpunt|voornaam|achternaam|tussenvoegsel|eigenaar|directeur)/, true],
+    ['actie', /^actie$/, false],
+    ['notitie', /(notitie|opmerking|toelichting|omschrijving|notes|memo|branche)/, true],
+  ];
+
+  const $ = id => document.getElementById(id);
+  const rowsEl = $('rows'), tabsEl = $('tabs'), chipsEl = $('chips'), filtersEl = $('filters');
+  const summaryEl = $('summary'), todayEl = $('today'), actieListEl = $('actieLijst'), plaatsListEl = $('plaatsLijst');
+  const addForm = $('addForm'), addBtn = $('addBtn'), addWhenEl = $('addWhen'), dupWarnEl = $('dupWarn');
+  const importBtn = $('importBtn'), exportBtn = $('exportBtn'), importPanel = $('importPanel'), installBtn = $('installBtn');
+  const mailBtn = $('mailBtn'), mailPanel = $('mailPanel'), selBar = $('selBar'), selInner = $('selInner');
+  const exampleNotice = $('exampleNotice'), clearExamplesBtn = $('clearExamples'), roNote = $('roNote');
+  const searchEl = $('search'), toastEl = $('toast');
+
+  const pref = {
+    get(k) { try { return localStorage.getItem('koude-acq.' + k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem('koude-acq.' + k, v); } catch {} },
+  };
+  let groupPrefs = {};
+  try { groupPrefs = JSON.parse(pref.get('groep') || '{}') || {}; } catch { groupPrefs = {}; }
+
+  const state = {
+    leads: [], acties: [], sjablonen: [], loaded: false, problem: null, readOnly: false,
+    view: VIEWS.has(pref.get('view')) ? pref.get('view') : 'alles',
+    actie: pref.get('actie') || '',
+    search: '', open: null, mode: 'edit', selecting: false, selected: new Set(), pendingMail: null,
+  };
+  const drafts = {}, finishes = {};
+  const mail = { open: false, ids: [], mode: 'bcc', tplId: '', onderwerp: '', tekst: '', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false };
+  const imp = { open: false, rows: null, header: true, map: [], include: new Map(), actie: '', datum: '', busy: false, loading: false, done: 0, total: 0, error: '' };
+  let col = null, sjCol = null, actiesDoc = null, appStore = null, actiesChain = Promise.resolve();
+  let armedDelete = null, armedTimer = 0, armedExamples = false, armedExamplesTimer = 0, dupSig = '', dupAcked = false;
+
+  /* ---------- hulpjes ---------- */
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const str = v => typeof v === 'string' ? v : '';
+  const pad = n => String(n).padStart(2, '0');
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const plural = (n, one, many) => n === 1 ? one : many;
+  const key = s => String(s || '').trim().toLocaleLowerCase('nl');
+  const clip = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const byId = id => state.leads.find(l => l.id === id);
+  const nowISO = () => new Date().toISOString();
+  const cmp = (a, b) => a.localeCompare(b, 'nl', { sensitivity: 'base' });
+  const byName = (a, b) => cmp(a.bedrijf, b.bedrijf);
+  const sortNames = list => [...list].sort(cmp);
+  const mailable = l => !!l && !l.geenMail && /\S+@\S+\.\S+/.test(l.email || '');
+
+  const isoOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const todayISO = () => isoOf(new Date());
+  function parseISO(s) { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+  function addDays(iso, n) { const d = parseISO(iso); d.setDate(d.getDate() + n); return isoOf(d); }
+  function nextWorkday(iso) { const d = parseISO(iso); do { d.setDate(d.getDate() + 1); } while (d.getDay() === 0 || d.getDay() === 6); return isoOf(d); }
+  function dayDiff(from, to) {
+    const a = parseISO(from), b = parseISO(to);
+    if (!a || !b) return null;
+    return Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate()) - Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())) / 86400000);
+  }
+  const fmtShort = new Intl.DateTimeFormat('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
+  const fmtYear = new Intl.DateTimeFormat('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+  const fmtLong = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const fmtToday = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+  const fmtWeekday = new Intl.DateTimeFormat('nl-NL', { weekday: 'long' });
+  function shortDate(s) {
+    const d = parseISO(s);
+    if (!d) return '';
+    return (Math.abs(dayDiff(todayISO(), s)) > 150 ? fmtYear : fmtShort).format(d).replace(/\./g, '');
+  }
+  const longDate = s => parseISO(s) ? cap(fmtLong.format(parseISO(s))) : '';
+
+  function withFocus(container, fn) {
+    const ae = document.activeElement;
+    const keepId = ae && ae !== document.body && container.contains(ae) && ae.id ? ae.id : null;
+    let sel = null;
+    if (keepId) { try { if (typeof ae.selectionStart === 'number') sel = [ae.selectionStart, ae.selectionEnd]; } catch {} }
+    fn();
+    if (keepId) {
+      const el = document.getElementById(keepId);
+      if (el) {
+        el.focus({ preventScroll: true });
+        if (sel) { try { el.setSelectionRange(sel[0], sel[1]); } catch {} }
+      }
+    }
+  }
+
+  function quickDates() {
+    const t = todayISO(), nw = nextWorkday(t);
+    return [
+      { iso: t, label: 'Vandaag' },
+      { iso: nw, label: dayDiff(t, nw) === 1 ? 'Morgen' : cap(fmtWeekday.format(parseISO(nw))) },
+      { iso: addDays(t, 7), label: 'Volgende week' },
+    ];
+  }
+  function whenHtml(id, value, extra = '', disabled = false) {
+    return `<div class="when">${quickDates().map(q =>
+      `<button type="button" class="qd" data-qd="${q.iso}" aria-pressed="${value === q.iso}" title="${esc(longDate(q.iso))}"${disabled ? ' disabled' : ''}>${q.label}</button>`).join('')}` +
+      `<input class="input" type="date" id="${id}" value="${esc(value)}" aria-label="Datum"${extra}${disabled ? ' disabled' : ''}></div>`;
+  }
+  function syncWhen(w) {
+    if (!w) return;
+    const v = w.querySelector('input[type="date"]').value;
+    w.querySelectorAll('[data-qd]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.qd === v)));
+  }
+  function renderAddWhen() {
+    const cur = $('addDatum') ? $('addDatum').value : '';
+    addWhenEl.innerHTML = whenHtml('addDatum', cur);
+  }
+
+  const isDue = (l, today) => !l.gearchiveerd && !!l.actie && !!l.datum && l.datum <= today;
+
+  /* Acties: opgeslagen filters plus acties die bij een actief bedrijf staan. */
+  function actionNames() {
+    const seen = new Map();
+    for (const n of [...state.acties, ...state.leads.filter(l => !l.gearchiveerd).map(l => l.actie)]) {
+      if (n && !seen.has(key(n))) seen.set(key(n), n);
+    }
+    return sortNames([...seen.values()]);
+  }
+  function actionCounts() {
+    const c = new Map();
+    state.leads.forEach(l => { if (!l.gearchiveerd && l.actie) c.set(key(l.actie), (c.get(key(l.actie)) || 0) + 1); });
+    return c;
+  }
+  function canonAction(raw) {
+    const t = String(raw || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+    if (!t) return '';
+    return actionNames().find(n => key(n) === key(t)) || cap(t);
+  }
+  function canonPlaats(raw) {
+    const t = String(raw || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+    if (!t) return '';
+    const hit = state.leads.find(l => l.plaats && key(l.plaats) === key(t));
+    return hit ? hit.plaats : cap(t);
+  }
+  const groupByPlaats = name => key(name) in groupPrefs ? !!groupPrefs[key(name)] : /bezoek/i.test(name);
+
+  /* Dubbele bedrijven herkennen op naam, telefoon, e-mail of domein. */
+  const normName = s => key(s).replace(/[.,'’"&()\/\-+]/g, ' ')
+    .replace(/\b(b ?v|v ?o ?f|n ?v|c ?v|holding|en zn|zn|zonen|ltd|gmbh)\b/g, ' ').replace(/\s+/g, ' ').trim();
+  const phoneKey = s => { const d = String(s || '').replace(/\D/g, ''); return d.length >= 9 ? d.slice(-9) : ''; };
+  const domainKey = s => { const m = /@([^@\s]+)$/.exec(key(s)); return m && !FREE_MAIL.has(m[1]) ? m[1] : ''; };
+  const leadKeys = l => ({ n: normName(l.bedrijf), p: phoneKey(l.telefoon), e: /@/.test(l.email || '') ? key(l.email) : '', d: domainKey(l.email) });
+  function buildIndex(list) {
+    const idx = { n: new Map(), p: new Map(), e: new Map(), d: new Map() };
+    list.forEach(l => addToIndex(idx, l));
+    return idx;
+  }
+  function addToIndex(idx, l) {
+    const k = leadKeys(l);
+    for (const f of ['n', 'p', 'e', 'd']) if (k[f] && !idx[f].has(k[f])) idx[f].set(k[f], l);
+  }
+  function lookup(idx, c) {
+    const k = leadKeys(c), hits = new Set();
+    for (const f of ['n', 'p', 'e', 'd']) if (k[f] && idx[f].has(k[f])) hits.add(idx[f].get(k[f]));
+    return [...hits];
+  }
+
+  /* Mailteksten invullen per bedrijf. */
+  function contactParts(contact) {
+    const c = String(contact || '').trim().replace(/\s+/g, ' ');
+    const m = /^(dhr\.?|de heer|heer|mr\.?)\s+(.+)$/i.exec(c);
+    if (m) return { aanhef: `Geachte heer ${m[2]}`, voornaam: '' };
+    const f = /^(mevr\.?|mw\.?|mevrouw)\s+(.+)$/i.exec(c);
+    if (f) return { aanhef: `Geachte mevrouw ${f[2]}`, voornaam: '' };
+    if (!c) return { aanhef: 'Geachte heer, mevrouw', voornaam: '' };
+    const first = c.split(' ')[0];
+    return { aanhef: `Beste ${first}`, voornaam: first };
+  }
+  function fillTemplate(text, l) {
+    return String(text || '').replace(/\{(aanhef|voornaam|contactpersoon|bedrijf|plaats)\}/gi, (m, k) => {
+      k = k.toLowerCase();
+      if (!l) return { aanhef: 'Geachte heer, mevrouw', voornaam: '', contactpersoon: '', bedrijf: 'uw bedrijf', plaats: '' }[k];
+      const p = contactParts(l.contact);
+      return { aanhef: p.aanhef, voornaam: p.voornaam, contactpersoon: l.contact, bedrijf: l.bedrijf, plaats: l.plaats }[k] || '';
+    });
+  }
+  function mailtoUrl(to, bcc = '', subject = '', body = '') {
+    const enc = v => encodeURIComponent(v).replace(/%40/g, '@');
+    const list = v => String(v || '').split(/[;,]\s*/).map(x => x.trim()).filter(Boolean);
+    const q = [];
+    if (list(bcc).length) q.push('bcc=' + list(bcc).map(enc).join(','));
+    if (subject) q.push('subject=' + enc(subject));
+    if (body) q.push('body=' + enc(String(body).replace(/\r?\n/g, '\r\n')));
+    return 'mailto:' + list(to).map(enc).join(',') + (q.length ? '?' + q.join('&') : '');
+  }
+
+  /* Outlook op het web (Microsoft 365): een gewone https-link, die ook werkt waar mailto: wordt tegengehouden. */
+  /* Buiten Claude mogen tel:- en mailto-links gewoon de telefoon- en mail-app openen. */
+  const MAILTO_MAX = 8000;
+  const telHref = v => 'tel:' + String(v || '').replace(/[^\d+]/g, '');
+  const callLink = (l, label = 'Bel', cls = 'call') => String(l.telefoon || '').replace(/\D/g, '').length >= 6
+    ? `<a class="${cls}" href="${esc(telHref(l.telefoon))}" data-act="call" aria-label="Bel ${esc(l.bedrijf)}">${label}</a>` : '';
+
+  /* Google Maps */
+  const placeQuery = l => l.adres ? [l.adres, l.plaats].filter(Boolean).join(', ') : [l.bedrijf, l.plaats].filter(Boolean).join(', ');
+  const mapUrl = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+  function routeLink(items) {
+    const stops = [...items].sort((a, b) => cmp(a.plaats || '~', b.plaats || '~') || cmp(a.adres || '', b.adres || ''))
+      .map(placeQuery).filter(Boolean);
+    if (!stops.length) return '';
+    const use = stops.slice(0, 10), dest = use[use.length - 1], way = use.slice(0, -1);
+    const url = 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(dest) +
+      (way.length ? '&waypoints=' + encodeURIComponent(way.join('|')) : '');
+    const label = stops.length === 1 ? 'Open in Google Maps' : `Route openen (${use.length} stops${stops.length > 10 ? ', max. 10' : ''})`;
+    return `<a class="route" href="${esc(url)}" target="_blank" rel="noopener">${label}</a>`;
+  }
+
+  /* ---------- gegevens ---------- */
+  function normalizeLog(arr) {
+    return Array.isArray(arr) ? arr.filter(x => x && typeof x.a === 'string').map(x => ({ d: str(x.d), a: x.a, u: str(x.u), t: str(x.t) })) : [];
+  }
+  const logBody = log => log.map(x => { const e = { d: x.d, a: x.a }; if (x.u) e.u = x.u; if (x.t) e.t = x.t; return e; });
+  function normalize(snap) {
+    const d = snap.data() || {};
+    return {
+      id: snap.id,
+      bedrijf: str(d.bedrijf), contact: str(d.contact), email: str(d.email).trim(), telefoon: str(d.telefoon),
+      adres: str(d.adres).trim(), plaats: str(d.plaats).trim(),
+      actie: str(d.actie).trim(), datum: parseISO(d.datum) ? str(d.datum).slice(0, 10) : '', notitie: str(d.notitie),
+      geenMail: d.geenMail === true, log: normalizeLog(d.log),
+      gearchiveerd: d.gearchiveerd === true, gearchiveerdOp: parseISO(d.gearchiveerdOp) ? str(d.gearchiveerdOp).slice(0, 10) : '',
+      aangemaakt: str(d.aangemaakt), gewijzigd: str(d.gewijzigd), voorbeeld: d.voorbeeld === true,
+    };
+  }
+  function toBody(l) {
+    const b = {
+      bedrijf: l.bedrijf, contact: l.contact || '', email: l.email || '', telefoon: l.telefoon || '', adres: l.adres || '', plaats: l.plaats || '',
+      actie: l.actie || '', datum: l.datum || '', notitie: l.notitie || '', geenMail: !!l.geenMail,
+      log: logBody(l.log || []), gearchiveerd: !!l.gearchiveerd, gearchiveerdOp: l.gearchiveerdOp || '',
+      aangemaakt: l.aangemaakt, gewijzigd: l.gewijzigd,
+    };
+    if (l.voorbeeld) b.voorbeeld = true;
+    return b;
+  }
+  const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, actie: l.actie, datum: l.datum, notitie: l.notitie, geenMail: l.geenMail });
+
+  let toastTimer = 0;
+  function toast(msg, ms = 3600) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
+  }
+  function copyText(text, label, echo = true) {
+    const tip = '';
+    const ok = () => toast((echo ? `${label} gekopieerd: ${clip(text, 60)}.` : `${label} gekopieerd.`) + tip, tip ? 6000 : 3600);
+    const fail = () => toast(`Kopiëren lukte niet. Selecteer de tekst in het voorbeeld en kopieer die zelf.`);
+    try { navigator.clipboard.writeText(text).then(ok, fail); } catch { fail(); }
+  }
+
+  /* ---------- opslaan ---------- */
+  function setReadOnly(on) {
+    if (state.readOnly === on) return;
+    state.readOnly = on;
+    renderAll();
+  }
+  function writeError(e) {
+    const code = e && e.code;
+    if (code === 'invalid_argument') { setReadOnly(true); toast('Opslaan lukte niet: je kunt deze lijst alleen bekijken.'); }
+    else if (code === 'quota_exceeded') toast('De lijst is vol. Verwijder bedrijven die je niet meer nodig hebt en probeer het opnieuw.');
+    else if (code === 'resource_exhausted') toast('Te veel wijzigingen tegelijk. Wacht een paar seconden en probeer het opnieuw.');
+    else toast('Opslaan lukte niet. Controleer je verbinding en probeer het opnieuw.');
+  }
+  async function write(fn) {
+    if (!col) { toast('De lijst is nog niet geladen. Probeer het zo opnieuw.'); return false; }
+    if (state.readOnly) return false;
+    try { await fn(); return true; }
+    catch (e) {
+      let err = e;
+      if (err && err.code === 'unavailable') {
+        await sleep(400 + Math.random() * 800);
+        try { await fn(); return true; } catch (e2) { err = e2; }
+      }
+      writeError(err);
+      return false;
+    }
+  }
+
+  function saveActionFilters() {
+    actiesChain = actiesChain.then(() => write(() => actiesDoc.set({ namen: state.acties })));
+  }
+  function rememberAction(name) {
+    if (!name || state.acties.some(n => key(n) === key(name))) return;
+    state.acties = sortNames([...state.acties, name]);
+    saveActionFilters();
+  }
+  function removeAction(name) {
+    if ((actionCounts().get(key(name)) || 0) > 0) return;
+    state.acties = state.acties.filter(n => key(n) !== key(name));
+    if (key(state.actie) === key(name)) setActie('');
+    saveActionFilters();
+    renderAll();
+    toast(`Filter ${name} verwijderd.`);
+  }
+
+  function checkAddDupes() {
+    const c = { bedrijf: $('addBedrijf').value, telefoon: $('addTelefoon').value, email: $('addEmail').value };
+    const any = c.bedrijf.trim() || c.telefoon.trim() || c.email.trim();
+    const hits = any ? lookup(buildIndex(state.leads), c).slice(0, 3) : [];
+    const sig = hits.map(h => h.id).join(',');
+    if (sig !== dupSig) { dupSig = sig; dupAcked = false; addBtn.textContent = 'Toevoegen'; }
+    dupWarnEl.hidden = !hits.length;
+    dupWarnEl.innerHTML = hits.length ? `<strong>Lijkt al in je lijst te staan:</strong> ` + hits.map(h =>
+      `<button type="button" class="linkbtn" data-goto="${esc(h.id)}">${esc(h.bedrijf)}</button>` +
+      `<span class="faint">${h.plaats ? ' · ' + esc(h.plaats) : ''}${h.gearchiveerd ? ' · in archief' : ''}${h.log[0] && h.log[0].u ? ' · laatst: ' + esc(h.log[0].u) : ''}</span>`).join('; ') : '';
+    return hits;
+  }
+
+  async function addLead(e) {
+    e.preventDefault();
+    const bedrijf = $('addBedrijf').value.trim();
+    if (!bedrijf) { toast('Vul een bedrijfsnaam in.'); $('addBedrijf').focus(); return; }
+    const actie = canonAction($('addActie').value);
+    const datum = parseISO($('addDatum').value) ? $('addDatum').value : '';
+    if (datum && !actie) { toast('Vul ook een actie in bij de datum, bijvoorbeeld Bellen.'); $('addActie').focus(); return; }
+    const hits = checkAddDupes();
+    if (hits.length && !dupAcked) {
+      dupAcked = true;
+      addBtn.textContent = 'Toch toevoegen';
+      toast('Dit bedrijf lijkt al in je lijst te staan. Klik op Toch toevoegen als het een ander bedrijf is.');
+      return;
+    }
+    if (state.leads.length >= MAX_LEADS) { toast(`De lijst kan maximaal ${MAX_LEADS} bedrijven bevatten. Verwijder eerst bedrijven die je niet meer nodig hebt.`); return; }
+    const now = nowISO();
+    const lead = {
+      bedrijf, contact: $('addContact').value.trim(), email: $('addEmail').value.trim(), telefoon: $('addTelefoon').value.trim(),
+      adres: $('addAdres').value.trim(), plaats: canonPlaats($('addPlaats').value),
+      actie, datum, notitie: '', geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now,
+    };
+    addBtn.disabled = true;
+    const ok = await write(() => col.doc().set(toBody(lead)));
+    addBtn.disabled = false;
+    if (!ok) return;
+    rememberAction(actie);
+    addForm.reset();
+    syncWhen(addWhenEl.querySelector('.when'));
+    dupSig = ''; dupAcked = false; addBtn.textContent = 'Toevoegen'; dupWarnEl.hidden = true;
+    $('addBedrijf').focus();
+    if (!inView(lead)) { setView('alles'); state.search = ''; searchEl.value = ''; }
+    renderAll();
+    toast(`${bedrijf} staat op je lijst${datum ? `, actie ${actie} op ${shortDate(datum)}` : ''}.`);
+  }
+
+  async function saveLead(id) {
+    const l = byId(id), d = drafts[id];
+    if (!l || !d || state.readOnly) return false;
+    const bedrijf = d.bedrijf.trim();
+    if (!bedrijf) { toast('Vul een bedrijfsnaam in.'); $(`p-${id}-bedrijf`)?.focus(); return false; }
+    const actie = canonAction(d.actie);
+    const next = {
+      ...l, bedrijf,
+      contact: d.contact.trim(), email: d.email.trim(), telefoon: d.telefoon.trim(), adres: d.adres.trim(), plaats: canonPlaats(d.plaats),
+      actie, datum: actie && parseISO(d.datum) ? d.datum : '', notitie: d.notitie.trim(), geenMail: !!d.geenMail, gewijzigd: nowISO(),
+    };
+    const ok = await write(() => col.doc(id).set(toBody(next)));
+    if (!ok) return false;
+    rememberAction(actie);
+    closeRow(true);
+    renderAll();
+    toast('Opgeslagen.');
+    return true;
+  }
+
+  function applyOutcome(id, outcome) {
+    const l = byId(id), f = finishes[id];
+    if (!l || !f) return;
+    f.uitkomst = f.uitkomst === outcome ? '' : outcome;
+    if (!f.uitkomst) { f.actie = l.actie; f.datum = ''; f.archief = false; }
+    else if (outcome === 'Geen gehoor') { f.actie = l.actie; f.datum = nextWorkday(todayISO()); f.archief = false; }
+    else if (outcome === 'Terugbellen') { f.actie = canonAction('Bellen'); f.datum = nextWorkday(todayISO()); f.archief = false; }
+    else if (outcome === 'Interesse') { f.actie = ''; f.datum = ''; f.archief = false; }
+    else if (outcome === 'Geen interesse') { f.actie = ''; f.datum = ''; f.archief = true; }
+    renderRows();
+  }
+
+  async function finishLead(id) {
+    const l = byId(id), f = finishes[id];
+    if (!l || !f || state.readOnly) return;
+    const tekst = f.tekst.trim().slice(0, 200);
+    if (!f.uitkomst && !tekst) { toast('Kies een uitkomst of typ zelf wat er gebeurde.'); $(`oc-${id}-0`)?.focus(); return; }
+    const today = todayISO(), archive = !!f.archief;
+    const actie = archive ? '' : canonAction(f.actie);
+    const datum = actie && parseISO(f.datum) ? f.datum : '';
+    const next = {
+      ...l, log: [{ d: today, a: l.actie, u: f.uitkomst, t: tekst }, ...l.log].slice(0, 100), actie, datum,
+      gearchiveerd: archive, gearchiveerdOp: archive ? today : '', gewijzigd: nowISO(),
+    };
+    const ok = await write(() => col.doc(id).set(toBody(next)));
+    if (!ok) return;
+    rememberAction(actie);
+    closeRow(true);
+    renderAll();
+    if (archive) toast(`${l.bedrijf} vastgelegd en naar het archief verplaatst.`);
+    else if (actie) toast(`Vastgelegd. Volgende: ${actie}${datum ? ` op ${shortDate(datum)}` : ' (nog zonder datum)'}.`);
+    else toast('Vastgelegd. Er staat nog geen volgende actie.');
+  }
+
+  async function archiveLead(id, on) {
+    const l = byId(id);
+    if (!l) return;
+    const next = { ...l, gearchiveerd: on, gearchiveerdOp: on ? todayISO() : '', actie: on ? '' : l.actie, datum: on ? '' : l.datum, gewijzigd: nowISO() };
+    const ok = await write(() => col.doc(id).set(toBody(next)));
+    if (!ok) return;
+    closeRow(true);
+    renderAll();
+    toast(on ? `${l.bedrijf} staat nu in het archief.` : `${l.bedrijf} staat weer in je lijst.`);
+  }
+
+  function disarm() { armedDelete = null; clearTimeout(armedTimer); }
+  async function deleteLead(id) {
+    if (armedDelete !== id) {
+      disarm();
+      armedDelete = id;
+      armedTimer = setTimeout(() => { armedDelete = null; renderRows(); }, 4000);
+      renderRows();
+      return;
+    }
+    disarm();
+    const l = byId(id);
+    const ok = await write(() => col.doc(id).delete());
+    if (!ok) { renderRows(); return; }
+    closeRow(true);
+    renderAll();
+    toast(`${l ? l.bedrijf : 'Bedrijf'} is verwijderd.`);
+  }
+
+  async function clearExamples() {
+    if (!armedExamples) {
+      armedExamples = true;
+      clearTimeout(armedExamplesTimer);
+      armedExamplesTimer = setTimeout(() => { armedExamples = false; renderMeta(); }, 4000);
+      renderMeta();
+      return;
+    }
+    armedExamples = false;
+    clearTimeout(armedExamplesTimer);
+    clearExamplesBtn.disabled = true;
+    let failed = false;
+    for (const l of state.leads.filter(x => x.voorbeeld)) {
+      if (!(await write(() => col.doc(l.id).delete()))) { failed = true; break; }
+      if (state.open === l.id) closeRow(true);
+      state.selected.delete(l.id);
+    }
+    clearExamplesBtn.disabled = false;
+    renderAll();
+    if (!failed) toast('Voorbeelden verwijderd. Voeg hierboven je eerste eigen bedrijf toe.');
+  }
+
+  function saveFile(filename, text, type) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }
+  async function exportCsv() {
+    if (!state.leads.length) return;
+    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Actie', 'Datum', 'Notitie', 'Geen mail', 'Contactmomenten', 'Gearchiveerd', 'Laatst gewijzigd'];
+    const cell = v => {
+      let s = String(v ?? '');
+      if (/^[=@]/.test(s) || /^[+\-](?![\d\s(])/.test(s)) s = "'" + s;
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
+    const lines = [head, ...[...state.leads].sort(byName).map(l => [
+      l.bedrijf, l.contact, l.email, l.telefoon, l.adres, l.plaats, l.actie, l.datum, l.notitie, l.geenMail ? 'ja' : '',
+      l.log.map(x => `${x.d} ${x.a}${x.u ? ': ' + x.u : ''}${x.t ? ' (' + x.t + ')' : ''}`).join(' | '),
+      l.gearchiveerd ? `ja (${l.gearchiveerdOp})` : '', l.gewijzigd.slice(0, 10),
+    ])].map(r => r.map(cell).join(';'));
+    saveFile(`koude-acquisitie-${todayISO()}.csv`, '\ufeff' + lines.join('\r\n'), 'text/csv;charset=utf-8');
+    toast('Export opgeslagen in je downloads.');
+  }
+
+  /* ---------- weergave ---------- */
+  function setView(v) { state.view = v; pref.set('view', v); }
+  function setActie(a) { state.actie = a; pref.set('actie', a); }
+
+  function inView(l) {
+    const q = key(state.search);
+    if (q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
+    if (state.view === 'archief') return !!l.gearchiveerd;
+    if (l.gearchiveerd) return false;
+    if (state.view === 'vandaag') return isDue(l, todayISO());
+    if (state.view === 'acties') return !!l.actie && (!state.actie || key(l.actie) === key(state.actie));
+    return true;
+  }
+  const byDate = (a, b) => (a.datum ? 0 : 1) - (b.datum ? 0 : 1) || a.datum.localeCompare(b.datum);
+  const byDateThenName = (a, b) => byDate(a, b) || byName(a, b);
+  const byDatePlaatsName = (a, b) => byDate(a, b) || cmp(a.plaats || '~', b.plaats || '~') || byName(a, b);
+
+  function dueChip(l) {
+    if (!l.datum) return '';
+    const diff = dayDiff(todayISO(), l.datum);
+    if (diff === null) return '';
+    let cls = '', txt = shortDate(l.datum);
+    if (diff === -1) { cls = 'late'; txt = 'Gisteren'; }
+    else if (diff < 0) { cls = 'late'; txt = `${-diff} dagen te laat`; }
+    else if (diff === 0) { cls = 'today'; txt = 'Vandaag'; }
+    else if (diff === 1) txt = 'Morgen';
+    return `<span class="due ${cls}" title="${esc(longDate(l.datum))}">${esc(txt)}</span>`;
+  }
+
+  function lastInfo(l) {
+    const x = l.log[0];
+    if (!x) return '';
+    let streak = 0;
+    for (const e of l.log) { if (e.u === 'Geen gehoor') streak++; else break; }
+    const what = x.a === 'Mail' ? 'Mail verstuurd' : (x.u || clip(x.t, 50) || x.a);
+    return `Laatst: ${what}${streak >= 2 ? ` (${streak}×)` : ''} · ${shortDate(x.d)}`;
+  }
+
+  function logHtml(l) {
+    if (!l.log.length) return '<p class="none">Nog niets vastgelegd.</p>';
+    return `<ol>${l.log.map(x => `<li><time>${esc(shortDate(x.d) || x.d)}</time>` +
+      `<span><strong>${esc(x.a || 'Contact')}</strong>${x.u ? ` · ${esc(x.u)}` : ''}</span>` +
+      `${x.t ? `<span class="t">${esc(x.t)}</span>` : ''}</li>`).join('')}</ol>`;
+  }
+
+  function editHtml(l) {
+    const d = drafts[l.id] || (drafts[l.id] = draftFrom(l));
+    const id = esc(l.id), ro = state.readOnly ? ' readonly' : '';
+    const input = (k, label, span, type = 'text', max = 120, extra = '') =>
+      `<div class="field ${span}"><label for="p-${id}-${k}">${label}</label>` +
+      `<input class="input" id="p-${id}-${k}" data-field="${k}" type="${type}" maxlength="${max}" value="${esc(d[k])}"${extra}${ro}></div>`;
+    const archiveBtn = l.gearchiveerd
+      ? `<button type="button" class="btn" id="arch-${id}" data-act="restore">Terugzetten in lijst</button>`
+      : `<button type="button" class="btn" id="arch-${id}" data-act="archive">Archiveren</button>`;
+    const mailB = mailable(l) ? `<button type="button" class="btn" id="mail-${id}" data-act="mail">Mail opstellen</button>` : '';
+    const actions = state.readOnly ? '' : `
+      <div class="pactions">
+        <button type="button" class="btn primary" id="save-${id}" data-act="save">Opslaan</button>
+        ${mailB}
+        ${archiveBtn}
+        <button type="button" class="btn danger push${armedDelete === l.id ? ' armed' : ''}" id="del-${id}" data-act="delete">${armedDelete === l.id ? 'Klik nogmaals om te verwijderen' : 'Verwijderen'}</button>
+      </div>`;
+    const q = placeQuery(l);
+    const maps = q ? `<p class="hint"><a class="inline-link" href="${esc(mapUrl(q))}" target="_blank" rel="noopener">Open ${l.adres ? 'adres' : 'bedrijf'} in Google Maps</a></p>` : '';
+    const added = l.aangemaakt ? `<p class="meta">Toegevoegd op ${esc(shortDate(l.aangemaakt.slice(0, 10)))}</p>` : '';
+    const archived = l.gearchiveerd && l.gearchiveerdOp ? `<p class="meta">Gearchiveerd op ${esc(shortDate(l.gearchiveerdOp))}</p>` : '';
+    return `<div class="panel">
+      <div class="pform">
+        <div class="pgrid">
+          ${input('bedrijf', 'Bedrijfsnaam', 'span2')}
+          ${input('contact', 'Contactpersoon', 'span2')}
+          ${input('email', 'E-mailadres', 'span2', 'email')}
+          ${input('telefoon', 'Telefoonnummer', 'span2', 'tel', 40)}
+          ${input('adres', 'Adres', 'span2', 'text', 120, ' placeholder="Straat en huisnummer"')}
+          ${input('plaats', 'Plaats', 'span2', 'text', 60, ' list="plaatsLijst"')}
+          ${input('actie', 'Actie', 'span2', 'text', 40, ' list="actieLijst" placeholder="Kies of typ, bijv. Bezoek"')}
+          <div class="field span2"><label for="p-${id}-datum">Wanneer</label>${whenHtml(`p-${id}-datum`, d.datum, ` data-field="datum"${ro}`, state.readOnly)}</div>
+          <div class="field span4"><label for="p-${id}-notitie">Notitie</label>
+            <textarea class="input" id="p-${id}-notitie" data-field="notitie" maxlength="2000" placeholder="Wat weet je over dit bedrijf?"${ro}>${esc(d.notitie)}</textarea></div>
+          <label class="check span4" for="p-${id}-geenMail"><input type="checkbox" id="p-${id}-geenMail" data-field="geenMail"${d.geenMail ? ' checked' : ''}${state.readOnly ? ' disabled' : ''}>Wil geen mail ontvangen (wordt overgeslagen bij mailen)</label>
+        </div>
+        ${maps}
+        ${actions}
+      </div>
+      <aside class="log" aria-label="Contactmomenten">
+        <h3>Contactmomenten</h3>
+        ${logHtml(l)}
+        ${added}${archived}
+      </aside>
+    </div>`;
+  }
+
+  function finishHtml(l) {
+    const f = finishes[l.id] || (finishes[l.id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', archief: false });
+    const id = esc(l.id), dis = f.archief;
+    return `<div class="finish">
+      <section class="step" aria-label="Uitkomst">
+        <h3>Hoe ging het? <span class="faint">${esc(l.actie)}</span></h3>
+        ${l.telefoon ? `<div class="callbox"><span class="pick" role="button" tabindex="0" id="cb-${id}" data-act="copy" data-copy="${esc(l.telefoon)}" data-label="Telefoonnummer">${esc(l.telefoon)}</span>${callLink(l, `Bel ${esc(l.telefoon)}`, 'call big')}</div>` : ''}
+        <div class="outcomes">${OUTCOMES.map((o, i) =>
+          `<button type="button" class="oc" id="oc-${id}-${i}" data-act="outcome" data-outcome="${o}" aria-pressed="${f.uitkomst === o}">${o}</button>`).join('')}</div>
+        <div class="field">
+          <label for="f-${id}-tekst">Eigen uitkomst of toelichting<span class="opt">optioneel</span></label>
+          <input class="input" id="f-${id}-tekst" data-ffield="tekst" maxlength="200" value="${esc(f.tekst)}" placeholder="Bijv. sprak met de receptie, mailadres gekregen">
+        </div>
+      </section>
+      <section class="step" aria-label="Volgende stap">
+        <h3>Volgende stap</h3>
+        <div class="field">
+          <label for="f-${id}-actie">Actie</label>
+          <input class="input" id="f-${id}-actie" data-ffield="actie" list="actieLijst" maxlength="40" value="${esc(dis ? '' : f.actie)}" placeholder="Kies of typ, bijv. Bezoek"${dis ? ' disabled' : ''}>
+        </div>
+        <div class="field">
+          <label for="f-${id}-datum">Wanneer</label>
+          ${whenHtml(`f-${id}-datum`, dis ? '' : f.datum, ' data-ffield="datum"', dis)}
+          <p class="hint">Met een datum staat de actie die dag bovenaan, onder <strong>Vandaag</strong>.</p>
+        </div>
+        <label class="check" for="f-${id}-archief"><input type="checkbox" id="f-${id}-archief" data-ffield="archief"${f.archief ? ' checked' : ''}>Archiveren, geen vervolg</label>
+      </section>
+      <div class="pactions">
+        <button type="button" class="btn primary" id="fin-${id}" data-act="finish">Vastleggen</button>
+        <button type="button" class="btn" id="can-${id}" data-act="cancel">Annuleren</button>
+      </div>
+    </div>`;
+  }
+
+  function rowHtml(l) {
+    const open = state.open === l.id && !state.selecting, id = esc(l.id);
+    const finishing = open && state.mode === 'finish';
+    const pick = (val, label, mono) => `<span class="pick${mono ? ' mono' : ''}" role="button" tabindex="0" data-act="copy" data-copy="${esc(val)}" data-label="${label}" title="Klik om te kopiëren">${esc(val)}</span>`;
+    const contactCell = (l.telefoon || l.email)
+      ? `<div class="cell contactinfo">${l.telefoon ? `<span class="telline">${pick(l.telefoon, 'Telefoonnummer', true)}${callLink(l)}</span>` : ''}${l.email ? pick(l.email, 'E-mailadres', false) : ''}${l.geenMail ? '<span class="meta">Wil geen mail</span>' : ''}</div>`
+      : `<div class="cell contactinfo none"><span class="faint">–</span></div>`;
+    const plaatsCell = (l.plaats || l.adres)
+      ? `<div class="cell plaats">${l.plaats ? `<span>${esc(l.plaats)}</span>` : ''}${l.adres ? `<span class="meta">${esc(l.adres)}</span>` : ''}</div>`
+      : `<div class="cell plaats none"><span class="faint">–</span></div>`;
+    let actie;
+    if (l.gearchiveerd) actie = `<span class="faint">Gearchiveerd${l.gearchiveerdOp ? ' ' + esc(shortDate(l.gearchiveerdOp)) : ''}</span>`;
+    else if (l.actie) actie = `<button type="button" class="atag" data-act="filter" data-actie="${esc(l.actie)}" title="Toon alle bedrijven met actie ${esc(l.actie)}">${esc(l.actie)}</button>${dueChip(l)}`;
+    else actie = `<span class="faint">Geen actie</span>`;
+    const canMail = mailable(l);
+    const check = state.selecting
+      ? `<input type="checkbox" class="sel" id="sel-${id}" data-act="select"${state.selected.has(l.id) ? ' checked' : ''}${canMail ? '' : ' disabled'} aria-label="Selecteer ${esc(l.bedrijf)}" title="${canMail ? 'Selecteer voor mail' : l.geenMail ? 'Wil geen mail ontvangen' : 'Geen e-mailadres'}">`
+      : '';
+    const canFinish = !state.readOnly && !state.selecting && !l.gearchiveerd && l.actie;
+    const info = lastInfo(l);
+    return `<article class="row${open ? ' open' : ''}${state.selecting && !canMail ? ' nomail' : ''}" data-id="${id}">
+      <div class="row-main cols" data-act="toggle">
+        <div class="cell first">${check}
+          <button type="button" class="bedrijf" id="t-${id}" data-act="toggle" aria-expanded="${open && !finishing}">
+            <span class="name">${esc(l.bedrijf)}${l.voorbeeld ? '<span class="tag">Voorbeeld</span>' : ''}</span>
+            ${l.contact ? `<span class="sub">${esc(l.contact)}</span>` : ''}
+            ${info ? `<span class="meta">${esc(info)}</span>` : ''}
+          </button>
+        </div>
+        ${plaatsCell}
+        ${contactCell}
+        <div class="cell actie">${actie}</div>
+        <div class="cell acts">
+          ${canMail && !state.selecting ? `<a class="btn small" id="qm-${id}" href="${esc(mailtoUrl(l.email))}" data-act="qmail">Mail</a>` : ''}
+          ${canFinish ? `<button type="button" class="btn small" id="af-${id}" data-act="afronden" aria-expanded="${finishing}">Afronden</button>` : ''}
+          ${state.selecting ? '' : '<button type="button" class="more" data-act="toggle" tabindex="-1" aria-hidden="true"><span class="chev"></span></button>'}
+        </div>
+      </div>
+      ${open ? (finishing ? finishHtml(l) : editHtml(l)) : ''}
+    </article>`;
+  }
+
+  const emptyHtml = (title, text, extra = '') => `<div class="empty"><strong>${esc(title)}</strong><p>${esc(text)}</p>${extra}</div>`;
+  const groupHead = (label, n, extra = '', quiet = false) => `<div class="group-head${quiet ? ' quiet' : ''}"><span>${esc(label)}</span><span class="n">${n}</span>${extra}</div>`;
+  function grouped(list, keyOf, labelOf, order, sorter, extraOf) {
+    const groups = new Map();
+    list.forEach(l => { const k = keyOf(l); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(l); });
+    return [...groups.keys()].sort(order).map(k => {
+      const items = groups.get(k).sort(sorter);
+      return groupHead(labelOf(k, items), items.length, extraOf ? extraOf(k, items) : '') + items.map(rowHtml).join('');
+    }).join('');
+  }
+
+  function listHtml() {
+    if (state.problem) return emptyHtml(state.problem.title, state.problem.text);
+    if (!state.loaded) return `<div class="empty"><p>Lijst laden…</p></div>`;
+    if (!state.leads.length) return emptyHtml('Nog geen bedrijven op je lijst',
+      state.readOnly ? 'Zodra er bedrijven zijn toegevoegd, zie je ze hier.' : 'Vul hierboven een bedrijfsnaam in en klik op Toevoegen, of importeer een lijst uit Excel.');
+    const list = state.leads.filter(inView);
+    const today = todayISO();
+    const resetBtn = '<button type="button" class="btn" data-act="reset">Toon alle bedrijven</button>';
+    if (!list.length && state.search.trim()) return emptyHtml('Geen bedrijven gevonden', 'Niets past bij je zoekterm.', resetBtn);
+
+    if (state.view === 'alles') {
+      if (!list.length) return emptyHtml('Alle bedrijven staan in het archief', 'Voeg hierboven een nieuw bedrijf toe of zet er een terug vanuit het archief.');
+      const due = list.filter(l => isDue(l, today)).sort(byDatePlaatsName);
+      const rest = list.filter(l => !isDue(l, today)).sort(byName);
+      if (!due.length) return rest.map(rowHtml).join('');
+      return groupHead('Vandaag te doen', due.length) + due.map(rowHtml).join('') +
+        (rest.length ? groupHead('Overige bedrijven', rest.length, '', true) + rest.map(rowHtml).join('') : '');
+    }
+
+    if (state.view === 'vandaag') {
+      if (!list.length) return emptyHtml('Niets meer te doen vandaag', 'Er staan geen acties voor vandaag of eerder. Plan nieuwe acties met een datum, dan verschijnen ze hier op die dag.');
+      return grouped(list, l => key(l.actie), (k, items) => items[0].actie, cmp, byDatePlaatsName,
+        (k, items) => /bezoek/i.test(items[0].actie) ? routeLink(items) : '');
+    }
+
+    if (state.view === 'archief') {
+      if (!list.length) return emptyHtml('Het archief is leeg', 'Bedrijven die je archiveert, bijvoorbeeld na Geen interesse, vind je hier terug.');
+      return list.sort((a, b) => b.gearchiveerdOp.localeCompare(a.gearchiveerdOp) || byName(a, b)).map(rowHtml).join('');
+    }
+
+    if (!list.length) {
+      if (state.actie) return emptyHtml(`Geen bedrijven met actie ${state.actie}`, 'Geef een bedrijf deze actie, dan verschijnt het hier.', '<button type="button" class="btn" data-act="allacties">Toon alle acties</button>');
+      return emptyHtml('Nog geen acties', 'Geef een bedrijf een actie, bijvoorbeeld Bezoek. Die actie komt dan automatisch als filter boven de lijst.');
+    }
+    if (!state.actie) return grouped(list, l => key(l.actie), (k, items) => items[0].actie, cmp, byDateThenName);
+    if (groupByPlaats(state.actie)) {
+      return grouped(list, l => key(l.plaats), (k, items) => items[0].plaats || 'Plaats onbekend',
+        (a, b) => (a ? 0 : 1) - (b ? 0 : 1) || cmp(a, b), byDateThenName,
+        (k, items) => /bezoek/i.test(state.actie) ? routeLink(items) : '');
+    }
+    return list.sort(byDateThenName).map(rowHtml).join('');
+  }
+
+  function renderRows() {
+    if (state.open && !byId(state.open)) closeRow(true);
+    withFocus(rowsEl, () => { rowsEl.innerHTML = listHtml(); });
+  }
+
+  function renderMeta() {
+    todayEl.textContent = cap(fmtToday.format(new Date()));
+    const today = todayISO();
+    const active = state.leads.filter(l => !l.gearchiveerd);
+    const n = active.length, archived = state.leads.length - n;
+    const withAction = active.filter(l => l.actie).length;
+    const due = active.filter(l => isDue(l, today)).length;
+    const late = active.filter(l => isDue(l, today) && l.datum < today).length;
+    if (state.problem) summaryEl.textContent = '';
+    else if (!state.loaded) summaryEl.textContent = 'Lijst laden…';
+    else if (!state.leads.length) summaryEl.textContent = 'Nog geen bedrijven op je lijst.';
+    else summaryEl.innerHTML = `<strong>${n}</strong> ${plural(n, 'bedrijf', 'bedrijven')} · <strong>${due}</strong> vandaag te doen${late ? ` · <strong>${late}</strong> te laat` : ''}`;
+
+    const names = actionNames(), counts = actionCounts();
+    if (state.loaded && state.actie && !names.some(x => key(x) === key(state.actie))) setActie('');
+
+    const tab = (v, label, count, hot) =>
+      `<button type="button" class="tab" data-view="${v}" aria-pressed="${state.view === v}">${label} <span class="n${hot && count ? ' hot' : ''}">${count}</span></button>`;
+    tabsEl.innerHTML = tab('alles', 'Alles', n) + tab('acties', 'Acties', withAction) + tab('vandaag', 'Vandaag', due, true) + tab('archief', 'Archief', archived);
+
+    filtersEl.hidden = state.view !== 'acties' || !!state.problem;
+    let chips = `<button type="button" class="chip" data-actie="" aria-pressed="${!state.actie}">Alle acties <span class="n">${withAction}</span></button>` +
+      names.map(name => {
+        const c = counts.get(key(name)) || 0;
+        const chip = `<button type="button" class="chip" data-actie="${esc(name)}" aria-pressed="${key(state.actie) === key(name)}">${esc(name)} <span class="n">${c}</span></button>`;
+        return c === 0 && !state.readOnly
+          ? `<span class="chip-group">${chip}<button type="button" class="chip-x" data-remove="${esc(name)}" aria-label="Filter ${esc(name)} verwijderen" title="Filter verwijderen">×</button></span>`
+          : chip;
+      }).join('');
+    if (state.actie) chips += `<span class="sep" aria-hidden="true"></span><button type="button" class="chip toggle" data-groep aria-pressed="${groupByPlaats(state.actie)}">Per plaats</button>`;
+    chipsEl.innerHTML = chips;
+
+    actieListEl.innerHTML = names.map(x => `<option value="${esc(x)}"></option>`).join('');
+    const plaatsen = new Map();
+    state.leads.forEach(l => { if (l.plaats && !plaatsen.has(key(l.plaats))) plaatsen.set(key(l.plaats), l.plaats); });
+    plaatsListEl.innerHTML = sortNames([...plaatsen.values()]).map(x => `<option value="${esc(x)}"></option>`).join('');
+
+    const ready = !!col && !state.problem && !state.readOnly;
+    exampleNotice.hidden = state.readOnly || !state.leads.some(l => l.voorbeeld);
+    clearExamplesBtn.textContent = armedExamples ? 'Klik nogmaals om ze te verwijderen' : 'Voorbeelden verwijderen';
+    exportBtn.disabled = !state.leads.length;
+    $('backupBtn').disabled = !state.leads.length;
+    importBtn.hidden = !ready || !state.loaded;
+    importBtn.setAttribute('aria-expanded', String(imp.open));
+    mailBtn.hidden = !ready || !state.leads.some(mailable);
+    mailBtn.setAttribute('aria-pressed', String(state.selecting));
+    mailBtn.textContent = state.selecting ? 'Stop met selecteren' : 'Mail versturen';
+    addForm.hidden = state.readOnly || !!state.problem;
+    roNote.hidden = !state.readOnly;
+    if ($('addBedrijf').value || $('addTelefoon').value || $('addEmail').value) checkAddDupes();
+  }
+
+  function selectedRecipients() { return [...state.selected].map(byId).filter(mailable); }
+  function renderSelBar() {
+    const show = state.selecting || !!state.pendingMail;
+    document.body.classList.toggle('selecting', show);
+    selBar.hidden = !show;
+    if (!show) { selInner.innerHTML = ''; return; }
+    if (!state.selecting) {
+      const ids = state.pendingMail.ids, one = ids.length === 1 ? byId(ids[0]) : null;
+      withFocus(selInner, () => {
+        selInner.innerHTML = `
+          <span class="count">Mail ${one ? 'aan ' + esc(one.bedrijf) : `aan ${ids.length} bedrijven`} verstuurd?</span>
+          <button type="button" class="btn primary" id="pmYes" data-s="pm-yes">Ja, vastleggen</button>
+          <button type="button" class="btn on-band" id="pmNo" data-s="pm-no">Nee</button>`;
+      });
+      return;
+    }
+    const visible = state.leads.filter(inView).filter(mailable);
+    const allOn = visible.length > 0 && visible.every(l => state.selected.has(l.id));
+    const recips = selectedRecipients(), n = recips.length;
+    const bcc = recips.map(l => l.email).join(',');
+    const full = mailtoUrl('', bcc);
+    const url = full.length < MAILTO_MAX ? full : 'mailto:';
+    withFocus(selInner, () => {
+      selInner.innerHTML = `
+        <span class="count">${n} ${plural(n, 'bedrijf', 'bedrijven')} geselecteerd</span>
+        <button type="button" class="btn on-band" id="selAll" data-s="${allOn ? 'none' : 'all'}"${visible.length ? '' : ' disabled'}>${allOn ? 'Niets selecteren' : `Alles selecteren (${visible.length})`}</button>
+        <a class="btn primary${n ? '' : ' disabled'}" id="selOutlook" href="${n ? esc(url) : '#'}" data-s="outlook" aria-disabled="${!n}">Nieuwe mail</a>
+        <button type="button" class="btn on-band" id="selGo" data-s="go"${n ? '' : ' disabled'}>Met mailtekst</button>
+        <button type="button" class="btn on-band" id="selCancel" data-s="cancel">Annuleren</button>`;
+    });
+  }
+
+  function renderAll() { renderMeta(); renderRows(); renderSelBar(); if (mail.open) renderMailOut(); }
+  let renderQueued = false;
+  function scheduleRender() {
+    if (renderQueued) return;
+    renderQueued = true;
+    requestAnimationFrame(() => { renderQueued = false; renderAll(); });
+  }
+
+  function closeRow(silent) {
+    if (state.open) { delete drafts[state.open]; delete finishes[state.open]; }
+    state.open = null;
+    disarm();
+    if (!silent) renderRows();
+  }
+  function openRow(id, mode) {
+    if (state.open === id && (mode === 'toggle' || state.mode === mode)) { closeRow(); return; }
+    closeRow(true);
+    const l = byId(id);
+    if (!l) { renderRows(); return; }
+    state.open = id;
+    state.mode = mode === 'finish' ? 'finish' : 'edit';
+    if (state.mode === 'edit') drafts[id] = draftFrom(l);
+    else finishes[id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', archief: false };
+    renderRows();
+  }
+  function gotoLead(id) {
+    const l = byId(id);
+    if (!l) return;
+    state.selecting = false;
+    setView(l.gearchiveerd ? 'archief' : 'alles');
+    state.search = ''; searchEl.value = '';
+    closeRow(true);
+    state.open = id; state.mode = 'edit'; drafts[id] = draftFrom(l);
+    renderAll();
+    document.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+
+  /* ---------- selecteren en mailen ---------- */
+  function setSelecting(on) {
+    state.selecting = on;
+    if (!on) state.selected.clear();
+    else closeRow(true);
+    renderAll();
+  }
+  function toggleSelect(id, on) {
+    if (on) state.selected.add(id); else state.selected.delete(id);
+    renderSelBar();
+  }
+
+  const mailRecipients = () => mail.ids.map(byId).filter(mailable);
+  function applyTemplate(id) {
+    const t = state.sjablonen.find(x => x.id === id);
+    if (!t) return;
+    mail.tplId = id; mail.onderwerp = t.onderwerp; mail.tekst = t.tekst;
+  }
+  function openMail(ids) {
+    const list = ids.filter(id => mailable(byId(id)));
+    if (!list.length) { toast('Geen bedrijven met een e-mailadres geselecteerd.'); return; }
+    list.sort((a, b) => byName(byId(a), byId(b)));
+    Object.assign(mail, { open: true, ids: list, mode: list.length === 1 ? 'pers' : 'bcc', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false });
+    if (!mail.onderwerp && !mail.tekst && state.sjablonen.length) applyTemplate(state.sjablonen[0].id);
+    state.selecting = false; state.selected.clear();
+    closeRow(true);
+    renderAll();
+    renderMail();
+    mailPanel.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+  function closeMail() { mail.open = false; renderMail(); }
+
+  function previewHtml(subj, body) {
+    return `<div class="preview"><span class="lbl">Voorbeeld</span><div class="pv-subj">${subj ? esc(subj) : '<span class="faint">Geen onderwerp</span>'}</div><div class="pv-body">${body ? esc(body) : '<span class="faint">Nog geen tekst</span>'}</div></div>`;
+  }
+
+  function mailOutHtml() {
+    const recips = mailRecipients(), n = recips.length;
+    const legal = '<p class="hint">Let op: voor ongevraagde reclamemail gelden in Nederland regels, ook richting bedrijven. Bedrijven met "Wil geen mail ontvangen" worden overgeslagen.</p>';
+    const tabs = n > 1 ? `<div class="tabs" aria-label="Manier van versturen"><button type="button" class="tab" id="mModeBcc" data-m="mode-bcc" aria-pressed="${mail.mode === 'bcc'}">Eén mail aan iedereen</button><button type="button" class="tab" id="mModePers" data-m="mode-pers" aria-pressed="${mail.mode === 'pers'}">Persoonlijk per bedrijf</button></div>` : '';
+    if (!n) return '<p class="hint">Er zijn geen ontvangers meer over.</p>';
+    if (mail.mode === 'bcc' && n > 1) {
+      const subj = fillTemplate(mail.onderwerp, null), body = fillTemplate(mail.tekst, null);
+      const personal = /\{(voornaam|contactpersoon|bedrijf|plaats)\}/i.test(mail.onderwerp + mail.tekst);
+      const bcc = recips.map(l => l.email).join(',');
+      const owa = mailtoUrl('', bcc, subj, body);
+      const fits = owa.length < MAILTO_MAX;
+      const copyBtns = `<button type="button" class="btn small" id="mCopyAddrs" data-m="copy-addrs">Kopieer ${n} adressen</button><button type="button" class="btn small" id="mCopySubj" data-m="copy-subj">Kopieer onderwerp</button><button type="button" class="btn small" id="mCopyBody" data-m="copy-body">Kopieer tekst</button>`;
+      return `${tabs}
+        ${personal ? '<p class="warn">In één mail aan iedereen worden {voornaam}, {bedrijf} en {plaats} niet per bedrijf ingevuld. Kies <strong>Persoonlijk per bedrijf</strong> als je dat wel wilt.</p>' : ''}
+        <div class="steps">
+          <div class="srow"><span class="num">1</span>
+            ${fits ? `<div><strong>Open de nieuwe mail</strong><p class="hint">De ${n} adressen staan in <strong>BCC</strong>, zodat niemand de andere adressen ziet. Onderwerp en tekst zijn ingevuld.</p></div>
+            <div class="btns"><a class="btn dark" href="${esc(owa)}" data-handoff="mail">Open nieuwe mail</a></div>
+            <p class="hint">Opent je mail-app niet? Kopieer dan alles en plak het in een nieuwe mail, de adressen bij BCC:</p>
+            <div class="btns">${copyBtns}</div>`
+            : `<div><strong>Kopieer adressen, onderwerp en tekst</strong><p class="hint">Het zijn te veel adressen om in één keer te openen. Plak ze in een nieuwe mail in Outlook, de adressen bij <strong>BCC</strong>.</p></div>
+            <div class="btns">${copyBtns}</div>`}
+          </div>
+          <div class="srow"><span class="num">2</span><div><strong>Verstuur de mail</strong><p class="hint">Klik daarna op Vastleggen. De mail komt dan bij elk bedrijf in de contactmomenten.</p></div>
+            <div class="btns"><button type="button" class="btn primary" id="mLogAll" data-m="log-all"${mail.busy ? ' disabled' : ''}>${mail.busy ? 'Bezig met vastleggen…' : 'Vastleggen als verstuurd'}</button></div></div>
+        </div>
+        ${previewHtml(subj, body)}
+        ${legal}`;
+    }
+    if (mail.index >= n) {
+      return `${tabs}<div class="done-box"><strong>Klaar</strong><p>${mail.done.size} ${plural(mail.done.size, 'mail', 'mails')} vastgelegd${mail.skipped.size ? `, ${mail.skipped.size} overgeslagen` : ''}.</p>
+        <div class="btns"><button type="button" class="btn" id="mRestart" data-m="restart">Terug naar het begin</button><button type="button" class="btn primary" id="mDone" data-m="close">Sluiten</button></div></div>`;
+    }
+    const l = recips[mail.index];
+    const subj = fillTemplate(mail.onderwerp, l), body = fillTemplate(mail.tekst, l);
+    const owa = mailtoUrl(l.email, '', subj, body);
+    return `${tabs}
+      <div class="pers-head"><span class="meta">${n > 1 ? `${mail.index + 1} van ${n}` : 'Eén bedrijf'}${mail.done.has(l.id) ? ' · al vastgelegd' : ''}</span><strong>${esc(l.bedrijf)}</strong><span>${l.contact ? esc(l.contact) + ' · ' : ''}<span class="pick">${esc(l.email)}</span></span></div>
+      <div class="btns">
+        <a class="btn dark" href="${esc(owa)}" data-handoff="mail">Open nieuwe mail</a>
+      </div>
+      <div class="btns">
+        <button type="button" class="btn small" id="mCopyTo" data-m="copy-to">Kopieer adres</button>
+        <button type="button" class="btn small" id="mCopySubj" data-m="copy-subj">Kopieer onderwerp</button>
+        <button type="button" class="btn small" id="mCopyBody" data-m="copy-body">Kopieer tekst</button>
+      </div>
+      ${previewHtml(subj, body)}
+      <div class="btns">
+        <button type="button" class="btn primary" id="mSent" data-m="sent"${mail.busy ? ' disabled' : ''}>${n > 1 ? 'Verstuurd, volgende' : 'Vastleggen als verstuurd'}</button>
+        ${n > 1 ? '<button type="button" class="btn" id="mSkip" data-m="skip">Overslaan</button>' : ''}
+        ${mail.index > 0 ? '<button type="button" class="btn" id="mPrev" data-m="prev">Vorige</button>' : ''}
+      </div>
+      <p class="hint">Tik op Open nieuwe mail: de mail staat klaar met adres, onderwerp en tekst. Opent je mail-app niet, kopieer dan adres, onderwerp en tekst naar een nieuwe mail. Klik na het versturen op ${n > 1 ? 'Verstuurd' : 'Vastleggen'}, dan komt de mail in de contactmomenten.</p>
+      ${legal}`;
+  }
+
+  function mailHtml() {
+    const recips = mailRecipients(), n = recips.length;
+    const names = recips.slice(0, 6).map(l => l.bedrijf).join(', ') + (n > 6 ? ` en nog ${n - 6}` : '');
+    const opts = state.sjablonen.map(t => `<option value="${esc(t.id)}"${t.id === mail.tplId ? ' selected' : ''}>${esc(t.naam)}</option>`).join('') +
+      `<option value=""${mail.tplId ? '' : ' selected'}>Eigen tekst</option>`;
+    const tplBar = state.readOnly ? '' : (mail.newName !== null
+      ? `<input class="input" id="mNewName" maxlength="60" placeholder="Naam, bijv. Kennismaking" value="${esc(mail.newName)}" aria-label="Naam van de nieuwe mailtekst">` +
+        '<button type="button" class="btn small primary" id="mCreate" data-m="tpl-create">Bewaar</button><button type="button" class="btn small" id="mNewCancel" data-m="tpl-cancel">Annuleren</button>'
+      : `${mail.tplId ? '<button type="button" class="btn small" id="mSave" data-m="tpl-save">Wijzigingen opslaan</button>' : ''}` +
+        '<button type="button" class="btn small" id="mNew" data-m="tpl-new">Opslaan als nieuwe mailtekst</button>' +
+        `${mail.tplId ? `<button type="button" class="btn small danger${mail.armedDel ? ' armed' : ''}" id="mDel" data-m="tpl-del">${mail.armedDel ? 'Klik nogmaals om te verwijderen' : 'Verwijderen'}</button>` : ''}`);
+    return `
+      <div class="card-head"><h2>Mail aan ${n} ${plural(n, 'bedrijf', 'bedrijven')}</h2><button type="button" class="btn small" id="mClose" data-m="close">Sluiten</button></div>
+      <p class="hint">${esc(names)}</p>
+      <div class="mail-grid">
+        <div class="mail-edit">
+          <div class="field"><label for="mTpl">Mailtekst</label><select class="input" id="mTpl">${opts}</select></div>
+          <div class="field"><label for="mSubj">Onderwerp</label><input class="input" id="mSubj" maxlength="200" value="${esc(mail.onderwerp)}"></div>
+          <div class="field"><label for="mBody">Tekst</label><textarea class="input mail-body" id="mBody" maxlength="5000">${esc(mail.tekst)}</textarea>
+            <div class="phs"><span>Invoegen:</span>${PLACEHOLDERS.map((p, i) => `<button type="button" class="ph" id="ph-${i}" data-ph="${p}">${p}</button>`).join('')}</div>
+          </div>
+          <div class="tplbar">${tplBar}</div>
+          <p class="hint">{aanhef} wordt per bedrijf bijvoorbeeld "Beste Marieke" of "Geachte heer, mevrouw". Je Outlook-handtekening komt er vanzelf onder als je die hebt ingesteld.</p>
+        </div>
+        <div class="mail-out" id="mailOut">${mailOutHtml()}</div>
+      </div>`;
+  }
+  function renderMail() {
+    mailPanel.hidden = !mail.open;
+    if (!mail.open) { mailPanel.innerHTML = ''; return; }
+    withFocus(mailPanel, () => { mailPanel.innerHTML = mailHtml(); });
+  }
+  function renderMailOut() {
+    const out = $('mailOut');
+    if (!mail.open || !out) return;
+    withFocus(out, () => { out.innerHTML = mailOutHtml(); });
+  }
+
+  async function logMail(ids, subject) {
+    const today = todayISO();
+    let ok = 0;
+    for (const id of ids) {
+      const l = byId(id);
+      if (!l) continue;
+      const log = logBody([{ d: today, a: 'Mail', u: 'Verstuurd', t: clip(subject, 200) }, ...l.log].slice(0, 100));
+      if (await write(() => col.doc(id).update({ log, gewijzigd: nowISO() }))) ok++;
+      else break;
+    }
+    return ok;
+  }
+  async function logAll() {
+    const recips = mailRecipients();
+    if (!recips.length || mail.busy) return;
+    mail.busy = true; renderMailOut();
+    const ok = await logMail(recips.map(l => l.id), fillTemplate(mail.onderwerp, null) || 'Mail');
+    mail.busy = false;
+    if (ok === recips.length) { closeMail(); toast(`Mail vastgelegd bij ${ok} ${plural(ok, 'bedrijf', 'bedrijven')}.`); }
+    else renderMailOut();
+  }
+  async function markSent() {
+    const l = mailRecipients()[mail.index];
+    if (!l || mail.busy) return;
+    mail.busy = true; renderMailOut();
+    const ok = await logMail([l.id], fillTemplate(mail.onderwerp, l) || 'Mail');
+    mail.busy = false;
+    if (ok) {
+      mail.done.add(l.id); mail.skipped.delete(l.id); mail.index++;
+      if (mail.ids.length === 1) { closeMail(); toast(`Mail aan ${l.bedrijf} vastgelegd.`); return; }
+    }
+    renderMailOut();
+  }
+  async function createTemplate() {
+    const naam = String(mail.newName || '').trim().slice(0, 60);
+    if (!naam) { toast('Geef de mailtekst een naam.'); $('mNewName')?.focus(); return; }
+    if (!mail.onderwerp.trim() && !mail.tekst.trim()) { toast('Vul eerst een onderwerp of tekst in.'); return; }
+    const ref = sjCol.doc();
+    const body = { naam, onderwerp: mail.onderwerp, tekst: mail.tekst, gewijzigd: nowISO() };
+    if (!(await write(() => ref.set(body)))) return;
+    if (!state.sjablonen.some(t => t.id === ref.id)) state.sjablonen = [...state.sjablonen, { id: ref.id, ...body }].sort((a, b) => cmp(a.naam, b.naam));
+    mail.tplId = ref.id; mail.newName = null;
+    renderMail();
+    toast(`Mailtekst ${naam} bewaard.`);
+  }
+  async function saveTemplate() {
+    const t = state.sjablonen.find(x => x.id === mail.tplId);
+    if (!t) return;
+    if (await write(() => sjCol.doc(t.id).update({ onderwerp: mail.onderwerp, tekst: mail.tekst, gewijzigd: nowISO() }))) toast(`Mailtekst ${t.naam} bijgewerkt.`);
+  }
+  async function deleteTemplate() {
+    const t = state.sjablonen.find(x => x.id === mail.tplId);
+    if (!t) return;
+    if (!mail.armedDel) {
+      mail.armedDel = true; renderMail();
+      setTimeout(() => { if (mail.armedDel) { mail.armedDel = false; if (mail.open) renderMail(); } }, 4000);
+      return;
+    }
+    mail.armedDel = false;
+    if (!(await write(() => sjCol.doc(t.id).delete()))) return;
+    state.sjablonen = state.sjablonen.filter(x => x.id !== t.id);
+    mail.tplId = '';
+    renderMail();
+    toast(`Mailtekst ${t.naam} verwijderd.`);
+  }
+  function insertPlaceholder(p) {
+    const ta = $('mBody');
+    if (!ta) return;
+    const s = ta.selectionStart ?? ta.value.length, e = ta.selectionEnd ?? s;
+    ta.setRangeText(p, s, e, 'end');
+    ta.focus();
+    mail.tekst = ta.value;
+    renderMailOut();
+  }
+
+  /* ---------- importeren ---------- */
+  function parseDelimited(text) {
+    text = String(text).replace(/^﻿/, '');
+    const first = text.split(/\r?\n/, 1)[0] || '';
+    const counts = [['\t', (first.match(/\t/g) || []).length], [';', (first.match(/;/g) || []).length], [',', (first.match(/,/g) || []).length]].sort((a, b) => b[1] - a[1]);
+    const delim = counts[0][1] > 0 ? counts[0][0] : '\t';
+    const rows = [];
+    let row = [], cur = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (q) {
+        if (ch === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; }
+        else cur += ch;
+      }
+      else if (ch === '"' && cur === '') q = true;
+      else if (ch === delim) { row.push(cur); cur = ''; }
+      else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+      else cur += ch;
+    }
+    if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+    return rows.map(r => r.map(c => c.trim())).filter(r => r.some(Boolean));
+  }
+  let xlsxPromise = null;
+  function loadXlsx() {
+    if (window.XLSX) return Promise.resolve(window.XLSX);
+    if (!xlsxPromise) xlsxPromise = new Promise((resolve, reject) => {
+      const srcs = ['vendor/xlsx.full.min.js', 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'];
+      const tryNext = i => {
+        if (i >= srcs.length) { xlsxPromise = null; reject(new Error('xlsx')); return; }
+        const s = document.createElement('script');
+        s.src = srcs[i];
+        s.onload = () => window.XLSX ? resolve(window.XLSX) : tryNext(i + 1);
+        s.onerror = () => { s.remove(); tryNext(i + 1); };
+        document.head.appendChild(s);
+      };
+      tryNext(0);
+    });
+    return xlsxPromise;
+  }
+  function headerField(cell) {
+    const k = key(cell);
+    if (!k) return null;
+    for (const [field, re] of IMP_HINTS) if (re.test(k)) return field;
+    return /^naam$/.test(k) ? 'bedrijf?' : null;
+  }
+  const looksLikeHeader = r => !r.some(c => /@/.test(c)) && r.some(c => { const f = headerField(c); return f !== null && f !== ''; });
+  function guessMap(rows, header) {
+    const width = Math.max(1, ...rows.slice(0, 50).map(r => r.length));
+    const map = new Array(width).fill('');
+    if (header) {
+      const used = new Set();
+      (rows[0] || []).forEach((h, i) => {
+        const k = key(h);
+        for (const [field, re, multi] of IMP_HINTS) {
+          if (re.test(k)) { if (field && (multi || !used.has(field))) { map[i] = field; used.add(field); } break; }
+        }
+      });
+      if (!map.includes('bedrijf')) {
+        const i = (rows[0] || []).findIndex((h, idx) => !map[idx] && /^naam$/.test(key(h)));
+        if (i >= 0) map[i] = 'bedrijf';
+      }
+    } else {
+      const sample = rows.slice(0, 20);
+      for (let i = 0; i < width; i++) {
+        const vals = sample.map(r => r[i] || '').filter(Boolean);
+        if (!vals.length) continue;
+        if (!map.includes('email') && vals.every(v => /@/.test(v))) map[i] = 'email';
+        else if (!map.includes('telefoon') && vals.every(v => /^[+\d][\d\s\-()]{7,}$/.test(v))) map[i] = 'telefoon';
+      }
+      const t = map.findIndex((m, i) => !m && sample.some(r => r[i]));
+      if (t >= 0) map[t] = 'bedrijf';
+    }
+    return map;
+  }
+  const normPhone = s => { const t = String(s || '').trim(); return /^[1-9]\d{8}$/.test(t) ? '0' + t : t; };
+  function mapRow(row, map) {
+    const o = { bedrijf: [], contact: [], email: [], telefoon: [], adres: [], huisnummer: [], postcode: [], plaats: [], actie: [], notitie: [] };
+    map.forEach((f, i) => { const v = String(row[i] ?? '').trim(); if (f && v && o[f]) o[f].push(v); });
+    let adres = [o.adres.join(' '), o.huisnummer.join(' ')].filter(Boolean).join(' ');
+    if (o.postcode.length) adres = [adres, o.postcode.join(' ')].filter(Boolean).join(', ');
+    return {
+      bedrijf: o.bedrijf.join(' ').slice(0, 120), contact: o.contact.join(' ').replace(/\s+/g, ' ').slice(0, 120),
+      email: (o.email[0] || '').split(/[;,\s]+/)[0].slice(0, 120), telefoon: normPhone(o.telefoon[0]).slice(0, 40),
+      adres: adres.slice(0, 120), plaats: o.plaats.join(' ').slice(0, 60), actie: o.actie[0] || '', notitie: o.notitie.join(' · ').slice(0, 2000),
+    };
+  }
+  function importRows() {
+    if (!imp.rows) return [];
+    const data = imp.header ? imp.rows.slice(1) : imp.rows;
+    const existing = buildIndex(state.leads), inFile = buildIndex([]);
+    return data.map((row, i) => {
+      const c = mapRow(row, imp.map);
+      let status = 'nieuw';
+      if (!c.bedrijf) status = 'leeg';
+      else if (lookup(existing, c).length) status = 'bestaat';
+      else if (lookup(inFile, c).length) status = 'dubbel';
+      if (c.bedrijf) addToIndex(inFile, c);
+      const include = status === 'leeg' ? false : (imp.include.has(i) ? imp.include.get(i) : status === 'nieuw');
+      return { i, row, c, status, include };
+    });
+  }
+  function setImportRows(rows) {
+    if (!rows.length) { imp.error = 'Er staan geen rijen in. Controleer het bestand of plak de rijen opnieuw.'; renderImport(); return; }
+    imp.rows = rows.slice(0, 5001);
+    imp.header = looksLikeHeader(rows[0]);
+    imp.map = guessMap(imp.rows, imp.header);
+    imp.include = new Map();
+    imp.error = '';
+    renderImport();
+  }
+  async function readImportFile(file) {
+    imp.loading = true; imp.error = ''; renderImport();
+    try {
+      let rows;
+      if (/\.(xlsx|xlsm|xls|ods)$/i.test(file.name)) {
+        const X = await loadXlsx();
+        const wb = X.read(new Uint8Array(await file.arrayBuffer()), { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        rows = X.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '', blankrows: false })
+          .map(r => r.map(c => String(c ?? '').trim())).filter(r => r.some(Boolean));
+      } else {
+        const buf = await file.arrayBuffer();
+        let text;
+        try { text = new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch { text = new TextDecoder('windows-1252').decode(buf); }
+        rows = parseDelimited(text);
+      }
+      imp.loading = false;
+      setImportRows(rows);
+    } catch {
+      imp.loading = false;
+      imp.error = 'Dit bestand kon niet worden gelezen. Sla het in Excel op als CSV, of kopieer de rijen en plak ze hieronder.';
+      renderImport();
+    }
+  }
+  function importHtml() {
+    const head = `<div class="card-head"><h2>Importeren uit Excel</h2><button type="button" class="btn small" id="impClose" data-i="close"${imp.busy ? ' disabled' : ''}>Sluiten</button></div>`;
+    if (imp.busy) {
+      const pct = imp.total ? Math.round(imp.done / imp.total * 100) : 0;
+      return head + `<div class="progress"><div class="bar"><span id="impBar" style="width:${pct}%"></span></div><p class="hint" id="impProg">${imp.done} van ${imp.total} bedrijven geïmporteerd…</p></div>`;
+    }
+    if (!imp.rows) {
+      return head + `
+        <div class="imp-src">
+          <div class="field"><label for="impFile">Kies een bestand</label><input type="file" class="file" id="impFile" accept=".xlsx,.xls,.xlsm,.ods,.csv,.txt">
+            <p class="hint">Excel (.xlsx of .xls), CSV of tekst. Alleen het eerste werkblad wordt gelezen.</p></div>
+          <div class="field"><label for="impPaste">Of plak rijen uit Excel</label>
+            <textarea class="input" id="impPaste" rows="5" placeholder="Selecteer in Excel de rijen inclusief kolomnamen, kopieer ze en plak ze hier."></textarea></div>
+        </div>
+        ${imp.loading ? '<p class="hint">Bestand lezen…</p>' : ''}
+        ${imp.error ? `<p class="warn">${esc(imp.error)}</p>` : ''}
+        <p class="hint">Na het inlezen kies je per kolom welk veld het is en zie je welke bedrijven al in je lijst staan.</p>`;
+    }
+    const rows = importRows();
+    const counts = { nieuw: 0, bestaat: 0, dubbel: 0, leeg: 0 };
+    rows.forEach(r => counts[r.status]++);
+    const chosen = rows.filter(r => r.include).length;
+    const over = state.leads.length + chosen > MAX_LEADS;
+    const statusTxt = { nieuw: 'Nieuw', bestaat: 'Staat al in je lijst', dubbel: 'Dubbel in bestand', leeg: 'Geen bedrijfsnaam' };
+    const width = imp.map.length;
+    const table = `<div class="imp-wrap"><table class="imp-table">
+      <thead><tr><th><span class="sr">Importeren</span></th><th>Status</th>${imp.map.map((f, i) =>
+        `<th><select id="impMap-${i}" data-col="${i}" aria-label="Veld voor kolom ${i + 1}">${IMP_FIELDS.map(([v, lab]) => `<option value="${v}"${v === f ? ' selected' : ''}>${lab}</option>`).join('')}</select>` +
+        `${imp.header ? `<div class="colname">${esc(imp.rows[0][i] || '')}</div>` : ''}</th>`).join('')}</tr></thead>
+      <tbody>${rows.slice(0, 200).map(r => `<tr class="st-${r.status}"><td><input type="checkbox" class="sel" id="impRow-${r.i}" data-row="${r.i}"${r.include ? ' checked' : ''}${r.status === 'leeg' ? ' disabled' : ''} aria-label="Rij ${r.i + 1} importeren"></td><td class="st">${statusTxt[r.status]}</td>` +
+        Array.from({ length: width }, (_, i) => `<td title="${esc(r.row[i] || '')}">${esc(r.row[i] || '')}</td>`).join('') + '</tr>').join('')}</tbody>
+    </table></div>`;
+    return head + `
+      <label class="check" for="impHeader"><input type="checkbox" id="impHeader"${imp.header ? ' checked' : ''}>Eerste rij bevat kolomnamen</label>
+      ${imp.map.includes('bedrijf') ? '' : '<p class="warn">Kies bij één kolom <strong>Bedrijfsnaam</strong>. Zonder bedrijfsnaam kan een rij niet worden geïmporteerd.</p>'}
+      <p class="hint">Kies bovenaan elke kolom welk veld het is. Bedrijven die al in je lijst of archief staan, zijn niet aangevinkt.</p>
+      ${table}
+      ${rows.length > 200 ? `<p class="hint">De eerste 200 van ${rows.length} rijen worden getoond. De rest wordt ook geïmporteerd, behalve dubbele rijen.</p>` : ''}
+      <p class="imp-sum"><strong>${chosen}</strong> ${plural(chosen, 'bedrijf wordt', 'bedrijven worden')} geïmporteerd · ${counts.bestaat} ${plural(counts.bestaat, 'staat', 'staan')} al in je lijst · ${counts.dubbel} dubbel in bestand${counts.leeg ? ` · ${counts.leeg} zonder bedrijfsnaam` : ''}</p>
+      <div class="imp-opts">
+        <div class="field"><label for="impActie">Actie voor deze bedrijven<span class="opt">optioneel</span></label><input class="input" id="impActie" list="actieLijst" maxlength="40" value="${esc(imp.actie)}" placeholder="Bijv. Bellen"></div>
+        <div class="field"><label for="impDatum">Wanneer<span class="opt">optioneel</span></label>${whenHtml('impDatum', imp.datum)}</div>
+      </div>
+      ${over ? `<p class="warn">De lijst kan maximaal ${MAX_LEADS} bedrijven bevatten. Er staan er nu ${state.leads.length}. Vink er minder aan of verwijder eerst oude bedrijven.</p>` : ''}
+      <div class="pactions">
+        <button type="button" class="btn primary" id="impGo" data-i="go"${chosen && !over ? '' : ' disabled'}>Importeer ${chosen} ${plural(chosen, 'bedrijf', 'bedrijven')}</button>
+        <button type="button" class="btn" id="impReset" data-i="reset">Ander bestand kiezen</button>
+      </div>`;
+  }
+  function renderImport() {
+    importPanel.hidden = !imp.open;
+    importBtn.setAttribute('aria-expanded', String(imp.open));
+    if (!imp.open) { importPanel.innerHTML = ''; return; }
+    withFocus(importPanel, () => { importPanel.innerHTML = importHtml(); });
+  }
+  function openImport() {
+    if (state.readOnly || !col) return;
+    if (imp.open) { if (!imp.busy) { imp.open = false; renderImport(); } return; }
+    Object.assign(imp, { open: true, rows: null, include: new Map(), busy: false, loading: false, error: '' });
+    renderImport();
+    importPanel.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+  async function runImport() {
+    const chosen = importRows().filter(r => r.include);
+    if (!chosen.length || imp.busy) return;
+    if (state.leads.length + chosen.length > MAX_LEADS) return;
+    const now = nowISO(), globalActie = canonAction(imp.actie), datum = parseISO(imp.datum) ? imp.datum : '';
+    const bodies = chosen.map(r => {
+      const actie = canonAction(r.c.actie) || globalActie;
+      return toBody({ bedrijf: r.c.bedrijf, contact: r.c.contact, email: r.c.email, telefoon: r.c.telefoon, adres: r.c.adres, plaats: canonPlaats(r.c.plaats),
+        actie, datum: actie ? datum : '', notitie: r.c.notitie, geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now });
+    });
+    const acties = [...new Set(bodies.map(b => b.actie).filter(Boolean))];
+    Object.assign(imp, { busy: true, done: 0, total: bodies.length });
+    renderImport();
+    const queue = bodies.slice();
+    let failed = 0, stop = false, lastErr = null;
+    const progress = () => {
+      const bar = $('impBar'), p = $('impProg');
+      if (bar) bar.style.width = Math.round(imp.done / imp.total * 100) + '%';
+      if (p) p.textContent = `${imp.done} van ${imp.total} bedrijven geïmporteerd…`;
+    };
+    const worker = async () => {
+      while (queue.length && !stop) {
+        const body = queue.shift(), ref = col.doc();
+        let ok = false;
+        for (let a = 0; a < 4 && !ok && !stop; a++) {
+          try { await ref.set(body); ok = true; }
+          catch (e) {
+            lastErr = e;
+            if (e && (e.code === 'resource_exhausted' || e.code === 'unavailable')) await sleep(1000 * (a + 1));
+            else stop = true;
+          }
+        }
+        if (ok) imp.done++; else failed++;
+        progress();
+      }
+    };
+    await Promise.all([worker(), worker(), worker()]);
+    acties.forEach(rememberAction);
+    imp.busy = false;
+    const done = imp.done;
+    if (done) { imp.open = false; setView('alles'); state.search = ''; searchEl.value = ''; }
+    renderImport();
+    renderAll();
+    if (stop || failed) { writeError(lastErr); if (done) toast(`${done} bedrijven geïmporteerd. Daarna ging het mis: ${queue.length + failed} niet geïmporteerd.`); }
+    else toast(`${done} ${plural(done, 'bedrijf', 'bedrijven')} geïmporteerd.`);
+  }
+
+  /* ---------- gebeurtenissen ---------- */
+  addForm.addEventListener('submit', addLead);
+  const addToggle = $('addToggle');
+  const setAddOpen = open => { addForm.classList.toggle('collapsed', !open); addToggle.setAttribute('aria-expanded', String(open)); };
+  setAddOpen(!(window.matchMedia && matchMedia('(max-width: 760px)').matches));
+  addToggle.addEventListener('click', () => {
+    const open = addForm.classList.contains('collapsed');
+    setAddOpen(open);
+    if (open) $('addBedrijf').focus();
+  });
+  addForm.addEventListener('input', e => { if (['addBedrijf', 'addTelefoon', 'addEmail'].includes(e.target.id)) checkAddDupes(); });
+  dupWarnEl.addEventListener('click', e => { const b = e.target.closest('[data-goto]'); if (b) gotoLead(b.dataset.goto); });
+  exportBtn.addEventListener('click', exportCsv);
+  importBtn.addEventListener('click', openImport);
+  clearExamplesBtn.addEventListener('click', clearExamples);
+  searchEl.addEventListener('input', () => { state.search = searchEl.value; renderRows(); renderSelBar(); });
+  mailBtn.addEventListener('click', () => setSelecting(!state.selecting));
+
+  tabsEl.addEventListener('click', e => {
+    const b = e.target.closest('[data-view]');
+    if (!b || !VIEWS.has(b.dataset.view)) return;
+    setView(b.dataset.view);
+    renderAll();
+  });
+  chipsEl.addEventListener('click', e => {
+    const x = e.target.closest('[data-remove]');
+    if (x) { removeAction(x.dataset.remove); return; }
+    if (e.target.closest('[data-groep]')) {
+      groupPrefs[key(state.actie)] = !groupByPlaats(state.actie);
+      pref.set('groep', JSON.stringify(groupPrefs));
+      renderAll();
+      return;
+    }
+    const b = e.target.closest('[data-actie]');
+    if (!b) return;
+    const a = b.dataset.actie;
+    setActie(a && key(a) === key(state.actie) ? '' : a);
+    renderAll();
+  });
+  selInner.addEventListener('click', e => {
+    const b = e.target.closest('[data-s]');
+    if (!b) return;
+    const s = b.dataset.s;
+    if (s === 'cancel') setSelecting(false);
+    else if (s === 'go') openMail([...state.selected]);
+    else if (s === 'all' || s === 'none') {
+      const visible = state.leads.filter(inView).filter(mailable);
+      visible.forEach(l => s === 'all' ? state.selected.add(l.id) : state.selected.delete(l.id));
+      renderRows(); renderSelBar();
+    }
+    else if (s === 'outlook') {
+      const recips = selectedRecipients();
+      if (!recips.length) { e.preventDefault(); return; }
+      const addrs = recips.map(l => l.email).join('; ');
+      const tooMany = mailtoUrl('', recips.map(l => l.email).join(',')).length >= MAILTO_MAX;
+      state.pendingMail = { ids: recips.map(l => l.id) };
+      if (tooMany) {
+        try { navigator.clipboard.writeText(addrs).catch(() => {}); } catch {}
+        toast(`Het zijn te veel adressen om in één keer mee te geven. Ze zijn gekopieerd: plak ze in de nieuwe mail bij BCC.`, 8000);
+      }
+      setTimeout(() => { state.selecting = false; state.selected.clear(); renderAll(); }, 0);
+    }
+    else if (s === 'pm-yes') {
+      const ids = state.pendingMail ? state.pendingMail.ids : [];
+      state.pendingMail = null;
+      renderSelBar();
+      logMail(ids, '').then(ok => { if (ok) toast(`Mail vastgelegd bij ${ok} ${plural(ok, 'bedrijf', 'bedrijven')}.`); });
+    }
+    else if (s === 'pm-no') { state.pendingMail = null; renderSelBar(); }
+  });
+
+  // Snelknoppen voor datums, overal op de pagina.
+  document.addEventListener('click', e => {
+    const q = e.target.closest('[data-qd]');
+    if (!q || q.disabled) return;
+    const w = q.closest('.when'), input = w.querySelector('input[type="date"]');
+    if (input.disabled || input.readOnly) return;
+    input.value = q.getAttribute('aria-pressed') === 'true' ? '' : q.dataset.qd;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    syncWhen(w);
+  });
+  document.addEventListener('input', e => {
+    if (e.target.matches && e.target.matches('.when input[type="date"]')) syncWhen(e.target.closest('.when'));
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && state.selecting && !e.target.closest('.row')) setSelecting(false);
+  });
+
+  rowsEl.addEventListener('click', e => {
+    const el = e.target.closest('[data-act]');
+    if (!el) return;
+    const act = el.dataset.act;
+    if (act === 'call') return;
+    if (act === 'reset') { setView('alles'); state.search = ''; searchEl.value = ''; renderAll(); return; }
+    if (act === 'allacties') { setActie(''); renderAll(); return; }
+    if (act === 'copy') { copyText(el.dataset.copy, el.dataset.label); return; }
+    if (act === 'filter') { setView('acties'); setActie(el.dataset.actie); renderAll(); filtersEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return; }
+    const row = el.closest('.row');
+    if (!row) return;
+    const id = row.dataset.id;
+    if (act === 'select') { toggleSelect(id, el.checked); return; }
+    if (act === 'qmail') {
+      const l = byId(id);
+      if (!l) return;
+      state.pendingMail = { ids: [id] };
+      setTimeout(renderSelBar, 0);
+      return;
+    }
+    if (act === 'toggle') {
+      if (state.selecting) {
+        const cb = $('sel-' + id);
+        if (cb && !cb.disabled) { cb.checked = !cb.checked; toggleSelect(id, cb.checked); }
+        return;
+      }
+      if (e.detail > 0 && String(window.getSelection ? window.getSelection() : '').length) return;
+      openRow(id, 'toggle');
+    }
+    else if (act === 'afronden') openRow(id, 'finish');
+    else if (act === 'outcome') applyOutcome(id, el.dataset.outcome);
+    else if (act === 'finish') finishLead(id);
+    else if (act === 'cancel') { closeRow(); $(`af-${id}`)?.focus(); }
+    else if (act === 'save') saveLead(id);
+    else if (act === 'mail') openMail([id]);
+    else if (act === 'archive') archiveLead(id, true);
+    else if (act === 'restore') archiveLead(id, false);
+    else if (act === 'delete') deleteLead(id);
+  });
+  function onField(e) {
+    const t = e.target, row = t.closest('.row');
+    if (!row) return;
+    const id = row.dataset.id;
+    if (t.dataset.field && drafts[id]) {
+      if (t.type === 'checkbox') { if (e.type === 'change') drafts[id][t.dataset.field] = t.checked; }
+      else drafts[id][t.dataset.field] = t.value;
+    }
+    if (t.dataset.ffield && finishes[id]) {
+      if (t.type === 'checkbox') {
+        if (e.type !== 'change') return;
+        finishes[id].archief = t.checked;
+        if (!t.checked && !finishes[id].actie) finishes[id].actie = byId(id)?.actie || '';
+        renderRows();
+      } else finishes[id][t.dataset.ffield] = t.value;
+    }
+  }
+  rowsEl.addEventListener('input', onField);
+  rowsEl.addEventListener('change', onField);
+  rowsEl.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.pick[data-act="copy"]')) { e.preventDefault(); copyText(e.target.dataset.copy, e.target.dataset.label); return; }
+    const f = e.target.closest('[data-field], [data-ffield]');
+    if (!f) return;
+    const id = f.closest('.row').dataset.id;
+    if (e.key === 'Enter' && f.tagName === 'INPUT' && f.type !== 'checkbox' && !state.readOnly) {
+      e.preventDefault();
+      if (f.dataset.ffield) finishLead(id); else saveLead(id);
+    }
+    else if (e.key === 'Escape') { e.preventDefault(); closeRow(); document.getElementById('t-' + id)?.focus(); }
+  });
+
+  mailPanel.addEventListener('click', e => {
+    if (e.target.closest('a[data-handoff]')) return;
+    const ph = e.target.closest('[data-ph]');
+    if (ph) { insertPlaceholder(ph.dataset.ph); return; }
+    const b = e.target.closest('[data-m]');
+    if (!b) return;
+    const recips = mailRecipients();
+    const cur = (mail.mode === 'pers' || recips.length === 1) ? recips[mail.index] || null : null;
+    switch (b.dataset.m) {
+      case 'close': closeMail(); break;
+      case 'mode-bcc': mail.mode = 'bcc'; renderMailOut(); break;
+      case 'mode-pers': mail.mode = 'pers'; renderMailOut(); break;
+      case 'copy-addrs': copyText(recips.map(l => l.email).join('; '), `${recips.length} adressen`, false); break;
+      case 'copy-subj': copyText(fillTemplate(mail.onderwerp, cur), 'Onderwerp', false); break;
+      case 'copy-body': copyText(fillTemplate(mail.tekst, cur), 'Tekst', false); break;
+      case 'copy-to': if (cur) copyText(cur.email, 'E-mailadres'); break;
+      case 'log-all': logAll(); break;
+      case 'sent': markSent(); break;
+      case 'skip': if (cur) { mail.skipped.add(cur.id); mail.index++; renderMailOut(); } break;
+      case 'prev': mail.index = Math.max(0, mail.index - 1); renderMailOut(); break;
+      case 'restart': mail.index = 0; renderMailOut(); break;
+      case 'tpl-new': mail.newName = ''; renderMail(); $('mNewName')?.focus(); break;
+      case 'tpl-cancel': mail.newName = null; renderMail(); break;
+      case 'tpl-create': createTemplate(); break;
+      case 'tpl-save': saveTemplate(); break;
+      case 'tpl-del': deleteTemplate(); break;
+    }
+  });
+  mailPanel.addEventListener('input', e => {
+    if (e.target.id === 'mSubj') { mail.onderwerp = e.target.value; renderMailOut(); }
+    else if (e.target.id === 'mBody') { mail.tekst = e.target.value; renderMailOut(); }
+    else if (e.target.id === 'mNewName') mail.newName = e.target.value;
+  });
+  mailPanel.addEventListener('change', e => {
+    if (e.target.id !== 'mTpl') return;
+    if (e.target.value) applyTemplate(e.target.value); else mail.tplId = '';
+    mail.armedDel = false;
+    renderMail();
+  });
+  mailPanel.addEventListener('keydown', e => { if (e.target.id === 'mNewName' && e.key === 'Enter') { e.preventDefault(); createTemplate(); } });
+
+  importPanel.addEventListener('click', e => {
+    const b = e.target.closest('[data-i]');
+    if (!b) return;
+    const a = b.dataset.i;
+    if (a === 'close') { if (!imp.busy) { imp.open = false; renderImport(); } }
+    else if (a === 'reset') { imp.rows = null; imp.error = ''; renderImport(); }
+    else if (a === 'go') runImport();
+  });
+  importPanel.addEventListener('change', e => {
+    const t = e.target;
+    if (t.id === 'impFile' && t.files && t.files[0]) readImportFile(t.files[0]);
+    else if (t.id === 'impPaste' && t.value.trim()) setImportRows(parseDelimited(t.value));
+    else if (t.id === 'impHeader') { imp.header = t.checked; imp.map = guessMap(imp.rows, imp.header); imp.include = new Map(); renderImport(); }
+    else if (t.dataset.col !== undefined) { imp.map[+t.dataset.col] = t.value; imp.include = new Map(); renderImport(); }
+    else if (t.dataset.row !== undefined) { imp.include.set(+t.dataset.row, t.checked); renderImport(); }
+  });
+  importPanel.addEventListener('input', e => {
+    if (e.target.id === 'impActie') imp.actie = e.target.value;
+    else if (e.target.id === 'impDatum') imp.datum = e.target.value;
+  });
+  importPanel.addEventListener('paste', e => {
+    if (e.target.id !== 'impPaste') return;
+    setTimeout(() => { const t = $('impPaste'); if (t && t.value.trim()) setImportRows(parseDelimited(t.value)); }, 0);
+  });
+
+  let lastDay = todayISO();
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) return;
+    if (todayISO() !== lastDay) { lastDay = todayISO(); renderAddWhen(); }
+    renderAll();
+  });
+
+  /* ---------- opstarten ---------- */
+  renderAddWhen();
+  renderAll();
+
+  /* ---------- opslag in Supabase ---------- */
+  /* Alle gegevens staan als documenten in één tabel "docs", per gebruiker afgeschermd (Row Level Security).
+     Een kopie in de browser zorgt dat de app snel opent, ook als er even geen bereik is. */
+  let offlineToastAt = 0;
+  function offlineNotice() {
+    if (Date.now() - offlineToastAt < 60000) return;
+    offlineToastAt = Date.now();
+    toast('Geen verbinding. Je ziet de laatst opgeslagen lijst. Opslaan lukt weer zodra je internet hebt.', 6000);
+  }
+
+  function createStore(sb, uid) {
+    const cache = new Map(), subs = new Map(), loaded = new Set();
+    const LS = 'koude-acq.cache.' + uid;
+    try {
+      const saved = JSON.parse(localStorage.getItem(LS) || '{}');
+      Object.entries(saved).forEach(([c, docs]) => cache.set(c, new Map(Object.entries(docs || {}))));
+    } catch {}
+    let saveTimer = 0;
+    const saveLocal = () => {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        try { const o = {}; cache.forEach((m, c) => { o[c] = Object.fromEntries(m); }); localStorage.setItem(LS, JSON.stringify(o)); } catch {}
+      }, 400);
+    };
+    const colMap = c => { if (!cache.has(c)) cache.set(c, new Map()); return cache.get(c); };
+    const snap = c => ({ docs: [...colMap(c)].map(([id, data]) => ({ id, exists: true, data: () => data })) });
+    const emit = c => (subs.get(c) || new Set()).forEach(fn => { try { fn(snap(c)); } catch (e) { console.error(e); } });
+    const storeError = err => { const e = new Error((err && err.message) || 'Opslaan lukte niet'); e.code = 'unavailable'; return e; };
+    const newId = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)).replace(/-/g, '').slice(0, 20);
+
+    async function fetchCol(c) {
+      const { data, error } = await sb.from('docs').select('id,data').eq('collection', c).limit(5000);
+      if (error) throw storeError(error);
+      cache.set(c, new Map((data || []).map(r => [r.id, r.data])));
+      loaded.add(c);
+      saveLocal();
+      emit(c);
+    }
+    async function put(c, id, data) {
+      const m = colMap(c), prev = m.get(id);
+      m.set(id, data);
+      emit(c);
+      let error;
+      try { ({ error } = await sb.from('docs').upsert({ user_id: uid, collection: c, id, data, updated_at: new Date().toISOString() }, { onConflict: 'user_id,collection,id' })); }
+      catch (e) { error = e; }
+      if (error) { if (prev === undefined) m.delete(id); else m.set(id, prev); emit(c); throw storeError(error); }
+      saveLocal();
+    }
+    async function remove(c, id) {
+      const m = colMap(c), prev = m.get(id);
+      m.delete(id);
+      emit(c);
+      let error;
+      try { ({ error } = await sb.from('docs').delete().eq('collection', c).eq('id', id)); }
+      catch (e) { error = e; }
+      if (error) { if (prev !== undefined) m.set(id, prev); emit(c); throw storeError(error); }
+      saveLocal();
+    }
+    function subscribe(c, fn, onError) {
+      if (!subs.has(c)) subs.set(c, new Set());
+      subs.get(c).add(fn);
+      if (cache.has(c)) setTimeout(() => fn(snap(c)), 0);
+      fetchCol(c).catch(e => { if (cache.has(c)) offlineNotice(); else if (onError) onError(e); });
+      return () => subs.get(c).delete(fn);
+    }
+    const docRef = (c, id) => ({
+      id,
+      get: async () => { const d = colMap(c).get(id); return { id, exists: d !== undefined, data: () => d }; },
+      set: data => put(c, id, data),
+      update: patch => {
+        const cur = colMap(c).get(id);
+        if (cur === undefined) return Promise.reject(storeError({ message: 'Dit item bestaat niet meer.' }));
+        return put(c, id, { ...cur, ...patch });
+      },
+      delete: () => remove(c, id),
+      onSnapshot: (next, onError) => subscribe(c, s => {
+        const d = s.docs.find(x => x.id === id);
+        next(d || { id, exists: false, data: () => undefined });
+      }, onError),
+    });
+    const colRef = c => {
+      const q = { limit: () => q, onSnapshot: (next, onError) => subscribe(c, next, onError), doc: id => docRef(c, id || newId()), get: async () => snap(c) };
+      return q;
+    };
+    const refreshAll = () => [...subs.keys()].forEach(c => fetchCol(c).catch(offlineNotice));
+
+    // Live bijwerken als je op een ander apparaat iets wijzigt.
+    try {
+      sb.channel('docs-' + uid)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'docs', filter: 'user_id=eq.' + uid }, p => {
+          const row = p.eventType === 'DELETE' ? p.old : p.new;
+          if (!row || !row.collection || (row.user_id && row.user_id !== uid)) { refreshAll(); return; }
+          if (p.eventType === 'DELETE') colMap(row.collection).delete(row.id);
+          else colMap(row.collection).set(row.id, row.data);
+          saveLocal();
+          emit(row.collection);
+        })
+        .subscribe();
+    } catch {}
+
+    return {
+      collection: colRef,
+      doc: path => { const [c, id] = path.split('/'); return docRef(c, id); },
+      refreshAll,
+      isLoaded: c => loaded.has(c),
+      clearLocal: () => { try { localStorage.removeItem(LS); } catch {} },
+    };
+  }
+
+  /* ---------- opslag op dit apparaat (zonder database-account) ---------- */
+  function createLocalStore() {
+    const LS = 'koude-acq.lokaal';
+    const cache = new Map(), subs = new Map();
+    const load = () => {
+      cache.clear();
+      try {
+        const saved = JSON.parse(localStorage.getItem(LS) || '{}');
+        Object.entries(saved).forEach(([c, docs]) => cache.set(c, new Map(Object.entries(docs || {}))));
+      } catch {}
+    };
+    load();
+    const persist = () => {
+      try { const o = {}; cache.forEach((m, c) => { o[c] = Object.fromEntries(m); }); localStorage.setItem(LS, JSON.stringify(o)); return true; }
+      catch { return false; }
+    };
+    const colMap = c => { if (!cache.has(c)) cache.set(c, new Map()); return cache.get(c); };
+    const snap = c => ({ docs: [...colMap(c)].map(([id, data]) => ({ id, exists: true, data: () => data })) });
+    const emit = c => (subs.get(c) || new Set()).forEach(fn => { try { fn(snap(c)); } catch (e) { console.error(e); } });
+    const newId = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)).replace(/-/g, '').slice(0, 20);
+    async function put(c, id, data) {
+      const m = colMap(c), prev = m.get(id);
+      m.set(id, data);
+      if (!persist()) {
+        if (prev === undefined) m.delete(id); else m.set(id, prev);
+        const e = new Error('Opslag vol'); e.code = 'quota_exceeded'; throw e;
+      }
+      emit(c);
+    }
+    async function remove(c, id) { colMap(c).delete(id); persist(); emit(c); }
+    function subscribe(c, fn) {
+      if (!subs.has(c)) subs.set(c, new Set());
+      subs.get(c).add(fn);
+      setTimeout(() => fn(snap(c)), 0);
+      return () => subs.get(c).delete(fn);
+    }
+    const docRef = (c, id) => ({
+      id,
+      get: async () => { const d = colMap(c).get(id); return { id, exists: d !== undefined, data: () => d }; },
+      set: data => put(c, id, data),
+      update: patch => {
+        const cur = colMap(c).get(id);
+        if (cur === undefined) { const e = new Error('Dit item bestaat niet meer.'); e.code = 'unavailable'; return Promise.reject(e); }
+        return put(c, id, { ...cur, ...patch });
+      },
+      delete: () => remove(c, id),
+      onSnapshot: next => subscribe(c, sn => {
+        const d = sn.docs.find(x => x.id === id);
+        next(d || { id, exists: false, data: () => undefined });
+      }),
+    });
+    const colRef = c => {
+      const q = { limit: () => q, onSnapshot: next => subscribe(c, next), doc: id => docRef(c, id || newId()), get: async () => snap(c) };
+      return q;
+    };
+    // Is de app in een tweede venster open, dan loopt die mee.
+    window.addEventListener('storage', e => { if (e.key === LS) { load(); subs.forEach((_, c) => emit(c)); } });
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch {}
+    return {
+      collection: colRef,
+      doc: path => { const [c, id] = path.split('/'); return docRef(c, id); },
+      refreshAll: () => {},
+      isLoaded: () => true,
+      clearLocal: () => {},
+    };
+  }
+
+  /* ---------- standaard mailteksten bij de eerste start ---------- */
+  const DEFAULT_SJABLONEN = [
+    { id: 'kennismaking', naam: 'Kennismaking', onderwerp: 'Kennismaking met Hevotec',
+      tekst: '{aanhef},\n\nGraag stel ik me even voor. Ik neem contact met u op omdat ik denk dat Hevotec ook voor {bedrijf} iets kan betekenen.\n\nIn een kort gesprek van een kwartier vertel ik u graag wat we doen en hoe we andere bedrijven helpen. Wanneer komt het u uit? Dan bel ik u op dat moment.\n\nWilt u geen e-mail meer van ons ontvangen? Laat het me weten, dan haal ik u uit onze lijst.\n\nMet vriendelijke groet,' },
+    { id: 'na-gesprek', naam: 'Na ons gesprek', onderwerp: 'Bedankt voor het gesprek',
+      tekst: '{aanhef},\n\nBedankt voor het prettige gesprek. Zoals afgesproken stuur ik u hierbij meer informatie over wat Hevotec voor {bedrijf} kan betekenen.\n\nHeeft u vragen? Bel of mail me gerust.\n\nMet vriendelijke groet,' },
+    { id: 'geen-gehoor', naam: 'Na geen gehoor', onderwerp: 'Even kennismaken?',
+      tekst: '{aanhef},\n\nIk heb u de afgelopen dagen een paar keer geprobeerd te bellen, maar kreeg u helaas niet te pakken. Ik wil graag kort kennismaken en laten zien wat Hevotec voor {bedrijf} kan betekenen.\n\nWanneer kan ik u het beste bellen? Een kort antwoord op deze mail is genoeg.\n\nWilt u geen e-mail meer van ons ontvangen? Laat het me weten, dan haal ik u uit onze lijst.\n\nMet vriendelijke groet,' },
+  ];
+  let seedChecked = false;
+  function maybeSeed() {
+    if (seedChecked || !appStore || !appStore.isLoaded('sjablonen') || !appStore.isLoaded('instellingen')) return;
+    seedChecked = true;
+    appStore.doc('instellingen/app').get().then(async s => {
+      if (s.exists) return;
+      if (!state.sjablonen.length) {
+        for (const t of DEFAULT_SJABLONEN) await write(() => sjCol.doc(t.id).set({ naam: t.naam, onderwerp: t.onderwerp, tekst: t.tekst, gewijzigd: nowISO() }));
+      }
+      await write(() => appStore.doc('instellingen/app').set({ gestart: nowISO() }));
+    });
+  }
+
+  /* ---------- back-up maken en terugzetten ---------- */
+  let restoreData = null, restoreBusy = false;
+  const restoreEl = $('restoreNotice');
+  function renderRestore(msg) {
+    if (!restoreData && !msg) { restoreEl.hidden = true; restoreEl.innerHTML = ''; return; }
+    restoreEl.hidden = false;
+    if (msg) {
+      restoreEl.innerHTML = `<p>${esc(msg)}</p>` + (restoreBusy ? '' : '<button type="button" class="btn small" data-r="close">Sluiten</button>');
+      return;
+    }
+    const n = restoreData.leads.length, m = restoreData.sjablonen.length;
+    restoreEl.innerHTML = `<p><strong>Back-up gevonden:</strong> ${n} ${plural(n, 'bedrijf', 'bedrijven')} en ${m} ${plural(m, 'mailtekst', 'mailteksten')}. Bedrijven die al in je lijst staan, worden bijgewerkt.</p>
+      <div class="btns"><button type="button" class="btn primary" id="restoreGo" data-r="go">Terugzetten</button><button type="button" class="btn" data-r="cancel">Annuleren</button></div>`;
+  }
+  $('backupBtn').addEventListener('click', () => {
+    const data = {
+      app: 'koude-acquisitie', versie: 1, gemaakt: nowISO(),
+      leads: state.leads.map(l => ({ id: l.id, ...toBody(l) })),
+      sjablonen: state.sjablonen.map(t => ({ id: t.id, naam: t.naam, onderwerp: t.onderwerp, tekst: t.tekst })),
+      acties: state.acties,
+    };
+    saveFile(`koude-acquisitie-backup-${todayISO()}.json`, JSON.stringify(data, null, 2), 'application/json');
+    toast('Back-up opgeslagen in je downloads.');
+  });
+  $('restoreBtn').addEventListener('click', () => $('restoreFile').click());
+  $('restoreFile').addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      const leads = Array.isArray(data.leads) ? data.leads.filter(x => x && typeof x.bedrijf === 'string' && x.bedrijf.trim()) : [];
+      const sjablonen = Array.isArray(data.sjablonen) ? data.sjablonen.filter(x => x && (x.onderwerp || x.tekst)) : [];
+      const acties = Array.isArray(data.acties) ? data.acties.filter(x => typeof x === 'string' && x.trim()) : [];
+      if (!leads.length && !sjablonen.length) throw new Error('leeg');
+      restoreData = { leads, sjablonen, acties };
+      renderRestore();
+    } catch {
+      restoreData = null;
+      renderRestore('Dit bestand is geen back-up van deze app. Kies het .json-bestand van Back-up maken.');
+    }
+    restoreEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+  restoreEl.addEventListener('click', e => {
+    const b = e.target.closest('[data-r]');
+    if (!b) return;
+    if (b.dataset.r === 'go') runRestore();
+    else { restoreData = null; renderRestore(); }
+  });
+  async function runRestore() {
+    if (!restoreData || restoreBusy || !col) return;
+    restoreBusy = true;
+    const { leads, sjablonen, acties } = restoreData;
+    const idOk = v => typeof v === 'string' && /^[A-Za-z0-9_\-.~:@+]{1,200}$/.test(v);
+    const jobs = [
+      ...leads.map(x => () => col.doc(idOk(x.id) ? x.id : undefined).set(toBody(normalize({ id: '', data: () => x })))),
+      ...sjablonen.map(x => () => sjCol.doc(idOk(x.id) ? x.id : undefined).set({ naam: str(x.naam).trim() || 'Naamloos', onderwerp: str(x.onderwerp), tekst: str(x.tekst), gewijzigd: nowISO() })),
+    ];
+    let done = 0, failed = 0;
+    renderRestore(`Bezig met terugzetten: 0 van ${jobs.length}…`);
+    const queue = jobs.slice();
+    const worker = async () => {
+      while (queue.length) {
+        const job = queue.shift();
+        try { await job(); done++; } catch { failed++; }
+        renderRestore(`Bezig met terugzetten: ${done + failed} van ${jobs.length}…`);
+      }
+    };
+    await Promise.all([worker(), worker(), worker()]);
+    const merged = new Map(state.acties.map(a => [key(a), a]));
+    acties.forEach(a => { const t = a.trim().slice(0, 40); if (!merged.has(key(t))) merged.set(key(t), t); });
+    if (merged.size !== state.acties.length) { state.acties = sortNames([...merged.values()]); saveActionFilters(); }
+    restoreBusy = false;
+    restoreData = null;
+    renderRestore(failed
+      ? `${done} onderdelen teruggezet, ${failed} mislukt. Controleer je verbinding en probeer het opnieuw.`
+      : `Klaar: ${leads.length} ${plural(leads.length, 'bedrijf', 'bedrijven')} en ${sjablonen.length} ${plural(sjablonen.length, 'mailtekst', 'mailteksten')} teruggezet.`);
+    renderAll();
+  }
+
+  /* ---------- app installeren ---------- */
+  let installEvt = null;
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; installBtn.hidden = false; });
+  window.addEventListener('appinstalled', () => { installEvt = null; installBtn.hidden = true; toast('De app staat nu tussen je apps.'); });
+  installBtn.addEventListener('click', async () => {
+    if (!installEvt) return;
+    installEvt.prompt();
+    try { await installEvt.userChoice; } catch {}
+    installEvt = null;
+    installBtn.hidden = true;
+  });
+
+  /* ---------- inloggen en opstarten ---------- */
+  const gateEl = $('gate'), appEl = $('app');
+  let sb = null, started = false, inRecovery = /type=recovery/.test(location.hash);
+  function showGate(mode, msg) {
+    gateEl.hidden = false;
+    appEl.hidden = true;
+    $('loginForm').hidden = mode !== 'login';
+    $('newPassForm').hidden = mode !== 'newpass';
+    $('setupForm').hidden = mode !== 'setup';
+    $('gateTitle').textContent = { login: 'Inloggen', newpass: 'Nieuw wachtwoord', setup: 'App koppelen' }[mode] || 'Koude Acquisitie';
+    $('gateMsg').textContent = msg || '';
+    $('gateMsg').hidden = !msg;
+  }
+  function getConfig() {
+    const c = window.KA_CONFIG || {};
+    let url = c.supabaseUrl, k = c.supabaseKey;
+    if (!url || !k) {
+      try { const saved = JSON.parse(localStorage.getItem('koude-acq.config') || '{}'); url = url || saved.url; k = k || saved.key; } catch {}
+    }
+    return url && k ? { url: String(url).trim().replace(/\/+$/, ''), key: String(k).trim() } : null;
+  }
+  function startApp(session, localStore) {
+    if (started) return;
+    started = true;
+    $('who').textContent = localStore
+      ? 'Je gegevens staan op dit apparaat. Maak af en toe een back-up.'
+      : 'Ingelogd als ' + (session.user.email || '');
+    $('logoutBtn').hidden = !!localStore;
+    gateEl.hidden = true;
+    appEl.hidden = false;
+    const store = localStore || createStore(sb, session.user.id);
+    appStore = store;
+    col = store.collection('leads');
+    sjCol = store.collection('sjablonen');
+    actiesDoc = store.doc('instellingen/acties');
+
+    col.limit(MAX_LEADS).onSnapshot(snap => {
+      state.leads = snap.docs.filter(d => d.exists).map(normalize);
+      state.loaded = true;
+      state.problem = null;
+      scheduleRender();
+    }, () => {
+      state.problem = { title: 'Lijst niet beschikbaar', text: 'Je lijst kan nu niet worden geladen. Controleer je internetverbinding. De app probeert het vanzelf opnieuw.' };
+      renderAll();
+    });
+    actiesDoc.onSnapshot(snap => {
+      const namen = snap.exists && Array.isArray(snap.data().namen) ? snap.data().namen : [];
+      const seen = new Set();
+      state.acties = sortNames(namen.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim().slice(0, 40)).filter(x => !seen.has(key(x)) && seen.add(key(x))));
+      scheduleRender();
+      maybeSeed();
+    });
+    sjCol.limit(200).onSnapshot(snap => {
+      state.sjablonen = snap.docs.filter(d => d.exists).map(d => {
+        const x = d.data() || {};
+        return { id: d.id, naam: str(x.naam).trim() || 'Naamloos', onderwerp: str(x.onderwerp), tekst: str(x.tekst) };
+      }).sort((a, b) => cmp(a.naam, b.naam));
+      if (mail.open) {
+        if (!mail.tplId && !mail.onderwerp && !mail.tekst && state.sjablonen.length) applyTemplate(state.sjablonen[0].id);
+        renderMail();
+      }
+      maybeSeed();
+    });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) store.refreshAll(); });
+    window.addEventListener('online', () => store.refreshAll());
+    setInterval(() => { if (!document.hidden) store.refreshAll(); }, 120000);
+    renderAll();
+  }
+
+  const loginErr = m => { $('loginErr').textContent = m || ''; $('loginErr').hidden = !m; };
+  $('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    loginErr('');
+    const email = $('loginEmail').value.trim(), password = $('loginPass').value;
+    if (!email || !password) { loginErr('Vul je e-mailadres en wachtwoord in.'); return; }
+    $('loginBtn').disabled = true;
+    try {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) loginErr(/invalid login/i.test(error.message) ? 'E-mailadres of wachtwoord klopt niet.'
+        : /not confirmed/i.test(error.message) ? 'Je e-mailadres is nog niet bevestigd. Klik eerst op de link in de bevestigingsmail.'
+        : 'Inloggen lukte niet: ' + error.message);
+    } catch { loginErr('Geen verbinding. Controleer je internet en probeer het opnieuw.'); }
+    $('loginBtn').disabled = false;
+  });
+  $('forgotBtn').addEventListener('click', async () => {
+    const email = $('loginEmail').value.trim();
+    if (!email) { loginErr('Vul eerst je e-mailadres in.'); $('loginEmail').focus(); return; }
+    try {
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+      if (error) loginErr('Versturen lukte niet: ' + error.message);
+      else { loginErr(''); $('gateMsg').hidden = false; $('gateMsg').textContent = 'Je krijgt een mail met een link. Open die link op dit apparaat en kies een nieuw wachtwoord.'; }
+    } catch { loginErr('Geen verbinding. Probeer het opnieuw.'); }
+  });
+  $('newPassForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const pw = $('newPass').value, err = m => { $('newPassErr').textContent = m; $('newPassErr').hidden = !m; };
+    if (pw.length < 8) { err('Kies een wachtwoord van minimaal 8 tekens.'); return; }
+    $('newPassBtn').disabled = true;
+    try {
+      const { error } = await sb.auth.updateUser({ password: pw });
+      if (error) { err('Opslaan lukte niet: ' + error.message); return; }
+      inRecovery = false;
+      history.replaceState(null, '', location.pathname);
+      const { data } = await sb.auth.getSession();
+      if (data && data.session) startApp(data.session);
+      else showGate('login', 'Wachtwoord opgeslagen. Log in met je nieuwe wachtwoord.');
+    } catch { err('Geen verbinding. Probeer het opnieuw.'); }
+    finally { $('newPassBtn').disabled = false; }
+  });
+  $('setupForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const url = $('setupUrl').value.trim(), k = $('setupKey').value.trim();
+    if (!/^https:\/\/\S+$/.test(url) || k.length < 20) {
+      $('gateMsg').hidden = false;
+      $('gateMsg').textContent = 'Vul een geldige Project URL (begint met https://) en de anon public key in.';
+      return;
+    }
+    try { localStorage.setItem('koude-acq.config', JSON.stringify({ url, key: k })); } catch {}
+    location.reload();
+  });
+  $('logoutBtn').addEventListener('click', async () => {
+    if (appStore) appStore.clearLocal();
+    try { await sb.auth.signOut(); } catch {}
+    location.reload();
+  });
+
+  async function bootApp() {
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) navigator.serviceWorker.register('sw.js').catch(() => {});
+    const cfg = getConfig();
+    if (!cfg) { startApp(null, createLocalStore()); return; }
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+      showGate('loading', 'De app kon niet volledig laden. Controleer je internetverbinding en open de app opnieuw.');
+      return;
+    }
+    try {
+      sb = window.supabase.createClient(cfg.url, cfg.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+    } catch {
+      showGate('setup', 'De koppeling met Supabase klopt niet. Controleer de Project URL en de anon public key.');
+      return;
+    }
+    sb.auth.onAuthStateChange((event, session) => {
+      // Geen Supabase-aanroepen binnen deze callback: daarom via setTimeout.
+      setTimeout(() => {
+        if (event === 'PASSWORD_RECOVERY') { inRecovery = true; showGate('newpass'); return; }
+        if (event === 'SIGNED_OUT') { if (started) location.reload(); return; }
+        if (session && !inRecovery) startApp(session);
+      }, 0);
+    });
+    try {
+      const { data } = await sb.auth.getSession();
+      if (inRecovery) { showGate('newpass'); return; }
+      if (data && data.session) startApp(data.session);
+      else if (!started) showGate('login');
+    } catch {
+      showGate('login', 'Geen verbinding met de database. Controleer je internet en probeer het opnieuw.');
+    }
+  }
+  bootApp();
+})();
+</script>
+</body>
+</html>
