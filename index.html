@@ -416,6 +416,20 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
 .add.collapsed > :not(.add-title) { display: none !important; }
 .add.collapsed .add-title button::after { transform: rotate(45deg); }
 
+/* Prioriteit */
+.prio { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; font: 600 11px/1.5 var(--f-body); vertical-align: 2px; }
+.prio.hoog { background: var(--danger-soft); color: var(--danger); }
+.prio.laag { background: var(--sunken); color: var(--muted); border: 1px solid var(--line); }
+
+/* Visitekaartje scannen */
+.scanrow { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.scanrow .hint { flex: 1 1 220px; }
+
+/* Ochtendmelding als kleine regel */
+.push-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 13px; }
+.push-line .linkbtn { font-size: 13px; }
+.push-line .input { flex-basis: 100%; font: 12px/1.4 var(--f-mono); }
+
 /* Inloggen */
 .gate { min-height: 100vh; min-height: 100dvh; background: var(--bg); }
 .gate-band { background: var(--band); color: var(--band-ink); border-bottom: 5px solid var(--geel); }
@@ -474,9 +488,15 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
 <main class="gutter wrap">
   <section class="card" id="importPanel" aria-label="Importeren uit Excel" hidden></section>
   <div class="notice" id="restoreNotice" hidden></div>
+  <div class="notice" id="backupNotice" hidden></div>
 
   <form class="add" id="addForm" autocomplete="off" novalidate>
     <h2 class="add-title"><button type="button" id="addToggle" aria-expanded="true">Nieuw bedrijf</button></h2>
+    <div class="scanrow">
+      <button type="button" class="btn small" id="scanBtn">Visitekaartje scannen</button>
+      <input type="file" id="scanFile" accept="image/*" capture="environment" hidden>
+      <span class="hint" id="scanMsg">Maak een foto van een kaartje, dan vult de app de gegevens in.</span>
+    </div>
     <div class="field">
       <label for="addBedrijf">Bedrijfsnaam</label>
       <input class="input" id="addBedrijf" maxlength="120" placeholder="Bijv. Drukkerij De Vries">
@@ -504,6 +524,10 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     <div class="field">
       <label for="addActie">Actie<span class="opt">optioneel</span></label>
       <input class="input" id="addActie" list="actieLijst" maxlength="40" placeholder="Kies of typ, bijv. Bezoek">
+    </div>
+    <div class="field">
+      <label for="addPrio">Prioriteit</label>
+      <select class="input" id="addPrio"><option value="hoog">Hoog</option><option value="normaal" selected>Normaal</option><option value="laag">Laag</option></select>
     </div>
     <div class="field span-when">
       <label for="addDatum">Wanneer<span class="opt">optioneel</span></label>
@@ -547,15 +571,6 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   </section>
 
   <footer class="foot">
-    <div class="notice" id="pushBox">
-      <p><strong>Ochtendmelding om 08:05</strong><br><span id="pushStatus">Op werkdagen een melding met je acties van vandaag.</span></p>
-      <div class="btns">
-        <button type="button" class="btn small primary" id="pushOn">Meldingen aanzetten</button>
-        <button type="button" class="btn small" id="pushCopy" hidden>Kopieer koppelcode</button>
-        <button type="button" class="btn small" id="pushTest" hidden>Testmelding</button>
-      </div>
-      <textarea class="input" id="pushCode" rows="3" readonly hidden aria-label="Koppelcode"></textarea>
-    </div>
     <div class="foot-row">
       <span class="meta" id="who"></span>
       <div class="btns">
@@ -567,6 +582,13 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       </div>
     </div>
     <p class="hint">Met Back-up terugzetten zet je ook je lijst uit de Claude-app over.</p>
+    <p class="hint push-line" id="pushLine">
+      <span id="pushStatus">Ochtendmelding 08:05</span>
+      <button type="button" class="linkbtn" id="pushOn" hidden>Aanzetten</button>
+      <button type="button" class="linkbtn" id="pushTest" hidden>Testmelding</button>
+      <button type="button" class="linkbtn" id="pushCopy" hidden>Koppelcode</button>
+      <textarea class="input" id="pushCode" rows="3" readonly hidden aria-label="Koppelcode"></textarea>
+    </p>
   </footer>
 </main>
 
@@ -587,7 +609,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     'icloud.com', 'me.com', 'yahoo.com', 'yahoo.nl', 'ziggo.nl', 'kpnmail.nl', 'kpnplanet.nl', 'planet.nl', 'home.nl', 'xs4all.nl', 'upcmail.nl',
     'chello.nl', 'casema.nl', 'telfort.nl', 'online.nl', 'hetnet.nl', 'zeelandnet.nl', 'quicknet.nl', 'tele2.nl', 'caiway.nl', 'solcon.nl', 'gmx.com', 'gmx.net']);
   const IMP_FIELDS = [['', 'Niet importeren'], ['bedrijf', 'Bedrijfsnaam'], ['contact', 'Contactpersoon'], ['email', 'E-mailadres'], ['telefoon', 'Telefoonnummer'],
-    ['adres', 'Adres'], ['huisnummer', 'Huisnummer'], ['postcode', 'Postcode'], ['plaats', 'Plaats'], ['actie', 'Actie'], ['notitie', 'Notitie']];
+    ['adres', 'Adres'], ['huisnummer', 'Huisnummer'], ['postcode', 'Postcode'], ['plaats', 'Plaats'], ['actie', 'Actie'], ['prioriteit', 'Prioriteit'], ['notitie', 'Notitie']];
   const IMP_HINTS = [
     ['', /(contactmoment|gearchiveerd|gewijzigd|datum|geen mail|website|kvk|btw)/, true],
     ['email', /e-?mail|^mail/, false],
@@ -598,6 +620,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     ['adres', /(adres|straat|address)/, false],
     ['plaats', /(plaats|stad|city|gemeente)/, false],
     ['contact', /(contact|persoon|aanspreekpunt|voornaam|achternaam|tussenvoegsel|eigenaar|directeur)/, true],
+    ['prioriteit', /^(prioriteit|prio|priority)/, false],
     ['actie', /^actie$/, false],
     ['notitie', /(notitie|opmerking|toelichting|omschrijving|notes|memo|branche)/, true],
   ];
@@ -622,7 +645,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     leads: [], acties: [], sjablonen: [], loaded: false, problem: null, readOnly: false,
     view: VIEWS.has(pref.get('view')) ? pref.get('view') : 'alles',
     actie: pref.get('actie') || '',
-    search: '', open: null, mode: 'edit', selecting: false, selected: new Set(), pendingMail: null,
+    search: '', open: null, mode: 'edit', selecting: false, selected: new Set(), pendingMail: null, local: false,
   };
   const drafts = {}, finishes = {};
   const mail = { open: false, ids: [], mode: 'bcc', tplId: '', onderwerp: '', tekst: '', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false };
@@ -644,6 +667,8 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   const cmp = (a, b) => a.localeCompare(b, 'nl', { sensitivity: 'base' });
   const byName = (a, b) => cmp(a.bedrijf, b.bedrijf);
   const sortNames = list => [...list].sort(cmp);
+  const validPrio = v => (v === 'hoog' || v === 'laag') ? v : 'normaal';
+  const mapPrio = v => { const k = String(v || '').trim().toLowerCase(); return /^(hoog|high|warm|heet|a|1)$/.test(k) ? 'hoog' : /^(laag|low|koud|c|3)$/.test(k) ? 'laag' : 'normaal'; };
   const mailable = l => !!l && !l.geenMail && /\S+@\S+\.\S+/.test(l.email || '');
 
   const isoOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -817,6 +842,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       bedrijf: str(d.bedrijf), contact: str(d.contact), email: str(d.email).trim(), telefoon: str(d.telefoon),
       adres: str(d.adres).trim(), plaats: str(d.plaats).trim(),
       actie: str(d.actie).trim(), datum: parseISO(d.datum) ? str(d.datum).slice(0, 10) : '', notitie: str(d.notitie),
+      tijd: /^\d{2}:\d{2}$/.test(str(d.tijd)) ? d.tijd : '', prioriteit: validPrio(d.prioriteit),
       geenMail: d.geenMail === true, log: normalizeLog(d.log),
       gearchiveerd: d.gearchiveerd === true, gearchiveerdOp: parseISO(d.gearchiveerdOp) ? str(d.gearchiveerdOp).slice(0, 10) : '',
       aangemaakt: str(d.aangemaakt), gewijzigd: str(d.gewijzigd), voorbeeld: d.voorbeeld === true,
@@ -825,14 +851,14 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   function toBody(l) {
     const b = {
       bedrijf: l.bedrijf, contact: l.contact || '', email: l.email || '', telefoon: l.telefoon || '', adres: l.adres || '', plaats: l.plaats || '',
-      actie: l.actie || '', datum: l.datum || '', notitie: l.notitie || '', geenMail: !!l.geenMail,
+      actie: l.actie || '', datum: l.datum || '', tijd: l.tijd || '', prioriteit: validPrio(l.prioriteit), notitie: l.notitie || '', geenMail: !!l.geenMail,
       log: logBody(l.log || []), gearchiveerd: !!l.gearchiveerd, gearchiveerdOp: l.gearchiveerdOp || '',
       aangemaakt: l.aangemaakt, gewijzigd: l.gewijzigd,
     };
     if (l.voorbeeld) b.voorbeeld = true;
     return b;
   }
-  const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, actie: l.actie, datum: l.datum, notitie: l.notitie, geenMail: l.geenMail });
+  const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail });
 
   let toastTimer = 0;
   function toast(msg, ms = 3600) {
@@ -925,7 +951,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     const lead = {
       bedrijf, contact: $('addContact').value.trim(), email: $('addEmail').value.trim(), telefoon: $('addTelefoon').value.trim(),
       adres: $('addAdres').value.trim(), plaats: canonPlaats($('addPlaats').value),
-      actie, datum, notitie: '', geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now,
+      actie, datum, tijd: '', prioriteit: validPrio($('addPrio').value), notitie: '', geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now,
     };
     addBtn.disabled = true;
     const ok = await write(() => col.doc().set(toBody(lead)));
@@ -941,7 +967,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     toast(`${bedrijf} staat op je lijst${datum ? `, actie ${actie} op ${shortDate(datum)}` : ''}.`);
   }
 
-  async function saveLead(id) {
+  async function saveLead(id, opts = {}) {
     const l = byId(id), d = drafts[id];
     if (!l || !d || state.readOnly) return false;
     const bedrijf = d.bedrijf.trim();
@@ -951,13 +977,14 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       ...l, bedrijf,
       contact: d.contact.trim(), email: d.email.trim(), telefoon: d.telefoon.trim(), adres: d.adres.trim(), plaats: canonPlaats(d.plaats),
       actie, datum: actie && parseISO(d.datum) ? d.datum : '', notitie: d.notitie.trim(), geenMail: !!d.geenMail, gewijzigd: nowISO(),
+      tijd: actie && parseISO(d.datum) && /^\d{2}:\d{2}$/.test(d.tijd || '') ? d.tijd : '', prioriteit: validPrio(d.prioriteit),
     };
     const ok = await write(() => col.doc(id).set(toBody(next)));
     if (!ok) return false;
     rememberAction(actie);
     closeRow(true);
     renderAll();
-    toast('Opgeslagen.');
+    if (opts.agenda) addToCalendar(next); else toast('Opgeslagen.');
     return true;
   }
 
@@ -981,8 +1008,9 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     const today = todayISO(), archive = !!f.archief;
     const actie = archive ? '' : canonAction(f.actie);
     const datum = actie && parseISO(f.datum) ? f.datum : '';
+    const tijd = datum && /^\d{2}:\d{2}$/.test(f.tijd || '') ? f.tijd : '';
     const next = {
-      ...l, log: [{ d: today, a: l.actie, u: f.uitkomst, t: tekst }, ...l.log].slice(0, 100), actie, datum,
+      ...l, log: [{ d: today, a: l.actie, u: f.uitkomst, t: tekst }, ...l.log].slice(0, 100), actie, datum, tijd,
       gearchiveerd: archive, gearchiveerdOp: archive ? today : '', gewijzigd: nowISO(),
     };
     const ok = await write(() => col.doc(id).set(toBody(next)));
@@ -993,12 +1021,13 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     if (archive) toast(`${l.bedrijf} vastgelegd en naar het archief verplaatst.`);
     else if (actie) toast(`Vastgelegd. Volgende: ${actie}${datum ? ` op ${shortDate(datum)}` : ' (nog zonder datum)'}.`);
     else toast('Vastgelegd. Er staat nog geen volgende actie.');
+    if (f.agenda && actie && datum) addToCalendar(next);
   }
 
   async function archiveLead(id, on) {
     const l = byId(id);
     if (!l) return;
-    const next = { ...l, gearchiveerd: on, gearchiveerdOp: on ? todayISO() : '', actie: on ? '' : l.actie, datum: on ? '' : l.datum, gewijzigd: nowISO() };
+    const next = { ...l, gearchiveerd: on, gearchiveerdOp: on ? todayISO() : '', actie: on ? '' : l.actie, datum: on ? '' : l.datum, tijd: on ? '' : l.tijd, gewijzigd: nowISO() };
     const ok = await write(() => col.doc(id).set(toBody(next)));
     if (!ok) return;
     closeRow(true);
@@ -1057,19 +1086,190 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   }
   async function exportCsv() {
     if (!state.leads.length) return;
-    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Actie', 'Datum', 'Notitie', 'Geen mail', 'Contactmomenten', 'Gearchiveerd', 'Laatst gewijzigd'];
+    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Actie', 'Datum', 'Tijd', 'Prioriteit', 'Notitie', 'Geen mail', 'Contactmomenten', 'Gearchiveerd', 'Laatst gewijzigd'];
     const cell = v => {
       let s = String(v ?? '');
       if (/^[=@]/.test(s) || /^[+\-](?![\d\s(])/.test(s)) s = "'" + s;
       return '"' + s.replace(/"/g, '""') + '"';
     };
     const lines = [head, ...[...state.leads].sort(byName).map(l => [
-      l.bedrijf, l.contact, l.email, l.telefoon, l.adres, l.plaats, l.actie, l.datum, l.notitie, l.geenMail ? 'ja' : '',
+      l.bedrijf, l.contact, l.email, l.telefoon, l.adres, l.plaats, l.actie, l.datum, l.tijd, l.prioriteit, l.notitie, l.geenMail ? 'ja' : '',
       l.log.map(x => `${x.d} ${x.a}${x.u ? ': ' + x.u : ''}${x.t ? ' (' + x.t + ')' : ''}`).join(' | '),
       l.gearchiveerd ? `ja (${l.gearchiveerdOp})` : '', l.gewijzigd.slice(0, 10),
     ])].map(r => r.map(cell).join(';'));
     saveFile(`koude-acquisitie-${todayISO()}.csv`, '\ufeff' + lines.join('\r\n'), 'text/csv;charset=utf-8');
     toast('Export opgeslagen in je downloads.');
+  }
+
+  /* ---------- afspraak in je agenda (.ics, werkt met Samsung Agenda en Outlook) ---------- */
+  function icsText(l) {
+    const e = v => String(v || '').replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+    const fold = line => { const out = []; let rest = line; while (rest.length > 74) { out.push(rest.slice(0, 74)); rest = ' ' + rest.slice(74); } out.push(rest); return out.join('\r\n'); };
+    const z = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const [y, m, dd] = l.datum.split('-').map(Number);
+    const title = `${l.actie} – ${l.bedrijf}`;
+    const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Koude Acquisitie//NL', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
+      `UID:${l.id}-${l.datum.replace(/-/g, '')}@koude-acquisitie`, `DTSTAMP:${z(new Date())}`];
+    if (l.tijd) {
+      const [hh, mi] = l.tijd.split(':').map(Number);
+      const start = new Date(y, m - 1, dd, hh, mi);
+      lines.push(`DTSTART:${z(start)}`, `DTEND:${z(new Date(start.getTime() + 3600000))}`);
+    } else {
+      lines.push(`DTSTART;VALUE=DATE:${l.datum.replace(/-/g, '')}`, `DTEND;VALUE=DATE:${isoOf(new Date(y, m - 1, dd + 1)).replace(/-/g, '')}`);
+    }
+    const loc = [l.adres, l.plaats].filter(Boolean).join(', ');
+    const desc = [l.contact && 'Contactpersoon: ' + l.contact, l.telefoon && 'Telefoon: ' + l.telefoon, l.email && 'E-mail: ' + l.email, l.notitie].filter(Boolean).join('\n');
+    lines.push(`SUMMARY:${e(title)}`);
+    if (loc) lines.push(`LOCATION:${e(loc)}`);
+    if (desc) lines.push(`DESCRIPTION:${e(desc)}`);
+    // Herinnering: met tijd een half uur vooraf, zonder tijd om 08:05 die dag.
+    lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${e(title)}`, l.tijd ? 'TRIGGER:-PT30M' : 'TRIGGER:PT8H5M', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR');
+    return lines.map(fold).join('\r\n') + '\r\n';
+  }
+  function addToCalendar(l) {
+    if (!l || !l.actie || !l.datum) { toast('Vul eerst een actie en een datum in.'); return; }
+    const slug = (l.bedrijf || 'afspraak').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'afspraak';
+    saveFile(`agenda-${slug}-${l.datum}.ics`, icsText(l), 'text/calendar;charset=utf-8');
+    toast('Agenda-bestand gedownload. Tik op Openen en kies je agenda om de afspraak op te slaan.', 7000);
+  }
+
+  /* ---------- herinnering aan de back-up ---------- */
+  function backupAgeDays() {
+    const last = Date.parse(pref.get('laatsteBackup') || '');
+    return isNaN(last) ? null : Math.floor((Date.now() - last) / 86400000);
+  }
+  function renderBackupNotice() {
+    const el = $('backupNotice');
+    if (!el) return;
+    const days = backupAgeDays();
+    const show = state.local && state.loaded && state.leads.length > 0 && (days === null || days >= 7);
+    el.hidden = !show;
+    if (!show) { el.innerHTML = ''; return; }
+    el.innerHTML = `<p><strong>${days === null ? 'Je hebt nog geen back-up gemaakt.' : `Je laatste back-up is ${days} dagen oud.`}</strong> Je gegevens staan alleen op deze telefoon.</p>
+      <button type="button" class="btn small" data-backup>Back-up maken</button>`;
+  }
+
+  /* ---------- visitekaartje scannen ---------- */
+  let tessPromise = null;
+  function loadTesseract() {
+    if (window.Tesseract) return Promise.resolve(window.Tesseract);
+    if (!tessPromise) tessPromise = new Promise((resolve, reject) => {
+      const sc = document.createElement('script');
+      sc.src = 'vendor/ocr/tesseract.min.js';
+      sc.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error('ocr'));
+      sc.onerror = () => { tessPromise = null; sc.remove(); reject(new Error('ocr')); };
+      document.head.appendChild(sc);
+    });
+    return tessPromise;
+  }
+  async function imageToCanvas(file) {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((resolve, reject) => { const i = new Image(); i.onload = () => resolve(i); i.onerror = reject; i.src = url; });
+      const k = Math.min(1, 1800 / Math.max(img.naturalWidth, img.naturalHeight));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.naturalWidth * k);
+      c.height = Math.round(img.naturalHeight * k);
+      const g = c.getContext('2d');
+      g.filter = 'grayscale(1) contrast(1.25)';
+      g.drawImage(img, 0, 0, c.width, c.height);
+      return c;
+    } finally { URL.revokeObjectURL(url); }
+  }
+  function parseCard(text) {
+    const out = { bedrijf: '', contact: '', email: '', telefoon: '', adres: '', plaats: '' };
+    const lines = String(text).split(/\r?\n/).map(x => x.replace(/[|•·®©™]/g, ' ').replace(/\s+/g, ' ').trim()).filter(x => x.length > 1);
+    const used = new Set();
+    const emailRe = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+    let domain = '';
+    lines.forEach((l, i) => {
+      const m = l.match(emailRe);
+      if (!m) return;
+      used.add(i);
+      if (!out.email) out.email = m[0].toLowerCase();
+      const d = m[0].split('@')[1].toLowerCase();
+      if (!domain && !FREE_MAIL.has(d)) domain = d;
+    });
+    const phones = [];
+    lines.forEach((l, i) => {
+      const re = /(?:\+31|0031|0)[\s\-.()]*(?:\d[\s\-.()]*){9}/g;
+      let m;
+      while ((m = re.exec(l))) phones.push({ v: m[0].replace(/[\s\-.()]+$/, '').trim(), i });
+    });
+    if (phones.length) {
+      const mob = phones.find(p => /^(?:\+31|0031|0)[\s\-.()]*6/.test(p.v));
+      out.telefoon = (mob || phones[0]).v;
+      phones.forEach(p => used.add(p.i));
+    }
+    lines.forEach((l, i) => {
+      if (used.has(i)) return;
+      const m = l.match(/(?:https?:\/\/)?(?:www\.)?([a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:nl|com|eu|be|de|net|org|io|biz|info|frl))\b/i);
+      if (m) { used.add(i); if (!domain) domain = m[1].toLowerCase().replace(/^www\./, ''); }
+    });
+    lines.forEach((l, i) => {
+      if (out.plaats) return;
+      const m = l.match(/^(.*?)\b(\d{4})\s?([A-Z]{2})\b[\s,]*([A-Za-zÀ-ÿ'][A-Za-zÀ-ÿ' .-]+)$/);
+      if (!m) return;
+      const city = m[4].trim();
+      out.plaats = city === city.toUpperCase() ? city.toLowerCase().replace(/(^|[\s-])([a-zà-ÿ])/g, (x, a, b) => a + b.toUpperCase()) : city;
+      let street = m[1].replace(/[,\s]+$/, '').trim();
+      if (!street && i > 0 && !used.has(i - 1) && /[A-Za-z]/.test(lines[i - 1]) && /\d/.test(lines[i - 1])) { street = lines[i - 1]; used.add(i - 1); }
+      out.adres = [street, `${m[2]} ${m[3]}`].filter(Boolean).join(', ');
+      used.add(i);
+    });
+    const legal = /\b(b\.?\s?v\.?|v\.?o\.?f\.?|n\.?v\.?|holding|groep|group|gmbh|ltd)(\s|$)/i;
+    const titles = /\b(directeur|eigenaar|owner|manager|accountmanager|adviseur|consultant|verkoop|sales|inkoop|medewerker|ceo|cto|cfo|coo|director|bedrijfsleider|projectleider|office|planner|monteur|specialist|partner|oprichter|founder|engineer|hoofd|teamleider|commercieel|administratie|marketing|tel|mobiel|email|e-mail)\b/i;
+    const cand = lines.map((l, i) => ({ l, i })).filter(x => !used.has(x.i) && /[A-Za-zÀ-ÿ]{2}/.test(x.l) && !/\d{3,}/.test(x.l) && x.l.length <= 60);
+    const norm = x => x.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const dom = norm(domain.split('.')[0] || '');
+    const comp = cand.find(x => legal.test(x.l)) || (dom && cand.find(x => { const n = norm(x.l); return n.length >= 3 && (dom.includes(n) || n.includes(dom)); }));
+    if (comp) { out.bedrijf = comp.l; used.add(comp.i); }
+    const nameWord = w => /^[A-ZÀ-Ý][a-zà-ÿ'-]+$/.test(w) || /^(van|de|der|den|het|ter|ten|op|in|'t)$/i.test(w) || /^[A-Z]\.$/.test(w);
+    const isName = x => { const w = x.split(' '); return w.length >= 2 && w.length <= 5 && !titles.test(x) && !legal.test(x) && w.every(nameWord); };
+    const nameC = cand.find(x => !used.has(x.i) && isName(x.l));
+    if (nameC) { out.contact = nameC.l; used.add(nameC.i); }
+    if (!out.bedrijf) {
+      const rest = cand.find(x => !used.has(x.i) && !titles.test(x.l));
+      if (rest) out.bedrijf = rest.l;
+      else if (dom) out.bedrijf = dom.charAt(0).toUpperCase() + dom.slice(1);
+    }
+    return out;
+  }
+  function fillAddForm(found) {
+    setAddOpen(true);
+    const map = { addBedrijf: 'bedrijf', addContact: 'contact', addEmail: 'email', addTelefoon: 'telefoon', addAdres: 'adres', addPlaats: 'plaats' };
+    let n = 0;
+    Object.entries(map).forEach(([elId, k]) => { $(elId).value = found[k] || ''; if (found[k]) n++; });
+    checkAddDupes();
+    return n;
+  }
+  async function scanCard(file) {
+    const msg = $('scanMsg'), btn = $('scanBtn');
+    btn.disabled = true;
+    msg.textContent = 'Kaartje lezen…';
+    let worker = null;
+    try {
+      const T = await loadTesseract();
+      const base = new URL('vendor/ocr', location.href).href;
+      worker = await T.createWorker(['nld', 'eng'], 1, {
+        workerPath: base + '/worker.min.js', corePath: base, langPath: base + '/lang', gzip: true,
+        logger: m => {
+          if (m.status === 'recognizing text') msg.textContent = `Kaartje lezen… ${Math.round((m.progress || 0) * 100)}%`;
+          else if (/load|initializ/i.test(m.status || '')) msg.textContent = 'Tekstherkenning starten… De eerste keer duurt dit even.';
+        },
+      });
+      const { data } = await worker.recognize(await imageToCanvas(file));
+      const n = fillAddForm(parseCard(data.text || ''));
+      msg.textContent = n
+        ? `${n} ${plural(n, 'gegeven', 'gegevens')} ingevuld. Controleer ze en tik op Toevoegen.`
+        : 'Er kon geen tekst worden gelezen. Maak de foto recht van boven, met goed licht, en probeer het opnieuw.';
+      if (n) $('addBedrijf').focus();
+    } catch {
+      msg.textContent = 'Lezen lukte niet. Probeer het opnieuw met een scherpere foto.';
+    } finally {
+      btn.disabled = false;
+      if (worker) worker.terminate().catch(() => {});
+    }
   }
 
   /* ---------- weergave ---------- */
@@ -1085,9 +1285,15 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     if (state.view === 'acties') return !!l.actie && (!state.actie || key(l.actie) === key(state.actie));
     return true;
   }
-  const byDate = (a, b) => (a.datum ? 0 : 1) - (b.datum ? 0 : 1) || a.datum.localeCompare(b.datum);
-  const byDateThenName = (a, b) => byDate(a, b) || byName(a, b);
-  const byDatePlaatsName = (a, b) => byDate(a, b) || cmp(a.plaats || '~', b.plaats || '~') || byName(a, b);
+  const prioRank = l => l.prioriteit === 'hoog' ? 0 : l.prioriteit === 'laag' ? 2 : 1;
+  const byDate = (a, b) => (a.datum ? 0 : 1) - (b.datum ? 0 : 1) || a.datum.localeCompare(b.datum) || (a.tijd || '99').localeCompare(b.tijd || '99');
+  const byDateThenName = (a, b) => byDate(a, b) || prioRank(a) - prioRank(b) || byName(a, b);
+  const byDatePlaatsName = (a, b) => byDate(a, b) || prioRank(a) - prioRank(b) || cmp(a.plaats || '~', b.plaats || '~') || byName(a, b);
+  // Takenlijst voor vandaag: eerst wat belangrijk is, dan wat het langst openstaat.
+  const byPrioDate = (a, b) => prioRank(a) - prioRank(b) || byDate(a, b) || cmp(a.plaats || '~', b.plaats || '~') || byName(a, b);
+  const prioBadge = l => l.prioriteit === 'hoog' ? '<span class="prio hoog">Hoog</span>' : l.prioriteit === 'laag' ? '<span class="prio laag">Laag</span>' : '';
+  const prioOptions = cur => [['hoog', 'Hoog'], ['normaal', 'Normaal'], ['laag', 'Laag']]
+    .map(([v, t]) => `<option value="${v}"${v === cur ? ' selected' : ''}>${t}</option>`).join('');
 
   function dueChip(l) {
     if (!l.datum) return '';
@@ -1098,6 +1304,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     else if (diff < 0) { cls = 'late'; txt = `${-diff} dagen te laat`; }
     else if (diff === 0) { cls = 'today'; txt = 'Vandaag'; }
     else if (diff === 1) txt = 'Morgen';
+    if (l.tijd) txt += ' ' + l.tijd;
     return `<span class="due ${cls}" title="${esc(longDate(l.datum))}">${esc(txt)}</span>`;
   }
 
@@ -1131,6 +1338,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       <div class="pactions">
         <button type="button" class="btn primary" id="save-${id}" data-act="save">Opslaan</button>
         ${mailB}
+        <button type="button" class="btn" id="agenda-${id}" data-act="agenda">In agenda</button>
         ${archiveBtn}
         <button type="button" class="btn danger push${armedDelete === l.id ? ' armed' : ''}" id="del-${id}" data-act="delete">${armedDelete === l.id ? 'Klik nogmaals om te verwijderen' : 'Verwijderen'}</button>
       </div>`;
@@ -1149,6 +1357,8 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
           ${input('plaats', 'Plaats', 'span2', 'text', 60, ' list="plaatsLijst"')}
           ${input('actie', 'Actie', 'span2', 'text', 40, ' list="actieLijst" placeholder="Kies of typ, bijv. Bezoek"')}
           <div class="field span2"><label for="p-${id}-datum">Wanneer</label>${whenHtml(`p-${id}-datum`, d.datum, ` data-field="datum"${ro}`, state.readOnly)}</div>
+          <div class="field span2"><label for="p-${id}-tijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="p-${id}-tijd" data-field="tijd" value="${esc(d.tijd || '')}"${ro}></div>
+          <div class="field span2"><label for="p-${id}-prioriteit">Prioriteit</label><select class="input" id="p-${id}-prioriteit" data-field="prioriteit"${state.readOnly ? ' disabled' : ''}>${prioOptions(d.prioriteit)}</select></div>
           <div class="field span4"><label for="p-${id}-notitie">Notitie</label>
             <textarea class="input" id="p-${id}-notitie" data-field="notitie" maxlength="2000" placeholder="Wat weet je over dit bedrijf?"${ro}>${esc(d.notitie)}</textarea></div>
           <label class="check span4" for="p-${id}-geenMail"><input type="checkbox" id="p-${id}-geenMail" data-field="geenMail"${d.geenMail ? ' checked' : ''}${state.readOnly ? ' disabled' : ''}>Wil geen mail ontvangen (wordt overgeslagen bij mailen)</label>
@@ -1165,7 +1375,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   }
 
   function finishHtml(l) {
-    const f = finishes[l.id] || (finishes[l.id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', archief: false });
+    const f = finishes[l.id] || (finishes[l.id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false });
     const id = esc(l.id), dis = f.archief;
     return `<div class="finish">
       <section class="step" aria-label="Uitkomst">
@@ -1189,6 +1399,11 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
           ${whenHtml(`f-${id}-datum`, dis ? '' : f.datum, ' data-ffield="datum"', dis)}
           <p class="hint">Met een datum staat de actie die dag bovenaan, onder <strong>Vandaag</strong>.</p>
         </div>
+        <div class="field">
+          <label for="f-${id}-tijd">Tijd<span class="opt">optioneel</span></label>
+          <input class="input" type="time" id="f-${id}-tijd" data-ffield="tijd" value="${esc(dis ? '' : f.tijd || '')}"${dis ? ' disabled' : ''}>
+        </div>
+        <label class="check" for="f-${id}-agenda"><input type="checkbox" id="f-${id}-agenda" data-ffield="agenda"${f.agenda && !dis ? ' checked' : ''}${dis ? ' disabled' : ''}>Ook in mijn agenda zetten</label>
         <label class="check" for="f-${id}-archief"><input type="checkbox" id="f-${id}-archief" data-ffield="archief"${f.archief ? ' checked' : ''}>Archiveren, geen vervolg</label>
       </section>
       <div class="pactions">
@@ -1222,7 +1437,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       <div class="row-main cols" data-act="toggle">
         <div class="cell first">${check}
           <button type="button" class="bedrijf" id="t-${id}" data-act="toggle" aria-expanded="${open && !finishing}">
-            <span class="name">${esc(l.bedrijf)}${l.voorbeeld ? '<span class="tag">Voorbeeld</span>' : ''}</span>
+            <span class="name">${esc(l.bedrijf)}${prioBadge(l)}${l.voorbeeld ? '<span class="tag">Voorbeeld</span>' : ''}</span>
             ${l.contact ? `<span class="sub">${esc(l.contact)}</span>` : ''}
             ${info ? `<span class="meta">${esc(info)}</span>` : ''}
           </button>
@@ -1263,7 +1478,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
 
     if (state.view === 'alles') {
       if (!list.length) return emptyHtml('Alle bedrijven staan in het archief', 'Voeg hierboven een nieuw bedrijf toe of zet er een terug vanuit het archief.');
-      const due = list.filter(l => isDue(l, today)).sort(byDatePlaatsName);
+      const due = list.filter(l => isDue(l, today)).sort(byPrioDate);
       const rest = list.filter(l => !isDue(l, today)).sort(byName);
       if (!due.length) return rest.map(rowHtml).join('');
       return groupHead('Vandaag te doen', due.length) + due.map(rowHtml).join('') +
@@ -1272,7 +1487,9 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
 
     if (state.view === 'vandaag') {
       if (!list.length) return emptyHtml('Niets meer te doen vandaag', 'Er staan geen acties voor vandaag of eerder. Plan nieuwe acties met een datum, dan verschijnen ze hier op die dag.');
-      return grouped(list, l => key(l.actie), (k, items) => items[0].actie, cmp, byDatePlaatsName,
+      const groupRank = new Map();
+      list.forEach(l => { const k = key(l.actie); groupRank.set(k, Math.min(groupRank.has(k) ? groupRank.get(k) : 9, prioRank(l))); });
+      return grouped(list, l => key(l.actie), (k, items) => items[0].actie, (a, b) => groupRank.get(a) - groupRank.get(b) || cmp(a, b), byPrioDate,
         (k, items) => /bezoek/i.test(items[0].actie) ? routeLink(items) : '');
     }
 
@@ -1348,6 +1565,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     mailBtn.textContent = state.selecting ? 'Stop met selecteren' : 'Mail versturen';
     addForm.hidden = state.readOnly || !!state.problem;
     roNote.hidden = !state.readOnly;
+    renderBackupNotice();
     if ($('addBedrijf').value || $('addTelefoon').value || $('addEmail').value) checkAddDupes();
   }
 
@@ -1405,7 +1623,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     state.open = id;
     state.mode = mode === 'finish' ? 'finish' : 'edit';
     if (state.mode === 'edit') drafts[id] = draftFrom(l);
-    else finishes[id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', archief: false };
+    else finishes[id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false };
     renderRows();
   }
   function gotoLead(id) {
@@ -1701,14 +1919,14 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   }
   const normPhone = s => { const t = String(s || '').trim(); return /^[1-9]\d{8}$/.test(t) ? '0' + t : t; };
   function mapRow(row, map) {
-    const o = { bedrijf: [], contact: [], email: [], telefoon: [], adres: [], huisnummer: [], postcode: [], plaats: [], actie: [], notitie: [] };
+    const o = { bedrijf: [], contact: [], email: [], telefoon: [], adres: [], huisnummer: [], postcode: [], plaats: [], actie: [], prioriteit: [], notitie: [] };
     map.forEach((f, i) => { const v = String(row[i] ?? '').trim(); if (f && v && o[f]) o[f].push(v); });
     let adres = [o.adres.join(' '), o.huisnummer.join(' ')].filter(Boolean).join(' ');
     if (o.postcode.length) adres = [adres, o.postcode.join(' ')].filter(Boolean).join(', ');
     return {
       bedrijf: o.bedrijf.join(' ').slice(0, 120), contact: o.contact.join(' ').replace(/\s+/g, ' ').slice(0, 120),
       email: (o.email[0] || '').split(/[;,\s]+/)[0].slice(0, 120), telefoon: normPhone(o.telefoon[0]).slice(0, 40),
-      adres: adres.slice(0, 120), plaats: o.plaats.join(' ').slice(0, 60), actie: o.actie[0] || '', notitie: o.notitie.join(' · ').slice(0, 2000),
+      adres: adres.slice(0, 120), plaats: o.plaats.join(' ').slice(0, 60), actie: o.actie[0] || '', prioriteit: mapPrio(o.prioriteit[0]), notitie: o.notitie.join(' · ').slice(0, 2000),
     };
   }
   function importRows() {
@@ -1828,7 +2046,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     const now = nowISO(), globalActie = canonAction(imp.actie), datum = parseISO(imp.datum) ? imp.datum : '';
     const bodies = chosen.map(r => {
       const actie = canonAction(r.c.actie) || globalActie;
-      return toBody({ bedrijf: r.c.bedrijf, contact: r.c.contact, email: r.c.email, telefoon: r.c.telefoon, adres: r.c.adres, plaats: canonPlaats(r.c.plaats),
+      return toBody({ bedrijf: r.c.bedrijf, prioriteit: r.c.prioriteit, contact: r.c.contact, email: r.c.email, telefoon: r.c.telefoon, adres: r.c.adres, plaats: canonPlaats(r.c.plaats),
         actie, datum: actie ? datum : '', notitie: r.c.notitie, geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now });
     });
     const acties = [...new Set(bodies.map(b => b.actie).filter(Boolean))];
@@ -1870,6 +2088,9 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
 
   /* ---------- gebeurtenissen ---------- */
   addForm.addEventListener('submit', addLead);
+  $('scanBtn').addEventListener('click', () => $('scanFile').click());
+  $('scanFile').addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) scanCard(f); });
+  $('backupNotice').addEventListener('click', e => { if (e.target.closest('[data-backup]')) $('backupBtn').click(); });
   const addToggle = $('addToggle');
   const setAddOpen = open => { addForm.classList.toggle('collapsed', !open); addToggle.setAttribute('aria-expanded', String(open)); };
   setAddOpen(!(window.matchMedia && matchMedia('(max-width: 760px)').matches));
@@ -1991,6 +2212,11 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     else if (act === 'cancel') { closeRow(); $(`af-${id}`)?.focus(); }
     else if (act === 'save') saveLead(id);
     else if (act === 'mail') openMail([id]);
+    else if (act === 'agenda') {
+      const d = drafts[id];
+      if (!d || !d.actie.trim() || !parseISO(d.datum)) { toast('Vul eerst een actie en een datum in.'); return; }
+      saveLead(id, { agenda: true });
+    }
     else if (act === 'archive') archiveLead(id, true);
     else if (act === 'restore') archiveLead(id, false);
     else if (act === 'delete') deleteLead(id);
@@ -2004,7 +2230,8 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       else drafts[id][t.dataset.field] = t.value;
     }
     if (t.dataset.ffield && finishes[id]) {
-      if (t.type === 'checkbox') {
+      if (t.type === 'checkbox' && t.dataset.ffield === 'agenda') { if (e.type === 'change') finishes[id].agenda = t.checked; }
+      else if (t.type === 'checkbox') {
         if (e.type !== 'change') return;
         finishes[id].archief = t.checked;
         if (!t.checked && !finishes[id].actie) finishes[id].actie = byId(id)?.actie || '';
@@ -2323,7 +2550,10 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       acties: state.acties,
     };
     saveFile(`koude-acquisitie-backup-${todayISO()}.json`, JSON.stringify(data, null, 2), 'application/json');
-    toast('Back-up opgeslagen in je downloads.');
+    pref.set('laatsteBackup', nowISO());
+    renderBackupNotice();
+    saveAgenda();
+    toast('Back-up opgeslagen in je downloads. Bewaar hem ook ergens anders, bijvoorbeeld in OneDrive of je mail.', 6000);
   });
   $('restoreBtn').addEventListener('click', () => $('restoreFile').click());
   $('restoreFile').addEventListener('change', async e => {
@@ -2401,23 +2631,25 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   let lastAgenda = '';
   function agendaItems() {
     return state.leads.filter(l => !l.gearchiveerd && l.actie && l.datum)
-      .map(l => ({ bedrijf: l.bedrijf, actie: l.actie, datum: l.datum, plaats: l.plaats }));
+      .map(l => ({ bedrijf: l.bedrijf, actie: l.actie, datum: l.datum, tijd: l.tijd, plaats: l.plaats, prioriteit: l.prioriteit }));
   }
   function saveAgenda() {
     if (!('caches' in window)) return;
-    const json = JSON.stringify({ bijgewerkt: nowISO(), items: agendaItems() });
+    const json = JSON.stringify({ bijgewerkt: nowISO(), lokaal: state.local, laatsteBackup: pref.get('laatsteBackup') || '', items: agendaItems() });
     if (json.replace(/"bijgewerkt":"[^"]*",/, '') === lastAgenda) return;
     lastAgenda = json.replace(/"bijgewerkt":"[^"]*",/, '');
     caches.open(DATA_CACHE)
       .then(c => c.put(new URL('agenda.json', location.href).href, new Response(json, { headers: { 'Content-Type': 'application/json' } })))
       .catch(() => {});
   }
+  // Zelfde opbouw als in sw.js.
   function buildMessage(items, today) {
+    const rank = x => x.prioriteit === 'hoog' ? 0 : x.prioriteit === 'laag' ? 2 : 1;
     const due = items.filter(x => x.datum && x.datum <= today)
-      .sort((a, b) => a.datum.localeCompare(b.datum) || String(a.plaats || '').localeCompare(String(b.plaats || '')));
+      .sort((a, b) => rank(a) - rank(b) || a.datum.localeCompare(b.datum) || (a.tijd || '99').localeCompare(b.tijd || '99') || String(a.plaats || '').localeCompare(String(b.plaats || '')));
     if (!due.length) return null;
     const n = due.length, late = due.filter(x => x.datum < today).length;
-    const lines = due.slice(0, 6).map(x => `${x.actie} · ${x.bedrijf}${x.plaats ? ' (' + x.plaats + ')' : ''}${x.datum < today ? ' – te laat' : ''}`);
+    const lines = due.slice(0, 6).map(x => `${x.tijd && x.datum === today ? x.tijd + ' ' : ''}${x.actie} · ${x.bedrijf}${x.plaats ? ' (' + x.plaats + ')' : ''}${x.datum < today ? ' – te laat' : ''}${x.prioriteit === 'hoog' ? ' – hoog' : ''}`);
     if (n > 6) lines.push(`en nog ${n - 6}`);
     return { title: `Vandaag: ${n} ${plural(n, 'actie', 'acties')}${late ? `, ${late} te laat` : ''}`, body: lines.join('\n') };
   }
@@ -2434,19 +2666,19 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   async function renderPush() {
     const status = $('pushStatus'), on = $('pushOn'), copy = $('pushCopy'), test = $('pushTest');
     if (!pushSupported()) {
-      status.textContent = 'Deze browser kan geen meldingen tonen. Installeer de app via Chrome.';
+      status.textContent = 'Ochtendmelding: niet beschikbaar in deze browser.';
       on.hidden = copy.hidden = test.hidden = true;
       return;
     }
     const sub = await currentSub();
     if (Notification.permission === 'denied') {
-      status.textContent = 'Meldingen zijn geblokkeerd. Zet ze aan via Instellingen → Apps → Acquisitie → Meldingen, en open de app opnieuw.';
-      on.hidden = true; copy.hidden = true; test.hidden = true;
+      status.textContent = 'Ochtendmelding: geblokkeerd. Zet meldingen voor de app aan in de Android-instellingen.';
+      on.hidden = copy.hidden = test.hidden = true;
     } else if (sub && Notification.permission === 'granted') {
-      status.textContent = 'Staan aan op dit toestel. Op werkdagen om 08:05 krijg je een melding als er acties voor vandaag zijn.';
+      status.textContent = 'Ochtendmelding 08:05: aan.';
       on.hidden = true; copy.hidden = false; test.hidden = false;
     } else {
-      status.textContent = 'Op werkdagen om 08:05 een melding met je acties van vandaag. Geen acties, dan geen melding.';
+      status.textContent = 'Ochtendmelding 08:05: uit.';
       on.hidden = false; copy.hidden = true; test.hidden = true;
     }
   }
@@ -2509,6 +2741,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       ? 'Je gegevens staan op dit apparaat. Maak af en toe een back-up.'
       : 'Ingelogd als ' + (session.user.email || '');
     $('logoutBtn').hidden = !!localStore;
+    state.local = !!localStore;
     gateEl.hidden = true;
     appEl.hidden = false;
     const store = localStore || createStore(sb, session.user.id);
