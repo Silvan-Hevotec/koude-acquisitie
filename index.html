@@ -547,6 +547,15 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   </section>
 
   <footer class="foot">
+    <div class="notice" id="pushBox">
+      <p><strong>Ochtendmelding om 08:05</strong><br><span id="pushStatus">Op werkdagen een melding met je acties van vandaag.</span></p>
+      <div class="btns">
+        <button type="button" class="btn small primary" id="pushOn">Meldingen aanzetten</button>
+        <button type="button" class="btn small" id="pushCopy" hidden>Kopieer koppelcode</button>
+        <button type="button" class="btn small" id="pushTest" hidden>Testmelding</button>
+      </div>
+      <textarea class="input" id="pushCode" rows="3" readonly hidden aria-label="Koppelcode"></textarea>
+    </div>
     <div class="foot-row">
       <span class="meta" id="who"></span>
       <div class="btns">
@@ -2384,6 +2393,94 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     installBtn.hidden = true;
   });
 
+  /* ---------- ochtendmelding ---------- */
+  /* Om 08:05 stuurt een geplande taak van Claude een leeg signaal naar dit toestel. De service worker leest dan
+     de actielijst die de app hieronder klaarzet en toont een melding als er vandaag iets op staat. */
+  const VAPID_PUBLIC = 'BDz5_askKTOerYW4HV6sHD4GET_pLPTGSah3yEDccDjpEZTWyK0-lRdvAnYPSresTw1bs1VKjXSdPqmMHwFmGM8';
+  const DATA_CACHE = 'koude-acq-data';
+  let lastAgenda = '';
+  function agendaItems() {
+    return state.leads.filter(l => !l.gearchiveerd && l.actie && l.datum)
+      .map(l => ({ bedrijf: l.bedrijf, actie: l.actie, datum: l.datum, plaats: l.plaats }));
+  }
+  function saveAgenda() {
+    if (!('caches' in window)) return;
+    const json = JSON.stringify({ bijgewerkt: nowISO(), items: agendaItems() });
+    if (json.replace(/"bijgewerkt":"[^"]*",/, '') === lastAgenda) return;
+    lastAgenda = json.replace(/"bijgewerkt":"[^"]*",/, '');
+    caches.open(DATA_CACHE)
+      .then(c => c.put(new URL('agenda.json', location.href).href, new Response(json, { headers: { 'Content-Type': 'application/json' } })))
+      .catch(() => {});
+  }
+  function buildMessage(items, today) {
+    const due = items.filter(x => x.datum && x.datum <= today)
+      .sort((a, b) => a.datum.localeCompare(b.datum) || String(a.plaats || '').localeCompare(String(b.plaats || '')));
+    if (!due.length) return null;
+    const n = due.length, late = due.filter(x => x.datum < today).length;
+    const lines = due.slice(0, 6).map(x => `${x.actie} · ${x.bedrijf}${x.plaats ? ' (' + x.plaats + ')' : ''}${x.datum < today ? ' – te laat' : ''}`);
+    if (n > 6) lines.push(`en nog ${n - 6}`);
+    return { title: `Vandaag: ${n} ${plural(n, 'actie', 'acties')}${late ? `, ${late} te laat` : ''}`, body: lines.join('\n') };
+  }
+  const b64ToBytes = b64 => {
+    const s = atob((b64 + '='.repeat((4 - b64.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/'));
+    return Uint8Array.from(s, c => c.charCodeAt(0));
+  };
+  const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  async function currentSub() {
+    try { const reg = await navigator.serviceWorker.getRegistration(); return reg ? await reg.pushManager.getSubscription() : null; }
+    catch { return null; }
+  }
+  const pushCode = sub => 'KA-PUSH:' + btoa(JSON.stringify(sub.toJSON()));
+  async function renderPush() {
+    const status = $('pushStatus'), on = $('pushOn'), copy = $('pushCopy'), test = $('pushTest');
+    if (!pushSupported()) {
+      status.textContent = 'Deze browser kan geen meldingen tonen. Installeer de app via Chrome.';
+      on.hidden = copy.hidden = test.hidden = true;
+      return;
+    }
+    const sub = await currentSub();
+    if (Notification.permission === 'denied') {
+      status.textContent = 'Meldingen zijn geblokkeerd. Zet ze aan via Instellingen → Apps → Acquisitie → Meldingen, en open de app opnieuw.';
+      on.hidden = true; copy.hidden = true; test.hidden = true;
+    } else if (sub && Notification.permission === 'granted') {
+      status.textContent = 'Staan aan op dit toestel. Op werkdagen om 08:05 krijg je een melding als er acties voor vandaag zijn.';
+      on.hidden = true; copy.hidden = false; test.hidden = false;
+    } else {
+      status.textContent = 'Op werkdagen om 08:05 een melding met je acties van vandaag. Geen acties, dan geen melding.';
+      on.hidden = false; copy.hidden = true; test.hidden = true;
+    }
+  }
+  function showCode(sub) {
+    const code = pushCode(sub), box = $('pushCode');
+    box.value = code;
+    box.hidden = false;
+    copyText(code, 'Koppelcode', false);
+  }
+  $('pushOn').addEventListener('click', async () => {
+    if (!pushSupported()) return;
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') { toast('Zonder toestemming kan de app geen meldingen tonen.'); renderPush(); return; }
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const sub = (await reg.pushManager.getSubscription())
+        || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(VAPID_PUBLIC) });
+      saveAgenda();
+      showCode(sub);
+      toast('Meldingen staan aan. Plak de koppelcode in je gesprek met Claude, dan zet Claude de ochtendmelding aan.', 8000);
+    } catch {
+      toast('Aanzetten lukte niet. Controleer je internetverbinding en probeer het opnieuw.');
+    }
+    renderPush();
+  });
+  $('pushCopy').addEventListener('click', async () => { const sub = await currentSub(); if (sub) showCode(sub); });
+  $('pushTest').addEventListener('click', async () => {
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const m = buildMessage(agendaItems(), todayISO()) || { title: 'Koude Acquisitie', body: 'Meldingen werken. Er staan vandaag geen acties op je lijst.' };
+      await reg.showNotification(m.title, { body: m.body, icon: 'icons/icon-192.png', badge: 'icons/badge-96.png', tag: 'dagtaken', renotify: true, data: { url: './#vandaag' } });
+    } catch { toast('De testmelding lukte niet. Staan meldingen aan voor de app?'); }
+  });
+
   /* ---------- inloggen en opstarten ---------- */
   const gateEl = $('gate'), appEl = $('app');
   let sb = null, started = false, inRecovery = /type=recovery/.test(location.hash);
@@ -2424,6 +2521,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       state.leads = snap.docs.filter(d => d.exists).map(normalize);
       state.loaded = true;
       state.problem = null;
+      saveAgenda();
       scheduleRender();
     }, () => {
       state.problem = { title: 'Lijst niet beschikbaar', text: 'Je lijst kan nu niet worden geladen. Controleer je internetverbinding. De app probeert het vanzelf opnieuw.' };
@@ -2450,6 +2548,15 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     document.addEventListener('visibilitychange', () => { if (!document.hidden) store.refreshAll(); });
     window.addEventListener('online', () => store.refreshAll());
     setInterval(() => { if (!document.hidden) store.refreshAll(); }, 120000);
+    const openFromNotification = () => {
+      if (location.hash !== '#vandaag') return;
+      setView('vandaag');
+      history.replaceState(null, '', location.pathname);
+      renderAll();
+    };
+    openFromNotification();
+    window.addEventListener('hashchange', openFromNotification);
+    renderPush();
     renderAll();
   }
 
