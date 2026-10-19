@@ -3059,6 +3059,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (has('AADSTS50194')) return 'Vul ook de map-ID (tenant-ID) in.';
     if (has('AADSTS65001') || has('AADSTS90094') || has('AADSTS90095') || code === 'consent_required')
       return 'Er is nog toestemming nodig. Klik in de app-registratie bij API-machtigingen op "Beheerderstoestemming verlenen", of vraag dat aan je beheerder.';
+    if (has('AADSTS65004')) return 'Je hebt de toestemming niet gegeven. Tik opnieuw op Aanmelden en kies Accepteren. Lukt dat niet, vraag dan je Microsoft 365-beheerder om in de app-registratie op "Beheerderstoestemming verlenen" te klikken.';
     if (code === 'access_denied') return 'Aanmelden is afgebroken.';
     return 'Aanmelden bij Microsoft lukte niet' + (d ? ': ' + d.split(/\r?\n/)[0].replace(/^AADSTS\d+:\s*/, '') : '.');
   }
