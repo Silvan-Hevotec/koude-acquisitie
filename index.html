@@ -424,6 +424,14 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
 /* Visitekaartje scannen */
 .scanrow { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .scanrow .hint { flex: 1 1 220px; }
+.scanlines { grid-column: 1 / -1; display: grid; gap: 8px; }
+.scanlines .hint { margin: 0; }
+.ocr-lines { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.ocr-lines li { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 12px; }
+.ocr-lines li + li { border-top: 1px solid var(--line); }
+.ocr-t { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
+.ocr-sel { flex: 0 0 auto; width: 142px; min-height: 36px; padding-block: 4px; font-size: 14px; color: var(--muted); }
+.ocr-sel.used { color: var(--ink); font-weight: 600; }
 
 /* Ochtendmelding als kleine regel */
 .push-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 13px; }
@@ -497,6 +505,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       <input type="file" id="scanFile" accept="image/*" capture="environment" hidden>
       <span class="hint" id="scanMsg">Maak een foto van een kaartje, dan vult de app de gegevens in.</span>
     </div>
+    <div class="scanlines" id="scanLines" hidden></div>
     <div class="field">
       <label for="addBedrijf">Bedrijfsnaam</label>
       <input class="input" id="addBedrijf" maxlength="120" placeholder="Bijv. Drukkerij De Vries">
@@ -959,6 +968,8 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     if (!ok) return;
     rememberAction(actie);
     addForm.reset();
+    clearScanLines();
+    $('scanMsg').textContent = 'Maak een foto van een kaartje, dan vult de app de gegevens in.';
     syncWhen(addWhenEl.querySelector('.when'));
     dupSig = ''; dupAcked = false; addBtn.textContent = 'Toevoegen'; dupWarnEl.hidden = true;
     $('addBedrijf').focus();
@@ -1103,7 +1114,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
 
   /* ---------- afspraak in je agenda (.ics, werkt met Samsung Agenda en Outlook) ---------- */
   function icsText(l) {
-    const e = v => String(v || '').replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+    const e = v => String(v || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
     const fold = line => { const out = []; let rest = line; while (rest.length > 74) { out.push(rest.slice(0, 74)); rest = ' ' + rest.slice(74); } out.push(rest); return out.join('\r\n'); };
     const z = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
     const [y, m, dd] = l.datum.split('-').map(Number);
@@ -1150,7 +1161,9 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   }
 
   /* ---------- visitekaartje scannen ---------- */
-  let tessPromise = null;
+  // De tekstherkenning (Tesseract) draait op het toestel zelf. Ligt het kaartje gedraaid, dan probeert de app
+  // de andere kanten; mist er daarna nog iets, dan leest hij de foto nog een keer met gelijkgetrokken licht.
+  let tessPromise = null, ocrWorker = null, ocrIdle = 0, ocrStatus = null;
   function loadTesseract() {
     if (window.Tesseract) return Promise.resolve(window.Tesseract);
     if (!tessPromise) tessPromise = new Promise((resolve, reject) => {
@@ -1162,104 +1175,324 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     });
     return tessPromise;
   }
-  async function imageToCanvas(file) {
-    const url = URL.createObjectURL(file);
-    try {
-      const img = await new Promise((resolve, reject) => { const i = new Image(); i.onload = () => resolve(i); i.onerror = reject; i.src = url; });
-      const k = Math.min(1, 1800 / Math.max(img.naturalWidth, img.naturalHeight));
-      const c = document.createElement('canvas');
-      c.width = Math.round(img.naturalWidth * k);
-      c.height = Math.round(img.naturalHeight * k);
-      const g = c.getContext('2d');
-      g.filter = 'grayscale(1) contrast(1.25)';
-      g.drawImage(img, 0, 0, c.width, c.height);
-      return c;
-    } finally { URL.revokeObjectURL(url); }
-  }
-  function parseCard(text) {
-    const out = { bedrijf: '', contact: '', email: '', telefoon: '', adres: '', plaats: '' };
-    const lines = String(text).split(/\r?\n/).map(x => x.replace(/[|•·®©™]/g, ' ').replace(/\s+/g, ' ').trim()).filter(x => x.length > 1);
-    const used = new Set();
-    const emailRe = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
-    let domain = '';
-    lines.forEach((l, i) => {
-      const m = l.match(emailRe);
-      if (!m) return;
-      used.add(i);
-      if (!out.email) out.email = m[0].toLowerCase();
-      const d = m[0].split('@')[1].toLowerCase();
-      if (!domain && !FREE_MAIL.has(d)) domain = d;
-    });
-    const phones = [];
-    lines.forEach((l, i) => {
-      const re = /(?:\+31|0031|0)[\s\-.()]*(?:\d[\s\-.()]*){9}/g;
-      let m;
-      while ((m = re.exec(l))) phones.push({ v: m[0].replace(/[\s\-.()]+$/, '').trim(), i });
-    });
-    if (phones.length) {
-      const mob = phones.find(p => /^(?:\+31|0031|0)[\s\-.()]*6/.test(p.v));
-      out.telefoon = (mob || phones[0]).v;
-      phones.forEach(p => used.add(p.i));
+  function getOcrWorker() {
+    clearTimeout(ocrIdle);
+    if (!ocrWorker) {
+      ocrWorker = loadTesseract().then(T => {
+        const base = new URL('vendor/ocr', location.href).href;
+        return T.createWorker(['nld', 'eng'], 1, {
+          workerPath: base + '/worker.min.js', corePath: base, langPath: base + '/lang', gzip: true,
+          logger: m => { if (ocrStatus) ocrStatus(m); },
+        });
+      });
+      ocrWorker.catch(() => { ocrWorker = null; });
     }
-    lines.forEach((l, i) => {
-      if (used.has(i)) return;
-      const m = l.match(/(?:https?:\/\/)?(?:www\.)?([a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:nl|com|eu|be|de|net|org|io|biz|info|frl))\b/i);
-      if (m) { used.add(i); if (!domain) domain = m[1].toLowerCase().replace(/^www\./, ''); }
+    return ocrWorker;
+  }
+  // Na twee minuten zonder scan wordt de tekstherkenning afgesloten, zodat hij geen geheugen vasthoudt.
+  function releaseOcrWorker() {
+    clearTimeout(ocrIdle);
+    ocrIdle = setTimeout(() => { const w = ocrWorker; ocrWorker = null; if (w) w.then(x => x.terminate()).catch(() => {}); }, 120000);
+  }
+  function loadPhoto(url) {
+    return new Promise((resolve, reject) => { const i = new Image(); i.onload = () => resolve(i); i.onerror = reject; i.src = url; });
+  }
+  function photoCanvas(img, rot) {
+    const k = Math.min(1, 1800 / Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k), turn = rot % 180 !== 0;
+    const c = document.createElement('canvas');
+    c.width = turn ? h : w;
+    c.height = turn ? w : h;
+    const g = c.getContext('2d');
+    g.filter = 'grayscale(1) contrast(1.25)';
+    g.translate(c.width / 2, c.height / 2);
+    g.rotate(rot * Math.PI / 180);
+    g.drawImage(img, -w / 2, -h / 2, w, h);
+    return c;
+  }
+  // Trekt licht en schaduw gelijk: elke pixel wordt vergeleken met het gemiddelde en de spreiding van zijn omgeving.
+  // Lichte tekst op een donker kaartje wordt omgedraaid, zodat de tekst altijd donker op licht staat.
+  function evenLight(src) {
+    const W = src.width, H = src.height, c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const g = c.getContext('2d', { willReadFrequently: true });
+    g.drawImage(src, 0, 0);
+    const img = g.getImageData(0, 0, W, H), d = img.data;
+    const B = 16, R = 3, bw = Math.ceil(W / B), bh = Math.ceil(H / B), nb = bw * bh;
+    const S = new Float32Array(nb), S2 = new Float32Array(nb), N = new Float32Array(nb);
+    for (let y = 0; y < H; y++) {
+      const row = ((y / B) | 0) * bw;
+      for (let x = 0; x < W; x++) { const v = d[(y * W + x) * 4], k = row + ((x / B) | 0); S[k] += v; S2[k] += v * v; N[k]++; }
+    }
+    const box = A => {
+      const t = new Float32Array(nb), o = new Float32Array(nb);
+      for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) { let s = 0; for (let i = -R; i <= R; i++) s += A[y * bw + Math.min(bw - 1, Math.max(0, x + i))]; t[y * bw + x] = s; }
+      for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) { let s = 0; for (let i = -R; i <= R; i++) s += t[Math.min(bh - 1, Math.max(0, y + i)) * bw + x]; o[y * bw + x] = s; }
+      return o;
+    };
+    const bS = box(S), bS2 = box(S2), bN = box(N), M = new Float32Array(nb), SD = new Float32Array(nb);
+    for (let k = 0; k < nb; k++) { M[k] = bS[k] / bN[k]; SD[k] = Math.sqrt(Math.max(0, bS2[k] / bN[k] - M[k] * M[k])); }
+    const at = (A, x, y) => {
+      const fx = Math.min(bw - 1.001, Math.max(0, x / B - 0.5)), fy = Math.min(bh - 1.001, Math.max(0, y / B - 0.5));
+      const x0 = fx | 0, y0 = fy | 0, ax = fx - x0, ay = fy - y0, x1 = Math.min(bw - 1, x0 + 1), y1 = Math.min(bh - 1, y0 + 1);
+      return (A[y0 * bw + x0] * (1 - ax) + A[y0 * bw + x1] * ax) * (1 - ay) + (A[y1 * bw + x0] * (1 - ax) + A[y1 * bw + x1] * ax) * ay;
+    };
+    const Z = new Float32Array(W * H);
+    let m2 = 0, m3 = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const sd = at(SD, x, y), z = (d[(y * W + x) * 4] - at(M, x, y)) / Math.max(sd, 10);
+      Z[y * W + x] = z;
+      if (sd > 20) { m2 += z * z; m3 += z * z * z; }
+    }
+    const flip = m3 > 0 && m2 > 0 ? -1 : 1;   // scheef naar licht: lichte tekst op donker
+    for (let i = 0, j = 0; i < Z.length; i++, j += 4) d[j] = d[j + 1] = d[j + 2] = Math.max(0, Math.min(255, 170 + 55 * flip * Z[i]));
+    g.putImageData(img, 0, 0);
+    return c;
+  }
+  // Leest een foto en geeft de regels terug. Grote gaten in een regel splitsen hem (twee kolommen naast elkaar).
+  async function ocrRead(worker, canvas, sauvola) {
+    await worker.setParameters({ tessedit_pageseg_mode: '3', thresholding_method: sauvola ? '2' : '0' });
+    const { data } = await worker.recognize(canvas);
+    const segs = [];
+    let good = 0;
+    for (const line of data.lines || []) {
+      const words = (line.words || []).filter(w => w.text && w.text.trim());
+      if (!words.length) continue;
+      const hs = words.map(w => w.bbox.y1 - w.bbox.y0).sort((a, b) => a - b);
+      const lh = (line.rowAttributes && line.rowAttributes.row_height) || hs[hs.length >> 1] || 1;   // lettergrootte
+      let cur = null;
+      for (const w of words) {
+        if (w.confidence >= 60 && /[\p{L}\d]{2}/u.test(w.text)) good += w.text.length;
+        if (cur && w.bbox.x0 - cur.x1 > Math.max(lh * 1.6, 12)) { segs.push(cur); cur = null; }
+        if (!cur) cur = { words: [], x0: w.bbox.x0, x1: w.bbox.x1, y0: w.bbox.y0, y1: w.bbox.y1, h: lh };
+        cur.words.push(w);
+        cur.x1 = Math.max(cur.x1, w.bbox.x1); cur.y0 = Math.min(cur.y0, w.bbox.y0); cur.y1 = Math.max(cur.y1, w.bbox.y1);
+      }
+      if (cur) segs.push(cur);
+    }
+    const lines = segs.map(s => {
+      const n = s.words.reduce((a, w) => a + w.text.length, 0) || 1;
+      return { t: cleanCardLine(s.words.map(w => w.text).join(' ')), conf: s.words.reduce((a, w) => a + w.confidence * w.text.length, 0) / n, x0: s.x0, x1: s.x1, y0: s.y0, y1: s.y1, h: s.h };
+    }).filter(s => s.conf >= 45 && /[\p{L}\d]{2}/u.test(s.t));
+    return { segs: joinWrapped(orderColumns(lines)), good, conf: data.confidence || 0 };
+  }
+  // Kolommen: regels die elkaar horizontaal overlappen horen bij elkaar. Eerst de linkerkolom van boven naar beneden.
+  function orderColumns(segs) {
+    let cols = [];
+    [...segs].sort((a, b) => a.x0 - b.x0).forEach(s => {
+      const c = cols.find(c => s.x0 < c.x1 - 4 && s.x1 > c.x0 + 4);
+      if (c) { c.items.push(s); c.x0 = Math.min(c.x0, s.x0); c.x1 = Math.max(c.x1, s.x1); }
+      else cols.push({ x0: s.x0, x1: s.x1, items: [s] });
     });
-    lines.forEach((l, i) => {
-      if (out.plaats) return;
-      const m = l.match(/^(.*?)\b(\d{4})\s?([A-Z]{2})\b[\s,]*([A-Za-zÀ-ÿ'][A-Za-zÀ-ÿ' .-]+)$/);
-      if (!m) return;
-      const city = m[4].trim();
-      out.plaats = city === city.toUpperCase() ? city.toLowerCase().replace(/(^|[\s-])([a-zà-ÿ])/g, (x, a, b) => a + b.toUpperCase()) : city;
-      let street = m[1].replace(/[,\s]+$/, '').trim();
-      if (!street && i > 0 && !used.has(i - 1) && /[A-Za-z]/.test(lines[i - 1]) && /\d/.test(lines[i - 1])) { street = lines[i - 1]; used.add(i - 1); }
-      out.adres = [street, `${m[2]} ${m[3]}`].filter(Boolean).join(', ');
-      used.add(i);
-    });
-    const legal = /\b(b\.?\s?v\.?|v\.?o\.?f\.?|n\.?v\.?|holding|groep|group|gmbh|ltd)(\s|$)/i;
-    const titles = /\b(directeur|eigenaar|owner|manager|accountmanager|adviseur|consultant|verkoop|sales|inkoop|medewerker|ceo|cto|cfo|coo|director|bedrijfsleider|projectleider|office|planner|monteur|specialist|partner|oprichter|founder|engineer|hoofd|teamleider|commercieel|administratie|marketing|tel|mobiel|email|e-mail)\b/i;
-    const cand = lines.map((l, i) => ({ l, i })).filter(x => !used.has(x.i) && /[A-Za-zÀ-ÿ]{2}/.test(x.l) && !/\d{3,}/.test(x.l) && x.l.length <= 60);
-    const norm = x => x.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const dom = norm(domain.split('.')[0] || '');
-    const comp = cand.find(x => legal.test(x.l)) || (dom && cand.find(x => { const n = norm(x.l); return n.length >= 3 && (dom.includes(n) || n.includes(dom)); }));
-    if (comp) { out.bedrijf = comp.l; used.add(comp.i); }
-    const nameWord = w => /^[A-ZÀ-Ý][a-zà-ÿ'-]+$/.test(w) || /^(van|de|der|den|het|ter|ten|op|in|'t)$/i.test(w) || /^[A-Z]\.$/.test(w);
-    const isName = x => { const w = x.split(' '); return w.length >= 2 && w.length <= 5 && !titles.test(x) && !legal.test(x) && w.every(nameWord); };
-    const nameC = cand.find(x => !used.has(x.i) && isName(x.l));
-    if (nameC) { out.contact = nameC.l; used.add(nameC.i); }
-    if (!out.bedrijf) {
-      const rest = cand.find(x => !used.has(x.i) && !titles.test(x.l));
-      if (rest) out.bedrijf = rest.l;
-      else if (dom) out.bedrijf = dom.charAt(0).toUpperCase() + dom.slice(1);
+    for (let merged = true; merged;) {
+      merged = false;
+      for (let i = 0; i < cols.length && !merged; i++) for (let j = i + 1; j < cols.length && !merged; j++) {
+        const a = cols[i], b = cols[j];
+        if (a.x0 < b.x1 - 4 && a.x1 > b.x0 + 4) { a.items.push(...b.items); a.x0 = Math.min(a.x0, b.x0); a.x1 = Math.max(a.x1, b.x1); cols.splice(j, 1); merged = true; }
+      }
+    }
+    return cols.sort((a, b) => a.x0 - b.x0).flatMap(c => c.items.sort((a, b) => a.y0 - b.y0));
+  }
+  // Een lange bedrijfsnaam in grote letters staat vaak over twee regels: die worden weer één regel.
+  function joinWrapped(segs) {
+    const hs = segs.map(s => s.h).sort((a, b) => a - b), med = hs[hs.length >> 1] || 1;
+    const out = [];
+    for (const s of segs) {
+      const p = out[out.length - 1];
+      const big = x => x.h >= med * 1.25;
+      if (p && big(p) && big(s) && Math.abs(p.h - s.h) <= 0.25 * Math.max(p.h, s.h) && s.y0 > p.y0 && s.y0 - p.y1 < 0.9 * p.h
+        && (Math.abs(s.x0 - p.x0) < 2 * p.h || Math.abs((s.x0 + s.x1) - (p.x0 + p.x1)) < 4 * p.h)
+        && !/\d{3}|@/.test(p.t + s.t) && !isPersonName(p.t) && !isPersonName(s.t)) {
+        out[out.length - 1] = { ...p, t: p.t + ' ' + s.t, x1: Math.max(p.x1, s.x1), y1: s.y1 };
+      } else out.push(s);
     }
     return out;
   }
+
+  const CARD_LEGAL = /\b(b\.?\s?v\.?|v\.?o\.?f\.?|n\.?v\.?|holding|groep|group|gmbh|ltd)(\s|$)/i;
+  const CARD_TITLES = /\b(directeur|eigenaar|owner|manager|accountmanager|adviseur|consultant|verkoop|sales|inkoop|medewerker|ceo|cto|cfo|coo|director|bedrijfsleider|projectleider|uitvoerder|office|planner|monteur|specialist|partner|oprichter|founder|engineer|hoofd|teamleider|commercieel|administratie|marketing|tel|mobiel|email|e-mail|sinds)\b/i;
+  const CARD_BIZ = /(bedrijf|bouw|techniek|technisch|installat|metaal|bakkerij|groep|service|transport|advies|handel|centrum|studio|kantoor|winkel|garage|fabriek|makelaar|notaris|praktijk|zorg|school|stichting|vereniging|gemeente|logistiek|verhuur|onderhoud|systems|solutions|consult|media|design|catering|hotel|restaurant|machines|elektro|schilder|timmer|dakdek|loodgiet|hovenier|keuken|interieur|meubel|drukkerij|reclame|automatisering|software|accountant)/i;
+  const CARD_TLDS = new Set(['nl', 'com', 'eu', 'be', 'de', 'net', 'org', 'io', 'biz', 'info', 'frl', 'nu', 'online', 'shop', 'tech', 'co', 'uk', 'fr', 'email', 'group', 'amsterdam']);
+  function cleanCardLine(t) {
+    return String(t).replace(/[|•·®©™¢§¶«»“”"]/g, ' ').replace(/\s+/g, ' ').trim()
+      .replace(/^[^\p{L}\p{N}+(]+/u, '')                // icoontjes vooraan
+      .replace(/^\p{Ll}{1,2}\s+(?=\p{Lu})/u, '')           // een icoontje dat als letter is gelezen
+      .replace(/(\+31|0031)\s*\(0\)\s*/g, '$1 ')         // +31 (0)38 → +31 38
+      .replace(/[\s,;:\-–]+$/, '');
+  }
+  function isPersonName(x) {
+    const w = String(x).split(' ');
+    const word = v => /^\p{Lu}[\p{Ll}'’-]+$/u.test(v) || /^\p{Lu}{2,}$/u.test(v) || /^(van|de|der|den|het|ter|ten|op|in|'t|von|la|le|du|da)$/i.test(v) || /^(\p{Lu}\.)+$/u.test(v);
+    return w.length >= 2 && w.length <= 5 && !CARD_TITLES.test(x) && !CARD_LEGAL.test(x) && !CARD_BIZ.test(x) && w.every(word);
+  }
+  // HOOFDLETTERS → Hoofdletters, maar korte afkortingen (BV, ABC) blijven staan.
+  function calmCaps(s) {
+    if (s !== s.toUpperCase() || !/\p{Lu}{4}/u.test(s)) return s;
+    return s.split(' ').map(w => w.length <= 3 && !/^(de|het|van|den|der|en|ter|ten|op)$/i.test(w) ? w : w.charAt(0) + w.slice(1).toLowerCase()).join(' ');
+  }
+  function cardEmail(line) {
+    const re = /([A-Za-z0-9._%+-]+)@([A-Za-z0-9-]+(?:[.,:][A-Za-z0-9-]+)*)[.,:]([A-Za-z0-9|!]{2,})/;
+    const t = String(line).replace(/\s*(?:\(at\)|\[at\])\s*/gi, '@').replace(/\s*@\s*/g, '@');
+    // Soms leest de herkenning een spatie midden in het adres (jan sen-installatie.nl).
+    const m = t.match(re) || t.replace(/@(.*)$/, (x, r) => '@' + r.replace(/\s+/g, '')).match(re);
+    if (!m) return '';
+    let tld = m[3].toLowerCase();
+    if (!CARD_TLDS.has(tld)) { const alt = tld.replace(/[1|!i]/g, 'l').replace(/0/g, 'o'); if (CARD_TLDS.has(alt)) tld = alt; }   // n! of n1 → nl
+    return (m[1] + '@' + m[2].replace(/[,:]/g, '.') + '.' + tld).toLowerCase();
+  }
+  function cardPhones(line) {
+    const out = [], re = /(?:\+31|0031|0)[\s\-.()]*(?:\d[\s\-.()]*){9}/g;
+    let m;
+    while ((m = re.exec(line))) out.push(m[0].replace(/[\s\-.()]+$/, '').replace(/\s+/g, ' ').trim());
+    return out;
+  }
+  function cardAddress(line) {
+    const m = String(line).match(/^(.*?)\b(\d{4})\s?([A-Z]{2})\b[\s,]*([A-Za-zÀ-ÿ'][A-Za-zÀ-ÿ' .-]+)$/);
+    if (!m) return null;
+    const city = m[4].trim();
+    return {
+      straat: m[1].replace(/^(?:[A-Z]|adres|bezoekadres|postadres)\s*[:.]?\s+(?=\p{Lu}\p{Ll})/u, '').replace(/[\s,;:\-–]+$/, '').trim(),
+      postcode: `${m[2]} ${m[3]}`,
+      plaats: city === city.toUpperCase() ? city.toLowerCase().replace(/(^|[\s-])([a-zà-ÿ])/g, (x, a, b) => a + b.toUpperCase()) : city,
+    };
+  }
+  // Zet de gelezen regels om in velden. use[i] zegt in welk veld regel i terechtkwam.
+  function parseCard(segs) {
+    const lines = segs.map(s => s.t), use = lines.map(() => '');
+    const out = { bedrijf: '', contact: '', email: '', telefoon: '', adres: '', plaats: '' };
+    let domain = '';
+    lines.forEach((l, i) => {
+      const e = cardEmail(l);
+      if (!e) return;
+      if (!out.email) { out.email = e; use[i] = 'email'; }
+      const d = e.split('@')[1];
+      if (!domain && !FREE_MAIL.has(d)) domain = d;
+    });
+    const phones = [];
+    lines.forEach((l, i) => cardPhones(l).forEach(v => phones.push({ v, i })));
+    if (phones.length) {
+      const p = phones.find(x => /^(?:\+31|0031|0)[\s\-.()]*6/.test(x.v)) || phones[0];
+      out.telefoon = p.v;
+      if (!use[p.i]) use[p.i] = 'telefoon';
+    }
+    const busy = i => use[i] || phones.some(p => p.i === i);
+    lines.forEach((l, i) => {
+      if (busy(i)) return;
+      const m = l.match(/(?:https?:\/\/)?(?:www\.)?([a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:nl|com|eu|be|de|net|org|io|biz|info|frl|nu))\b/i);
+      if (m) { use[i] = 'web'; if (!domain) domain = m[1].toLowerCase().replace(/^www\./, ''); }
+    });
+    lines.forEach((l, i) => {
+      if (out.plaats) return;
+      const a = cardAddress(l);
+      if (!a) return;
+      out.plaats = a.plaats;
+      use[i] = 'adres';
+      let street = a.straat;
+      if (!street && i > 0 && !busy(i - 1) && /\p{L}{2}/u.test(lines[i - 1]) && /\d/.test(lines[i - 1])) {
+        street = lines[i - 1].replace(/^(?:[A-Z]|adres|bezoekadres|postadres)\s*[:.]?\s+(?=\p{Lu}\p{Ll})/u, '');
+        use[i - 1] = 'adres';
+      }
+      out.adres = [street, a.postcode].filter(Boolean).join(', ');
+    });
+    const cand = lines.map((l, i) => ({ l, i, h: segs[i].h || 0 })).filter(x => !busy(x.i) && /\p{L}{2}/u.test(x.l) && !/\d{3,}/.test(x.l) && x.l.length <= 60);
+    const norm = x => x.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const dom = norm(domain.split('.')[0] || '');
+    let comp = cand.find(x => CARD_LEGAL.test(x.l)) || (dom && cand.find(x => { const n = norm(x.l); return n.length >= 3 && (dom.includes(n) || n.includes(dom)); }));
+    if (comp) { out.bedrijf = calmCaps(comp.l); use[comp.i] = 'bedrijf'; }
+    // Contactpersoon: een naam, het liefst met een functie eronder.
+    const names = cand.filter(x => !use[x.i] && isPersonName(x.l));
+    const nameC = names.find(x => { const nx = lines[x.i + 1]; return nx && CARD_TITLES.test(nx); }) || names[0];
+    if (nameC) { out.contact = calmCaps(nameC.l); use[nameC.i] = 'contact'; }
+    if (!out.bedrijf) {
+      // Anders: de regel in de grootste letters die geen functie of slogan is.
+      const rest = cand.filter(x => !use[x.i] && !CARD_TITLES.test(x.l) && (x.l.match(/\s[-–·]\s/g) || []).length < 2).sort((a, b) => b.h - a.h || a.i - b.i)[0];
+      if (rest) { out.bedrijf = calmCaps(rest.l); use[rest.i] = 'bedrijf'; }
+      else if (dom) out.bedrijf = dom.charAt(0).toUpperCase() + dom.slice(1);
+    }
+    return { fields: out, lines, use: use.map(u => u === 'web' ? '' : u) };
+  }
+
+  const SCAN_FIELDS = [['bedrijf', 'Bedrijf', 'addBedrijf'], ['contact', 'Contact', 'addContact'], ['email', 'E-mail', 'addEmail'],
+    ['telefoon', 'Telefoon', 'addTelefoon'], ['adres', 'Adres', 'addAdres'], ['plaats', 'Plaats', 'addPlaats']];
+  const scan = { lines: [], use: [] };
   function fillAddForm(found) {
     setAddOpen(true);
-    const map = { addBedrijf: 'bedrijf', addContact: 'contact', addEmail: 'email', addTelefoon: 'telefoon', addAdres: 'adres', addPlaats: 'plaats' };
     let n = 0;
-    Object.entries(map).forEach(([elId, k]) => { $(elId).value = found[k] || ''; if (found[k]) n++; });
+    SCAN_FIELDS.forEach(([k, , elId]) => { $(elId).value = found[k] || ''; if (found[k]) n++; });
     checkAddDupes();
     return n;
   }
+  function renderScanLines() {
+    const el = $('scanLines');
+    el.hidden = !scan.lines.length;
+    if (!scan.lines.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `<p class="hint">Dit las de app op het kaartje. Staat iets niet goed? Kies bij de regel in welk veld hij hoort.</p>
+      <ul class="ocr-lines">${scan.lines.map((t, i) => `<li><span class="ocr-t">${esc(t)}</span><select class="input ocr-sel${scan.use[i] ? ' used' : ''}" id="ocr-${i}" data-ocr="${i}" aria-label="Veld voor ${esc(t)}">
+        <option value="">Niet gebruiken</option>${SCAN_FIELDS.map(([k, label]) => `<option value="${k}"${scan.use[i] === k ? ' selected' : ''}>${label}</option>`).join('')}</select></li>`).join('')}</ul>`;
+  }
+  function clearScanLines() { scan.lines = []; scan.use = []; renderScanLines(); }
+  function scanAssign(i, k) {
+    const t = scan.lines[i];
+    if (t === undefined) return;
+    if (k) {
+      const elId = SCAN_FIELDS.find(f => f[0] === k)[2], a = cardAddress(t);
+      let v = t;
+      if (k === 'email') v = cardEmail(t) || t.replace(/\s+/g, '');
+      else if (k === 'telefoon') v = cardPhones(t)[0] || t.replace(/^\p{L}{1,7}[.:]?\s+(?=[+(\d])/u, '');
+      else if (k === 'plaats') v = a ? a.plaats : t;
+      else if (k === 'adres') {
+        if (a) { v = [a.straat, a.postcode].filter(Boolean).join(', '); if (!$('addPlaats').value) $('addPlaats').value = a.plaats; }
+        else { const pc = ($('addAdres').value.match(/\b\d{4} [A-Z]{2}$/) || [''])[0]; v = [t.replace(/^(?:[A-Z]|adres)\s*[:.]?\s+(?=\p{Lu}\p{Ll})/u, ''), pc].filter(Boolean).join(', '); }
+      }
+      else v = calmCaps(t);
+      $(elId).value = v;
+      scan.use = scan.use.map((u, j) => j === i ? k : (u === k ? '' : u));
+    } else scan.use[i] = '';
+    renderScanLines();
+    checkAddDupes();
+    $('ocr-' + i)?.focus();
+  }
   async function scanCard(file) {
-    const msg = $('scanMsg'), btn = $('scanBtn');
+    const msg = $('scanMsg'), btn = $('scanBtn'), url = URL.createObjectURL(file);
     btn.disabled = true;
-    msg.textContent = 'Kaartje lezen…';
-    let worker = null;
+    clearScanLines();
+    let label = 'Kaartje lezen…';
+    msg.textContent = label;
+    ocrStatus = m => {
+      if (m.status === 'recognizing text') msg.textContent = `${label} ${Math.round((m.progress || 0) * 100)}%`;
+      else if (/load|initializ/i.test(m.status || '')) msg.textContent = 'Tekstherkenning starten… De eerste keer duurt dit even.';
+    };
     try {
-      const T = await loadTesseract();
-      const base = new URL('vendor/ocr', location.href).href;
-      worker = await T.createWorker(['nld', 'eng'], 1, {
-        workerPath: base + '/worker.min.js', corePath: base, langPath: base + '/lang', gzip: true,
-        logger: m => {
-          if (m.status === 'recognizing text') msg.textContent = `Kaartje lezen… ${Math.round((m.progress || 0) * 100)}%`;
-          else if (/load|initializ/i.test(m.status || '')) msg.textContent = 'Tekstherkenning starten… De eerste keer duurt dit even.';
-        },
-      });
-      const { data } = await worker.recognize(await imageToCanvas(file));
-      const n = fillAddForm(parseCard(data.text || ''));
+      const [worker, img] = await Promise.all([getOcrWorker(), loadPhoto(url)]);
+      const readable = r => r.conf >= 70 && r.good >= 40;
+      let best = { ...await ocrRead(worker, photoCanvas(img, 0), false), rot: 0 };
+      if (!readable(best)) {
+        // Een staande foto met een rechtop gehouden kaartje ligt meestal een kwartslag gedraaid.
+        for (const rot of img.naturalHeight > img.naturalWidth ? [90, 270, 180] : [180, 90, 270]) {
+          label = 'Het kaartje ligt gedraaid. Opnieuw lezen…';
+          const r = { ...await ocrRead(worker, photoCanvas(img, rot), false), rot };
+          if (r.good > best.good) best = r;
+          if (readable(r)) break;
+        }
+      }
+      let res = parseCard(best.segs);
+      const filled = p => Object.values(p.fields).filter(Boolean).length;
+      if (!res.fields.email || !res.fields.telefoon || !res.fields.plaats) {
+        // Iets gemist: vaak schaduw of een donker kaartje. Nog een keer met gelijkgetrokken licht.
+        label = 'Nog een keer lezen met minder schaduw…';
+        const alt = parseCard((await ocrRead(worker, evenLight(photoCanvas(img, best.rot)), true)).segs);
+        const [a, b] = filled(alt) > filled(res) ? [alt, res] : [res, alt];
+        res = { fields: { ...a.fields }, lines: [...a.lines], use: [...a.use] };
+        for (const k of Object.keys(res.fields)) {
+          if (res.fields[k] || !b.fields[k]) continue;
+          res.fields[k] = b.fields[k];
+          b.use.forEach((u, j) => { if (u === k) { res.lines.push(b.lines[j]); res.use.push(k); } });
+        }
+      }
+      scan.lines = res.lines.slice(0, 24);
+      scan.use = res.use.slice(0, 24);
+      const n = fillAddForm(res.fields);
+      renderScanLines();
       msg.textContent = n
         ? `${n} ${plural(n, 'gegeven', 'gegevens')} ingevuld. Controleer ze en tik op Toevoegen.`
         : 'Er kon geen tekst worden gelezen. Maak de foto recht van boven, met goed licht, en probeer het opnieuw.';
@@ -1267,8 +1500,10 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     } catch {
       msg.textContent = 'Lezen lukte niet. Probeer het opnieuw met een scherpere foto.';
     } finally {
+      ocrStatus = null;
+      URL.revokeObjectURL(url);
       btn.disabled = false;
-      if (worker) worker.terminate().catch(() => {});
+      releaseOcrWorker();
     }
   }
 
@@ -2100,6 +2335,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     if (open) $('addBedrijf').focus();
   });
   addForm.addEventListener('input', e => { if (['addBedrijf', 'addTelefoon', 'addEmail'].includes(e.target.id)) checkAddDupes(); });
+  addForm.addEventListener('change', e => { if (e.target.dataset.ocr !== undefined) scanAssign(+e.target.dataset.ocr, e.target.value); });
   dupWarnEl.addEventListener('click', e => { const b = e.target.closest('[data-goto]'); if (b) gotoLead(b.dataset.goto); });
   exportBtn.addEventListener('click', exportCsv);
   importBtn.addEventListener('click', openImport);
