@@ -5,6 +5,6 @@
 window.KA_CONFIG = {
   supabaseUrl: '',
   supabaseKey: '',
-  outlookClientId: '',
-  outlookTenant: ''
+  outlookClientId: 'e777094c-a5b8-4a06-ad5a-d71785416740',
+  outlookTenant: 'afc2fa94-adb8-4b72-a3ba-f7d1e9c5b606'
 };
