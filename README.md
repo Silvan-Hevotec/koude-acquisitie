@@ -32,7 +32,7 @@ De app staat dan op `https://<gebruikersnaam>.github.io/<repository>/`.
 Met een koppeling verstuurt de app mails vanuit je eigen mailbox (ook persoonlijk per bedrijf, in één keer) en zet hij afspraken direct in je Outlook-agenda. Zonder koppeling opent de app je mail-app en downloadt hij een agenda-bestand (.ics).
 
 1. Ga naar [entra.microsoft.com](https://entra.microsoft.com) → **App-registraties** → **Nieuwe registratie**.
-2. Naam: `Koude Acquisitie`. Accounttype: **Alleen accounts in deze organisatiemap**.
+2. Naam: `Koude Acquisitie`. Accounttype: **Alleen één tenant** (je eigen organisatie).
 3. Omleidings-URI: platform **Toepassing met één pagina (SPA)**, adres `https://<gebruikersnaam>.github.io/<repository>/` (precies het adres van de app, met `/` aan het eind).
 4. **API-machtigingen** → **Een machtiging toevoegen** → **Microsoft Graph** → **Gedelegeerde machtigingen**: `Mail.ReadWrite`, `Mail.Send`, `Calendars.ReadWrite`, `offline_access` (en `User.Read`, staat er al). Klik op **Beheerderstoestemming verlenen**.
 5. Zet de **Toepassings-ID (client-ID)** en **Map-ID (tenant-ID)** van de pagina **Overzicht** in `config.js` (`outlookClientId`, `outlookTenant`), of vul ze in de app in onderaan bij **Outlook → Koppelen**.

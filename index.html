@@ -3310,7 +3310,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       <p>Eenmalig: maak in Microsoft 365 een app-registratie aan, zodat de app namens jou mag mailen en afspraken mag maken. Dat duurt ongeveer vijf minuten. Doe het op een computer en meld je aan met je werkaccount.</p>
       <ol class="olist">
         <li>Ga naar <a href="https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank" rel="noopener">entra.microsoft.com</a> → <strong>App-registraties</strong> → <strong>Nieuwe registratie</strong>.</li>
-        <li>Naam: <strong>Koude Acquisitie</strong>. Accounttype: <strong>Alleen accounts in deze organisatiemap</strong>.</li>
+        <li>Naam: <strong>Koude Acquisitie</strong>. Accounttype: <strong>Alleen één tenant</strong> (je eigen organisatie).</li>
         <li>Omleidings-URI: kies <strong>Toepassing met één pagina (SPA)</strong> en vul in:<br><code class="pick" id="msRedirectUri" data-o="copy-uri" tabindex="0" role="button" title="Kopiëren">${esc(msRedirect())}</code><br>Klik op <strong>Registreren</strong>.</li>
         <li>Ga naar <strong>API-machtigingen</strong> → <strong>Een machtiging toevoegen</strong> → <strong>Microsoft Graph</strong> → <strong>Gedelegeerde machtigingen</strong>. Vink aan: <strong>Mail.ReadWrite</strong>, <strong>Mail.Send</strong>, <strong>Calendars.ReadWrite</strong> en <strong>offline_access</strong>. Klik daarna op <strong>Beheerderstoestemming verlenen</strong>.</li>
         <li>Kopieer op <strong>Overzicht</strong> de twee codes hieronder, of stuur ze naar Claude: dan staan ze meteen op al je apparaten.</li>
