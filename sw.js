@@ -1,6 +1,6 @@
 // Service worker: maakt de app installeerbaar, laat hem openen zonder bereik
 // en toont de ochtendmelding met de acties van vandaag.
-const CACHE = 'koude-acquisitie-v4';
+const CACHE = 'koude-acquisitie-v5';
 const DATA_CACHE = 'koude-acq-data';   // hierin zet de app de actielijst voor de ochtendmelding
 const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest', './vendor/supabase.js', './icons/icon-192.png', './icons/icon-512.png', './icons/badge-96.png'];
 
@@ -22,7 +22,8 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(req)
       .then(res => {
-        if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(cache => cache.put(req, copy)); }
+        // Niet bewaren: het adres waarmee Microsoft na het aanmelden terugstuurt (met eenmalige code).
+        if (res.ok && !(req.mode === 'navigate' && new URL(req.url).search)) { const copy = res.clone(); caches.open(CACHE).then(cache => cache.put(req, copy)); }
         return res;
       })
       .catch(() => caches.match(req, { ignoreSearch: true }).then(hit => hit || caches.match('./index.html')))

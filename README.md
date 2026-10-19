@@ -9,10 +9,10 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 | Bestand | Wat het doet |
 |---|---|
 | `index.html` | De app |
-| `config.js` | Koppeling met Supabase (Project URL en publishable/anon key) |
+| `config.js` | Koppeling met Supabase (Project URL en publishable/anon key) en Outlook (toepassings-ID en map-ID) |
 | `supabase.sql` | Maakt de tabel en de beveiliging aan in Supabase |
 | `manifest.webmanifest`, `sw.js`, `icons/` | Maken de app installeerbaar op Android |
-| `vendor/` | Supabase-bibliotheek 2.117.2 en SheetJS 0.18.5 (Excel-import) |
+| `vendor/` | Supabase-bibliotheek 2.117.2, SheetJS 0.18.5 (Excel-import) en Tesseract.js 5.1.1 (visitekaartjes lezen) |
 
 ## Eenmalig instellen
 
@@ -27,6 +27,17 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 ### 2. Online zetten (GitHub Pages)
 Zet de bestanden in een openbare GitHub-repository en zet **Settings → Pages** aan op de branch `main`, map `/ (root)`.
 De app staat dan op `https://<gebruikersnaam>.github.io/<repository>/`.
+
+### 3. Outlook (optioneel, mailen en agenda via Microsoft 365)
+Met een koppeling verstuurt de app mails vanuit je eigen mailbox (ook persoonlijk per bedrijf, in één keer) en zet hij afspraken direct in je Outlook-agenda. Zonder koppeling opent de app je mail-app en downloadt hij een agenda-bestand (.ics).
+
+1. Ga naar [entra.microsoft.com](https://entra.microsoft.com) → **App-registraties** → **Nieuwe registratie**.
+2. Naam: `Koude Acquisitie`. Accounttype: **Alleen accounts in deze organisatiemap**.
+3. Omleidings-URI: platform **Toepassing met één pagina (SPA)**, adres `https://<gebruikersnaam>.github.io/<repository>/` (precies het adres van de app, met `/` aan het eind).
+4. **API-machtigingen** → **Een machtiging toevoegen** → **Microsoft Graph** → **Gedelegeerde machtigingen**: `Mail.ReadWrite`, `Mail.Send`, `Calendars.ReadWrite`, `offline_access` (en `User.Read`, staat er al). Klik op **Beheerderstoestemming verlenen**.
+5. Zet de **Toepassings-ID (client-ID)** en **Map-ID (tenant-ID)** van de pagina **Overzicht** in `config.js` (`outlookClientId`, `outlookTenant`), of vul ze in de app in onderaan bij **Outlook → Koppelen**.
+
+Aanmelden gebeurt bij Microsoft zelf (code met PKCE, geen wachtwoord in de app). Microsoft laat een app als deze maximaal 24 uur aangemeld; daarna meldt de app zich meestal vanzelf opnieuw aan. Lukt dat niet, dan vraagt hij je even op Aanmelden te tikken.
 
 ## Op de telefoon installeren
 Open het adres in **Chrome**, log in en tik op **App installeren** (of menu ⋮ → **App installeren**).

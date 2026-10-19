@@ -437,6 +437,19 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
 .push-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 13px; }
 .push-line .linkbtn { font-size: 13px; }
 .push-line .input { flex-basis: 100%; font: 12px/1.4 var(--f-mono); }
+.outlook-panel { display: grid; gap: 12px; }
+.outlook-panel p { margin: 0; }
+.olist { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+.olist code { display: inline-block; margin: 4px 0; padding: 2px 6px; border-radius: 6px; background: var(--sunken); font: 13px/1.5 var(--f-mono); overflow-wrap: anywhere; cursor: pointer; }
+.ms-ids { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 16px; }
+.ms-ids .input { font-family: var(--f-mono); font-size: 14px; }
+@media (max-width: 560px) { .ms-ids { grid-template-columns: minmax(0, 1fr); } }
+.ms-send { display: grid; gap: 8px; }
+.ms-send .hint { margin: 0; }
+details.alt { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+details.alt > summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
+.outlook-panel a { color: inherit; font-weight: 600; text-decoration-color: var(--geel); text-underline-offset: 3px; }
 
 /* Inloggen */
 .gate { min-height: 100vh; min-height: 100dvh; background: var(--bg); }
@@ -497,6 +510,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   <section class="card" id="importPanel" aria-label="Importeren uit Excel" hidden></section>
   <div class="notice" id="restoreNotice" hidden></div>
   <div class="notice" id="backupNotice" hidden></div>
+  <div class="notice" id="outlookNotice" hidden></div>
 
   <form class="add" id="addForm" autocomplete="off" novalidate>
     <h2 class="add-title"><button type="button" id="addToggle" aria-expanded="true">Nieuw bedrijf</button></h2>
@@ -598,6 +612,13 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       <button type="button" class="linkbtn" id="pushCopy" hidden>Koppelcode</button>
       <textarea class="input" id="pushCode" rows="3" readonly hidden aria-label="Koppelcode"></textarea>
     </p>
+    <p class="hint push-line" id="outlookLine">
+      <span id="outlookStatus">Outlook</span>
+      <button type="button" class="linkbtn" id="outlookLogin" hidden>Koppelen</button>
+      <button type="button" class="linkbtn" id="outlookSig" hidden>Handtekening</button>
+      <button type="button" class="linkbtn" id="outlookOff" hidden>Ontkoppelen</button>
+    </p>
+    <section class="card outlook-panel" id="outlookPanel" aria-label="Outlook" hidden></section>
   </footer>
 </main>
 
@@ -610,6 +631,15 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
 <script src="vendor/supabase.js"></script>
 <script>
 (() => {
+  // Verborgen venster van het stil aanmelden bij Microsoft: hier hoeft de app niet te starten.
+  if (window.parent !== window && /[?&]state=ka-ms\./.test(location.search)) return;
+  // Terug van het aanmelden bij Microsoft: code en state uit het adres halen voordat iets anders het adres leest.
+  const msReturn = (() => {
+    const q = new URLSearchParams(location.search), st = q.get('state') || '';
+    if (!st.startsWith('ka-ms.')) return null;
+    history.replaceState(null, '', location.pathname + location.hash);
+    return { state: st, code: q.get('code') || '', error: q.get('error') || '', desc: q.get('error_description') || '' };
+  })();
   const VIEWS = new Set(['alles', 'acties', 'vandaag', 'archief']);
   const OUTCOMES = ['Geen gehoor', 'Terugbellen', 'Interesse', 'Geen interesse'];
   const PLACEHOLDERS = ['{aanhef}', '{voornaam}', '{bedrijf}', '{plaats}'];
@@ -657,7 +687,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     search: '', open: null, mode: 'edit', selecting: false, selected: new Set(), pendingMail: null, local: false,
   };
   const drafts = {}, finishes = {};
-  const mail = { open: false, ids: [], mode: 'bcc', tplId: '', onderwerp: '', tekst: '', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false };
+  const mail = { open: false, ids: [], mode: 'bcc', tplId: '', onderwerp: '', tekst: '', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false, sending: null };
   const imp = { open: false, rows: null, header: true, map: [], include: new Map(), actie: '', datum: '', busy: false, loading: false, done: 0, total: 0, error: '' };
   let col = null, sjCol = null, actiesDoc = null, appStore = null, actiesChain = Promise.resolve();
   let armedDelete = null, armedTimer = 0, armedExamples = false, armedExamplesTimer = 0, dupSig = '', dupAcked = false;
@@ -854,7 +884,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       tijd: /^\d{2}:\d{2}$/.test(str(d.tijd)) ? d.tijd : '', prioriteit: validPrio(d.prioriteit),
       geenMail: d.geenMail === true, log: normalizeLog(d.log),
       gearchiveerd: d.gearchiveerd === true, gearchiveerdOp: parseISO(d.gearchiveerdOp) ? str(d.gearchiveerdOp).slice(0, 10) : '',
-      aangemaakt: str(d.aangemaakt), gewijzigd: str(d.gewijzigd), voorbeeld: d.voorbeeld === true,
+      aangemaakt: str(d.aangemaakt), gewijzigd: str(d.gewijzigd), voorbeeld: d.voorbeeld === true, outlookId: str(d.outlookId),
     };
   }
   function toBody(l) {
@@ -865,6 +895,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       aangemaakt: l.aangemaakt, gewijzigd: l.gewijzigd,
     };
     if (l.voorbeeld) b.voorbeeld = true;
+    if (l.outlookId) b.outlookId = l.outlookId;
     return b;
   }
   const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail });
@@ -995,7 +1026,9 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     rememberAction(actie);
     closeRow(true);
     renderAll();
-    if (opts.agenda) addToCalendar(next); else toast('Opgeslagen.');
+    if (opts.agenda) addToCalendar(next);
+    else if (l.outlookId && next.datum && outlookOn() && ['datum', 'tijd', 'actie', 'bedrijf', 'adres', 'plaats'].some(k => l[k] !== next[k])) outlookEvent(next, true);
+    else toast('Opgeslagen.');
     return true;
   }
 
@@ -1022,7 +1055,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     const tijd = datum && /^\d{2}:\d{2}$/.test(f.tijd || '') ? f.tijd : '';
     const next = {
       ...l, log: [{ d: today, a: l.actie, u: f.uitkomst, t: tekst }, ...l.log].slice(0, 100), actie, datum, tijd,
-      gearchiveerd: archive, gearchiveerdOp: archive ? today : '', gewijzigd: nowISO(),
+      gearchiveerd: archive, gearchiveerdOp: archive ? today : '', gewijzigd: nowISO(), outlookId: '',
     };
     const ok = await write(() => col.doc(id).set(toBody(next)));
     if (!ok) return;
@@ -1139,6 +1172,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   }
   function addToCalendar(l) {
     if (!l || !l.actie || !l.datum) { toast('Vul eerst een actie en een datum in.'); return; }
+    if (outlookOn()) { outlookEvent(l); return; }
     const slug = (l.bedrijf || 'afspraak').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'afspraak';
     saveFile(`agenda-${slug}-${l.datum}.ics`, icsText(l), 'text/calendar;charset=utf-8');
     toast('Agenda-bestand gedownload. Tik op Openen en kies je agenda om de afspraak op te slaan.', 7000);
@@ -1638,7 +1672,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
           <label for="f-${id}-tijd">Tijd<span class="opt">optioneel</span></label>
           <input class="input" type="time" id="f-${id}-tijd" data-ffield="tijd" value="${esc(dis ? '' : f.tijd || '')}"${dis ? ' disabled' : ''}>
         </div>
-        <label class="check" for="f-${id}-agenda"><input type="checkbox" id="f-${id}-agenda" data-ffield="agenda"${f.agenda && !dis ? ' checked' : ''}${dis ? ' disabled' : ''}>Ook in mijn agenda zetten</label>
+        <label class="check" for="f-${id}-agenda"><input type="checkbox" id="f-${id}-agenda" data-ffield="agenda"${f.agenda && !dis ? ' checked' : ''}${dis ? ' disabled' : ''}>${outlookOn() ? 'Ook in mijn Outlook-agenda zetten' : 'Ook in mijn agenda zetten'}</label>
         <label class="check" for="f-${id}-archief"><input type="checkbox" id="f-${id}-archief" data-ffield="archief"${f.archief ? ' checked' : ''}>Archiveren, geen vervolg</label>
       </section>
       <div class="pactions">
@@ -1895,7 +1929,8 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     const list = ids.filter(id => mailable(byId(id)));
     if (!list.length) { toast('Geen bedrijven met een e-mailadres geselecteerd.'); return; }
     list.sort((a, b) => byName(byId(a), byId(b)));
-    Object.assign(mail, { open: true, ids: list, mode: list.length === 1 ? 'pers' : 'bcc', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false });
+    if (mail.sending) { toast('Wacht even tot de mails zijn verstuurd.'); return; }
+    Object.assign(mail, { open: true, ids: list, mode: list.length === 1 ? 'pers' : 'bcc', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false, sending: null });
     if (!mail.onderwerp && !mail.tekst && state.sjablonen.length) applyTemplate(state.sjablonen[0].id);
     state.selecting = false; state.selected.clear();
     closeRow(true);
@@ -1903,16 +1938,19 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     renderMail();
     mailPanel.scrollIntoView({ block: 'start', behavior: 'smooth' });
   }
-  function closeMail() { mail.open = false; renderMail(); }
+  function closeMail() { if (mail.sending) mail.sending.stop = true; mail.open = false; renderMail(); }
 
   function previewHtml(subj, body) {
     return `<div class="preview"><span class="lbl">Voorbeeld</span><div class="pv-subj">${subj ? esc(subj) : '<span class="faint">Geen onderwerp</span>'}</div><div class="pv-body">${body ? esc(body) : '<span class="faint">Nog geen tekst</span>'}</div></div>`;
   }
 
   function mailOutHtml() {
-    const recips = mailRecipients(), n = recips.length;
+    const recips = mailRecipients(), n = recips.length, viaMs = outlookOn(), acc = msAccount();
     const legal = '<p class="hint">Let op: voor ongevraagde reclamemail gelden in Nederland regels, ook richting bedrijven. Bedrijven met "Wil geen mail ontvangen" worden overgeslagen.</p>';
     const tabs = n > 1 ? `<div class="tabs" aria-label="Manier van versturen"><button type="button" class="tab" id="mModeBcc" data-m="mode-bcc" aria-pressed="${mail.mode === 'bcc'}">Eén mail aan iedereen</button><button type="button" class="tab" id="mModePers" data-m="mode-pers" aria-pressed="${mail.mode === 'pers'}">Persoonlijk per bedrijf</button></div>` : '';
+    const off = mail.busy ? ' disabled' : '';
+    // Zonder koppeling (of als je liever zelf verstuurt): de mail-app openen en daarna vastleggen.
+    const own = (html, open) => viaMs ? `<details class="alt"${open ? ' open' : ''}><summary>Liever zelf versturen met je mail-app</summary>${html}</details>` : html;
     if (!n) return '<p class="hint">Er zijn geen ontvangers meer over.</p>';
     if (mail.mode === 'bcc' && n > 1) {
       const subj = fillTemplate(mail.onderwerp, null), body = fillTemplate(mail.tekst, null);
@@ -1921,8 +1959,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       const owa = mailtoUrl('', bcc, subj, body);
       const fits = owa.length < MAILTO_MAX;
       const copyBtns = `<button type="button" class="btn small" id="mCopyAddrs" data-m="copy-addrs">Kopieer ${n} adressen</button><button type="button" class="btn small" id="mCopySubj" data-m="copy-subj">Kopieer onderwerp</button><button type="button" class="btn small" id="mCopyBody" data-m="copy-body">Kopieer tekst</button>`;
-      return `${tabs}
-        ${personal ? '<p class="warn">In één mail aan iedereen worden {voornaam}, {bedrijf} en {plaats} niet per bedrijf ingevuld. Kies <strong>Persoonlijk per bedrijf</strong> als je dat wel wilt.</p>' : ''}
+      const steps = `
         <div class="steps">
           <div class="srow"><span class="num">1</span>
             ${fits ? `<div><strong>Open de nieuwe mail</strong><p class="hint">De ${n} adressen staan in <strong>BCC</strong>, zodat niemand de andere adressen ziet. Onderwerp en tekst zijn ingevuld.</p></div>
@@ -1933,20 +1970,29 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
             <div class="btns">${copyBtns}</div>`}
           </div>
           <div class="srow"><span class="num">2</span><div><strong>Verstuur de mail</strong><p class="hint">Klik daarna op Vastleggen. De mail komt dan bij elk bedrijf in de contactmomenten.</p></div>
-            <div class="btns"><button type="button" class="btn primary" id="mLogAll" data-m="log-all"${mail.busy ? ' disabled' : ''}>${mail.busy ? 'Bezig met vastleggen…' : 'Vastleggen als verstuurd'}</button></div></div>
-        </div>
-        ${previewHtml(subj, body)}
+            <div class="btns"><button type="button" class="btn primary" id="mLogAll" data-m="log-all"${off}>${mail.busy ? 'Bezig met vastleggen…' : 'Vastleggen als verstuurd'}</button></div></div>
+        </div>`;
+      return `${tabs}
+        ${personal ? '<p class="warn">In één mail aan iedereen worden {voornaam}, {bedrijf} en {plaats} niet per bedrijf ingevuld. Kies <strong>Persoonlijk per bedrijf</strong> als je dat wel wilt.</p>' : ''}
+        ${viaMs ? `<div class="ms-send">
+          <div class="btns"><button type="button" class="btn primary" id="msSendBcc" data-m="ms-send-bcc"${off}>${mail.busy ? 'Bezig met versturen…' : 'Versturen via Outlook'}</button>
+            <button type="button" class="btn" id="msDraftBcc" data-m="ms-draft-bcc"${off}>In Concepten zetten</button></div>
+          <p class="hint">Eén mail vanuit je eigen mailbox${acc && acc.mail ? ` (${esc(acc.mail)})` : ''}. De ${n} adressen staan in BCC, zodat niemand de andere adressen ziet; jij staat zelf in Aan. Na het versturen legt de app de mail bij elk bedrijf vast.</p>
+        </div>` : ''}
+        ${own(steps)}
+        ${previewHtml(subj, viaMs ? withSig(body) : body)}
         ${legal}`;
     }
     if (mail.index >= n) {
-      return `${tabs}<div class="done-box"><strong>Klaar</strong><p>${mail.done.size} ${plural(mail.done.size, 'mail', 'mails')} vastgelegd${mail.skipped.size ? `, ${mail.skipped.size} overgeslagen` : ''}.</p>
+      return `${tabs}<div class="done-box"><strong>Klaar</strong><p>${mail.done.size} ${plural(mail.done.size, 'mail', 'mails')} ${viaMs ? 'verstuurd en vastgelegd' : 'vastgelegd'}${mail.skipped.size ? `, ${mail.skipped.size} overgeslagen` : ''}.</p>
         <div class="btns"><button type="button" class="btn" id="mRestart" data-m="restart">Terug naar het begin</button><button type="button" class="btn primary" id="mDone" data-m="close">Sluiten</button></div></div>`;
     }
     const l = recips[mail.index];
     const subj = fillTemplate(mail.onderwerp, l), body = fillTemplate(mail.tekst, l);
     const owa = mailtoUrl(l.email, '', subj, body);
-    return `${tabs}
-      <div class="pers-head"><span class="meta">${n > 1 ? `${mail.index + 1} van ${n}` : 'Eén bedrijf'}${mail.done.has(l.id) ? ' · al vastgelegd' : ''}</span><strong>${esc(l.bedrijf)}</strong><span>${l.contact ? esc(l.contact) + ' · ' : ''}<span class="pick">${esc(l.email)}</span></span></div>
+    const rest = recips.slice(mail.index).filter(x => !mail.done.has(x.id)).length;
+    const nav = `${n > 1 ? '<button type="button" class="btn" id="mSkip" data-m="skip">Overslaan</button>' : ''}${mail.index > 0 ? '<button type="button" class="btn" id="mPrev" data-m="prev">Vorige</button>' : ''}`;
+    const manual = `
       <div class="btns">
         <a class="btn dark" href="${esc(owa)}" data-handoff="mail">Open nieuwe mail</a>
       </div>
@@ -1955,13 +2001,26 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
         <button type="button" class="btn small" id="mCopySubj" data-m="copy-subj">Kopieer onderwerp</button>
         <button type="button" class="btn small" id="mCopyBody" data-m="copy-body">Kopieer tekst</button>
       </div>
-      ${previewHtml(subj, body)}
-      <div class="btns">
-        <button type="button" class="btn primary" id="mSent" data-m="sent"${mail.busy ? ' disabled' : ''}>${n > 1 ? 'Verstuurd, volgende' : 'Vastleggen als verstuurd'}</button>
-        ${n > 1 ? '<button type="button" class="btn" id="mSkip" data-m="skip">Overslaan</button>' : ''}
-        ${mail.index > 0 ? '<button type="button" class="btn" id="mPrev" data-m="prev">Vorige</button>' : ''}
-      </div>
-      <p class="hint">Tik op Open nieuwe mail: de mail staat klaar met adres, onderwerp en tekst. Opent je mail-app niet, kopieer dan adres, onderwerp en tekst naar een nieuwe mail. Klik na het versturen op ${n > 1 ? 'Verstuurd' : 'Vastleggen'}, dan komt de mail in de contactmomenten.</p>
+      ${viaMs ? `<div class="btns"><button type="button" class="btn" id="mSent" data-m="sent"${off}>Vastleggen als verstuurd</button></div>` : ''}
+      <p class="hint">Tik op Open nieuwe mail: de mail staat klaar met adres, onderwerp en tekst. Opent je mail-app niet, kopieer dan adres, onderwerp en tekst naar een nieuwe mail. Klik na het versturen op ${n > 1 && !viaMs ? 'Verstuurd' : 'Vastleggen'}, dan komt de mail in de contactmomenten.</p>`;
+    const s = mail.sending;
+    return `${tabs}
+      <div class="pers-head"><span class="meta">${n > 1 ? `${mail.index + 1} van ${n}` : 'Eén bedrijf'}${mail.done.has(l.id) ? ' · al vastgelegd' : ''}</span><strong>${esc(l.bedrijf)}</strong><span>${l.contact ? esc(l.contact) + ' · ' : ''}<span class="pick">${esc(l.email)}</span></span></div>
+      ${viaMs ? `<div class="btns">
+          <button type="button" class="btn primary" id="msSend" data-m="ms-send"${off}>${mail.busy && !s ? 'Bezig met versturen…' : 'Versturen via Outlook'}</button>
+          <button type="button" class="btn" id="msDraft" data-m="ms-draft"${off}>In Concepten</button>
+          ${rest > 1 ? `<button type="button" class="btn dark" id="msSendAll" data-m="ms-send-all"${off}>Alle ${rest} versturen</button>` : ''}
+        </div>
+        ${s ? `<div class="progress"><div class="bar"><span style="width:${Math.round(s.done / s.total * 100)}%"></span></div>
+          <p class="hint">Versturen: ${s.done} van ${s.total}. Tussen de mails zit steeds even tijd, zodat Outlook ze niet tegenhoudt.</p>
+          <div class="btns"><button type="button" class="btn small" id="msStop" data-m="ms-stop"${s.stop ? ' disabled' : ''}>${s.stop ? 'Stoppen na deze mail…' : 'Stoppen'}</button></div></div>` : ''}
+        ${nav && !s ? `<div class="btns">${nav}</div>` : ''}` : ''}
+      ${s ? '' : own(manual)}
+      ${previewHtml(subj, viaMs ? withSig(body) : body)}
+      ${viaMs ? '' : `<div class="btns">
+        <button type="button" class="btn primary" id="mSent" data-m="sent"${off}>${n > 1 ? 'Verstuurd, volgende' : 'Vastleggen als verstuurd'}</button>
+        ${nav}
+      </div>`}
       ${legal}`;
   }
 
@@ -1987,7 +2046,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
             <div class="phs"><span>Invoegen:</span>${PLACEHOLDERS.map((p, i) => `<button type="button" class="ph" id="ph-${i}" data-ph="${p}">${p}</button>`).join('')}</div>
           </div>
           <div class="tplbar">${tplBar}</div>
-          <p class="hint">{aanhef} wordt per bedrijf bijvoorbeeld "Beste Marieke" of "Geachte heer, mevrouw". Je Outlook-handtekening komt er vanzelf onder als je die hebt ingesteld.</p>
+          <p class="hint">{aanhef} wordt per bedrijf bijvoorbeeld "Beste Marieke" of "Geachte heer, mevrouw". ${outlookOn() ? 'Via Outlook komt je handtekening uit de app eronder (onderaan bij Outlook: Handtekening).' : 'Je Outlook-handtekening komt er vanzelf onder als je die hebt ingesteld.'}</p>
         </div>
         <div class="mail-out" id="mailOut">${mailOutHtml()}</div>
       </div>`;
@@ -2507,6 +2566,12 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
       case 'copy-to': if (cur) copyText(cur.email, 'E-mailadres'); break;
       case 'log-all': logAll(); break;
       case 'sent': markSent(); break;
+      case 'ms-send': msSendCurrent(false); break;
+      case 'ms-draft': msSendCurrent(true); break;
+      case 'ms-send-all': msSendAll(); break;
+      case 'ms-stop': if (mail.sending) { mail.sending.stop = true; renderMailOut(); } break;
+      case 'ms-send-bcc': msSendBcc(false); break;
+      case 'ms-draft-bcc': msSendBcc(true); break;
       case 'skip': if (cur) { mail.skipped.add(cur.id); mail.index++; renderMailOut(); } break;
       case 'prev': mail.index = Math.max(0, mail.index - 1); renderMailOut(); break;
       case 'restart': mail.index = 0; renderMailOut(); break;
@@ -2949,6 +3014,385 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
     } catch { toast('De testmelding lukte niet. Staan meldingen aan voor de app?'); }
   });
 
+  /* ---------- Outlook (Microsoft 365) ---------- */
+  /* Met een eigen app-registratie in Microsoft Entra meldt de app zich aan bij je Microsoft 365-account. Daarna
+     verstuurt hij mails vanuit je eigen mailbox en zet hij afspraken direct in je Outlook-agenda. Aanmelden gaat
+     via een doorverwijzing naar Microsoft (code met PKCE); er zit geen eigen server tussen. */
+  const MS_SCOPES = 'openid profile offline_access User.Read Mail.ReadWrite Mail.Send Calendars.ReadWrite';
+  const MS_GAP = 2500;   // Exchange Online staat maximaal 30 mails per minuut toe
+  const GUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const ms = { panel: '', error: '', resume: null };
+  const msRedirect = () => new URL('./', location.href).href;
+  function msConfig() {
+    const c = window.KA_CONFIG || {};
+    let id = c.outlookClientId, tenant = c.outlookTenant;
+    if (!id) { try { const s = JSON.parse(localStorage.getItem('koude-acq.outlookCfg') || '{}'); id = s.clientId; tenant = s.tenant; } catch {} }
+    id = String(id || '').trim();
+    return GUID_RE.test(id) ? { clientId: id, tenant: String(tenant || '').trim() || 'organizations' } : null;
+  }
+  const msAuthority = cfg => `https://login.microsoftonline.com/${encodeURIComponent(cfg.tenant)}/oauth2/v2.0`;
+  function msLoad() { try { return JSON.parse(localStorage.getItem('koude-acq.outlook') || 'null'); } catch { return null; } }
+  function msSave(v) { try { if (v) localStorage.setItem('koude-acq.outlook', JSON.stringify(v)); else localStorage.removeItem('koude-acq.outlook'); } catch {} }
+  const msAccount = () => { const s = msLoad(); return s && s.user ? s.user : null; };
+  const outlookOn = () => !!(msConfig() && msAccount());
+  const withSig = body => { const sig = (pref.get('outlookSig') || '').trim(); return sig ? `${String(body).replace(/\s+$/, '')}\n\n${sig}` : body; };
+
+  const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const randomKey = n => b64url(crypto.getRandomValues(new Uint8Array(n)));
+  async function pkcePair() {
+    const verifier = randomKey(48);
+    return { verifier, challenge: b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))) };
+  }
+  function msAuthorizeUrl(cfg, p, stateKey, prompt) {
+    const q = new URLSearchParams({ client_id: cfg.clientId, response_type: 'code', redirect_uri: msRedirect(), response_mode: 'query',
+      scope: MS_SCOPES, state: stateKey, code_challenge: p.challenge, code_challenge_method: 'S256' });
+    const acc = msAccount();
+    if (acc && acc.mail) q.set('login_hint', acc.mail);
+    if (prompt) q.set('prompt', prompt);
+    return `${msAuthority(cfg)}/authorize?${q}`;
+  }
+  function msErrorText(code, desc) {
+    const d = String(desc || ''), has = c => d.includes(c);
+    if (has('AADSTS9002326') || has('AADSTS7000218')) return 'Kies in de app-registratie bij Verificatie het platform "Toepassing met één pagina" (SPA), niet "Web".';
+    if (has('AADSTS50011')) return `Het omleidings-URI klopt niet. Vul in de app-registratie precies ${msRedirect()} in.`;
+    if (has('AADSTS700016') || has('AADSTS90002')) return 'De toepassings-ID of map-ID klopt niet. Controleer ze op de pagina Overzicht van de app-registratie.';
+    if (has('AADSTS50194')) return 'Vul ook de map-ID (tenant-ID) in.';
+    if (has('AADSTS65001') || has('AADSTS90094') || has('AADSTS90095') || code === 'consent_required')
+      return 'Er is nog toestemming nodig. Klik in de app-registratie bij API-machtigingen op "Beheerderstoestemming verlenen", of vraag dat aan je beheerder.';
+    if (code === 'access_denied') return 'Aanmelden is afgebroken.';
+    return 'Aanmelden bij Microsoft lukte niet' + (d ? ': ' + d.split(/\r?\n/)[0].replace(/^AADSTS\d+:\s*/, '') : '.');
+  }
+  async function msTokenRequest(cfg, params) {
+    let res, data;
+    try {
+      res = await fetch(`${msAuthority(cfg)}/token`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ client_id: cfg.clientId, scope: MS_SCOPES, ...params }) });
+      data = await res.json();
+    } catch { throw Object.assign(new Error('net'), { offline: true }); }
+    if (!res.ok || !data.access_token) throw Object.assign(new Error('token'), { code: data.error, desc: data.error_description });
+    const prev = msLoad() || {};
+    const next = { ...prev, at: data.access_token, atExp: Date.now() + (Number(data.expires_in) || 3600) * 1000, rt: data.refresh_token || prev.rt || '', relogin: false };
+    msSave(next);
+    return next;
+  }
+  // Stil opnieuw aanmelden in een verborgen venster (lukt als je bij Microsoft aangemeld bent gebleven).
+  async function msSilent(cfg) {
+    if (!msAccount()) return null;
+    const p = await pkcePair(), key = 'ka-ms.stil.' + randomKey(12);
+    return new Promise(resolve => {
+      const f = document.createElement('iframe');
+      f.hidden = true;
+      f.setAttribute('aria-hidden', 'true');
+      let timer = 0, poll = 0;
+      const finish = v => { clearInterval(poll); clearTimeout(timer); f.remove(); resolve(v); };
+      poll = setInterval(() => {
+        let href = '';
+        try { href = f.contentWindow.location.href; } catch { return; }   // nog bij Microsoft
+        if (!href.startsWith(msRedirect())) return;
+        const q = new URL(href).searchParams;
+        if (q.get('state') === key) finish(q.get('code') ? { code: q.get('code'), verifier: p.verifier } : null);
+      }, 100);
+      timer = setTimeout(() => finish(null), 10000);
+      f.src = msAuthorizeUrl(cfg, p, key, 'none');
+      document.body.appendChild(f);
+    });
+  }
+  let msRenewing = null;
+  async function msToken() {
+    const cfg = msConfig(), s = msLoad();
+    if (!cfg || !s) throw Object.assign(new Error('login'), { needLogin: true });
+    if (s.at && s.atExp > Date.now() + 120000) return s.at;
+    if (!msRenewing) msRenewing = (async () => {
+      if (s.rt) {
+        try { return (await msTokenRequest(cfg, { grant_type: 'refresh_token', refresh_token: s.rt })).at; }
+        catch (e) { if (e.offline) throw e; }
+      }
+      const r = await msSilent(cfg);
+      if (r) {
+        try { return (await msTokenRequest(cfg, { grant_type: 'authorization_code', code: r.code, redirect_uri: msRedirect(), code_verifier: r.verifier })).at; }
+        catch (e) { if (e.offline) throw e; }
+      }
+      const cur = msLoad();
+      if (cur) msSave({ ...cur, at: '', atExp: 0, rt: '', relogin: true });
+      renderOutlook();
+      throw Object.assign(new Error('login'), { needLogin: true });
+    })().finally(() => { msRenewing = null; });
+    return msRenewing;
+  }
+  async function graph(method, path, body) {
+    for (let attempt = 0; ; attempt++) {
+      const at = await msToken();
+      let res;
+      try {
+        res = await fetch('https://graph.microsoft.com/v1.0' + path, {
+          method, headers: body ? { Authorization: 'Bearer ' + at, 'Content-Type': 'application/json' } : { Authorization: 'Bearer ' + at },
+          body: body ? JSON.stringify(body) : undefined,
+        });
+      } catch { throw Object.assign(new Error('net'), { offline: true }); }
+      if (res.status === 401 && attempt === 0) { const s = msLoad(); if (s) msSave({ ...s, at: '', atExp: 0 }); continue; }
+      if ((res.status === 429 || res.status === 503) && attempt < 2) { await sleep((Number(res.headers.get('Retry-After')) || 10) * 1000); continue; }
+      const data = res.status === 202 || res.status === 204 ? null : await res.json().catch(() => null);
+      if (!res.ok) throw Object.assign(new Error('graph'), { status: res.status, desc: data && data.error ? data.error.message : '' });
+      return data;
+    }
+  }
+  function outlookFail(e, what, resume) {
+    if (e && e.needLogin) { ms.resume = resume || null; askOutlookLogin(); return; }
+    if (e && e.offline) toast(`${what} lukte niet: geen verbinding met internet.`, 6000);
+    else if (e && e.status === 403) toast(`${what} lukte niet: de app mist toestemming in Microsoft 365. Klik in de app-registratie bij API-machtigingen op Beheerderstoestemming verlenen.`, 10000);
+    else toast(`${what} lukte niet${e && e.desc ? ': ' + e.desc : '. Probeer het opnieuw.'}`, 8000);
+  }
+  function askOutlookLogin() {
+    const el = $('outlookNotice');
+    el.hidden = false;
+    el.innerHTML = `<p><strong>Meld je even opnieuw aan bij Outlook.</strong> Daarna gaat de app verder waar je was.</p>
+      <div class="btns"><button type="button" class="btn small primary" id="msRelogin" data-o="login">Aanmelden</button><button type="button" class="btn small" data-o="notice-close">Later</button></div>`;
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+  async function msLogin() {
+    const cfg = msConfig();
+    if (!cfg) { openOutlookPanel('setup'); return; }
+    const p = await pkcePair(), key = 'ka-ms.' + randomKey(12);
+    try { localStorage.setItem('koude-acq.outlookAuth', JSON.stringify({ state: key, verifier: p.verifier, resume: ms.resume, t: Date.now() })); } catch {}
+    location.assign(msAuthorizeUrl(cfg, p, key, msAccount() ? '' : 'select_account'));
+  }
+
+  /* Mailen via Outlook */
+  const addrList = v => String(v || '').split(/[;,]\s*/).map(x => x.trim()).filter(Boolean);
+  function msMessage(subject, body, to, bcc = []) {
+    const r = a => ({ emailAddress: { address: a } });
+    return { subject, body: { contentType: 'Text', content: withSig(body) }, toRecipients: to.map(r), bccRecipients: bcc.map(r) };
+  }
+  const mailResume = () => ({ type: 'mail', mail: { ids: mail.ids, mode: mail.mode, onderwerp: mail.onderwerp, tekst: mail.tekst, tplId: mail.tplId, index: mail.index } });
+  async function msSendCurrent(draft) {
+    const l = mailRecipients()[mail.index];
+    if (!l || mail.busy) return;
+    const subj = fillTemplate(mail.onderwerp, l), body = fillTemplate(mail.tekst, l);
+    if (!subj.trim()) { toast('Vul eerst een onderwerp in.'); $('mSubj')?.focus(); return; }
+    mail.busy = true; renderMailOut();
+    try {
+      if (draft) {
+        await graph('POST', '/me/messages', msMessage(subj, body, addrList(l.email)));
+        toast(`De mail aan ${l.bedrijf} staat klaar in Concepten in Outlook. Leg hem na het versturen vast.`, 7000);
+      } else {
+        await graph('POST', '/me/sendMail', { message: msMessage(subj, body, addrList(l.email)), saveToSentItems: true });
+        await logMail([l.id], subj);
+        mail.done.add(l.id); mail.skipped.delete(l.id); mail.index++;
+        toast(`Mail aan ${l.bedrijf} verstuurd.`);
+        if (mail.ids.length === 1) { mail.busy = false; closeMail(); return; }
+      }
+    } catch (e) { outlookFail(e, draft ? 'In Concepten zetten' : 'Versturen', mailResume()); }
+    mail.busy = false;
+    renderMailOut();
+  }
+  async function msSendAll() {
+    if (mail.busy) return;
+    const todo = mailRecipients().slice(mail.index).filter(l => !mail.done.has(l.id));
+    if (!todo.length) return;
+    if (!mail.onderwerp.trim()) { toast('Vul eerst een onderwerp in.'); $('mSubj')?.focus(); return; }
+    mail.busy = true;
+    mail.sending = { done: 0, total: todo.length, stop: false };
+    renderMailOut();
+    let sent = 0;
+    for (const l of todo) {
+      if (mail.sending.stop || !mail.open) break;
+      const subj = fillTemplate(mail.onderwerp, l), body = fillTemplate(mail.tekst, l);
+      try {
+        await graph('POST', '/me/sendMail', { message: msMessage(subj, body, addrList(l.email)), saveToSentItems: true });
+      } catch (e) { outlookFail(e, `Versturen aan ${l.bedrijf}`, mailResume()); break; }
+      await logMail([l.id], subj);
+      sent++;
+      mail.done.add(l.id); mail.skipped.delete(l.id);
+      const i = mailRecipients().findIndex(x => x.id === l.id);
+      if (i >= mail.index) mail.index = i + 1;
+      mail.sending.done = sent;
+      renderMailOut();
+      if (sent < todo.length && !mail.sending.stop) await sleep(MS_GAP);
+    }
+    mail.sending = null;
+    mail.busy = false;
+    if (sent) toast(`${sent} ${plural(sent, 'mail', 'mails')} verstuurd via Outlook en vastgelegd.`);
+    renderMailOut();
+  }
+  async function msSendBcc(draft) {
+    const recips = mailRecipients(), acc = msAccount();
+    if (!recips.length || mail.busy) return;
+    const subj = fillTemplate(mail.onderwerp, null), body = fillTemplate(mail.tekst, null);
+    if (!subj.trim()) { toast('Vul eerst een onderwerp in.'); $('mSubj')?.focus(); return; }
+    mail.busy = true; renderMailOut();
+    try {
+      const msg = msMessage(subj, body, acc && acc.mail ? [acc.mail] : [], recips.flatMap(l => addrList(l.email)));
+      if (draft) {
+        await graph('POST', '/me/messages', msg);
+        toast('De mail staat klaar in Concepten in Outlook, met alle adressen in BCC. Leg hem na het versturen vast.', 8000);
+      } else {
+        await graph('POST', '/me/sendMail', { message: msg, saveToSentItems: true });
+        const ok = await logMail(recips.map(l => l.id), subj);
+        mail.busy = false;
+        closeMail();
+        toast(`Mail verstuurd aan ${recips.length} ${plural(recips.length, 'bedrijf', 'bedrijven')} en bij ${ok} vastgelegd.`);
+        return;
+      }
+    } catch (e) { outlookFail(e, draft ? 'In Concepten zetten' : 'Versturen', mailResume()); }
+    mail.busy = false;
+    renderMailOut();
+  }
+
+  /* Afspraken in de Outlook-agenda */
+  function msEvent(l) {
+    const [y, m, d] = l.datum.split('-').map(Number);
+    const iso = t => new Date(t).toISOString().slice(0, 19);
+    const info = [l.contact && 'Contactpersoon: ' + l.contact, l.telefoon && 'Telefoon: ' + l.telefoon, l.email && 'E-mail: ' + l.email, l.notitie].filter(Boolean).join('\n');
+    const ev = { subject: `${l.actie} – ${l.bedrijf}`, body: { contentType: 'Text', content: info }, location: { displayName: [l.adres, l.plaats].filter(Boolean).join(', ') } };
+    const tz = 'W. Europe Standard Time';
+    if (l.tijd) {
+      const [hh, mi] = l.tijd.split(':').map(Number), start = Date.UTC(y, m - 1, d, hh, mi);
+      return { ...ev, isAllDay: false, showAs: 'busy', start: { dateTime: iso(start), timeZone: tz }, end: { dateTime: iso(start + 3600000), timeZone: tz },
+        isReminderOn: true, reminderMinutesBeforeStart: 30 };
+    }
+    // Zonder tijd: een dag-item dat je agenda niet blokkeert. De ochtendmelding herinnert je eraan.
+    return { ...ev, isAllDay: true, showAs: 'free', isReminderOn: false,
+      start: { dateTime: iso(Date.UTC(y, m - 1, d)), timeZone: tz }, end: { dateTime: iso(Date.UTC(y, m - 1, d + 1)), timeZone: tz } };
+  }
+  async function outlookEvent(l, moved) {
+    if (!l || !l.actie || !l.datum) return;
+    try {
+      let id = l.outlookId || '';
+      if (id) {
+        try { await graph('PATCH', '/me/events/' + encodeURIComponent(id), msEvent(l)); }
+        catch (e) { if (e.status === 404) id = ''; else throw e; }   // in Outlook verwijderd: opnieuw aanmaken
+      }
+      if (!id) { const r = await graph('POST', '/me/events', msEvent(l)); id = r && r.id ? r.id : ''; }
+      if (id && id !== l.outlookId) await write(() => col.doc(l.id).update({ outlookId: id }));
+      toast(`${moved ? 'Afspraak in je Outlook-agenda bijgewerkt' : 'In je Outlook-agenda gezet'}: ${l.actie} ${l.bedrijf}, ${shortDate(l.datum)}${l.tijd ? ' om ' + l.tijd : ''}.`, 5000);
+    } catch (e) { outlookFail(e, 'In de agenda zetten', { type: 'agenda', id: l.id }); }
+  }
+
+  /* Instellen, handtekening en status onderaan */
+  function renderOutlook() {
+    const cfg = msConfig(), s = msLoad(), acc = s && s.user;
+    const st = $('outlookStatus'), login = $('outlookLogin'), sig = $('outlookSig'), off = $('outlookOff');
+    login.hidden = sig.hidden = off.hidden = true;
+    if (!cfg || !acc) {
+      st.textContent = 'Outlook: niet gekoppeld.';
+      login.hidden = false;
+      login.textContent = cfg ? 'Aanmelden' : 'Koppelen';
+    } else if (s.relogin) {
+      st.textContent = `Outlook: meld je opnieuw aan (${acc.mail}).`;
+      login.hidden = off.hidden = false;
+      login.textContent = 'Aanmelden';
+    } else {
+      st.textContent = `Outlook: gekoppeld met ${acc.mail}.`;
+      sig.hidden = off.hidden = false;
+    }
+    renderOutlookPanel();
+  }
+  function openOutlookPanel(which) {
+    ms.panel = ms.panel === which ? '' : which;
+    renderOutlookPanel();
+    if (ms.panel) $('outlookPanel').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+  function renderOutlookPanel() {
+    const el = $('outlookPanel');
+    el.hidden = !ms.panel;
+    if (!ms.panel) { el.innerHTML = ''; return; }
+    const err = ms.error ? `<p class="warn" role="alert">${esc(ms.error)}</p>` : '';
+    if (ms.panel === 'sig') {
+      el.innerHTML = `<div class="card-head"><h2>Handtekening</h2><button type="button" class="btn small" data-o="close">Sluiten</button></div>
+        <p class="hint">Deze tekst komt onder elke mail die de app via Outlook verstuurt. Je handtekening uit het Outlook-programma zelf kan de app niet ophalen.</p>
+        <textarea class="input mail-body" id="outlookSigText" rows="6" maxlength="1000" aria-label="Handtekening">${esc(pref.get('outlookSig') || '')}</textarea>
+        <div class="btns"><button type="button" class="btn primary" id="outlookSigSave" data-o="sig-save">Opslaan</button></div>`;
+      return;
+    }
+    const cfg = msConfig() || {}, saved = (() => { try { return JSON.parse(localStorage.getItem('koude-acq.outlookCfg') || '{}'); } catch { return {}; } })();
+    el.innerHTML = `<div class="card-head"><h2>Koppelen met Outlook</h2><button type="button" class="btn small" data-o="close">Sluiten</button></div>
+      ${err}
+      <p>Eenmalig: maak in Microsoft 365 een app-registratie aan, zodat de app namens jou mag mailen en afspraken mag maken. Dat duurt ongeveer vijf minuten. Doe het op een computer en meld je aan met je werkaccount.</p>
+      <ol class="olist">
+        <li>Ga naar <a href="https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank" rel="noopener">entra.microsoft.com</a> → <strong>App-registraties</strong> → <strong>Nieuwe registratie</strong>.</li>
+        <li>Naam: <strong>Koude Acquisitie</strong>. Accounttype: <strong>Alleen accounts in deze organisatiemap</strong>.</li>
+        <li>Omleidings-URI: kies <strong>Toepassing met één pagina (SPA)</strong> en vul in:<br><code class="pick" id="msRedirectUri" data-o="copy-uri" tabindex="0" role="button" title="Kopiëren">${esc(msRedirect())}</code><br>Klik op <strong>Registreren</strong>.</li>
+        <li>Ga naar <strong>API-machtigingen</strong> → <strong>Een machtiging toevoegen</strong> → <strong>Microsoft Graph</strong> → <strong>Gedelegeerde machtigingen</strong>. Vink aan: <strong>Mail.ReadWrite</strong>, <strong>Mail.Send</strong>, <strong>Calendars.ReadWrite</strong> en <strong>offline_access</strong>. Klik daarna op <strong>Beheerderstoestemming verlenen</strong>.</li>
+        <li>Kopieer op <strong>Overzicht</strong> de twee codes hieronder, of stuur ze naar Claude: dan staan ze meteen op al je apparaten.</li>
+      </ol>
+      <div class="ms-ids">
+        <div class="field"><label for="msClientId">Toepassings-ID (client-ID)</label><input class="input" id="msClientId" autocomplete="off" spellcheck="false" placeholder="00000000-0000-0000-0000-000000000000" value="${esc(saved.clientId || cfg.clientId || '')}"></div>
+        <div class="field"><label for="msTenant">Map-ID (tenant-ID)</label><input class="input" id="msTenant" autocomplete="off" spellcheck="false" placeholder="00000000-0000-0000-0000-000000000000" value="${esc(saved.tenant || (cfg.tenant !== 'organizations' ? cfg.tenant || '' : ''))}"></div>
+      </div>
+      <div class="btns"><button type="button" class="btn primary" id="msSaveLogin" data-o="setup-save">Opslaan en aanmelden</button></div>`;
+  }
+  function saveOutlookSetup() {
+    const clientId = $('msClientId').value.trim(), tenant = $('msTenant').value.trim();
+    if (!GUID_RE.test(clientId)) { ms.error = 'De toepassings-ID ziet eruit als 00000000-0000-0000-0000-000000000000. Kopieer hem van de pagina Overzicht.'; renderOutlookPanel(); return; }
+    if (!GUID_RE.test(tenant) && !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(tenant)) { ms.error = 'Vul de map-ID (tenant-ID) in. Die staat op de pagina Overzicht, onder de toepassings-ID.'; renderOutlookPanel(); return; }
+    try { localStorage.setItem('koude-acq.outlookCfg', JSON.stringify({ clientId, tenant })); } catch {}
+    ms.error = '';
+    msLogin();
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-o]');
+    if (!b) return;
+    const a = b.dataset.o;
+    if (a === 'login') msLogin();
+    else if (a === 'notice-close') { $('outlookNotice').hidden = true; ms.resume = null; }
+    else if (a === 'close') { ms.panel = ''; ms.error = ''; renderOutlookPanel(); }
+    else if (a === 'setup-save') saveOutlookSetup();
+    else if (a === 'copy-uri') copyText(msRedirect(), 'Omleidings-URI');
+    else if (a === 'sig-save') { pref.set('outlookSig', $('outlookSigText').value.trim()); ms.panel = ''; renderOutlookPanel(); toast('Handtekening opgeslagen.'); if (mail.open) renderMailOut(); }
+  });
+  $('outlookLogin').addEventListener('click', () => { if (msConfig()) msLogin(); else openOutlookPanel('setup'); });
+  $('outlookSig').addEventListener('click', () => openOutlookPanel('sig'));
+  $('outlookOff').addEventListener('click', () => {
+    msSave(null);
+    ms.panel = '';
+    renderOutlook();
+    if (mail.open) renderMail();
+    renderRows();
+    toast('Outlook is ontkoppeld op dit apparaat.');
+  });
+
+  // Na de doorverwijzing: code inwisselen, profiel ophalen en verdergaan waar je was.
+  async function outlookBoot() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('koude-acq.outlookAuth') || 'null'); localStorage.removeItem('koude-acq.outlookAuth'); } catch {}
+    if (msReturn) {
+      const cfg = msConfig();
+      if (!cfg || !saved || saved.state !== msReturn.state) ms.error = 'Aanmelden bij Microsoft is verlopen. Probeer het opnieuw.';
+      else if (msReturn.error) ms.error = msErrorText(msReturn.error, msReturn.desc);
+      else {
+        try {
+          await msTokenRequest(cfg, { grant_type: 'authorization_code', code: msReturn.code, redirect_uri: msRedirect(), code_verifier: saved.verifier });
+          const me = await graph('GET', '/me?$select=displayName,mail,userPrincipalName,jobTitle,mobilePhone,businessPhones,companyName');
+          const mailAddr = (me && (me.mail || me.userPrincipalName)) || '';
+          msSave({ ...msLoad(), user: { naam: (me && me.displayName) || mailAddr, mail: mailAddr }, relogin: false });
+          if (pref.get('outlookSig') === null && me) {
+            pref.set('outlookSig', [me.displayName, me.jobTitle, me.companyName, me.mobilePhone || (me.businessPhones || [])[0], mailAddr].filter(Boolean).join('\n'));
+          }
+          ms.error = '';
+          ms.panel = '';
+          toast(`Gekoppeld met Outlook als ${mailAddr}.`);
+        } catch (e) {
+          if (!msAccount()) msSave(null);
+          ms.error = e.offline ? 'Geen verbinding met Microsoft. Controleer je internet en probeer het opnieuw.' : e.status ? 'Je profiel ophalen lukte niet. Probeer het opnieuw.' : msErrorText(e.code, e.desc);
+        }
+      }
+      if (ms.error) ms.panel = 'setup';
+    }
+    renderOutlook();
+    if (ms.panel) setTimeout(() => $('outlookPanel').scrollIntoView({ block: 'start' }), 300);
+    const r = saved && !ms.error && msReturn ? saved.resume : null;
+    if (!r || !outlookOn()) return;
+    for (let i = 0; i < 100 && !state.loaded; i++) await sleep(100);
+    if (r.type === 'agenda') { const l = byId(r.id); if (l) outlookEvent(l); }
+    else if (r.type === 'mail' && r.mail) {
+      openMail(r.mail.ids || []);
+      if (!mail.open) return;
+      Object.assign(mail, { mode: r.mail.mode === 'pers' ? 'pers' : 'bcc', onderwerp: str(r.mail.onderwerp), tekst: str(r.mail.tekst), tplId: str(r.mail.tplId), index: Math.max(0, Number(r.mail.index) || 0) });
+      renderMail();
+      toast('Aangemeld bij Outlook. Tik nog een keer op Versturen.', 6000);
+    }
+  }
+
   /* ---------- inloggen en opstarten ---------- */
   const gateEl = $('gate'), appEl = $('app');
   let sb = null, started = false, inRecovery = /type=recovery/.test(location.hash);
@@ -3087,6 +3531,7 @@ body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); 
   });
 
   async function bootApp() {
+    outlookBoot();
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) navigator.serviceWorker.register('sw.js').catch(() => {});
     const cfg = getConfig();
     if (!cfg) { startApp(null, createLocalStore()); return; }
