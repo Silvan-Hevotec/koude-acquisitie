@@ -544,8 +544,9 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     <h2 class="add-title"><button type="button" id="addToggle" aria-expanded="true">Nieuw bedrijf</button></h2>
     <div class="scanrow">
       <button type="button" class="btn small" id="scanBtn">Visitekaartje scannen</button>
+      <button type="button" class="btn small" id="pasteBtn">Plakken</button>
       <input type="file" id="scanFile" accept="image/*" capture="environment" hidden>
-      <span class="hint" id="scanMsg">Maak een foto van een kaartje, dan vult de app de gegevens in.</span>
+      <span class="hint" id="scanMsg">Maak een foto van een kaartje, of kopieer een bedrijf in Google Maps of Chrome en tik op Plakken.</span>
     </div>
     <div class="scanlines" id="scanLines" hidden></div>
     <div class="field">
@@ -1091,7 +1092,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     rememberAction(actie);
     addForm.reset();
     clearScanLines();
-    $('scanMsg').textContent = 'Maak een foto van een kaartje, dan vult de app de gegevens in.';
+    $('scanMsg').textContent = 'Maak een foto van een kaartje, of kopieer een bedrijf in Google Maps of Chrome en tik op Plakken.';
     syncWhen(addWhenEl.querySelector('.when'));
     dupSig = ''; dupAcked = false; addBtn.textContent = 'Toevoegen'; dupWarnEl.hidden = true;
     $('addBedrijf').focus();
@@ -1583,6 +1584,13 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     // Paginatitel van een website: "Hoekstra Installatietechniek | Installateur in Deventer" → het eerste deel.
     const title = String(sh.title || '').split(/\s+[|–—·-]\s+|:\s/)[0].trim();
     if (title && !lines.some(t => key(t) === key(title))) lines.unshift(title);
+    // Een volledige Google Maps-link bevat de naam: google.com/maps/place/Bakkerij+Van+Dalen/@52.2,6.1
+    urls.forEach(u => {
+      const m = /\/maps\/place\/([^/@?#]+)/.exec(u);
+      let name = '';
+      try { name = m ? decodeURIComponent(m[1].replace(/\+/g, ' ')).trim() : ''; } catch {}
+      if (name && !lines.some(t => key(t).includes(key(name.split(',')[0])))) lines.unshift(...name.split(/,\s*/).filter(Boolean));
+    });
     const site = urls.find(u => !isMapsUrl(u) && !isSocialUrl(u));
     if (!lines.length && !site) {
       setAddOpen(true);
@@ -1591,6 +1599,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     }
     const res = parseCard(lines.map(t => ({ t: cleanCardLine(t), h: 0 })));
     if (!res.fields.website && site) { try { res.fields.website = cleanWebsite(new URL(site).hostname); } catch {} }
+    // Alleen een website: de naam van het domein als voorlopige bedrijfsnaam (hoekstra-installatie.nl → Hoekstra installatie).
+    if (!res.fields.bedrijf && !lines.length && res.fields.website) res.fields.bedrijf = cap(siteKey(res.fields.website).split('.')[0].replace(/-/g, ' '));
     // Bij delen staat de naam bovenaan: die gaat voor als de app geen bedrijfsnaam herkende.
     if (!res.fields.bedrijf && res.lines.length) { const i = res.use.findIndex(u => !u); if (i >= 0) { res.fields.bedrijf = calmCaps(res.lines[i]); res.use[i] = 'bedrijf'; } }
     const n = fillAddForm(res.fields);
@@ -2911,6 +2921,15 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   /* ---------- gebeurtenissen ---------- */
   addForm.addEventListener('submit', addLead);
   $('scanBtn').addEventListener('click', () => $('scanFile').click());
+  // Werkt ook als delen naar de app (nog) niet kan: in Google Maps of Chrome kopiëren, hier plakken.
+  $('pasteBtn').addEventListener('click', async () => {
+    let text = '';
+    try { text = await navigator.clipboard.readText(); }
+    catch { $('scanMsg').textContent = 'Plakken is niet toegestaan. Tik nog een keer op Plakken en kies Toestaan.'; return; }
+    if (!text.trim()) { $('scanMsg').textContent = 'Er staat niets op het klembord. Kopieer eerst een bedrijf, bijvoorbeeld in Google Maps via Delen → Kopiëren.'; return; }
+    clearScanLines();
+    handleShare({ title: '', text, url: '' });
+  });
   $('scanFile').addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) scanCard(f); });
   $('backupNotice').addEventListener('click', e => { if (e.target.closest('[data-backup]')) $('backupBtn').click(); });
   const addToggle = $('addToggle');
