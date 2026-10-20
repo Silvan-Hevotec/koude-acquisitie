@@ -1,6 +1,6 @@
 // Service worker: maakt de app installeerbaar, laat hem openen zonder bereik
 // en toont de ochtendmelding met de acties van vandaag.
-const CACHE = 'koude-acquisitie-v10';
+const CACHE = 'koude-acquisitie-v11';
 const DATA_CACHE = 'koude-acq-data';   // hierin zet de app de actielijst voor de ochtendmelding
 const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest', './vendor/supabase.js', './icons/icon-192.png', './icons/icon-512.png', './icons/badge-96.png'];
 
@@ -24,6 +24,8 @@ self.addEventListener('fetch', event => {
       .then(res => {
         // Niet bewaren: het adres waarmee Microsoft na het aanmelden terugstuurt (met eenmalige code).
         if (res.ok && !(req.mode === 'navigate' && new URL(req.url).search)) { const copy = res.clone(); caches.open(CACHE).then(cache => cache.put(req, copy)); }
+        // Is de website even niet bereikbaar (bijvoorbeeld een 404 van GitHub Pages), dan de bewaarde versie gebruiken.
+        if (!res.ok) return caches.match(req, { ignoreSearch: true }).then(hit => hit || (req.mode === 'navigate' ? caches.match('./index.html') : null)).then(hit => hit || res);
         return res;
       })
       .catch(() => caches.match(req, { ignoreSearch: true }).then(hit => hit || caches.match('./index.html')))
