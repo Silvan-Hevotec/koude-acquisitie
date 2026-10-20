@@ -191,6 +191,9 @@ select.input { padding-right: 8px; }
 .tab .n, .chip .n { font: 500 12.5px/1 var(--f-mono); font-variant-numeric: tabular-nums; opacity: .7; }
 .tab .n.hot { opacity: 1; padding: 3px 7px; border-radius: 999px; background: var(--geel); color: var(--geel-ink); }
 .search { flex: 1 1 220px; max-width: 360px; }
+.branchesel { flex: 0 1 190px; min-width: 0; }
+.branchesel.on { border-color: var(--geel); box-shadow: inset 0 0 0 1px var(--geel); }
+.hint.links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
 @media (max-width: 560px) {
   .tabs { display: flex; width: 100%; }
   .tab { flex: 1 1 auto; justify-content: center; padding: 0 8px; gap: 5px; font-size: 14px; }
@@ -545,6 +548,14 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       <input class="input" id="addPlaats" list="plaatsLijst" maxlength="60" placeholder="Bijv. Zwolle">
     </div>
     <div class="field">
+      <label for="addBranche">Branche<span class="opt">optioneel</span></label>
+      <input class="input" id="addBranche" list="brancheLijst" maxlength="60" placeholder="Bijv. Installatietechniek">
+    </div>
+    <div class="field">
+      <label for="addWebsite">Website<span class="opt">optioneel</span></label>
+      <input class="input" id="addWebsite" type="url" inputmode="url" maxlength="120" placeholder="www.bedrijf.nl">
+    </div>
+    <div class="field">
       <label for="addActie">Actie<span class="opt">optioneel</span></label>
       <input class="input" id="addActie" list="actieLijst" maxlength="40" placeholder="Kies of typ, bijv. Bezoek">
     </div>
@@ -563,6 +574,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   </form>
   <datalist id="actieLijst"></datalist>
   <datalist id="plaatsLijst"></datalist>
+  <datalist id="brancheLijst"></datalist>
 
   <div class="notice" id="roNote" hidden>
     <p>Je bekijkt deze lijst. Alleen de eigenaar en mensen met bewerkrechten kunnen bedrijven toevoegen of wijzigen.</p>
@@ -577,6 +589,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     <div class="tabs" id="tabs" aria-label="Overzicht"></div>
     <div class="tools">
       <input class="input search" id="search" type="search" placeholder="Zoek op bedrijf, naam, plaats, e-mail of telefoon" aria-label="Zoeken">
+      <select class="input branchesel" id="brancheSel" aria-label="Branche" hidden></select>
       <button type="button" class="btn" id="mailBtn" hidden>Mail versturen</button>
     </div>
   </div>
@@ -648,9 +661,11 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     'icloud.com', 'me.com', 'yahoo.com', 'yahoo.nl', 'ziggo.nl', 'kpnmail.nl', 'kpnplanet.nl', 'planet.nl', 'home.nl', 'xs4all.nl', 'upcmail.nl',
     'chello.nl', 'casema.nl', 'telfort.nl', 'online.nl', 'hetnet.nl', 'zeelandnet.nl', 'quicknet.nl', 'tele2.nl', 'caiway.nl', 'solcon.nl', 'gmx.com', 'gmx.net']);
   const IMP_FIELDS = [['', 'Niet importeren'], ['bedrijf', 'Bedrijfsnaam'], ['contact', 'Contactpersoon'], ['email', 'E-mailadres'], ['telefoon', 'Telefoonnummer'],
-    ['adres', 'Adres'], ['huisnummer', 'Huisnummer'], ['postcode', 'Postcode'], ['plaats', 'Plaats'], ['actie', 'Actie'], ['prioriteit', 'Prioriteit'], ['notitie', 'Notitie']];
+    ['adres', 'Adres'], ['huisnummer', 'Huisnummer'], ['postcode', 'Postcode'], ['plaats', 'Plaats'], ['branche', 'Branche'], ['website', 'Website'], ['actie', 'Actie'], ['prioriteit', 'Prioriteit'], ['notitie', 'Notitie']];
   const IMP_HINTS = [
-    ['', /(contactmoment|gearchiveerd|gewijzigd|datum|geen mail|website|kvk|btw)/, true],
+    ['', /(contactmoment|gearchiveerd|gewijzigd|datum|geen mail|kvk|btw)/, true],
+    ['website', /^(website|web|url|internet|homepage|site)/, false],
+    ['branche', /^(branche|sector|categorie|bedrijfstak|sbi)/, false],
     ['email', /e-?mail|^mail/, false],
     ['bedrijf', /^(bedrijf|bedrijfsnaam|organisatie|onderneming|firma|handelsnaam|company|klant|naam bedrijf|statutaire naam)/, false],
     ['telefoon', /^(tel|telefoon|phone|mobiel|gsm)/, false],
@@ -683,7 +698,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   const state = {
     leads: [], acties: [], sjablonen: [], loaded: false, problem: null, readOnly: false,
     view: VIEWS.has(pref.get('view')) ? pref.get('view') : 'alles',
-    actie: pref.get('actie') || '',
+    actie: pref.get('actie') || '', branche: pref.get('branche') || '',
     search: '', open: null, mode: 'edit', selecting: false, selected: new Set(), pendingMail: null, local: false,
   };
   const drafts = {}, finishes = {};
@@ -796,6 +811,17 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const hit = state.leads.find(l => l.plaats && key(l.plaats) === key(t));
     return hit ? hit.plaats : cap(t);
   }
+  function canonBranche(raw) {
+    const t = String(raw || '').trim().replace(/\s+/g, ' ').slice(0, 60);
+    if (!t) return '';
+    const hit = state.leads.find(l => l.branche && key(l.branche) === key(t));
+    return hit ? hit.branche : cap(t);
+  }
+  const brancheNames = () => { const m = new Map(); state.leads.forEach(l => { if (l.branche && !m.has(key(l.branche))) m.set(key(l.branche), l.branche); }); return sortNames([...m.values()]); };
+  // Website zonder http(s):// en zonder / aan het eind; de link krijgt https:// erbij.
+  const cleanWebsite = raw => String(raw || '').trim().replace(/\s+/g, '').replace(/^https?:\/\//i, '').replace(/\/+$/, '').slice(0, 120);
+  const webHref = w => /^https?:\/\//i.test(w) ? w : 'https://' + w;
+  const siteKey = w => { const m = /^(?:https?:\/\/)?(?:www\.)?([^\/?#:]+)/i.exec(String(w || '').trim()); return m && m[1].includes('.') ? m[1].toLowerCase() : ''; };
   const groupByPlaats = name => key(name) in groupPrefs ? !!groupPrefs[key(name)] : /bezoek/i.test(name);
 
   /* Dubbele bedrijven herkennen op naam, telefoon, e-mail of domein. */
@@ -803,7 +829,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     .replace(/\b(b ?v|v ?o ?f|n ?v|c ?v|holding|en zn|zn|zonen|ltd|gmbh)\b/g, ' ').replace(/\s+/g, ' ').trim();
   const phoneKey = s => { const d = String(s || '').replace(/\D/g, ''); return d.length >= 9 ? d.slice(-9) : ''; };
   const domainKey = s => { const m = /@([^@\s]+)$/.exec(key(s)); return m && !FREE_MAIL.has(m[1]) ? m[1] : ''; };
-  const leadKeys = l => ({ n: normName(l.bedrijf), p: phoneKey(l.telefoon), e: /@/.test(l.email || '') ? key(l.email) : '', d: domainKey(l.email) });
+  const leadKeys = l => ({ n: normName(l.bedrijf), p: phoneKey(l.telefoon), e: /@/.test(l.email || '') ? key(l.email) : '', d: [...new Set([domainKey(l.email), siteKey(l.website)].filter(Boolean))] });
   function buildIndex(list) {
     const idx = { n: new Map(), p: new Map(), e: new Map(), d: new Map() };
     list.forEach(l => addToIndex(idx, l));
@@ -811,11 +837,11 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   }
   function addToIndex(idx, l) {
     const k = leadKeys(l);
-    for (const f of ['n', 'p', 'e', 'd']) if (k[f] && !idx[f].has(k[f])) idx[f].set(k[f], l);
+    for (const f of ['n', 'p', 'e', 'd']) for (const v of [].concat(k[f])) if (v && !idx[f].has(v)) idx[f].set(v, l);
   }
   function lookup(idx, c) {
     const k = leadKeys(c), hits = new Set();
-    for (const f of ['n', 'p', 'e', 'd']) if (k[f] && idx[f].has(k[f])) hits.add(idx[f].get(k[f]));
+    for (const f of ['n', 'p', 'e', 'd']) for (const v of [].concat(k[f])) if (v && idx[f].has(v)) hits.add(idx[f].get(v));
     return [...hits];
   }
 
@@ -851,6 +877,17 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   /* Outlook op het web (Microsoft 365): een gewone https-link, die ook werkt waar mailto: wordt tegengehouden. */
   /* Buiten Claude mogen tel:- en mailto-links gewoon de telefoon- en mail-app openen. */
   const MAILTO_MAX = 8000;
+  const BCC_MAX = 50;   // per mail; meer adressen in BCC ziet er voor spamfilters verdacht uit
+  // Verdeelt de ontvangers over mails met hooguit 50 adressen, en zo dat elke mail-link niet te lang wordt.
+  function mailBatches(recips, subj = '', body = '', forLink = true) {
+    let size = BCC_MAX;
+    for (;;) {
+      const out = [];
+      for (let i = 0; i < recips.length; i += size) out.push(recips.slice(i, i + size));
+      if (!forLink || size === 1 || out.every(b => mailtoUrl('', b.map(l => l.email).join(','), subj, body).length < MAILTO_MAX)) return out;
+      size = Math.max(1, Math.floor(size / 2));
+    }
+  }
   const telHref = v => 'tel:' + String(v || '').replace(/[^\d+]/g, '');
   const callLink = (l, label = 'Bel', cls = 'call') => String(l.telefoon || '').replace(/\D/g, '').length >= 6
     ? `<a class="${cls}" href="${esc(telHref(l.telefoon))}" data-act="call" aria-label="Bel ${esc(l.bedrijf)}">${label}</a>` : '';
@@ -885,20 +922,30 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       geenMail: d.geenMail === true, log: normalizeLog(d.log),
       gearchiveerd: d.gearchiveerd === true, gearchiveerdOp: parseISO(d.gearchiveerdOp) ? str(d.gearchiveerdOp).slice(0, 10) : '',
       aangemaakt: str(d.aangemaakt), gewijzigd: str(d.gewijzigd), voorbeeld: d.voorbeeld === true, outlookId: str(d.outlookId),
+      website: str(d.website).trim(), branche: str(d.branche).trim(), geo: validGeo(d.geo),
     };
+  }
+  // Plek op de kaart: coördinaten, of onthouden dat het adres niet gevonden is. q is het adres waarvoor gezocht is.
+  function validGeo(g) {
+    if (!g || typeof g !== 'object' || typeof g.q !== 'string') return null;
+    if (g.none === true) return { q: g.q, none: true };
+    return Number.isFinite(g.lat) && Number.isFinite(g.lon) && Math.abs(g.lat) <= 90 && Math.abs(g.lon) <= 180
+      ? { q: g.q, lat: g.lat, lon: g.lon, p: g.p === 'plaats' ? 'plaats' : 'adres' } : null;
   }
   function toBody(l) {
     const b = {
       bedrijf: l.bedrijf, contact: l.contact || '', email: l.email || '', telefoon: l.telefoon || '', adres: l.adres || '', plaats: l.plaats || '',
+      website: l.website || '', branche: l.branche || '',
       actie: l.actie || '', datum: l.datum || '', tijd: l.tijd || '', prioriteit: validPrio(l.prioriteit), notitie: l.notitie || '', geenMail: !!l.geenMail,
       log: logBody(l.log || []), gearchiveerd: !!l.gearchiveerd, gearchiveerdOp: l.gearchiveerdOp || '',
       aangemaakt: l.aangemaakt, gewijzigd: l.gewijzigd,
     };
     if (l.voorbeeld) b.voorbeeld = true;
     if (l.outlookId) b.outlookId = l.outlookId;
+    if (validGeo(l.geo)) b.geo = validGeo(l.geo);
     return b;
   }
-  const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail });
+  const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, website: l.website, branche: l.branche, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail });
 
   let toastTimer = 0;
   function toast(msg, ms = 3600) {
@@ -991,6 +1038,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const lead = {
       bedrijf, contact: $('addContact').value.trim(), email: $('addEmail').value.trim(), telefoon: $('addTelefoon').value.trim(),
       adres: $('addAdres').value.trim(), plaats: canonPlaats($('addPlaats').value),
+      website: cleanWebsite($('addWebsite').value), branche: canonBranche($('addBranche').value),
       actie, datum, tijd: '', prioriteit: validPrio($('addPrio').value), notitie: '', geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now,
     };
     addBtn.disabled = true;
@@ -1018,6 +1066,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const next = {
       ...l, bedrijf,
       contact: d.contact.trim(), email: d.email.trim(), telefoon: d.telefoon.trim(), adres: d.adres.trim(), plaats: canonPlaats(d.plaats),
+      website: cleanWebsite(d.website), branche: canonBranche(d.branche),
       actie, datum: actie && parseISO(d.datum) ? d.datum : '', notitie: d.notitie.trim(), geenMail: !!d.geenMail, gewijzigd: nowISO(),
       tijd: actie && parseISO(d.datum) && /^\d{2}:\d{2}$/.test(d.tijd || '') ? d.tijd : '', prioriteit: validPrio(d.prioriteit),
     };
@@ -1130,14 +1179,14 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   }
   async function exportCsv() {
     if (!state.leads.length) return;
-    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Actie', 'Datum', 'Tijd', 'Prioriteit', 'Notitie', 'Geen mail', 'Contactmomenten', 'Gearchiveerd', 'Laatst gewijzigd'];
+    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Branche', 'Website', 'Actie', 'Datum', 'Tijd', 'Prioriteit', 'Notitie', 'Geen mail', 'Contactmomenten', 'Gearchiveerd', 'Laatst gewijzigd'];
     const cell = v => {
       let s = String(v ?? '');
       if (/^[=@]/.test(s) || /^[+\-](?![\d\s(])/.test(s)) s = "'" + s;
       return '"' + s.replace(/"/g, '""') + '"';
     };
     const lines = [head, ...[...state.leads].sort(byName).map(l => [
-      l.bedrijf, l.contact, l.email, l.telefoon, l.adres, l.plaats, l.actie, l.datum, l.tijd, l.prioriteit, l.notitie, l.geenMail ? 'ja' : '',
+      l.bedrijf, l.contact, l.email, l.telefoon, l.adres, l.plaats, l.branche, l.website, l.actie, l.datum, l.tijd, l.prioriteit, l.notitie, l.geenMail ? 'ja' : '',
       l.log.map(x => `${x.d} ${x.a}${x.u ? ': ' + x.u : ''}${x.t ? ' (' + x.t + ')' : ''}`).join(' | '),
       l.gearchiveerd ? `ja (${l.gearchiveerdOp})` : '', l.gewijzigd.slice(0, 10),
     ])].map(r => r.map(cell).join(';'));
@@ -1393,7 +1442,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   // Zet de gelezen regels om in velden. use[i] zegt in welk veld regel i terechtkwam.
   function parseCard(segs) {
     const lines = segs.map(s => s.t), use = lines.map(() => '');
-    const out = { bedrijf: '', contact: '', email: '', telefoon: '', adres: '', plaats: '' };
+    const out = { bedrijf: '', contact: '', email: '', telefoon: '', adres: '', plaats: '', website: '' };
     let domain = '';
     lines.forEach((l, i) => {
       const e = cardEmail(l);
@@ -1412,8 +1461,11 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const busy = i => use[i] || phones.some(p => p.i === i);
     lines.forEach((l, i) => {
       if (busy(i)) return;
-      const m = l.match(/(?:https?:\/\/)?(?:www\.)?([a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:nl|com|eu|be|de|net|org|io|biz|info|frl|nu))\b/i);
-      if (m) { use[i] = 'web'; if (!domain) domain = m[1].toLowerCase().replace(/^www\./, ''); }
+      const lt = /^(?:https?:\/\/|www[.,])/i.test(l) ? l.replace(/\s+/g, '').replace(/^www,/i, 'www.') : l;   // www.jan sen.nl → www.jansen.nl
+      const m = lt.match(/(?:https?:\/\/)?(?:www\.)?([a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:nl|com|eu|be|de|net|org|io|biz|info|frl|nu))\b/i);
+      if (!m) return;
+      if (!out.website) { out.website = cleanWebsite(m[0]).toLowerCase(); use[i] = 'website'; } else use[i] = 'web';
+      if (!domain) domain = m[1].toLowerCase().replace(/^www\./, '');
     });
     lines.forEach((l, i) => {
       if (out.plaats) return;
@@ -1447,7 +1499,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   }
 
   const SCAN_FIELDS = [['bedrijf', 'Bedrijf', 'addBedrijf'], ['contact', 'Contact', 'addContact'], ['email', 'E-mail', 'addEmail'],
-    ['telefoon', 'Telefoon', 'addTelefoon'], ['adres', 'Adres', 'addAdres'], ['plaats', 'Plaats', 'addPlaats']];
+    ['telefoon', 'Telefoon', 'addTelefoon'], ['adres', 'Adres', 'addAdres'], ['plaats', 'Plaats', 'addPlaats'], ['website', 'Website', 'addWebsite']];
   const scan = { lines: [], use: [] };
   function fillAddForm(found) {
     setAddOpen(true);
@@ -1474,6 +1526,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       if (k === 'email') v = cardEmail(t) || t.replace(/\s+/g, '');
       else if (k === 'telefoon') v = cardPhones(t)[0] || t.replace(/^\p{L}{1,7}[.:]?\s+(?=[+(\d])/u, '');
       else if (k === 'plaats') v = a ? a.plaats : t;
+      else if (k === 'website') { const w = t.match(/(?:https?:\/\/)?(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}(?:\/\S*)?/i); v = cleanWebsite(w ? w[0] : t).toLowerCase(); }
       else if (k === 'adres') {
         if (a) { v = [a.straat, a.postcode].filter(Boolean).join(', '); if (!$('addPlaats').value) $('addPlaats').value = a.plaats; }
         else { const pc = ($('addAdres').value.match(/\b\d{4} [A-Z]{2}$/) || [''])[0]; v = [t.replace(/^(?:[A-Z]|adres)\s*[:.]?\s+(?=\p{Lu}\p{Ll})/u, ''), pc].filter(Boolean).join(', '); }
@@ -1547,7 +1600,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 
   function inView(l) {
     const q = key(state.search);
-    if (q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
+    if (q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie, l.website, l.branche].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
+    if (state.branche && key(l.branche) !== key(state.branche)) return false;
     if (state.view === 'archief') return !!l.gearchiveerd;
     if (l.gearchiveerd) return false;
     if (state.view === 'vandaag') return isDue(l, todayISO());
@@ -1612,7 +1666,9 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         <button type="button" class="btn danger push${armedDelete === l.id ? ' armed' : ''}" id="del-${id}" data-act="delete">${armedDelete === l.id ? 'Klik nogmaals om te verwijderen' : 'Verwijderen'}</button>
       </div>`;
     const q = placeQuery(l);
-    const maps = q ? `<p class="hint"><a class="inline-link" href="${esc(mapUrl(q))}" target="_blank" rel="noopener">Open ${l.adres ? 'adres' : 'bedrijf'} in Google Maps</a></p>` : '';
+    const links = [q && `<a class="inline-link" href="${esc(mapUrl(q))}" target="_blank" rel="noopener">Open ${l.adres ? 'adres' : 'bedrijf'} in Google Maps</a>`,
+      l.website && `<a class="inline-link" href="${esc(webHref(l.website))}" target="_blank" rel="noopener">Open website</a>`].filter(Boolean);
+    const maps = links.length ? `<p class="hint links">${links.join('')}</p>` : '';
     const added = l.aangemaakt ? `<p class="meta">Toegevoegd op ${esc(shortDate(l.aangemaakt.slice(0, 10)))}</p>` : '';
     const archived = l.gearchiveerd && l.gearchiveerdOp ? `<p class="meta">Gearchiveerd op ${esc(shortDate(l.gearchiveerdOp))}</p>` : '';
     return `<div class="panel">
@@ -1624,6 +1680,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
           ${input('telefoon', 'Telefoonnummer', 'span2', 'tel', 40)}
           ${input('adres', 'Adres', 'span2', 'text', 120, ' placeholder="Straat en huisnummer"')}
           ${input('plaats', 'Plaats', 'span2', 'text', 60, ' list="plaatsLijst"')}
+          ${input('branche', 'Branche', 'span2', 'text', 60, ' list="brancheLijst"')}
+          ${input('website', 'Website', 'span2', 'url', 120, ' inputmode="url" placeholder="www.bedrijf.nl"')}
           ${input('actie', 'Actie', 'span2', 'text', 40, ' list="actieLijst" placeholder="Kies of typ, bijv. Bezoek"')}
           <div class="field span2"><label for="p-${id}-datum">Wanneer</label>${whenHtml(`p-${id}-datum`, d.datum, ` data-field="datum"${ro}`, state.readOnly)}</div>
           <div class="field span2"><label for="p-${id}-tijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="p-${id}-tijd" data-field="tijd" value="${esc(d.tijd || '')}"${ro}></div>
@@ -1707,7 +1765,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         <div class="cell first">${check}
           <button type="button" class="bedrijf" id="t-${id}" data-act="toggle" aria-expanded="${open && !finishing}">
             <span class="name">${esc(l.bedrijf)}${prioBadge(l)}${l.voorbeeld ? '<span class="tag">Voorbeeld</span>' : ''}</span>
-            ${l.contact ? `<span class="sub">${esc(l.contact)}</span>` : ''}
+            ${l.contact || l.branche ? `<span class="sub">${esc(l.contact)}${l.contact && l.branche ? ' · ' : ''}${l.branche ? `<span class="faint">${esc(l.branche)}</span>` : ''}</span>` : ''}
             ${info ? `<span class="meta">${esc(info)}</span>` : ''}
           </button>
         </div>
@@ -1818,6 +1876,13 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     chipsEl.innerHTML = chips;
 
     actieListEl.innerHTML = names.map(x => `<option value="${esc(x)}"></option>`).join('');
+    const branches = brancheNames(), bsel = $('brancheSel');
+    if (state.loaded && state.branche && !branches.some(x => key(x) === key(state.branche))) { state.branche = ''; pref.set('branche', ''); }
+    $('brancheLijst').innerHTML = branches.map(x => `<option value="${esc(x)}"></option>`).join('');
+    bsel.hidden = !branches.length;
+    const bcount = b => state.leads.filter(l => !l.gearchiveerd && key(l.branche) === key(b)).length;
+    bsel.innerHTML = `<option value="">Alle branches</option>` + branches.map(b => `<option value="${esc(b)}"${key(b) === key(state.branche) ? ' selected' : ''}>${esc(b)} (${bcount(b)})</option>`).join('');
+    bsel.classList.toggle('on', !!state.branche);
     const plaatsen = new Map();
     state.leads.forEach(l => { if (l.plaats && !plaatsen.has(key(l.plaats))) plaatsen.set(key(l.plaats), l.plaats); });
     plaatsListEl.innerHTML = sortNames([...plaatsen.values()]).map(x => `<option value="${esc(x)}"></option>`).join('');
@@ -1910,8 +1975,9 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   /* ---------- selecteren en mailen ---------- */
   function setSelecting(on) {
     state.selecting = on;
-    if (!on) state.selected.clear();
-    else closeRow(true);
+    state.selected.clear();
+    // Alles wat je nu ziet (filter, branche, zoekterm) staat meteen aangevinkt; vink uit wie je wilt overslaan.
+    if (on) { closeRow(true); state.leads.filter(inView).filter(mailable).forEach(l => state.selected.add(l.id)); }
     renderAll();
   }
   function toggleSelect(id, on) {
@@ -1930,7 +1996,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (!list.length) { toast('Geen bedrijven met een e-mailadres geselecteerd.'); return; }
     list.sort((a, b) => byName(byId(a), byId(b)));
     if (mail.sending) { toast('Wacht even tot de mails zijn verstuurd.'); return; }
-    Object.assign(mail, { open: true, ids: list, mode: list.length === 1 ? 'pers' : 'bcc', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false, sending: null });
+    Object.assign(mail, { open: true, ids: list, mode: list.length === 1 ? 'pers' : 'bcc', index: 0, done: new Set(), skipped: new Set(), opened: new Set(), newName: null, armedDel: false, busy: false, sending: null });
     if (!mail.onderwerp && !mail.tekst && state.sjablonen.length) applyTemplate(state.sjablonen[0].id);
     state.selecting = false; state.selected.clear();
     closeRow(true);
@@ -1955,14 +2021,17 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (mail.mode === 'bcc' && n > 1) {
       const subj = fillTemplate(mail.onderwerp, null), body = fillTemplate(mail.tekst, null);
       const personal = /\{(voornaam|contactpersoon|bedrijf|plaats)\}/i.test(mail.onderwerp + mail.tekst);
-      const bcc = recips.map(l => l.email).join(',');
-      const owa = mailtoUrl('', bcc, subj, body);
-      const fits = owa.length < MAILTO_MAX;
+      const batches = mailBatches(recips, subj, body);
+      const fits = batches.every(b => mailtoUrl('', b.map(l => l.email).join(','), subj, body).length < MAILTO_MAX);
+      const owa = mailtoUrl('', batches[0].map(l => l.email).join(','), subj, body);
+      const opened = i => mail.opened && mail.opened.has(i);
+      const batchBtns = batches.map((b, i) => `<a class="btn ${opened(i) ? '' : 'dark'}" href="${esc(mailtoUrl('', b.map(l => l.email).join(','), subj, body))}" data-handoff="mail" data-batch="${i}">${opened(i) ? '✓ ' : ''}Mail ${i + 1} openen (${b.length})</a>`).join('');
       const copyBtns = `<button type="button" class="btn small" id="mCopyAddrs" data-m="copy-addrs">Kopieer ${n} adressen</button><button type="button" class="btn small" id="mCopySubj" data-m="copy-subj">Kopieer onderwerp</button><button type="button" class="btn small" id="mCopyBody" data-m="copy-body">Kopieer tekst</button>`;
       const steps = `
         <div class="steps">
           <div class="srow"><span class="num">1</span>
-            ${fits ? `<div><strong>Open de nieuwe mail</strong><p class="hint">De ${n} adressen staan in <strong>BCC</strong>, zodat niemand de andere adressen ziet. Onderwerp en tekst zijn ingevuld.</p></div>
+            ${fits && batches.length > 1 ? `<div><strong>Open de mails een voor een</strong><p class="hint">Het zijn ${n} adressen. Die gaan in ${batches.length} mails van hooguit ${batches[0].length} adressen in <strong>BCC</strong>, zodat niemand de andere adressen ziet en spamfilters ze doorlaten. Onderwerp en tekst zijn steeds ingevuld: open een mail, verstuur hem en open de volgende.</p></div>
+            <div class="btns">${batchBtns}</div>` : fits ? `<div><strong>Open de nieuwe mail</strong><p class="hint">De ${n} adressen staan in <strong>BCC</strong>, zodat niemand de andere adressen ziet. Onderwerp en tekst zijn ingevuld.</p></div>
             <div class="btns"><a class="btn dark" href="${esc(owa)}" data-handoff="mail">Open nieuwe mail</a></div>
             <p class="hint">Opent je mail-app niet? Kopieer dan alles en plak het in een nieuwe mail, de adressen bij BCC:</p>
             <div class="btns">${copyBtns}</div>`
@@ -1977,7 +2046,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         ${viaMs ? `<div class="ms-send">
           <div class="btns"><button type="button" class="btn primary" id="msSendBcc" data-m="ms-send-bcc"${off}>${mail.busy ? 'Bezig met versturen…' : 'Versturen via Outlook'}</button>
             <button type="button" class="btn" id="msDraftBcc" data-m="ms-draft-bcc"${off}>In Concepten zetten</button></div>
-          <p class="hint">Eén mail vanuit je eigen mailbox${acc && acc.mail ? ` (${esc(acc.mail)})` : ''}. De ${n} adressen staan in BCC, zodat niemand de andere adressen ziet; jij staat zelf in Aan. Na het versturen legt de app de mail bij elk bedrijf vast.</p>
+          <p class="hint">${n > BCC_MAX ? `${Math.ceil(n / BCC_MAX)} mails van hooguit ${BCC_MAX} adressen` : 'Eén mail'} vanuit je eigen mailbox${acc && acc.mail ? ` (${esc(acc.mail)})` : ''}. De adressen staan in BCC, zodat niemand de andere adressen ziet; jij staat zelf in Aan. Na het versturen legt de app de mail bij elk bedrijf vast.</p>
         </div>` : ''}
         ${own(steps)}
         ${previewHtml(subj, viaMs ? withSig(body) : body)}
@@ -2213,14 +2282,14 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   }
   const normPhone = s => { const t = String(s || '').trim(); return /^[1-9]\d{8}$/.test(t) ? '0' + t : t; };
   function mapRow(row, map) {
-    const o = { bedrijf: [], contact: [], email: [], telefoon: [], adres: [], huisnummer: [], postcode: [], plaats: [], actie: [], prioriteit: [], notitie: [] };
+    const o = { bedrijf: [], contact: [], email: [], telefoon: [], adres: [], huisnummer: [], postcode: [], plaats: [], branche: [], website: [], actie: [], prioriteit: [], notitie: [] };
     map.forEach((f, i) => { const v = String(row[i] ?? '').trim(); if (f && v && o[f]) o[f].push(v); });
     let adres = [o.adres.join(' '), o.huisnummer.join(' ')].filter(Boolean).join(' ');
     if (o.postcode.length) adres = [adres, o.postcode.join(' ')].filter(Boolean).join(', ');
     return {
       bedrijf: o.bedrijf.join(' ').slice(0, 120), contact: o.contact.join(' ').replace(/\s+/g, ' ').slice(0, 120),
       email: (o.email[0] || '').split(/[;,\s]+/)[0].slice(0, 120), telefoon: normPhone(o.telefoon[0]).slice(0, 40),
-      adres: adres.slice(0, 120), plaats: o.plaats.join(' ').slice(0, 60), actie: o.actie[0] || '', prioriteit: mapPrio(o.prioriteit[0]), notitie: o.notitie.join(' · ').slice(0, 2000),
+      adres: adres.slice(0, 120), plaats: o.plaats.join(' ').slice(0, 60), branche: o.branche[0] || '', website: cleanWebsite(o.website[0]), actie: o.actie[0] || '', prioriteit: mapPrio(o.prioriteit[0]), notitie: o.notitie.join(' · ').slice(0, 2000),
     };
   }
   function importRows() {
@@ -2341,6 +2410,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const bodies = chosen.map(r => {
       const actie = canonAction(r.c.actie) || globalActie;
       return toBody({ bedrijf: r.c.bedrijf, prioriteit: r.c.prioriteit, contact: r.c.contact, email: r.c.email, telefoon: r.c.telefoon, adres: r.c.adres, plaats: canonPlaats(r.c.plaats),
+        branche: canonBranche(r.c.branche), website: r.c.website,
         actie, datum: actie ? datum : '', notitie: r.c.notitie, geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now });
     });
     const acties = [...new Set(bodies.map(b => b.actie).filter(Boolean))];
@@ -2400,6 +2470,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   importBtn.addEventListener('click', openImport);
   clearExamplesBtn.addEventListener('click', clearExamples);
   searchEl.addEventListener('input', () => { state.search = searchEl.value; renderRows(); renderSelBar(); });
+  $('brancheSel').addEventListener('change', e => { state.branche = e.target.value; pref.set('branche', state.branche); renderAll(); });
   mailBtn.addEventListener('click', () => setSelecting(!state.selecting));
 
   tabsEl.addEventListener('click', e => {
@@ -2549,7 +2620,11 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   });
 
   mailPanel.addEventListener('click', e => {
-    if (e.target.closest('a[data-handoff]')) return;
+    const handoff = e.target.closest('a[data-handoff]');
+    if (handoff) {
+      if (handoff.dataset.batch !== undefined) { (mail.opened = mail.opened || new Set()).add(+handoff.dataset.batch); setTimeout(renderMailOut, 0); }
+      return;
+    }
     const ph = e.target.closest('[data-ph]');
     if (ph) { insertPlaceholder(ph.dataset.ph); return; }
     const b = e.target.closest('[data-m]');
@@ -3221,20 +3296,27 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const subj = fillTemplate(mail.onderwerp, null), body = fillTemplate(mail.tekst, null);
     if (!subj.trim()) { toast('Vul eerst een onderwerp in.'); $('mSubj')?.focus(); return; }
     mail.busy = true; renderMailOut();
+    const batches = mailBatches(recips, '', '', false);
+    let sentTo = [];
     try {
-      const msg = msMessage(subj, body, acc && acc.mail ? [acc.mail] : [], recips.flatMap(l => addrList(l.email)));
-      if (draft) {
-        await graph('POST', '/me/messages', msg);
-        toast('De mail staat klaar in Concepten in Outlook, met alle adressen in BCC. Leg hem na het versturen vast.', 8000);
-      } else {
-        await graph('POST', '/me/sendMail', { message: msg, saveToSentItems: true });
-        const ok = await logMail(recips.map(l => l.id), subj);
+      for (const [i, b] of batches.entries()) {
+        if (i) await sleep(MS_GAP);
+        const msg = msMessage(subj, body, acc && acc.mail ? [acc.mail] : [], b.flatMap(l => addrList(l.email)));
+        if (draft) await graph('POST', '/me/messages', msg);
+        else { await graph('POST', '/me/sendMail', { message: msg, saveToSentItems: true }); sentTo = sentTo.concat(b); }
+      }
+      if (draft) toast(`${batches.length > 1 ? `${batches.length} mails staan` : 'De mail staat'} klaar in Concepten in Outlook, met de adressen in BCC. Leg ze na het versturen vast.`, 8000);
+      else {
+        const ok = await logMail(sentTo.map(l => l.id), subj);
         mail.busy = false;
         closeMail();
-        toast(`Mail verstuurd aan ${recips.length} ${plural(recips.length, 'bedrijf', 'bedrijven')} en bij ${ok} vastgelegd.`);
+        toast(`Mail verstuurd aan ${sentTo.length} ${plural(sentTo.length, 'bedrijf', 'bedrijven')} en bij ${ok} vastgelegd.`);
         return;
       }
-    } catch (e) { outlookFail(e, draft ? 'In Concepten zetten' : 'Versturen', mailResume()); }
+    } catch (e) {
+      if (sentTo.length) { await logMail(sentTo.map(l => l.id), subj); mail.ids = mail.ids.filter(id => !sentTo.some(l => l.id === id)); }
+      outlookFail(e, draft ? 'In Concepten zetten' : 'Versturen', mailResume());
+    }
     mail.busy = false;
     renderMailOut();
   }
