@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- Koude Acquisitie · © 2026 Silvan H. Alle rechten voorbehouden. Zie LICENSE. -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
@@ -7,6 +8,8 @@
 <meta name="description" content="Bedrijven, acties en contactmomenten voor koude acquisitie.">
 <meta name="theme-color" content="#383E42">
 <link rel="manifest" href="manifest.webmanifest">
+<meta name="author" content="Silvan H.">
+<meta name="copyright" content="© 2026 Silvan H. Alle rechten voorbehouden.">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -478,6 +481,7 @@ body.cam-open { overflow: hidden; }
 .push-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 13px; }
 .push-line .linkbtn { font-size: 13px; }
 .push-line .input { flex-basis: 100%; font: 12px/1.4 var(--f-mono); }
+.copyright { margin: 6px 0 0; font-size: 12px; color: var(--faint); }
 .outlook-panel { display: grid; gap: 12px; }
 .outlook-panel p { margin: 0; }
 .olist { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
@@ -679,6 +683,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       <button type="button" class="linkbtn" id="outlookOff" hidden>Ontkoppelen</button>
     </p>
     <section class="card outlook-panel" id="outlookPanel" aria-label="Outlook" hidden></section>
+    <p class="hint copyright">© 2026 Silvan H. Alle rechten voorbehouden.</p>
   </footer>
 </main>
 

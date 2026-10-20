@@ -55,3 +55,7 @@ De app verschijnt tussen je apps, opent zonder adresbalk, en bellen en mailen op
 
 ## Gegevens overzetten uit de Claude-app
 Log in en kies onderaan **Back-up terugzetten**. Kies het bestand `koude-acquisitie-overzetten.json`.
+
+## Auteursrecht
+© 2026 Silvan H. Alle rechten voorbehouden. Gebruik, kopiëren of verspreiden van deze app of de code is niet toegestaan zonder schriftelijke toestemming; zie `LICENSE`.
+De onderdelen in `vendor/` vallen onder hun eigen licenties: Supabase-bibliotheek (MIT), SheetJS (Apache-2.0), Tesseract.js (Apache-2.0) en Leaflet (BSD-2-Clause); zie `vendor/THIRD_PARTY.md`.

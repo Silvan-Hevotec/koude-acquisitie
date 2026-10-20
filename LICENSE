@@ -1,0 +1,21 @@
+Copyright © 2026 Silvan H. Alle rechten voorbehouden.
+
+Deze software (Koude Acquisitie) is eigendom van Silvan H. Zonder voorafgaande
+schriftelijke toestemming van de eigenaar mag niemand de software of delen ervan
+kopiëren, wijzigen, verspreiden, verkopen, in licentie geven of op een andere
+manier gebruiken. Dat de broncode openbaar te bekijken is, geeft geen recht op
+gebruik.
+
+De onderdelen in de map vendor/ zijn van derden en vallen onder hun eigen
+licenties (zie de licentiebestanden in die map en de README).
+
+---
+
+Copyright © 2026 Silvan H. All rights reserved.
+
+This software (Koude Acquisitie) is the property of Silvan H. No part of it may
+be copied, modified, distributed, sold, sublicensed or otherwise used without
+prior written permission from the owner. Public visibility of the source code
+does not grant any right to use it.
+
+Third-party components in the vendor/ directory are subject to their own licenses.
