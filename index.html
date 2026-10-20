@@ -95,6 +95,21 @@ h1 { margin: 0; font: 800 clamp(30px, 4.6vw, 44px)/1 var(--f-display); font-stre
 
 .wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 22px 80px; }
 body.selecting .wrap, body.sessie .wrap { padding-bottom: 170px; }
+.kaart { display: grid; gap: 10px; padding: 10px; }
+.kaart-map { height: min(52vh, 440px); min-height: 260px; border-radius: 10px; overflow: hidden; background: var(--sunken); z-index: 0; }
+.kaart-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.kaart .hint { margin: 0; padding: 0 4px; }
+.kaart-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 13px; }
+.kaart-legend .dot { display: inline-block; flex: 0 0 auto; width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #22272B; margin-left: 8px; }
+.kaart-legend .dot:first-child { margin-left: 0; }
+.dot.due { background: #F6B800; } .dot.act { background: #FFFFFF; } .dot.none { background: #A2A9AE; } .dot.approx { background: #FFFFFF; border-style: dashed; }
+.kpop { display: grid; gap: 4px; font: 14px/1.35 var(--f-body); color: #22272B; }
+.kpop strong { font-size: 15px; }
+.kpop-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.kpop .btn { min-height: 34px; padding: 0 10px; font-size: 13px; }
+.leaflet-container a.btn { color: #22272B; }
+.dist { margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--sunken); border: 1px solid var(--line); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.kaart-mis { padding: 12px 16px; margin: 0; }
 .sess-start { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
 .sess-start .hint { margin: 0; flex: 1 1 200px; }
 .row.current { box-shadow: inset 4px 0 0 var(--geel); }
@@ -204,6 +219,12 @@ select.input { padding-right: 8px; }
   .search { max-width: none; }
   .tools { flex-wrap: wrap; }
   .tools .btn { flex: 1; }
+  .branchesel { flex: 1 1 100%; }
+}
+/* Vijf tabbladen passen op een smalle telefoon: alleen het aantal bij Vandaag blijft staan. */
+@media (max-width: 420px) {
+  .tab { padding: 0 6px; }
+  .tab .n:not(.hot) { display: none; }
 }
 
 .filters { display: grid; gap: 8px; }
@@ -603,6 +624,12 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     <p class="hint">Elke actie die je bij een bedrijf invult, komt hier automatisch bij als filter.</p>
   </div>
 
+  <section class="card kaart" id="kaartPanel" aria-label="Kaart" hidden>
+    <div class="kaart-map" id="kaartMap"></div>
+    <div class="kaart-bar"><div class="chips" id="kaartChips"></div><button type="button" class="btn small" id="kaartMe">Mijn locatie</button></div>
+    <p class="hint" id="kaartStatus" role="status" hidden></p>
+    <p class="hint kaart-legend"><span class="dot due"></span>Vandaag te doen <span class="dot act"></span>Met actie <span class="dot none"></span>Zonder actie <span class="dot approx"></span>Alleen plaats bekend</p>
+  </section>
   <section class="card" id="mailPanel" aria-label="Mail versturen" hidden></section>
 
   <section class="list" aria-label="Bedrijven">
@@ -665,7 +692,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     history.replaceState(null, '', location.pathname + location.hash);
     return { title: q.get('deel_titel') || '', text: q.get('deel_tekst') || '', url: q.get('deel_url') || '' };
   })();
-  const VIEWS = new Set(['alles', 'acties', 'vandaag', 'archief']);
+  const VIEWS = new Set(['alles', 'acties', 'vandaag', 'kaart', 'archief']);
   const OUTCOMES = ['Geen gehoor', 'Terugbellen', 'Interesse', 'Geen interesse'];
   const PLACEHOLDERS = ['{aanhef}', '{voornaam}', '{bedrijf}', '{plaats}'];
   const MAX_LEADS = 1000;
@@ -1661,6 +1688,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (state.view === 'archief') return !!l.gearchiveerd;
     if (l.gearchiveerd) return false;
     if (state.view === 'vandaag') return isDue(l, todayISO());
+    if (state.view === 'kaart') return !kaart.alleenActie || !!l.actie;
     if (state.view === 'acties') return !!l.actie && (!state.actie || key(l.actie) === key(state.actie));
     return true;
   }
@@ -1806,7 +1834,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       ? `<div class="cell contactinfo">${l.telefoon ? `<span class="telline">${pick(l.telefoon, 'Telefoonnummer', true)}${callLink(l)}</span>` : ''}${l.email ? pick(l.email, 'E-mailadres', false) : ''}${l.geenMail ? '<span class="meta">Wil geen mail</span>' : ''}</div>`
       : `<div class="cell contactinfo none"><span class="faint">–</span></div>`;
     const plaatsCell = (l.plaats || l.adres)
-      ? `<div class="cell plaats">${l.plaats ? `<span>${esc(l.plaats)}</span>` : ''}${l.adres ? `<span class="meta">${esc(l.adres)}</span>` : ''}</div>`
+      ? `<div class="cell plaats">${l.plaats ? `<span>${esc(l.plaats)}${state.view === 'kaart' && kaart.dist.has(l.id) ? ` <span class="dist">${fmtKm(kaart.dist.get(l.id))}</span>` : ''}</span>` : ''}${l.adres ? `<span class="meta">${esc(l.adres)}</span>` : ''}</div>`
       : `<div class="cell plaats none"><span class="faint">–</span></div>`;
     let actie;
     if (l.gearchiveerd) actie = `<span class="faint">Gearchiveerd${l.gearchiveerdOp ? ' ' + esc(shortDate(l.gearchiveerdOp)) : ''}</span>`;
@@ -1840,6 +1868,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     </article>`;
   }
 
+  const sessStartHtml = n => !sess.on && !state.selecting && !state.readOnly && n
+    ? `<div class="sess-start"><button type="button" class="btn dark" id="sessStart" data-act="sess-start">Belsessie starten</button><span class="hint">${n} ${plural(n, 'bedrijf', 'bedrijven')} met telefoonnummer een voor een bellen en vastleggen.</span></div>` : '';
   const emptyHtml = (title, text, extra = '') => `<div class="empty"><strong>${esc(title)}</strong><p>${esc(text)}</p>${extra}</div>`;
   const groupHead = (label, n, extra = '', quiet = false) => `<div class="group-head${quiet ? ' quiet' : ''}"><span>${esc(label)}</span><span class="n">${n}</span>${extra}</div>`;
   function grouped(list, keyOf, labelOf, order, sorter, extraOf) {
@@ -1870,9 +1900,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         (rest.length ? groupHead('Overige bedrijven', rest.length, '', true) + rest.map(rowHtml).join('') : '');
     }
 
-    const nCall = list.filter(callable).length;
-    const sessStart = !sess.on && !state.selecting && !state.readOnly && nCall
-      ? `<div class="sess-start"><button type="button" class="btn dark" id="sessStart" data-act="sess-start">Belsessie starten</button><span class="hint">${nCall} ${plural(nCall, 'bedrijf', 'bedrijven')} met telefoonnummer een voor een bellen en vastleggen.</span></div>` : '';
+    const sessStart = sessStartHtml(list.filter(callable).length);
+    if (state.view === 'kaart') return kaartListHtml(list);
     if (state.view === 'vandaag') {
       if (!list.length) return emptyHtml('Niets meer te doen vandaag', 'Er staan geen acties voor vandaag of eerder. Plan nieuwe acties met een datum, dan verschijnen ze hier op die dag.');
       return sessStart + vandaagHtml(list);
@@ -1925,7 +1954,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 
     const tab = (v, label, count, hot) =>
       `<button type="button" class="tab" data-view="${v}" aria-pressed="${state.view === v}">${label} <span class="n${hot && count ? ' hot' : ''}">${count}</span></button>`;
-    tabsEl.innerHTML = tab('alles', 'Alles', n) + tab('acties', 'Acties', withAction) + tab('vandaag', 'Vandaag', due, true) + tab('archief', 'Archief', archived);
+    tabsEl.innerHTML = tab('alles', 'Alles', n) + tab('acties', 'Acties', withAction) + tab('vandaag', 'Vandaag', due, true) +
+      `<button type="button" class="tab" data-view="kaart" aria-pressed="${state.view === 'kaart'}">Kaart</button>` + tab('archief', 'Archief', archived);
 
     filtersEl.hidden = state.view !== 'acties' || !!state.problem;
     let chips = `<button type="button" class="chip" data-actie="" aria-pressed="${!state.actie}">Alle acties <span class="n">${withAction}</span></button>` +
@@ -1999,7 +2029,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     });
   }
 
-  function renderAll() { renderMeta(); renderRows(); renderSelBar(); renderSessBar(); if (mail.open) renderMailOut(); }
+  function renderAll() { renderMeta(); renderRows(); renderKaart(); renderSelBar(); renderSessBar(); if (mail.open) renderMailOut(); }
   let renderQueued = false;
   function scheduleRender() {
     if (renderQueued) return;
@@ -2049,6 +2079,244 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     renderAll();
     document.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
+
+  /* ---------- kaart: bedrijven bij jou in de buurt ---------- */
+  // Adressen zoekt de app op bij de Locatieserver van PDOK (Kadaster); de achtergrondkaart komt ook van PDOK.
+  // De gevonden plek wordt bij het bedrijf bewaard, zodat elk adres maar één keer wordt opgezocht.
+  const PDOK_ZOEK = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1/free';
+  const PDOK_KAART = 'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png';
+  const RADII = [2, 5, 10, 25, 0];
+  const kaart = {
+    map: null, layer: null, mine: null, ring: null, here: null, watch: null, fitted: false, centerOnMe: false,
+    radius: pref.get('kaartStraal') !== null && RADII.includes(Number(pref.get('kaartStraal'))) ? Number(pref.get('kaartStraal')) : 10, alleenActie: pref.get('kaartActie') === '1',
+    geoBusy: false, geoDone: 0, geoTotal: 0, geoError: '', locError: '', loadError: '', dist: new Map(),
+  };
+  const geoKey = l => key([l.adres, l.plaats].join('|'));
+  const onMap = l => !!(l.geo && !l.geo.none);
+  const needsGeo = l => !l.gearchiveerd && !!(l.adres || l.plaats) && (!l.geo || l.geo.q !== geoKey(l));
+  function distKm(a, b) {
+    const r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLon = (b.lon - a.lon) * r;
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLon / 2) ** 2;
+    return 12742 * Math.asin(Math.sqrt(h));
+  }
+  const fmtKm = d => d < 1 ? `${Math.max(50, Math.round(d * 20) * 50)} m` : `${d < 10 ? d.toFixed(1).replace('.', ',') : Math.round(d)} km`;
+
+  let leafletPromise = null;
+  function loadLeaflet() {
+    if (window.L) return Promise.resolve(window.L);
+    if (!leafletPromise) leafletPromise = new Promise((resolve, reject) => {
+      const fail = () => { leafletPromise = null; reject(new Error('kaart')); };
+      const css = document.createElement('link');
+      css.rel = 'stylesheet'; css.href = 'vendor/leaflet/leaflet.css';
+      const cssLoaded = new Promise(r => { css.onload = r; css.onerror = r; });
+      document.head.appendChild(css);
+      const sc = document.createElement('script');
+      sc.src = 'vendor/leaflet/leaflet.js';
+      sc.onload = () => window.L ? cssLoaded.then(() => resolve(window.L)) : fail();
+      sc.onerror = () => { sc.remove(); fail(); };
+      document.head.appendChild(sc);
+    });
+    return leafletPromise;
+  }
+
+  async function pdokFind(q, type) {
+    const res = await fetch(`${PDOK_ZOEK}?q=${encodeURIComponent(q)}&fq=type:${type}&rows=1&fl=centroide_ll,weergavenaam,type`);
+    if (!res.ok) throw new Error('pdok ' + res.status);
+    const data = await res.json();
+    const doc = data && data.response && data.response.docs && data.response.docs[0];
+    const m = doc && /POINT\(([-\d.]+) ([-\d.]+)\)/.exec(doc.centroide_ll || '');
+    return m ? { lon: Number(m[1]), lat: Number(m[2]) } : null;
+  }
+  async function geocodeLead(l) {
+    const q = geoKey(l), pc = String(l.adres || '').match(/\b(\d{4}) ?([A-Z]{2})\b/);
+    let hit = null, p = 'adres';
+    if (l.adres) {
+      hit = await pdokFind(`${l.adres} ${l.plaats}`.trim(), 'adres');
+      if (!hit && pc) hit = await pdokFind(pc[1] + pc[2], 'postcode');
+    }
+    if (!hit && l.plaats) { hit = await pdokFind(l.plaats, 'woonplaats'); p = 'plaats'; }
+    return hit ? { q, lat: hit.lat, lon: hit.lon, p } : { q, none: true };
+  }
+  let geoTimer = 0;
+  function scheduleGeocode() { clearTimeout(geoTimer); geoTimer = setTimeout(geocodeAll, 1500); }
+  async function geocodeAll() {
+    if (kaart.geoBusy || !col || state.readOnly || !navigator.onLine) return;
+    const todo = state.leads.filter(needsGeo);
+    if (!todo.length) return;
+    Object.assign(kaart, { geoBusy: true, geoDone: 0, geoTotal: todo.length, geoError: '' });
+    renderKaartStatus();
+    for (const l0 of todo) {
+      const l = byId(l0.id);
+      if (l && needsGeo(l)) {
+        try {
+          const geo = await geocodeLead(l), cur = byId(l.id);
+          if (cur && geoKey(cur) === geo.q) await write(() => col.doc(l.id).update({ geo }));   // adres intussen veranderd: later opnieuw
+        } catch {
+          kaart.geoError = 'Adressen opzoeken lukte niet. Controleer je internet; de app probeert het later opnieuw.';
+          break;
+        }
+        await sleep(120);
+      }
+      kaart.geoDone++;
+      renderKaartStatus();
+    }
+    kaart.geoBusy = false;
+    renderKaartStatus();
+  }
+
+  function startLocating() {
+    if (kaart.watch !== null) return;
+    if (!('geolocation' in navigator)) { kaart.locError = 'Je locatie is op dit toestel niet beschikbaar.'; return; }
+    kaart.watch = navigator.geolocation.watchPosition(p => {
+      const prev = kaart.here;
+      kaart.here = { lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy };
+      kaart.locError = '';
+      if (!prev) kaart.centerOnMe = true;
+      if (!prev || distKm(prev, kaart.here) > 0.1) scheduleRender(); else drawMe();
+    }, err => {
+      kaart.locError = err.code === 1
+        ? 'Je locatie is niet toegestaan. Sta locatie toe voor deze app (Instellingen → Apps → Chrome → Machtigingen → Locatie), dan zie je wat dichtbij is.'
+        : 'Je locatie is nu niet te bepalen. Staat locatie aan op je telefoon?';
+      stopLocating();
+      scheduleRender();
+    }, { enableHighAccuracy: false, maximumAge: 60000, timeout: 20000 });
+  }
+  function stopLocating() { if (kaart.watch !== null) { navigator.geolocation.clearWatch(kaart.watch); kaart.watch = null; } }
+
+  function renderKaart() {
+    const panel = $('kaartPanel'), on = state.view === 'kaart' && !state.problem;
+    panel.hidden = !on;
+    if (!on) { stopLocating(); return; }
+    pref.set('kaart', '1');
+    if (!document.hidden) startLocating();
+    scheduleGeocode();
+    const chip = (v, label) => `<button type="button" class="chip" data-straal="${v}" aria-pressed="${kaart.radius === v}">${label}</button>`;
+    $('kaartChips').innerHTML = RADII.map(v => chip(v, v ? `${v} km` : 'Alles')).join('') +
+      `<span class="sep" aria-hidden="true"></span><button type="button" class="chip toggle" data-kaartactie aria-pressed="${kaart.alleenActie}">Alleen met actie</button>`;
+    renderKaartStatus();
+    if (!kaart.map) { initMap(); return; }
+    drawMarkers();
+  }
+  function renderKaartStatus() {
+    const el = $('kaartStatus');
+    if (!el || state.view !== 'kaart') return;
+    const parts = [];
+    if (kaart.loadError) parts.push(kaart.loadError);
+    if (kaart.locError) parts.push(kaart.locError);
+    else if (!kaart.here) parts.push('Je locatie zoeken…');
+    if (kaart.geoError) parts.push(kaart.geoError);
+    else if (kaart.geoBusy) parts.push(`Adressen op de kaart zetten: ${kaart.geoDone} van ${kaart.geoTotal}…`);
+    el.textContent = parts.join(' ');
+    el.hidden = !parts.length;
+  }
+  async function initMap() {
+    let L;
+    try { L = await loadLeaflet(); }
+    catch { kaart.loadError = 'De kaart kon niet laden. Controleer je internetverbinding.'; renderKaartStatus(); return; }
+    kaart.loadError = '';
+    if (kaart.map || state.view !== 'kaart') { if (kaart.map) drawMarkers(); return; }
+    kaart.map = L.map('kaartMap', { zoomControl: true, attributionControl: true }).setView([52.25, 5.6], 7);
+    kaart.map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
+    L.tileLayer(PDOK_KAART, { maxZoom: 19, attribution: 'Kaart: <a href="https://www.pdok.nl" target="_blank" rel="noopener">PDOK</a> / Kadaster' }).addTo(kaart.map);
+    kaart.layer = L.layerGroup().addTo(kaart.map);
+    drawMarkers();
+  }
+  function kaartPopup(l) {
+    const d = kaart.dist.get(l.id);
+    const route = 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(placeQuery(l));
+    return `<div class="kpop"><strong>${esc(l.bedrijf)}</strong>
+      <span>${esc([l.plaats, d !== undefined ? fmtKm(d) : ''].filter(Boolean).join(' · '))}</span>
+      ${l.actie ? `<span>${esc(l.actie)} ${dueChip(l)}</span>` : ''}
+      <span class="kpop-btns">${callable(l) ? `<a class="btn small primary" href="${esc(telHref(l.telefoon))}" data-lead="${esc(l.id)}">Bel</a>` : ''}
+        <a class="btn small" href="${esc(route)}" target="_blank" rel="noopener">Route</a>
+        <button type="button" class="btn small" data-kaart-open="${esc(l.id)}">Openen</button></span></div>`;
+  }
+  function drawMe() {
+    const L = window.L;
+    if (!kaart.map || !L) return;
+    if (kaart.mine) { kaart.mine.remove(); kaart.mine = null; }
+    if (kaart.ring) { kaart.ring.remove(); kaart.ring = null; }
+    if (!kaart.here) return;
+    const at = [kaart.here.lat, kaart.here.lon];
+    if (kaart.radius) kaart.ring = L.circle(at, { radius: kaart.radius * 1000, color: '#383E42', weight: 1.5, dashArray: '6 6', fill: false, interactive: false }).addTo(kaart.map);
+    kaart.mine = L.circleMarker(at, { radius: 8, color: '#FFFFFF', weight: 3, fillColor: '#1A73E8', fillOpacity: 1, interactive: false }).addTo(kaart.map);
+  }
+  function drawMarkers() {
+    const L = window.L;
+    if (!kaart.map || !L) return;
+    kaart.map.invalidateSize();
+    kaart.layer.clearLayers();
+    const today = todayISO(), pts = [];
+    state.leads.filter(l => inView(l) && onMap(l)).forEach(l => {
+      const due = isDue(l, today);
+      L.circleMarker([l.geo.lat, l.geo.lon], {
+        radius: due ? 10 : 8, color: '#22272B', weight: l.prioriteit === 'hoog' ? 3.5 : 1.5,
+        fillColor: due ? '#F6B800' : l.actie ? '#FFFFFF' : '#A2A9AE', fillOpacity: 1, dashArray: l.geo.p === 'plaats' ? '3 3' : null,
+      }).bindPopup(() => kaartPopup(l), { maxWidth: 260 }).addTo(kaart.layer);
+      pts.push([l.geo.lat, l.geo.lon]);
+    });
+    drawMe();
+    // Alleen de eerste keer (en na Mijn locatie of een andere afstand) de kaart verplaatsen; anders blijft hij waar jij hem neerzet.
+    if (kaart.here && (kaart.centerOnMe || !kaart.fitted)) {
+      const at = L.latLng(kaart.here.lat, kaart.here.lon);
+      kaart.map.fitBounds(at.toBounds((kaart.radius || 25) * 2000));
+      kaart.centerOnMe = false; kaart.fitted = true;
+    } else if (!kaart.fitted && pts.length) {
+      kaart.map.fitBounds(pts, { padding: [24, 24], maxZoom: 13 });
+      kaart.fitted = true;
+    }
+  }
+  // De dichtstbijzijnde eerst, dan steeds de dichtstbijzijnde vanaf de vorige: een logische route.
+  function nearestRoute(items) {
+    const left = [...items], out = [];
+    let at = kaart.here;
+    while (left.length) {
+      let bi = 0;
+      left.forEach((l, i) => { if (distKm(at, l.geo) < distKm(at, left[bi].geo)) bi = i; });
+      at = left[bi].geo;
+      out.push(left.splice(bi, 1)[0]);
+    }
+    return out;
+  }
+  function kaartListHtml(list) {
+    const here = kaart.here;
+    kaart.dist = new Map();
+    const placed = list.filter(onMap), noAddr = list.filter(l => !l.adres && !l.plaats), notFound = list.filter(l => l.geo && l.geo.none && geoKey(l) === l.geo.q);
+    if (here) placed.forEach(l => kaart.dist.set(l.id, distKm(here, l.geo)));
+    const near = here ? placed.sort((a, b) => kaart.dist.get(a.id) - kaart.dist.get(b.id)) : placed.sort(byName);
+    const within = here && kaart.radius ? near.filter(l => kaart.dist.get(l.id) <= kaart.radius) : near;
+    const stops = here ? nearestRoute(within.slice(0, 10)) : [];
+    const route = stops.length > 1 ? `<a class="route" href="${esc('https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(placeQuery(stops[stops.length - 1])) +
+      '&waypoints=' + encodeURIComponent(stops.slice(0, -1).map(placeQuery).join('|')))}" target="_blank" rel="noopener">Route langs ${stops.length === within.length ? 'deze' : 'de ' + stops.length + ' dichtstbijzijnde'}</a>` : '';
+    const missing = [noAddr.length && `${noAddr.length} zonder adres`, notFound.length && `${notFound.length} met een adres dat niet gevonden is (${notFound.slice(0, 3).map(l => l.bedrijf).join(', ')}${notFound.length > 3 ? ' …' : ''})`].filter(Boolean);
+    const foot = missing.length ? `<p class="hint kaart-mis">Niet op de kaart: ${esc(missing.join(' en '))}. Vul het adres aan, dan komen ze er vanzelf op.</p>` : '';
+    if (!within.length) {
+      const why = !placed.length ? (kaart.geoBusy ? 'De adressen worden nog opgezocht.' : 'Er staan nog geen bedrijven met een adres of plaats op de kaart.')
+        : `Er is niets binnen ${kaart.radius} km. Kies een grotere afstand.`;
+      return emptyHtml('Niets in de buurt', why) + foot;
+    }
+    const head = here ? (kaart.radius ? `Binnen ${kaart.radius} km, dichtstbij eerst` : 'Dichtstbij eerst') : 'Op de kaart';
+    return sessStartHtml(within.filter(callable).length) + groupHead(head, within.length, route) + within.map(rowHtml).join('') + foot;
+  }
+  $('kaartChips').addEventListener('click', e => {
+    const r = e.target.closest('[data-straal]');
+    if (r) { kaart.radius = Number(r.dataset.straal); pref.set('kaartStraal', String(kaart.radius)); kaart.centerOnMe = !!kaart.here; renderAll(); return; }
+    if (e.target.closest('[data-kaartactie]')) { kaart.alleenActie = !kaart.alleenActie; pref.set('kaartActie', kaart.alleenActie ? '1' : ''); renderAll(); }
+  });
+  $('kaartMe').addEventListener('click', () => {
+    kaart.locError = '';
+    if (kaart.here) { kaart.centerOnMe = true; drawMarkers(); }
+    else { stopLocating(); startLocating(); renderKaartStatus(); }
+  });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-kaart-open]');
+    if (!b) return;
+    const id = b.dataset.kaartOpen;
+    if (kaart.map) kaart.map.closePopup();
+    if (document.querySelector(`.row[data-id="${CSS.escape(id)}"]`)) { if (state.open !== id) openRow(id, 'edit'); scrollToRow(id); }
+    else gotoLead(id);
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopLocating(); else if (state.view === 'kaart') startLocating(); });
 
   /* ---------- belsessie: de lijst een voor een afbellen ---------- */
   const sess = { on: false, ids: [], i: 0, done: 0, skipped: 0 };
@@ -3710,6 +3978,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       const first = !state.loaded;
       state.leads = snap.docs.filter(d => d.exists).map(normalize);
       state.loaded = true;
+      if (pref.get('kaart') === '1') scheduleGeocode();
       if (first) setTimeout(() => { if (shareIn) handleShare(shareIn); else afterCall(); }, 0);
       state.problem = null;
       saveAgenda();

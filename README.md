@@ -4,6 +4,16 @@ Installeerbare web-app (PWA) voor koude acquisitie: bedrijven, acties, contactmo
 Zonder verdere instellingen bewaart de app alles op het apparaat zelf (geen account nodig). Maak af en toe een back-up via de knop onderaan.
 Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supabase-database (zie hieronder); de app vraagt dan om in te loggen.
 
+## Wat de app doet
+
+- Bedrijven met contactpersoon, telefoon, e-mail, adres, branche en website; acties met datum, tijd en prioriteit.
+- **Vandaag**: wat er vandaag (of eerder) moet gebeuren, met elke ochtend om 08:05 een melding.
+- **Belsessie**: de lijst een voor een afbellen. Na elk gesprek staat "Hoe ging het?" open, ook als je vanuit de lijst belt.
+- **Vaste opvolgstappen** na geen gehoor: de volgende werkdag, na twee werkdagen, na drie keer een mail (daarna vanzelf nabellen), na vijf keer voorstel om te archiveren.
+- **Kaart**: bedrijven bij jou in de buurt (2, 5, 10 of 25 km), met route langs de dichtstbijzijnde. Adressen worden één keer opgezocht bij de Locatieserver van PDOK (Kadaster) en bij het bedrijf bewaard; de kaart komt ook van PDOK.
+- **Mailen**: per bedrijf of aan iedereen in de lijst (filter op branche of actie), in BCC in mails van hooguit 50 adressen, met mailteksten.
+- **Delen naar de app** vanuit Google Maps of Chrome, **visitekaartje scannen**, **in telefooncontacten** zetten, import uit Excel, export naar CSV, back-up.
+
 ## Bestanden
 
 | Bestand | Wat het doet |
@@ -12,7 +22,7 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 | `config.js` | Koppeling met Supabase (Project URL en publishable/anon key) en Outlook (toepassings-ID en map-ID) |
 | `supabase.sql` | Maakt de tabel en de beveiliging aan in Supabase |
 | `manifest.webmanifest`, `sw.js`, `icons/` | Maken de app installeerbaar op Android |
-| `vendor/` | Supabase-bibliotheek 2.117.2, SheetJS 0.18.5 (Excel-import) en Tesseract.js 5.1.1 (visitekaartjes lezen) |
+| `vendor/` | Supabase-bibliotheek 2.117.2, SheetJS 0.18.5 (Excel-import), Tesseract.js 5.1.1 (visitekaartjes lezen) en Leaflet 1.9.4 (kaart) |
 
 ## Eenmalig instellen
 
