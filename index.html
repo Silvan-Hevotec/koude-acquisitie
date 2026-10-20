@@ -3213,7 +3213,12 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const colMap = c => { if (!cache.has(c)) cache.set(c, new Map()); return cache.get(c); };
     const snap = c => ({ docs: [...colMap(c)].map(([id, data]) => ({ id, exists: true, data: () => data })) });
     const emit = c => (subs.get(c) || new Set()).forEach(fn => { try { fn(snap(c)); } catch (e) { console.error(e); } });
-    const storeError = err => { const e = new Error((err && err.message) || 'Opslaan lukte niet'); e.code = 'unavailable'; return e; };
+    const storeError = err => {
+      const e = new Error((err && err.message) || 'Opslaan lukte niet');
+      // Tabel ontbreekt: supabase.sql is nog niet uitgevoerd.
+      e.code = /PGRST205|42P01|schema cache|does not exist/i.test(`${err && err.code} ${err && err.message}`) ? 'no_table' : 'unavailable';
+      return e;
+    };
     const newId = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)).replace(/-/g, '').slice(0, 20);
 
     async function fetchCol(c) {
@@ -4029,8 +4034,10 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       state.problem = null;
       saveAgenda();
       scheduleRender();
-    }, () => {
-      state.problem = { title: 'Lijst niet beschikbaar', text: 'Je lijst kan nu niet worden geladen. Controleer je internetverbinding. De app probeert het vanzelf opnieuw.' };
+    }, e => {
+      state.problem = e && e.code === 'no_table'
+        ? { title: 'Database nog niet klaargezet', text: 'In Supabase ontbreekt de tabel voor je lijst. Open in Supabase de SQL Editor, plak de inhoud van supabase.sql en klik op Run. Open daarna de app opnieuw.' }
+        : { title: 'Lijst niet beschikbaar', text: 'Je lijst kan nu niet worden geladen. Controleer je internetverbinding. De app probeert het vanzelf opnieuw.' };
       renderAll();
     });
     actiesDoc.onSnapshot(snap => {
