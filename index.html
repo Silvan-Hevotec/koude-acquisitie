@@ -453,6 +453,19 @@ body.sessie .toast, body.selecting .toast { bottom: calc(110px + env(safe-area-i
 .scanrow { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .scanrow .hint { flex: 1 1 220px; }
 .scanlines { grid-column: 1 / -1; display: grid; gap: 8px; }
+/* Camera in de app: beeld over het hele scherm met een kader in de vorm van een visitekaartje. */
+.cam { position: fixed; inset: 0; z-index: 1000; background: #000; }
+.cam video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cam-frame { position: absolute; left: 50%; top: 44%; width: min(92vw, 70vh); aspect-ratio: 85 / 55; transform: translate(-50%, -50%);
+  border: 3px solid #F6B800; border-radius: 12px; box-shadow: 0 0 0 200vmax rgba(0, 0, 0, .5); pointer-events: none; }
+.cam-tip { position: absolute; left: 16px; right: 16px; top: max(16px, env(safe-area-inset-top)); margin: 0; text-align: center; color: #fff; font-weight: 600; text-shadow: 0 1px 3px #000; }
+.cam-bar { position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+  padding: 18px 16px calc(22px + env(safe-area-inset-bottom)); }
+.cam-bar #camClose { justify-self: start; }
+.cam-bar #camTorch { justify-self: end; }
+.cam-shot { width: 76px; height: 76px; border-radius: 50%; border: 5px solid #fff; background: #F6B800; cursor: pointer; }
+.cam-shot:active { transform: scale(.94); }
+body.cam-open { overflow: hidden; }
 .scanlines .hint { margin: 0; }
 .ocr-lines { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
 .ocr-lines li { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 12px; }
@@ -544,8 +557,10 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     <h2 class="add-title"><button type="button" id="addToggle" aria-expanded="true">Nieuw bedrijf</button></h2>
     <div class="scanrow">
       <button type="button" class="btn small" id="scanBtn">Visitekaartje scannen</button>
+      <button type="button" class="btn small" id="pickBtn">Foto uit galerij</button>
       <button type="button" class="btn small" id="pasteBtn">Plakken</button>
       <input type="file" id="scanFile" accept="image/*" capture="environment" hidden>
+      <input type="file" id="pickFile" accept="image/*" hidden>
       <span class="hint" id="scanMsg">Maak een foto van een kaartje, of kopieer een bedrijf in Google Maps of Chrome en tik op Plakken.</span>
     </div>
     <div class="scanlines" id="scanLines" hidden></div>
@@ -667,6 +682,16 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   </footer>
 </main>
 
+<div class="cam" id="cam" role="dialog" aria-modal="true" aria-label="Visitekaartje fotograferen" hidden>
+  <video id="camVideo" playsinline muted autoplay></video>
+  <div class="cam-frame" id="camFrame"></div>
+  <p class="cam-tip" id="camTip">Houd het kaartje recht binnen het gele kader</p>
+  <div class="cam-bar">
+    <button type="button" class="btn on-band" id="camClose">Annuleren</button>
+    <button type="button" class="cam-shot" id="camShot" aria-label="Foto maken"></button>
+    <button type="button" class="btn on-band" id="camTorch" aria-pressed="false" hidden>Lamp</button>
+  </div>
+</div>
 <div class="selbar" id="selBar" hidden><div class="gutter selbar-inner" id="selInner"></div></div>
 <div class="selbar sessbar" id="sessBar" hidden><div class="gutter selbar-inner" id="sessInner"></div></div>
 </div>
@@ -1318,14 +1343,22 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   function getOcrWorker() {
     clearTimeout(ocrIdle);
     if (!ocrWorker) {
+      // Gaat er bij het starten iets mis (bijvoorbeeld een taalbestand dat niet laadt), dan meteen stoppen in plaats van wachten.
+      let failStart = () => {};
+      const startFailed = new Promise((_, reject) => { failStart = reject; });
+      startFailed.catch(() => {});
       ocrWorker = loadTesseract().then(T => {
         const base = new URL('vendor/ocr', location.href).href;
+        // Rechtstreeks laden (geen blob-worker) en de taalbestanden niet in IndexedDB bewaren: de service worker bewaart ze al.
         return T.createWorker(['nld', 'eng'], 1, {
-          workerPath: base + '/worker.min.js', corePath: base, langPath: base + '/lang', gzip: true,
+          workerPath: base + '/worker.min.js', corePath: base, langPath: base + '/lang', gzip: true, workerBlobURL: false, cacheMethod: 'none',
           logger: m => { if (ocrStatus) ocrStatus(m); },
+          errorHandler: e => { console.error('[ocr]', e); failStart(e instanceof Error ? e : new Error(String(e))); },
         });
       });
-      ocrWorker.catch(() => { ocrWorker = null; });
+      ocrWorker = Promise.race([ocrWorker, startFailed]);
+      ocrWorker = inTime(ocrWorker, 120000, 'Tekstherkenning starten');
+      ocrWorker.catch(() => dropOcrWorker());
     }
     return ocrWorker;
   }
@@ -1335,11 +1368,23 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     ocrIdle = setTimeout(() => { const w = ocrWorker; ocrWorker = null; if (w) w.then(x => x.terminate()).catch(() => {}); }, 120000);
   }
   function loadPhoto(url) {
-    return new Promise((resolve, reject) => { const i = new Image(); i.onload = () => resolve(i); i.onerror = reject; i.src = url; });
+    return new Promise((resolve, reject) => { const i = new Image(); i.onload = () => resolve(i); i.onerror = () => reject(new Error('fotobestand onleesbaar')); i.src = url; });
   }
+  // Geeft op tijd op als de tekstherkenning niet reageert, in plaats van eindeloos te wachten.
+  function inTime(promise, ms, what) {
+    let t = 0;
+    return Promise.race([promise, new Promise((_, reject) => { t = setTimeout(() => reject(new Error(`${what} duurde te lang`)), ms); })]).finally(() => clearTimeout(t));
+  }
+  function dropOcrWorker() {
+    const w = ocrWorker;
+    ocrWorker = null;
+    if (w) w.then(x => x.terminate()).catch(() => {});
+  }
+  let ocrSide = 1800;   // lukt lezen niet (te weinig geheugen), dan opnieuw met 1200
   function photoCanvas(img, rot) {
-    const k = Math.min(1, 1800 / Math.max(img.naturalWidth, img.naturalHeight));
-    const w = Math.round(img.naturalWidth * k), h = Math.round(img.naturalHeight * k), turn = rot % 180 !== 0;
+    const nw = img.naturalWidth || img.width, nh = img.naturalHeight || img.height;
+    const k = Math.min(1, ocrSide / Math.max(nw, nh));
+    const w = Math.round(nw * k), h = Math.round(nh * k), turn = rot % 180 !== 0;
     const c = document.createElement('canvas');
     c.width = turn ? h : w;
     c.height = turn ? w : h;
@@ -1388,6 +1433,21 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     for (let i = 0, j = 0; i < Z.length; i++, j += 4) d[j] = d[j + 1] = d[j + 2] = Math.max(0, Math.min(255, 170 + 55 * flip * Z[i]));
     g.putImageData(img, 0, 0);
     return c;
+  }
+  // Eén leesronde. Loopt de tekstherkenning vast, dan start hij opnieuw en leest hij een kleinere versie van de foto.
+  async function readPhoto(img, rot, sauvola) {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const worker = await getOcrWorker();
+        const c = photoCanvas(img, rot);
+        return await inTime(ocrRead(worker, sauvola ? evenLight(c) : c, sauvola), 120000, 'Lezen');
+      } catch (e) {
+        console.error('[ocr]', e);
+        dropOcrWorker();
+        if (attempt) throw e;
+        ocrSide = 1200;
+      }
+    }
   }
   // Leest een foto en geeft de regels terug. Grote gaten in een regel splitsen hem (twee kolommen naast elkaar).
   async function ocrRead(worker, canvas, sauvola) {
@@ -1642,15 +1702,19 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       if (m.status === 'recognizing text') msg.textContent = `${label} ${Math.round((m.progress || 0) * 100)}%`;
       else if (/load|initializ/i.test(m.status || '')) msg.textContent = 'Tekstherkenning starten… De eerste keer duurt dit even.';
     };
+    let step = 'foto';
     try {
-      const [worker, img] = await Promise.all([getOcrWorker(), loadPhoto(url)]);
+      const img = await loadPhoto(url);
+      step = 'laden';
+      await getOcrWorker();
+      step = 'lezen';
       const readable = r => r.conf >= 70 && r.good >= 40;
-      let best = { ...await ocrRead(worker, photoCanvas(img, 0), false), rot: 0 };
+      let best = { ...await readPhoto(img, 0, false), rot: 0 };
       if (!readable(best)) {
         // Een staande foto met een rechtop gehouden kaartje ligt meestal een kwartslag gedraaid.
         for (const rot of img.naturalHeight > img.naturalWidth ? [90, 270, 180] : [180, 90, 270]) {
           label = 'Het kaartje ligt gedraaid. Opnieuw lezen…';
-          const r = { ...await ocrRead(worker, photoCanvas(img, rot), false), rot };
+          const r = { ...await readPhoto(img, rot, false), rot };
           if (r.good > best.good) best = r;
           if (readable(r)) break;
         }
@@ -1660,7 +1724,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       if (!res.fields.email || !res.fields.telefoon || !res.fields.plaats) {
         // Iets gemist: vaak schaduw of een donker kaartje. Nog een keer met gelijkgetrokken licht.
         label = 'Nog een keer lezen met minder schaduw…';
-        const alt = parseCard((await ocrRead(worker, evenLight(photoCanvas(img, best.rot)), true)).segs);
+        const alt = parseCard((await readPhoto(img, best.rot, true)).segs);
         const [a, b] = filled(alt) > filled(res) ? [alt, res] : [res, alt];
         res = { fields: { ...a.fields }, lines: [...a.lines], use: [...a.use] };
         for (const k of Object.keys(res.fields)) {
@@ -1677,8 +1741,12 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         ? `${n} ${plural(n, 'gegeven', 'gegevens')} ingevuld. Controleer ze en tik op Toevoegen.`
         : 'Er kon geen tekst worden gelezen. Maak de foto recht van boven, met goed licht, en probeer het opnieuw.';
       if (n) $('addBedrijf').focus();
-    } catch {
-      msg.textContent = 'Lezen lukte niet. Probeer het opnieuw met een scherpere foto.';
+    } catch (e) {
+      console.error('[ocr]', step, e);
+      const why = String((e && (e.message || e.name || e.type)) || e || '').replace(/\s+/g, ' ').slice(0, 160);
+      msg.textContent = (step === 'foto' ? 'De foto kon niet worden geopend. Maak hem opnieuw of kies hem uit je galerij.'
+        : step === 'laden' ? 'De tekstherkenning kon niet starten. Controleer je internetverbinding en probeer het opnieuw.'
+        : 'Lezen lukte niet.') + (why ? ` Technische melding: ${why}` : '');
     } finally {
       ocrStatus = null;
       URL.revokeObjectURL(url);
@@ -2920,7 +2988,69 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 
   /* ---------- gebeurtenissen ---------- */
   addForm.addEventListener('submit', addLead);
-  $('scanBtn').addEventListener('click', () => $('scanFile').click());
+  const cam = { stream: null, torch: false };
+  async function openCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { $('scanFile').click(); return; }
+    try {
+      cam.stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: { ideal: 'environment' }, width: { ideal: 4096 }, height: { ideal: 4096 } } });
+    } catch (e) {
+      $('scanMsg').textContent = e && e.name === 'NotAllowedError'
+        ? 'De app mag de camera niet gebruiken. Sta de camera toe (tik op het slotje of ga naar Instellingen → Apps → Chrome → Machtigingen → Camera), of kies een foto uit je galerij.'
+        : 'De camera kon niet starten. Kies een foto uit je galerij.';
+      return;
+    }
+    const v = $('camVideo'), stream = cam.stream;
+    v.srcObject = stream;
+    $('cam').hidden = false;
+    document.body.classList.add('cam-open');
+    history.pushState({ cam: true }, '');
+    try { await v.play(); } catch {}
+    if (cam.stream !== stream) return;   // intussen al gesloten
+    const track = stream.getVideoTracks()[0];
+    const caps = track && track.getCapabilities ? track.getCapabilities() : {};
+    cam.torch = false;
+    $('camTorch').hidden = !caps.torch;
+    $('camTorch').setAttribute('aria-pressed', 'false');
+    try { if (caps.focusMode && caps.focusMode.includes('continuous')) await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch {}
+  }
+  function closeCamera(fromHistory) {
+    if (cam.stream) cam.stream.getTracks().forEach(t => t.stop());
+    cam.stream = null;
+    $('camVideo').srcObject = null;
+    if ($('cam').hidden) return;
+    $('cam').hidden = true;
+    document.body.classList.remove('cam-open');
+    if (!fromHistory && history.state && history.state.cam) history.back();
+  }
+  // Snijdt het stuk binnen het kader (met wat marge) uit het camerabeeld; dat gaat naar de tekstherkenning.
+  function shootCamera() {
+    const v = $('camVideo'), vw = v.videoWidth, vh = v.videoHeight;
+    if (!vw || !vh) return;
+    const vr = v.getBoundingClientRect(), fr = $('camFrame').getBoundingClientRect();
+    const k = Math.max(vr.width / vw, vr.height / vh), ox = (vr.width - vw * k) / 2, oy = (vr.height - vh * k) / 2;
+    let w = fr.width / k * 1.12, h = fr.height / k * 1.12;
+    let x = (fr.left - vr.left - ox) / k - fr.width / k * 0.06, y = (fr.top - vr.top - oy) / k - fr.height / k * 0.06;
+    x = Math.max(0, x); y = Math.max(0, y); w = Math.min(vw - x, w); h = Math.min(vh - y, h);
+    const c = document.createElement('canvas');
+    c.width = Math.round(w); c.height = Math.round(h);
+    c.getContext('2d').drawImage(v, x, y, w, h, 0, 0, c.width, c.height);
+    closeCamera();
+    c.toBlob(b => { if (b) scanCard(b); }, 'image/jpeg', 0.95);
+  }
+  $('scanBtn').addEventListener('click', openCamera);
+  $('pickBtn').addEventListener('click', () => $('pickFile').click());
+  $('pickFile').addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) scanCard(f); });
+  $('camShot').addEventListener('click', shootCamera);
+  $('camClose').addEventListener('click', () => closeCamera());
+  $('camTorch').addEventListener('click', async () => {
+    const track = cam.stream && cam.stream.getVideoTracks()[0];
+    if (!track) return;
+    cam.torch = !cam.torch;
+    try { await track.applyConstraints({ advanced: [{ torch: cam.torch }] }); } catch { cam.torch = false; }
+    $('camTorch').setAttribute('aria-pressed', String(cam.torch));
+  });
+  window.addEventListener('popstate', () => { if (!$('cam').hidden) closeCamera(true); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && cam.stream) closeCamera(); });
   // Werkt ook als delen naar de app (nog) niet kan: in Google Maps of Chrome kopiëren, hier plakken.
   $('pasteBtn').addEventListener('click', async () => {
     let text = '';
