@@ -3395,6 +3395,11 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       return;
     }
     const n = restoreData.leads.length, m = restoreData.sjablonen.length;
+    if (restoreData.move) {
+      restoreEl.innerHTML = `<p><strong>Je lijst van dit apparaat overzetten?</strong> Hier staan nog ${n} ${plural(n, 'bedrijf', 'bedrijven')} en ${m} ${plural(m, 'mailtekst', 'mailteksten')} van vóór de online opslag. Zet ze over, dan staan ze in je online lijst en zie je ze ook op je computer.</p>
+        <div class="btns"><button type="button" class="btn primary" id="restoreGo" data-r="go">Overzetten</button><button type="button" class="btn" data-r="cancel">Niet nodig</button></div>`;
+      return;
+    }
     restoreEl.innerHTML = `<p><strong>Back-up gevonden:</strong> ${n} ${plural(n, 'bedrijf', 'bedrijven')} en ${m} ${plural(m, 'mailtekst', 'mailteksten')}. Bedrijven die al in je lijst staan, worden bijgewerkt.</p>
       <div class="btns"><button type="button" class="btn primary" id="restoreGo" data-r="go">Terugzetten</button><button type="button" class="btn" data-r="cancel">Annuleren</button></div>`;
   }
@@ -3434,12 +3439,12 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const b = e.target.closest('[data-r]');
     if (!b) return;
     if (b.dataset.r === 'go') runRestore();
-    else { restoreData = null; renderRestore(); }
+    else { if (restoreData && restoreData.move) pref.set('overgezet', 'nee'); restoreData = null; renderRestore(); }
   });
   async function runRestore() {
     if (!restoreData || restoreBusy || !col) return;
     restoreBusy = true;
-    const { leads, sjablonen, acties } = restoreData;
+    const { leads, sjablonen, acties, move } = restoreData;
     const idOk = v => typeof v === 'string' && /^[A-Za-z0-9_\-.~:@+]{1,200}$/.test(v);
     const jobs = [
       ...leads.map(x => () => col.doc(idOk(x.id) ? x.id : undefined).set(toBody(normalize({ id: '', data: () => x })))),
@@ -3461,10 +3466,31 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (merged.size !== state.acties.length) { state.acties = sortNames([...merged.values()]); saveActionFilters(); }
     restoreBusy = false;
     restoreData = null;
+    if (move && !failed) pref.set('overgezet', nowISO());
     renderRestore(failed
       ? `${done} onderdelen teruggezet, ${failed} mislukt. Controleer je verbinding en probeer het opnieuw.`
       : `Klaar: ${leads.length} ${plural(leads.length, 'bedrijf', 'bedrijven')} en ${sjablonen.length} ${plural(sjablonen.length, 'mailtekst', 'mailteksten')} teruggezet.`);
     renderAll();
+  }
+
+  /* ---------- lijst van dit apparaat naar de online opslag ---------- */
+  // Na het koppelen van de online opslag staat de oude lijst nog op het toestel. De app biedt aan hem over te zetten.
+  function localListData() {
+    try {
+      const o = JSON.parse(localStorage.getItem('koude-acq.lokaal') || '{}');
+      const leads = Object.entries(o.leads || {}).map(([id, d]) => ({ ...d, id })).filter(x => typeof x.bedrijf === 'string' && x.bedrijf.trim() && !x.voorbeeld);
+      const sjablonen = Object.entries(o.sjablonen || {}).map(([id, d]) => ({ ...d, id })).filter(x => x.onderwerp || x.tekst);
+      const namen = o.instellingen && o.instellingen.acties && o.instellingen.acties.namen;
+      return leads.length ? { leads, sjablonen, acties: Array.isArray(namen) ? namen.filter(x => typeof x === 'string') : [] } : null;
+    } catch { return null; }
+  }
+  function maybeOfferMove() {
+    if (state.local || state.readOnly || pref.get('overgezet') || !appStore || !appStore.isLoaded('leads') || restoreData || restoreBusy) return;
+    const d = localListData();
+    if (!d) return;
+    if (d.leads.every(x => byId(x.id))) { pref.set('overgezet', nowISO()); return; }   // staat er al
+    restoreData = { ...d, move: true };
+    renderRestore();
   }
 
   /* ---------- app installeren ---------- */
@@ -3998,6 +4024,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       state.leads = snap.docs.filter(d => d.exists).map(normalize);
       state.loaded = true;
       if (pref.get('kaart') === '1') scheduleGeocode();
+      setTimeout(maybeOfferMove, 0);
       if (first) setTimeout(() => { if (shareIn) handleShare(shareIn); else afterCall(); }, 0);
       state.problem = null;
       saveAgenda();
