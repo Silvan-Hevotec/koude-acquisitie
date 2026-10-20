@@ -94,7 +94,11 @@ h1 { margin: 0; font: 800 clamp(30px, 4.6vw, 44px)/1 var(--f-display); font-stre
 .band :focus-visible, .selbar :focus-visible { outline-color: var(--geel); }
 
 .wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 22px 80px; }
-body.selecting .wrap { padding-bottom: 170px; }
+body.selecting .wrap, body.sessie .wrap { padding-bottom: 170px; }
+.sess-start { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.sess-start .hint { margin: 0; flex: 1 1 200px; }
+.row.current { box-shadow: inset 4px 0 0 var(--geel); }
+.suggest { margin: 4px 0 0; padding: 8px 12px; border-left: 4px solid var(--geel); border-radius: 0 8px 8px 0; background: var(--sunken); font-size: 14px; }
 
 /* Knoppen */
 .btn {
@@ -408,7 +412,7 @@ textarea.mail-body { min-height: 240px; }
   opacity: 0; pointer-events: none; transform: translate(-50%, 8px); transition: opacity .2s, transform .2s;
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
-body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+body.sessie .toast, body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
 
 /* Nieuw bedrijf in- en uitklappen */
@@ -636,6 +640,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 </main>
 
 <div class="selbar" id="selBar" hidden><div class="gutter selbar-inner" id="selInner"></div></div>
+<div class="selbar sessbar" id="sessBar" hidden><div class="gutter selbar-inner" id="sessInner"></div></div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -652,6 +657,13 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (!st.startsWith('ka-ms.')) return null;
     history.replaceState(null, '', location.pathname + location.hash);
     return { state: st, code: q.get('code') || '', error: q.get('error') || '', desc: q.get('error_description') || '' };
+  })();
+  // Gedeeld vanuit een andere app (Google Maps, Chrome): titel, tekst en link staan in het adres.
+  const shareIn = (() => {
+    const q = new URLSearchParams(location.search);
+    if (!['deel_titel', 'deel_tekst', 'deel_url'].some(k => q.get(k))) return null;
+    history.replaceState(null, '', location.pathname + location.hash);
+    return { title: q.get('deel_titel') || '', text: q.get('deel_tekst') || '', url: q.get('deel_url') || '' };
   })();
   const VIEWS = new Set(['alles', 'acties', 'vandaag', 'archief']);
   const OUTCOMES = ['Geen gehoor', 'Terugbellen', 'Interesse', 'Geen interesse'];
@@ -730,6 +742,10 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   function parseISO(s) { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
   function addDays(iso, n) { const d = parseISO(iso); d.setDate(d.getDate() + n); return isoOf(d); }
   function nextWorkday(iso) { const d = parseISO(iso); do { d.setDate(d.getDate() + 1); } while (d.getDay() === 0 || d.getDay() === 6); return isoOf(d); }
+  function addWorkdays(iso, n) { let d = iso; for (let i = 0; i < n; i++) d = nextWorkday(d); return d; }
+  // Hoe vaak achter elkaar geen gehoor. Een mail ertussen telt niet als contact.
+  function noAnswerStreak(l) { let n = 0; for (const e of l.log || []) { if (e.a === 'Mail') continue; if (e.u === 'Geen gehoor') n++; else break; } return n; }
+  const callable = l => !!l && !l.gearchiveerd && String(l.telefoon || '').replace(/\D/g, '').length >= 6;
   function dayDiff(from, to) {
     const a = parseISO(from), b = parseISO(to);
     if (!a || !b) return null;
@@ -1085,10 +1101,22 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const l = byId(id), f = finishes[id];
     if (!l || !f) return;
     f.uitkomst = f.uitkomst === outcome ? '' : outcome;
-    if (!f.uitkomst) { f.actie = l.actie; f.datum = ''; f.archief = false; }
-    else if (outcome === 'Geen gehoor') { f.actie = l.actie; f.datum = nextWorkday(todayISO()); f.archief = false; }
-    else if (outcome === 'Terugbellen') { f.actie = canonAction('Bellen'); f.datum = nextWorkday(todayISO()); f.archief = false; }
-    else if (outcome === 'Interesse') { f.actie = ''; f.datum = ''; f.archief = false; }
+    const today = todayISO();
+    f.hint = '';
+    f.archief = false;
+    if (!f.uitkomst) { f.actie = l.actie; f.datum = ''; }
+    else if (outcome === 'Geen gehoor') {
+      // Vaste opvolgstappen: steeds wat langer wachten, na drie keer een mail, na vijf keer archiveren.
+      const n = noAnswerStreak(l) + 1, bel = l.actie && !/^mail/i.test(l.actie) ? l.actie : canonAction('Bellen');
+      if (n >= 5) { f.actie = ''; f.datum = ''; f.archief = true; f.hint = `${n}e keer geen gehoor. Voorstel: archiveren. Vink het uit als je het nog een keer wilt proberen.`; }
+      else if (n === 4) { f.actie = bel; f.datum = addWorkdays(today, 5); f.hint = '4e keer geen gehoor: over een week nog één keer bellen.'; }
+      else if (n === 3 && mailable(l)) { f.actie = canonAction('Mailen'); f.datum = today; f.hint = '3e keer geen gehoor: stuur vandaag een mail (mailtekst Na geen gehoor). Na het versturen zet de app vanzelf Bellen over drie werkdagen.'; }
+      else if (n === 3) { f.actie = bel; f.datum = addWorkdays(today, 3); f.hint = '3e keer geen gehoor en geen e-mailadres: over drie werkdagen opnieuw.'; }
+      else if (n === 2) { f.actie = bel; f.datum = addWorkdays(today, 2); f.hint = '2e keer geen gehoor: over twee werkdagen opnieuw, probeer een ander tijdstip.'; }
+      else { f.actie = bel; f.datum = nextWorkday(today); f.hint = 'Geen gehoor: de volgende werkdag opnieuw.'; }
+    }
+    else if (outcome === 'Terugbellen') { f.actie = canonAction('Bellen'); f.datum = nextWorkday(today); f.hint = 'Vul de afgesproken dag en tijd in.'; }
+    else if (outcome === 'Interesse') { f.actie = ''; f.datum = ''; f.hint = 'Plan de volgende stap, bijvoorbeeld Bezoek of Offerte sturen.'; }
     else if (outcome === 'Geen interesse') { f.actie = ''; f.datum = ''; f.archief = true; }
     renderRows();
   }
@@ -1103,7 +1131,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const datum = actie && parseISO(f.datum) ? f.datum : '';
     const tijd = datum && /^\d{2}:\d{2}$/.test(f.tijd || '') ? f.tijd : '';
     const next = {
-      ...l, log: [{ d: today, a: l.actie, u: f.uitkomst, t: tekst }, ...l.log].slice(0, 100), actie, datum, tijd,
+      ...l, log: [{ d: today, a: l.actie || f.via || '', u: f.uitkomst, t: tekst }, ...l.log].slice(0, 100), actie, datum, tijd,
       gearchiveerd: archive, gearchiveerdOp: archive ? today : '', gewijzigd: nowISO(), outlookId: '',
     };
     const ok = await write(() => col.doc(id).set(toBody(next)));
@@ -1115,6 +1143,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     else if (actie) toast(`Vastgelegd. Volgende: ${actie}${datum ? ` op ${shortDate(datum)}` : ' (nog zonder datum)'}.`);
     else toast('Vastgelegd. Er staat nog geen volgende actie.');
     if (f.agenda && actie && datum) addToCalendar(next);
+    if (sess.on && sessCurrent() === id) { sess.done++; setTimeout(nextInSession, 300); }
   }
 
   async function archiveLead(id, on) {
@@ -1500,7 +1529,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 
   const SCAN_FIELDS = [['bedrijf', 'Bedrijf', 'addBedrijf'], ['contact', 'Contact', 'addContact'], ['email', 'E-mail', 'addEmail'],
     ['telefoon', 'Telefoon', 'addTelefoon'], ['adres', 'Adres', 'addAdres'], ['plaats', 'Plaats', 'addPlaats'], ['website', 'Website', 'addWebsite']];
-  const scan = { lines: [], use: [] };
+  const scan = { lines: [], use: [], src: '' };
   function fillAddForm(found) {
     setAddOpen(true);
     let n = 0;
@@ -1512,11 +1541,38 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const el = $('scanLines');
     el.hidden = !scan.lines.length;
     if (!scan.lines.length) { el.innerHTML = ''; return; }
-    el.innerHTML = `<p class="hint">Dit las de app op het kaartje. Staat iets niet goed? Kies bij de regel in welk veld hij hoort.</p>
+    el.innerHTML = `<p class="hint">${scan.src === 'deel' ? 'Dit kwam mee met delen.' : 'Dit las de app op het kaartje.'} Staat iets niet goed? Kies bij de regel in welk veld hij hoort.</p>
       <ul class="ocr-lines">${scan.lines.map((t, i) => `<li><span class="ocr-t">${esc(t)}</span><select class="input ocr-sel${scan.use[i] ? ' used' : ''}" id="ocr-${i}" data-ocr="${i}" aria-label="Veld voor ${esc(t)}">
         <option value="">Niet gebruiken</option>${SCAN_FIELDS.map(([k, label]) => `<option value="${k}"${scan.use[i] === k ? ' selected' : ''}>${label}</option>`).join('')}</select></li>`).join('')}</ul>`;
   }
-  function clearScanLines() { scan.lines = []; scan.use = []; renderScanLines(); }
+  function clearScanLines() { scan.lines = []; scan.use = []; scan.src = ''; renderScanLines(); }
+
+  /* ---------- delen naar de app ---------- */
+  const isMapsUrl = u => /(google\.[a-z.]+\/maps|maps\.app\.goo\.gl|goo\.gl\/maps|maps\.google\.|g\.co\/kgs|share\.google)/i.test(u);
+  const isSocialUrl = u => /\/\/(?:[a-z0-9-]+\.)*(linkedin|facebook|instagram|twitter|x|youtube|tiktok|google|bing|wa|whatsapp|t)\.(com|me|co|nl)\b/i.test(u);
+  function handleShare(sh) {
+    const urls = [...new Set(`${sh.text}\n${sh.url}`.match(/https?:\/\/[^\s<>"]+/g) || [])];
+    const lines = String(sh.text || '').split(/\r?\n/).map(t => t.replace(/https?:\/\/[^\s<>"]+/g, '').replace(/\s+/g, ' ').trim()).filter(t => /\p{L}|\d{3}/u.test(t));
+    // Paginatitel van een website: "Hoekstra Installatietechniek | Installateur in Deventer" → het eerste deel.
+    const title = String(sh.title || '').split(/\s+[|–—·-]\s+|:\s/)[0].trim();
+    if (title && !lines.some(t => key(t) === key(title))) lines.unshift(title);
+    const site = urls.find(u => !isMapsUrl(u) && !isSocialUrl(u));
+    if (!lines.length && !site) {
+      setAddOpen(true);
+      $('scanMsg').textContent = urls.length ? 'Er kwam alleen een kaartlink mee, zonder naam of adres. Vul de gegevens zelf in.' : 'Er kwam niets bruikbaars mee. Vul de gegevens zelf in.';
+      return;
+    }
+    const res = parseCard(lines.map(t => ({ t: cleanCardLine(t), h: 0 })));
+    if (!res.fields.website && site) { try { res.fields.website = cleanWebsite(new URL(site).hostname); } catch {} }
+    // Bij delen staat de naam bovenaan: die gaat voor als de app geen bedrijfsnaam herkende.
+    if (!res.fields.bedrijf && res.lines.length) { const i = res.use.findIndex(u => !u); if (i >= 0) { res.fields.bedrijf = calmCaps(res.lines[i]); res.use[i] = 'bedrijf'; } }
+    const n = fillAddForm(res.fields);
+    scan.lines = res.lines.slice(0, 24); scan.use = res.use.slice(0, 24); scan.src = 'deel';
+    renderScanLines();
+    $('scanMsg').textContent = `${n} ${plural(n, 'gegeven', 'gegevens')} overgenomen. Controleer ze en tik op Toevoegen.`;
+    addForm.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    $('addBedrijf').focus({ preventScroll: true });
+  }
   function scanAssign(i, k) {
     const t = scan.lines[i];
     if (t === undefined) return;
@@ -1662,6 +1718,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         <button type="button" class="btn primary" id="save-${id}" data-act="save">Opslaan</button>
         ${mailB}
         <button type="button" class="btn" id="agenda-${id}" data-act="agenda">In agenda</button>
+        ${l.telefoon || l.email ? `<button type="button" class="btn" id="vcf-${id}" data-act="vcard">In contacten</button>` : ''}
         ${archiveBtn}
         <button type="button" class="btn danger push${armedDelete === l.id ? ' armed' : ''}" id="del-${id}" data-act="delete">${armedDelete === l.id ? 'Klik nogmaals om te verwijderen' : 'Verwijderen'}</button>
       </div>`;
@@ -1703,13 +1760,14 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 
   function finishHtml(l) {
     const f = finishes[l.id] || (finishes[l.id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false });
-    const id = esc(l.id), dis = f.archief;
+    const id = esc(l.id), dis = f.archief, inSess = sessCurrent() === l.id;
     return `<div class="finish">
       <section class="step" aria-label="Uitkomst">
-        <h3>Hoe ging het? <span class="faint">${esc(l.actie)}</span></h3>
+        <h3>Hoe ging het? <span class="faint">${esc(l.actie || f.via || '')}</span></h3>
         ${l.telefoon ? `<div class="callbox"><span class="pick" role="button" tabindex="0" id="cb-${id}" data-act="copy" data-copy="${esc(l.telefoon)}" data-label="Telefoonnummer">${esc(l.telefoon)}</span>${callLink(l, `Bel ${esc(l.telefoon)}`, 'call big')}</div>` : ''}
         <div class="outcomes">${OUTCOMES.map((o, i) =>
           `<button type="button" class="oc" id="oc-${id}-${i}" data-act="outcome" data-outcome="${o}" aria-pressed="${f.uitkomst === o}">${o}</button>`).join('')}</div>
+        ${f.hint ? `<p class="suggest" role="status">${esc(f.hint)}</p>` : ''}
         <div class="field">
           <label for="f-${id}-tekst">Eigen uitkomst of toelichting<span class="opt">optioneel</span></label>
           <input class="input" id="f-${id}-tekst" data-ffield="tekst" maxlength="200" value="${esc(f.tekst)}" placeholder="Bijv. sprak met de receptie, mailadres gekregen">
@@ -1734,8 +1792,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         <label class="check" for="f-${id}-archief"><input type="checkbox" id="f-${id}-archief" data-ffield="archief"${f.archief ? ' checked' : ''}>Archiveren, geen vervolg</label>
       </section>
       <div class="pactions">
-        <button type="button" class="btn primary" id="fin-${id}" data-act="finish">Vastleggen</button>
-        <button type="button" class="btn" id="can-${id}" data-act="cancel">Annuleren</button>
+        <button type="button" class="btn primary" id="fin-${id}" data-act="finish">${inSess ? 'Vastleggen, volgende' : 'Vastleggen'}</button>
+        ${inSess ? `<button type="button" class="btn" id="can-${id}" data-act="sess-skip">Overslaan</button>` : `<button type="button" class="btn" id="can-${id}" data-act="cancel">Annuleren</button>`}
       </div>
     </div>`;
   }
@@ -1760,7 +1818,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       : '';
     const canFinish = !state.readOnly && !state.selecting && !l.gearchiveerd && l.actie;
     const info = lastInfo(l);
-    return `<article class="row${open ? ' open' : ''}${state.selecting && !canMail ? ' nomail' : ''}" data-id="${id}">
+    return `<article class="row${open ? ' open' : ''}${state.selecting && !canMail ? ' nomail' : ''}${sessCurrent() === l.id ? ' current' : ''}" data-id="${id}">
       <div class="row-main cols" data-act="toggle">
         <div class="cell first">${check}
           <button type="button" class="bedrijf" id="t-${id}" data-act="toggle" aria-expanded="${open && !finishing}">
@@ -1812,8 +1870,14 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         (rest.length ? groupHead('Overige bedrijven', rest.length, '', true) + rest.map(rowHtml).join('') : '');
     }
 
+    const nCall = list.filter(callable).length;
+    const sessStart = !sess.on && !state.selecting && !state.readOnly && nCall
+      ? `<div class="sess-start"><button type="button" class="btn dark" id="sessStart" data-act="sess-start">Belsessie starten</button><span class="hint">${nCall} ${plural(nCall, 'bedrijf', 'bedrijven')} met telefoonnummer een voor een bellen en vastleggen.</span></div>` : '';
     if (state.view === 'vandaag') {
       if (!list.length) return emptyHtml('Niets meer te doen vandaag', 'Er staan geen acties voor vandaag of eerder. Plan nieuwe acties met een datum, dan verschijnen ze hier op die dag.');
+      return sessStart + vandaagHtml(list);
+    }
+    function vandaagHtml(list) {
       const groupRank = new Map();
       list.forEach(l => { const k = key(l.actie); groupRank.set(k, Math.min(groupRank.has(k) ? groupRank.get(k) : 9, prioRank(l))); });
       return grouped(list, l => key(l.actie), (k, items) => items[0].actie, (a, b) => groupRank.get(a) - groupRank.get(b) || cmp(a, b), byPrioDate,
@@ -1829,13 +1893,13 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       if (state.actie) return emptyHtml(`Geen bedrijven met actie ${state.actie}`, 'Geef een bedrijf deze actie, dan verschijnt het hier.', '<button type="button" class="btn" data-act="allacties">Toon alle acties</button>');
       return emptyHtml('Nog geen acties', 'Geef een bedrijf een actie, bijvoorbeeld Bezoek. Die actie komt dan automatisch als filter boven de lijst.');
     }
-    if (!state.actie) return grouped(list, l => key(l.actie), (k, items) => items[0].actie, cmp, byDateThenName);
+    if (!state.actie) return sessStart + grouped(list, l => key(l.actie), (k, items) => items[0].actie, cmp, byDateThenName);
     if (groupByPlaats(state.actie)) {
-      return grouped(list, l => key(l.plaats), (k, items) => items[0].plaats || 'Plaats onbekend',
+      return sessStart + grouped(list, l => key(l.plaats), (k, items) => items[0].plaats || 'Plaats onbekend',
         (a, b) => (a ? 0 : 1) - (b ? 0 : 1) || cmp(a, b), byDateThenName,
         (k, items) => /bezoek/i.test(state.actie) ? routeLink(items) : '');
     }
-    return list.sort(byDateThenName).map(rowHtml).join('');
+    return sessStart + list.sort(byDateThenName).map(rowHtml).join('');
   }
 
   function renderRows() {
@@ -1935,7 +1999,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     });
   }
 
-  function renderAll() { renderMeta(); renderRows(); renderSelBar(); if (mail.open) renderMailOut(); }
+  function renderAll() { renderMeta(); renderRows(); renderSelBar(); renderSessBar(); if (mail.open) renderMailOut(); }
   let renderQueued = false;
   function scheduleRender() {
     if (renderQueued) return;
@@ -1949,7 +2013,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     disarm();
     if (!silent) renderRows();
   }
-  function openRow(id, mode) {
+  function openRow(id, mode, via = '') {
     if (state.open === id && (mode === 'toggle' || state.mode === mode)) { closeRow(); return; }
     closeRow(true);
     const l = byId(id);
@@ -1957,8 +2021,22 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     state.open = id;
     state.mode = mode === 'finish' ? 'finish' : 'edit';
     if (state.mode === 'edit') drafts[id] = draftFrom(l);
-    else finishes[id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false };
+    else finishes[id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false, via, hint: '' };
     renderRows();
+  }
+  // Zorgt dat een bedrijf in de lijst te zien is: anders naar Alles (of Archief), zonder zoekterm en branchefilter.
+  function revealLead(l) {
+    if (inView(l)) return;
+    state.selecting = false; state.selected.clear();
+    setView(l.gearchiveerd ? 'archief' : 'alles');
+    state.search = ''; searchEl.value = '';
+    if (!inView(l)) { state.branche = ''; pref.set('branche', ''); }
+  }
+  function scrollToRow(id, focusId) {
+    requestAnimationFrame(() => {
+      document.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      if (focusId) $(focusId)?.focus({ preventScroll: true });
+    });
   }
   function gotoLead(id) {
     const l = byId(id);
@@ -1972,8 +2050,111 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     document.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 
+  /* ---------- belsessie: de lijst een voor een afbellen ---------- */
+  const sess = { on: false, ids: [], i: 0, done: 0, skipped: 0 };
+  const sessCurrent = () => sess.on ? sess.ids[sess.i] : null;
+  function startSession() {
+    // Zelfde volgorde als op het scherm.
+    const list = [...rowsEl.querySelectorAll('.row')].map(r => byId(r.dataset.id)).filter(callable);
+    if (!list.length) { toast('In deze lijst staan geen bedrijven met een telefoonnummer.'); return; }
+    if (state.selecting) setSelecting(false);
+    Object.assign(sess, { on: true, ids: list.map(l => l.id), i: -1, done: 0, skipped: 0 });
+    nextInSession();
+  }
+  function nextInSession() {
+    if (!sess.on) return;
+    do sess.i++; while (sess.i < sess.ids.length && !callable(byId(sess.ids[sess.i])));
+    if (sess.i >= sess.ids.length) { endSession(true); return; }
+    showSessionLead();
+  }
+  function showSessionLead() {
+    const l = byId(sessCurrent());
+    if (!l) { nextInSession(); return; }
+    revealLead(l);
+    if (!(state.open === l.id && state.mode === 'finish')) { closeRow(true); state.open = l.id; state.mode = 'finish'; finishes[l.id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false, via: 'Bellen', hint: '' }; }
+    renderAll();
+    scrollToRow(l.id);
+  }
+  function endSession(finished) {
+    if (!sess.on) return;
+    sess.on = false;
+    closeRow(true);
+    renderAll();
+    if (finished) toast(`Belsessie klaar: ${sess.done} vastgelegd${sess.skipped ? `, ${sess.skipped} overgeslagen` : ''}.`, 5000);
+  }
+  function renderSessBar() {
+    const bar = $('sessBar'), inner = $('sessInner');
+    bar.hidden = !sess.on;
+    document.body.classList.toggle('sessie', sess.on);
+    if (!sess.on) { inner.innerHTML = ''; return; }
+    const l = byId(sessCurrent()), open = l && state.open === l.id && state.mode === 'finish';
+    inner.innerHTML = `<span class="count">Belsessie · ${sess.i + 1} van ${sess.ids.length}${l ? ` · ${esc(l.bedrijf)}` : ''}</span>
+      ${open ? '' : '<button type="button" class="btn primary" id="sessGo" data-sess="go">Verder</button>'}
+      <button type="button" class="btn on-band" id="sessSkip" data-sess="skip">Overslaan</button>
+      <button type="button" class="btn on-band" id="sessStop" data-sess="stop">Stoppen</button>`;
+  }
+  $('sessInner').addEventListener('click', e => {
+    const b = e.target.closest('[data-sess]');
+    if (!b) return;
+    if (b.dataset.sess === 'skip') { sess.skipped++; nextInSession(); }
+    else if (b.dataset.sess === 'stop') endSession(false);
+    else showSessionLead();
+  });
+
+  /* ---------- na het bellen meteen vastleggen ---------- */
+  // Tik je op Bel, dan onthoudt de app bij welk bedrijf. Kom je terug in de app, dan staat "Hoe ging het?" open.
+  let pendingCall = null;
+  try { const c = JSON.parse(localStorage.getItem('koude-acq.belt') || 'null'); if (c && c.id && Date.now() - c.t < 3600000) pendingCall = c; } catch {}
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="tel:"]');
+    const id = a && (a.dataset.lead || a.closest('.row')?.dataset.id);
+    if (!id) return;
+    pendingCall = { id, t: Date.now() };
+    try { localStorage.setItem('koude-acq.belt', JSON.stringify(pendingCall)); } catch {}
+  }, true);
+  function afterCall() {
+    const c = pendingCall;
+    if (!c || !state.loaded || Date.now() - c.t < 3000) return;   // meteen terug: waarschijnlijk niet gebeld
+    pendingCall = null;
+    try { localStorage.removeItem('koude-acq.belt'); } catch {}
+    const l = byId(c.id);
+    if (!l || l.gearchiveerd || state.readOnly || Date.now() - c.t > 3 * 3600000) return;
+    if (!(state.open === l.id && state.mode === 'finish')) {
+      revealLead(l);
+      closeRow(true);
+      state.open = l.id; state.mode = 'finish';
+      finishes[l.id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false, via: 'Bellen', hint: '' };
+      renderAll();
+    }
+    scrollToRow(l.id, `oc-${l.id}-0`);
+    toast(`Hoe ging het gesprek met ${l.bedrijf}?`);
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(afterCall, 150); });
+
+  /* ---------- in je telefooncontacten ---------- */
+  function vcardText(l) {
+    const e = v => String(v || '').replace(/\\/g, '\\\\').replace(/([,;])/g, '\\$1').replace(/\r?\n/g, '\\n');
+    const fn = l.contact ? `${l.contact} (${l.bedrijf})` : l.bedrijf;
+    const pc = (String(l.adres || '').match(/\b\d{4} ?[A-Z]{2}\b/) || [''])[0];
+    const street = String(l.adres || '').replace(/,?\s*\b\d{4} ?[A-Z]{2}\b/, '').trim();
+    const tel = String(l.telefoon || '').trim(), mobile = /^(?:\+31|0031|0)[\s\-.()]*6/.test(tel);
+    const lines = ['BEGIN:VCARD', 'VERSION:3.0', `N:;${e(fn)};;;`, `FN:${e(fn)}`, `ORG:${e(l.bedrijf)}`];
+    if (tel) lines.push(`TEL;TYPE=${mobile ? 'CELL' : 'WORK,VOICE'}:${tel}`);
+    addrList(l.email).forEach(a => lines.push(`EMAIL;TYPE=INTERNET,WORK:${a}`));
+    if (street || pc || l.plaats) lines.push(`ADR;TYPE=WORK:;;${e(street)};${e(l.plaats)};;${e(pc)};Nederland`);
+    if (l.website) lines.push(`URL:${e(webHref(l.website))}`);
+    lines.push(`NOTE:${e(['Koude acquisitie', l.branche].filter(Boolean).join(' · '))}`, 'END:VCARD');
+    return lines.join('\r\n') + '\r\n';
+  }
+  function saveContact(l) {
+    const slug = (l.bedrijf || 'contact').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'contact';
+    saveFile(`${slug}.vcf`, vcardText(l), 'text/vcard;charset=utf-8');
+    toast('Contactkaart gedownload. Tik op Openen en kies Contacten om hem op te slaan.', 7000);
+  }
+
   /* ---------- selecteren en mailen ---------- */
   function setSelecting(on) {
+    if (on && sess.on) endSession(false);
     state.selecting = on;
     state.selected.clear();
     // Alles wat je nu ziet (filter, branche, zoekterm) staat meteen aangevinkt; vink uit wie je wilt overslaan.
@@ -1997,7 +2178,9 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     list.sort((a, b) => byName(byId(a), byId(b)));
     if (mail.sending) { toast('Wacht even tot de mails zijn verstuurd.'); return; }
     Object.assign(mail, { open: true, ids: list, mode: list.length === 1 ? 'pers' : 'bcc', index: 0, done: new Set(), skipped: new Set(), opened: new Set(), newName: null, armedDel: false, busy: false, sending: null });
-    if (!mail.onderwerp && !mail.tekst && state.sjablonen.length) applyTemplate(state.sjablonen[0].id);
+    const ggTpl = state.sjablonen.find(t => /geen gehoor/i.test(t.naam));
+    if (ggTpl && list.every(i => { const l = byId(i); return /^mail/i.test(l.actie || '') && noAnswerStreak(l) >= 2; })) applyTemplate(ggTpl.id);
+    else if (!mail.onderwerp && !mail.tekst && state.sjablonen.length) applyTemplate(state.sjablonen[0].id);
     state.selecting = false; state.selected.clear();
     closeRow(true);
     renderAll();
@@ -2133,13 +2316,20 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 
   async function logMail(ids, subject) {
     const today = todayISO();
-    let ok = 0;
+    let ok = 0, follow = 0;
     for (const id of ids) {
       const l = byId(id);
       if (!l) continue;
-      const log = logBody([{ d: today, a: 'Mail', u: 'Verstuurd', t: clip(subject, 200) }, ...l.log].slice(0, 100));
-      if (await write(() => col.doc(id).update({ log, gewijzigd: nowISO() }))) ok++;
+      const patch = { log: logBody([{ d: today, a: 'Mail', u: 'Verstuurd', t: clip(subject, 200) }, ...l.log].slice(0, 100)), gewijzigd: nowISO() };
+      // Opvolgstap: stond er Mailen, dan daarna nabellen.
+      const next = !l.gearchiveerd && /^mail/i.test(l.actie || '');
+      if (next) Object.assign(patch, { actie: canonAction('Bellen'), datum: addWorkdays(today, 3), tijd: '' });
+      if (await write(() => col.doc(id).update(patch))) { ok++; if (next) follow++; }
       else break;
+    }
+    if (follow) {
+      rememberAction(canonAction('Bellen'));
+      setTimeout(() => toast(`Nabellen ingepland op ${shortDate(addWorkdays(today, 3))} bij ${follow} ${plural(follow, 'bedrijf', 'bedrijven')}.`, 5000), 3800);
     }
     return ok;
   }
@@ -2550,6 +2740,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (act === 'call') return;
     if (act === 'reset') { setView('alles'); state.search = ''; searchEl.value = ''; renderAll(); return; }
     if (act === 'allacties') { setActie(''); renderAll(); return; }
+    if (act === 'sess-start') { startSession(); return; }
     if (act === 'copy') { copyText(el.dataset.copy, el.dataset.label); return; }
     if (act === 'filter') { setView('acties'); setActie(el.dataset.actie); renderAll(); filtersEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return; }
     const row = el.closest('.row');
@@ -2576,6 +2767,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     else if (act === 'outcome') applyOutcome(id, el.dataset.outcome);
     else if (act === 'finish') finishLead(id);
     else if (act === 'cancel') { closeRow(); $(`af-${id}`)?.focus(); }
+    else if (act === 'sess-skip') { sess.skipped++; nextInSession(); }
+    else if (act === 'vcard') { const l = byId(id); if (l) saveContact(l); }
     else if (act === 'save') saveLead(id);
     else if (act === 'mail') openMail([id]);
     else if (act === 'agenda') {
@@ -3514,8 +3707,10 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     actiesDoc = store.doc('instellingen/acties');
 
     col.limit(MAX_LEADS).onSnapshot(snap => {
+      const first = !state.loaded;
       state.leads = snap.docs.filter(d => d.exists).map(normalize);
       state.loaded = true;
+      if (first) setTimeout(() => { if (shareIn) handleShare(shareIn); else afterCall(); }, 0);
       state.problem = null;
       saveAgenda();
       scheduleRender();
