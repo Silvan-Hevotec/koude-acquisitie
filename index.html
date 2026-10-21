@@ -564,6 +564,108 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .gate-main { display: grid; gap: 14px; padding-block: 22px 40px; max-width: 480px; }
 .gate .card .field + .field { margin-top: 2px; }
 .gate .pactions .btn.primary { flex: 1; min-height: 48px; }
+/* Status: lead, potentiële klant, klant */
+.stag { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1.5; vertical-align: 2px; }
+.stag.prospect { background: var(--brand-soft); color: var(--brand-soft-ink); }
+.stag.klant { background: var(--ok-soft); color: var(--ok); }
+.buurtbtn[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+.buurt-status { margin-top: -4px; }
+.set-sel { width: auto; min-width: 140px; min-height: 40px; }
+
+/* Slimme datum: voorstel om in te plannen */
+.suggest.smart { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0 0; }
+.suggest.smart .ic { width: 16px; height: 16px; color: var(--muted); }
+.suggest.smart em { font-style: normal; font-weight: 600; }
+.suggest.smart .linkbtn { font-size: 14px; }
+.linkbtn.vlink { display: inline-flex; align-items: center; gap: 6px; justify-self: start; font-size: 14px; }
+.linkbtn.vlink .ic { width: 16px; height: 16px; }
+
+/* Voorbereiding bovenaan een geopend bedrijf */
+.panel > .prep, .panel > .verslagen { grid-column: 1 / -1; }
+.prep { display: grid; gap: 10px; padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--brand); }
+.prep-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.prep-head h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 700; }
+.prep-head h3 .ic { width: 18px; height: 18px; color: var(--brand-soft-ink); }
+.prep-head .linkbtn { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; }
+.prep-head .linkbtn .ic { width: 14px; height: 14px; }
+.psum { margin: 0; font-size: 15px; }
+.pfacts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 20px; margin: 0; }
+.pfacts > div { min-width: 0; }
+.pfacts dt { font-size: 12px; font-weight: 700; color: var(--muted); }
+.pfacts dd { margin: 1px 0 0; font-size: 14px; overflow-wrap: anywhere; }
+.pq { font-size: 14px; }
+.pq ul, .vq ul { margin: 4px 0 0; padding-left: 20px; }
+.mtag { display: inline-block; margin: 1px 4px 1px 0; padding: 1px 8px; border-radius: 999px; background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); font-size: 12.5px; font-weight: 600; }
+
+/* Klantverslagen */
+.verslagen { display: grid; gap: 12px; align-content: start; min-width: 0; padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.vhead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.vhead h3 { margin: 0; font-size: 15px; font-weight: 700; }
+.vhead h3 .n { font: 500 12px/1 var(--f-mono); color: var(--muted); }
+.vlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.verslag { display: grid; gap: 6px; padding: 10px 0 0 12px; border-left: 2px solid var(--line); }
+.verslag + .verslag { border-top: 1px solid var(--line); padding-top: 12px; }
+.vmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12.5px; color: var(--muted); }
+.vmeta time { font-weight: 700; color: var(--ink); }
+.aitag { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-soft-ink); font-size: 11px; font-weight: 700; }
+.aitag .ic { width: 12px; height: 12px; }
+.vdel { margin-left: auto; display: inline-flex; align-items: center; min-height: 28px; padding: 0 8px; border: 0; border-radius: 8px; background: none; color: var(--faint); font: inherit; font-size: 12.5px; cursor: pointer; }
+.vdel .ic { width: 16px; height: 16px; }
+.vdel:hover { color: var(--danger); background: var(--danger-soft); }
+.vdel.armed { background: var(--danger); color: #fff; font-weight: 600; }
+.vtekst { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; }
+.vfact { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+.vk { display: inline-block; min-width: 86px; margin-right: 6px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.vq { font-size: 14px; }
+.verslag details.raw summary { cursor: pointer; font-size: 12.5px; color: var(--muted); }
+.verslag details.raw p { margin: 6px 0 0; font-size: 13.5px; color: var(--muted); white-space: pre-wrap; }
+.veditor { display: grid; gap: 12px; padding: 14px; border-radius: 12px; background: var(--sunken); border: 1px solid var(--line); }
+.vgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 16px; }
+.vgrid > .span2 { grid-column: 1 / -1; }
+@media (max-width: 520px) {
+  .vgrid { grid-template-columns: minmax(0, 1fr); }
+  .panel > .prep, .panel > .verslagen { padding: 12px; }
+  .veditor { padding: 12px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; }
+}
+.vlabel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.vlabel label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.vtext { min-height: 120px; }
+.btn.mic.on { background: var(--danger); border-color: var(--danger); color: #fff; animation: mic-puls 1.4s ease-in-out infinite; }
+@keyframes mic-puls { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--danger) 25%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .btn.mic.on { animation: none; } }
+.vlive { color: var(--danger); font-weight: 600; }
+.vai { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.vplan { display: grid; gap: 10px; padding-top: 4px; border-top: 1px dashed var(--line-strong); }
+.vplan .hint .ic { width: 14px; height: 14px; vertical-align: -2px; }
+
+/* Vraag het Leadnex */
+.page-head #askBtn { flex: none; }
+.ask .card-head h2, #dupPanel .card-head h2 { display: flex; align-items: center; gap: 8px; }
+.ask .card-head .ic, #dupPanel .card-head .ic { width: 20px; height: 20px; }
+.askform { display: flex; gap: 8px; }
+.askform .input { flex: 1 1 auto; min-width: 0; }
+.askform .btn { flex: none; }
+.answer { display: grid; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--sunken); }
+.answer > p { margin: 0; }
+.askhits { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.askhits li { display: grid; gap: 1px; }
+.askhits .linkbtn { justify-self: start; font-size: 15px; text-align: left; }
+.ask .chips .chip { white-space: normal; text-align: left; }
+
+/* Dubbele bedrijven */
+.duplist { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.duppair { display: grid; gap: 8px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--sunken); }
+.dupcols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 16px; }
+@media (max-width: 560px) { .dupcols { grid-template-columns: minmax(0, 1fr); } }
+.dupside { display: grid; gap: 2px; min-width: 0; }
+.dupside + .dupside { padding-left: 16px; border-left: 2px solid var(--line); }
+@media (max-width: 560px) { .dupside + .dupside { padding: 10px 0 0; border-left: 0; border-top: 1px solid var(--line); } }
+
+/* Meer: uitleg Leadnex AI */
+.ai-help { padding: 4px 18px 16px 52px; font-size: 14px; }
+.ai-help ol { margin: 0 0 8px; padding-left: 20px; display: grid; gap: 6px; }
+.ai-help code { font: 13px var(--f-mono); padding: 1px 5px; border-radius: 6px; background: var(--sunken); }
+@media (max-width: 520px) { .ai-help { padding-left: 18px; } }
 </style>
 </head>
 <body>
@@ -629,7 +731,10 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   <!-- Bedrijven -->
   <div class="page-head" data-show="bedrijven">
     <div><h2>Bedrijven</h2><p class="sub" id="bedrijvenSub"></p></div>
+    <button type="button" class="btn" id="askBtn" aria-expanded="false"><i data-ic="message-circle-question"></i>Vraag het Leadnex</button>
   </div>
+  <section class="card ask" id="askPanel" aria-label="Vraag over je klantverslagen" hidden></section>
+  <div class="notice" id="dupNotice" hidden><p><span></span></p><div class="btns"><button type="button" class="btn small" id="dupNoticeGo">Bekijken</button><button type="button" class="btn small ghost" id="dupNoticeHide">Verbergen</button></div></div>
   <!-- Kaart -->
   <div class="page-head" data-show="kaart">
     <div><h2>In de buurt</h2><p class="sub">Bedrijven rond je huidige plek, de dichtstbijzijnde eerst.</p></div>
@@ -640,10 +745,13 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     <div class="tools">
       <label class="searchbox"><span class="sr">Zoeken</span><i data-ic="search"></i><input class="input search" id="search" type="search" placeholder="Zoek op bedrijf, naam, plaats of telefoon"></label>
       <select class="input branchesel" id="brancheSel" aria-label="Branche" hidden></select>
+      <select class="input branchesel" id="statusSel" aria-label="Lead of klant" hidden></select>
+      <button type="button" class="btn buurtbtn" id="buurtBtn" aria-pressed="false" hidden>In de buurt</button>
       <button type="button" class="btn" id="mailBtn" hidden>Mail versturen</button>
     </div>
   </div>
 
+  <p class="hint buurt-status" id="buurtStatus" role="status" hidden></p>
   <div class="filters" id="filters" hidden>
     <div class="chips" id="chips" aria-label="Filter op actie"></div>
     <p class="hint">Elke actie die je bij een bedrijf invult, komt hier automatisch bij als filter.</p>
@@ -716,6 +824,10 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       <label for="addPrio">Prioriteit</label>
       <select class="input" id="addPrio"><option value="hoog">Hoog</option><option value="normaal" selected>Normaal</option><option value="laag">Laag</option></select>
     </div>
+    <div class="field">
+      <label for="addStatus">Status</label>
+      <select class="input" id="addStatus"><option value="lead" selected>Lead</option><option value="prospect">Potentiële klant</option><option value="klant">Klant</option></select>
+    </div>
     <div class="field span-when">
       <label for="addDatum">Wanneer<span class="opt">optioneel</span></label>
       <div id="addWhen"></div>
@@ -734,6 +846,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     <div><h2>Meer</h2><p class="sub">Account, meldingen, koppelingen en je gegevens.</p></div>
   </div>
   <section class="card" id="importPanel" aria-label="Importeren uit Excel" hidden></section>
+  <section class="card" id="dupPanel" aria-label="Dubbele bedrijven" hidden></section>
   <div class="settings" data-show="meer">
     <section class="card set-group" aria-label="Account">
       <h3>Account</h3>
@@ -761,8 +874,29 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
         </p></div>
       <section class="outlook-panel" id="outlookPanel" aria-label="Outlook" hidden></section>
     </section>
+    <section class="card set-group" aria-label="Slimme functies">
+      <h3>Slimme functies</h3>
+      <div class="set-row"><i data-ic="sparkles"></i><div class="set-text"><strong>Leadnex AI</strong><span id="aiStatus">Nog niet gecontroleerd.</span></div>
+        <div class="btns"><button type="button" class="btn small" id="aiHelpBtn" aria-expanded="false" hidden>Zo zet je het aan</button><button type="button" class="btn small" id="aiCheckBtn">Opnieuw controleren</button></div></div>
+      <div class="ai-help" id="aiHelp" hidden>
+        <ol>
+          <li>Maak op <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> een API-sleutel aan, zet er tegoed op en stel een maandlimiet in.</li>
+          <li>Open je project in Supabase en kies <strong>Edge Functions</strong> → <strong>Deploy a new function</strong> → <strong>Via editor</strong>. Noem de functie <code>leadnex-ai</code>, plak de code uit <a href="https://github.com/Silvan-Hevotec/koude-acquisitie/blob/main/supabase/functions/leadnex-ai/index.ts" target="_blank" rel="noopener">supabase/functions/leadnex-ai/index.ts</a> en klik op <strong>Deploy</strong>.</li>
+          <li>Zet bij de functie <strong>Verify JWT with legacy secret</strong> uit. De functie controleert zelf of je bent ingelogd.</li>
+          <li>Voeg bij <strong>Edge Functions</strong> → <strong>Secrets</strong> het geheim <code>ANTHROPIC_API_KEY</code> toe, met je sleutel als waarde.</li>
+          <li>Tik hier op <strong>Opnieuw controleren</strong>.</li>
+        </ol>
+        <p class="hint">Verslagen en vragen gaan dan voor de verwerking naar Anthropic (Claude). Je collega's gebruiken dezelfde sleutel, maar zien alleen hun eigen bedrijven.</p>
+      </div>
+      <div class="set-row"><i data-ic="alarm-clock"></i><div class="set-text"><strong>Bouwvak</strong><span>Voor slimme datums zoals "belt na de bouwvak terug".</span></div>
+        <select class="input set-sel" id="bouwvakSel" aria-label="Bouwvak-regio"></select></div>
+      <div class="set-row"><i data-ic="navigation-2"></i><div class="set-text"><strong>In de buurt</strong><span>Afstand voor het filter In de buurt bij Bedrijven.</span></div>
+        <select class="input set-sel" id="buurtSel" aria-label="Afstand voor In de buurt"></select></div>
+    </section>
     <section class="card set-group" aria-label="Gegevens">
       <h3>Gegevens</h3>
+      <div class="set-row"><i data-ic="merge"></i><div class="set-text"><strong>Dubbele bedrijven</strong><span id="dupStatus">Zoeken…</span></div>
+        <button type="button" class="btn small" id="dupBtn">Bekijken</button></div>
       <div class="set-row"><i data-ic="file-spreadsheet"></i><div class="set-text"><strong>Importeren uit Excel</strong><span>Een lijst met bedrijven inlezen uit Excel of CSV.</span></div>
         <button type="button" class="btn small" id="importBtn" hidden>Importeren</button></div>
       <div class="set-row"><i data-ic="download"></i><div class="set-text"><strong>Exporteren</strong><span>Alle bedrijven als CSV-bestand, te openen in Excel.</span></div>
@@ -814,6 +948,11 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   })();
   const VIEWS = new Set(['alles', 'acties', 'vandaag', 'kaart', 'archief']);
   const OUTCOMES = ['Geen gehoor', 'Terugbellen', 'Interesse', 'Geen interesse'];
+  const STATUSES = [['lead', 'Lead'], ['prospect', 'Potentiële klant'], ['klant', 'Klant']];
+  const SOORTEN = ['Bezoek', 'Telefoon', 'Overig'];
+  const INTERESSE = [['', 'Onbekend'], ['hoog', 'Hoog'], ['middel', 'Middel'], ['laag', 'Laag'], ['geen', 'Geen']];
+  const HERINNERING = [[0, 'Geen'], [15, '15 minuten vooraf'], [30, 'Een half uur vooraf'], [60, 'Een uur vooraf'], [1440, 'Een dag vooraf']];
+  const BUURT_KM = [2, 5, 10, 25, 50];
   const PLACEHOLDERS = ['{aanhef}', '{voornaam}', '{bedrijf}', '{plaats}'];
   const MAX_LEADS = 1000;
   const FREE_MAIL = new Set(['gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.nl', 'outlook.com', 'outlook.nl', 'live.nl', 'live.com', 'msn.com',
@@ -840,7 +979,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 
   const $ = id => document.getElementById(id);
   // Pictogrammen: Lucide (ISC-licentie), alleen de vormen die de app gebruikt.
-  const ICONS = {"phone": "<path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "mail": "<path d=\"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7\" /> <rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" />", "message-circle": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "navigation": "<polygon points=\"3 11 22 2 13 21 11 13 3 11\" />", "calendar-check": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"m9 15 2 2 4-4\" />", "calendar": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "list": "<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "ellipsis": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />", "settings": "<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "camera": "<path d=\"M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z\" /> <circle cx=\"12\" cy=\"13\" r=\"3\" />", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <circle cx=\"9\" cy=\"9\" r=\"2\" /> <path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\" />", "clipboard-paste": "<path d=\"M11 14h10\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v1.344\" /> <path d=\"m17 18 4-4-4-4\" /> <path d=\"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113\" /> <rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" />", "search": "<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "upload": "<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />", "download": "<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />", "archive": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />", "archive-restore": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h2\" /> <path d=\"M20 8v11a2 2 0 0 1-2 2h-2\" /> <path d=\"m9 15 3-3 3 3\" /> <path d=\"M12 12v9\" />", "trash-2": "<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "log-out": "<path d=\"m16 17 5-5-5-5\" /> <path d=\"M21 12H9\" /> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 6v6l4 2\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /> <path d=\"m21.854 2.147-10.94 10.939\" />", "scan-line": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\" /> <path d=\"M17 3h2a2 2 0 0 1 2 2v2\" /> <path d=\"M21 17v2a2 2 0 0 1-2 2h-2\" /> <path d=\"M7 21H5a2 2 0 0 1-2-2v-2\" /> <path d=\"M7 12h10\" />", "contact": "<path d=\"M16 2v2\" /> <path d=\"M7 21v-2a2 2 0 012-2h6a2 2 0 012 2v2\" /> <path d=\"M8 2v2\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />", "house": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "flashlight": "<path d=\"M12 13v1\" /> <path d=\"M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z\" /> <path d=\"M6 6h12\" />", "locate-fixed": "<line x1=\"2\" x2=\"5\" y1=\"12\" y2=\"12\" /> <line x1=\"19\" x2=\"22\" y1=\"12\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"5\" /> <line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\" /> <circle cx=\"12\" cy=\"12\" r=\"7\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "file-spreadsheet": "<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M8 13h2\" /> <path d=\"M14 13h2\" /> <path d=\"M8 17h2\" /> <path d=\"M14 17h2\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "wifi-off": "<path d=\"M12 20h.01\" /> <path d=\"M8.5 16.429a5 5 0 0 1 7 0\" /> <path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\" /> <path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\" /> <path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\" /> <path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\" /> <path d=\"m2 2 20 20\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m16 9-5.5 5.5L8 12\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "layout-list": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" /> <path d=\"M14 4h7\" /> <path d=\"M14 9h7\" /> <path d=\"M14 15h7\" /> <path d=\"M14 20h7\" />", "list-checks": "<path d=\"M13 5h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" />", "mail-plus": "<path d=\"M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8\" /> <path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" /> <path d=\"M19 16v6\" /> <path d=\"M16 19h6\" />", "phone-call": "<path d=\"M13 2a9 9 0 0 1 9 9\" /> <path d=\"M13 6a5 5 0 0 1 5 5\" /> <path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />"};
+  const ICONS = {"phone": "<path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "mail": "<path d=\"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7\" /> <rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" />", "message-circle": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "navigation": "<polygon points=\"3 11 22 2 13 21 11 13 3 11\" />", "calendar-check": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"m9 15 2 2 4-4\" />", "calendar": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "list": "<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "ellipsis": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />", "settings": "<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "camera": "<path d=\"M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z\" /> <circle cx=\"12\" cy=\"13\" r=\"3\" />", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <circle cx=\"9\" cy=\"9\" r=\"2\" /> <path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\" />", "clipboard-paste": "<path d=\"M11 14h10\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v1.344\" /> <path d=\"m17 18 4-4-4-4\" /> <path d=\"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113\" /> <rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" />", "search": "<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "upload": "<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />", "download": "<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />", "archive": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />", "archive-restore": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h2\" /> <path d=\"M20 8v11a2 2 0 0 1-2 2h-2\" /> <path d=\"m9 15 3-3 3 3\" /> <path d=\"M12 12v9\" />", "trash-2": "<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "log-out": "<path d=\"m16 17 5-5-5-5\" /> <path d=\"M21 12H9\" /> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 6v6l4 2\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /> <path d=\"m21.854 2.147-10.94 10.939\" />", "scan-line": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\" /> <path d=\"M17 3h2a2 2 0 0 1 2 2v2\" /> <path d=\"M21 17v2a2 2 0 0 1-2 2h-2\" /> <path d=\"M7 21H5a2 2 0 0 1-2-2v-2\" /> <path d=\"M7 12h10\" />", "contact": "<path d=\"M16 2v2\" /> <path d=\"M7 21v-2a2 2 0 012-2h6a2 2 0 012 2v2\" /> <path d=\"M8 2v2\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />", "house": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "flashlight": "<path d=\"M12 13v1\" /> <path d=\"M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z\" /> <path d=\"M6 6h12\" />", "locate-fixed": "<line x1=\"2\" x2=\"5\" y1=\"12\" y2=\"12\" /> <line x1=\"19\" x2=\"22\" y1=\"12\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"5\" /> <line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\" /> <circle cx=\"12\" cy=\"12\" r=\"7\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "file-spreadsheet": "<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M8 13h2\" /> <path d=\"M14 13h2\" /> <path d=\"M8 17h2\" /> <path d=\"M14 17h2\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "wifi-off": "<path d=\"M12 20h.01\" /> <path d=\"M8.5 16.429a5 5 0 0 1 7 0\" /> <path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\" /> <path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\" /> <path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\" /> <path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\" /> <path d=\"m2 2 20 20\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m16 9-5.5 5.5L8 12\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "layout-list": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" /> <path d=\"M14 4h7\" /> <path d=\"M14 9h7\" /> <path d=\"M14 15h7\" /> <path d=\"M14 20h7\" />", "list-checks": "<path d=\"M13 5h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" />", "mail-plus": "<path d=\"M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8\" /> <path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" /> <path d=\"M19 16v6\" /> <path d=\"M16 19h6\" />", "phone-call": "<path d=\"M13 2a9 9 0 0 1 9 9\" /> <path d=\"M13 6a5 5 0 0 1 5 5\" /> <path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />", "mic": "<path d=\"M12 19v3\" /> <path d=\"M19 10v2a7 7 0 0 1-14 0v-2\" /> <rect x=\"9\" y=\"2\" width=\"6\" height=\"13\" rx=\"3\" />", "square": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" />", "merge": "<path d=\"m8 6 4-4 4 4\" /> <path d=\"M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22\" /> <path d=\"m20 22-5-5\" />", "history": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" /> <path d=\"M12 7v5l4 2\" />", "notebook-pen": "<path d=\"M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4\" /> <path d=\"M2 6h4\" /> <path d=\"M2 10h4\" /> <path d=\"M2 14h4\" /> <path d=\"M2 18h4\" /> <path d=\"M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z\" />", "message-circle-question": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" /> <path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\" /> <path d=\"M12 17h.01\" />", "refresh-cw": "<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\" /> <path d=\"M21 3v5h-5\" /> <path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\" /> <path d=\"M8 16H3v5\" />", "alarm-clock": "<circle cx=\"12\" cy=\"13\" r=\"8\" /> <path d=\"M12 9v4l2 2\" /> <path d=\"M5 3 2 6\" /> <path d=\"m22 6-3-3\" /> <path d=\"M6.38 18.7 4 21\" /> <path d=\"M17.64 18.67 20 21\" />", "navigation-2": "<polygon points=\"12 2 19 21 12 17 5 21 12 2\" />", "copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\" /> <path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\" />"};
   const ic = (n, cls = '') => `<svg class="ic${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
   document.querySelectorAll('i[data-ic]').forEach(el => { el.outerHTML = ic(el.dataset.ic); });
   const PIN = '<svg viewBox="0 0 30 40" aria-hidden="true"><path class="b" d="M15 38.5C15 38.5 3 25.6 3 15a12 12 0 0 1 24 0c0 10.6-12 23.5-12 23.5z"/><circle class="c" cx="15" cy="15" r="5"/></svg>';
@@ -865,6 +1004,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     view: VIEWS.has(pref.get('view')) ? pref.get('view') : 'alles',
     actie: pref.get('actie') || '', branche: pref.get('branche') || '',
     search: '', open: null, mode: 'edit', selecting: false, selected: new Set(), pendingMail: null, local: false,
+    status: ['lead', 'prospect', 'klant'].includes(pref.get('statusFilter')) ? pref.get('statusFilter') : '', buurt: pref.get('buurt') === '1',
   };
   const drafts = {}, finishes = {};
   const mail = { open: false, ids: [], mode: 'bcc', tplId: '', onderwerp: '', tekst: '', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false, sending: null };
@@ -887,6 +1027,10 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   const byName = (a, b) => cmp(a.bedrijf, b.bedrijf);
   const sortNames = list => [...list].sort(cmp);
   const validPrio = v => (v === 'hoog' || v === 'laag') ? v : 'normaal';
+  const validStatus = v => v === 'prospect' || v === 'klant' ? v : 'lead';
+  const statusLabel = v => STATUSES.find(x => x[0] === v)[1];
+  const validInteresse = v => INTERESSE.some(x => x[0] === v) ? v : '';
+  const validHerinnering = v => HERINNERING.some(x => x[0] === v) ? v : 30;
   const mapPrio = v => { const k = String(v || '').trim().toLowerCase(); return /^(hoog|high|warm|heet|a|1)$/.test(k) ? 'hoog' : /^(laag|low|koud|c|3)$/.test(k) ? 'laag' : 'normaal'; };
   const mailable = l => !!l && !l.geenMail && /\S+@\S+\.\S+/.test(l.email || '');
 
@@ -1105,7 +1249,26 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       gearchiveerd: d.gearchiveerd === true, gearchiveerdOp: parseISO(d.gearchiveerdOp) ? str(d.gearchiveerdOp).slice(0, 10) : '',
       aangemaakt: str(d.aangemaakt), gewijzigd: str(d.gewijzigd), voorbeeld: d.voorbeeld === true, outlookId: str(d.outlookId),
       website: str(d.website).trim(), branche: str(d.branche).trim(), geo: validGeo(d.geo),
+      status: validStatus(d.status), verslagen: normalizeVerslagen(d.verslagen), herinnering: validHerinnering(d.herinnering), voorbereiding: validPrep(d.voorbereiding),
     };
+  }
+  // Klantverslagen: nieuwste eerst. tekst is de (nette) notitie, ruw de oorspronkelijk ingesproken tekst.
+  const strList = (v, n, max) => Array.isArray(v) ? v.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim().slice(0, max)).slice(0, n) : [];
+  const byVerslag = (a, b) => b.datum.localeCompare(a.datum) || b.gemaakt.localeCompare(a.gemaakt);
+  function normalizeVerslagen(arr) {
+    if (!Array.isArray(arr)) return [];
+    return arr.filter(v => v && typeof v.tekst === 'string' && v.tekst.trim() && parseISO(v.datum)).map(v => ({
+      id: str(v.id).slice(0, 24) || Math.random().toString(36).slice(2, 10), datum: v.datum.slice(0, 10), soort: SOORTEN.includes(v.soort) ? v.soort : 'Overig',
+      tekst: v.tekst.slice(0, 6000), ruw: str(v.ruw).slice(0, 12000), machines: strList(v.machines, 20, 80), interesse: validInteresse(v.interesse),
+      afspraken: str(v.afspraken).slice(0, 1000), vragen: strList(v.vragen, 8, 300), door: v.door === 'ai' ? 'ai' : '', gemaakt: str(v.gemaakt),
+    })).sort(byVerslag).slice(0, 200);
+  }
+  const verslagBody = v => { const b = { id: v.id, datum: v.datum, soort: v.soort, tekst: v.tekst, gemaakt: v.gemaakt }; for (const k of ['ruw', 'interesse', 'afspraken', 'door']) if (v[k]) b[k] = v[k]; for (const k of ['machines', 'vragen']) if (v[k].length) b[k] = v[k]; return b; };
+  // Gespreksvoorbereiding van Leadnex AI, bewaard bij het bedrijf. sig zegt op welke gegevens hij gebaseerd is.
+  function validPrep(p) {
+    if (!p || typeof p !== 'object' || typeof p.sig !== 'string') return null;
+    return { sig: p.sig, samenvatting: str(p.samenvatting).slice(0, 1500), laatsteContact: str(p.laatsteContact).slice(0, 300), machines: strList(p.machines, 12, 80),
+      afspraken: strList(p.afspraken, 8, 300), interesse: str(p.interesse).slice(0, 300), vragen: strList(p.vragen, 6, 300), gemaakt: str(p.gemaakt) };
   }
   // Plek op de kaart: coördinaten, of onthouden dat het adres niet gevonden is. q is het adres waarvoor gezocht is.
   function validGeo(g) {
@@ -1120,14 +1283,17 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       website: l.website || '', branche: l.branche || '',
       actie: l.actie || '', datum: l.datum || '', tijd: l.tijd || '', prioriteit: validPrio(l.prioriteit), notitie: l.notitie || '', geenMail: !!l.geenMail,
       log: logBody(l.log || []), gearchiveerd: !!l.gearchiveerd, gearchiveerdOp: l.gearchiveerdOp || '',
-      aangemaakt: l.aangemaakt, gewijzigd: l.gewijzigd,
+      aangemaakt: l.aangemaakt, gewijzigd: l.gewijzigd, status: validStatus(l.status),
     };
+    if (l.verslagen && l.verslagen.length) b.verslagen = l.verslagen.map(verslagBody);
+    if (l.tijd && validHerinnering(l.herinnering) !== 30) b.herinnering = validHerinnering(l.herinnering);
+    if (validPrep(l.voorbereiding)) b.voorbereiding = validPrep(l.voorbereiding);
     if (l.voorbeeld) b.voorbeeld = true;
     if (l.outlookId) b.outlookId = l.outlookId;
     if (validGeo(l.geo)) b.geo = validGeo(l.geo);
     return b;
   }
-  const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, website: l.website, branche: l.branche, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail });
+  const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, website: l.website, branche: l.branche, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail, status: l.status, herinnering: String(l.herinnering) });
 
   let toastTimer = 0;
   function toast(msg, ms = 3600) {
@@ -1222,6 +1388,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       adres: $('addAdres').value.trim(), plaats: canonPlaats($('addPlaats').value),
       website: cleanWebsite($('addWebsite').value), branche: canonBranche($('addBranche').value),
       actie, datum, tijd: '', prioriteit: validPrio($('addPrio').value), notitie: '', geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now,
+      status: validStatus($('addStatus').value),
     };
     addBtn.disabled = true;
     const ok = await write(() => col.doc().set(toBody(lead)));
@@ -1250,6 +1417,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       website: cleanWebsite(d.website), branche: canonBranche(d.branche),
       actie, datum: actie && parseISO(d.datum) ? d.datum : '', notitie: d.notitie.trim(), geenMail: !!d.geenMail, gewijzigd: nowISO(),
       tijd: actie && parseISO(d.datum) && /^\d{2}:\d{2}$/.test(d.tijd || '') ? d.tijd : '', prioriteit: validPrio(d.prioriteit),
+      status: validStatus(d.status), herinnering: validHerinnering(+d.herinnering),
     };
     const ok = await write(() => col.doc(id).set(toBody(next)));
     if (!ok) return false;
@@ -1257,7 +1425,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     closeRow(true);
     renderAll();
     if (opts.agenda) addToCalendar(next);
-    else if (l.outlookId && next.datum && outlookOn() && ['datum', 'tijd', 'actie', 'bedrijf', 'adres', 'plaats'].some(k => l[k] !== next[k])) outlookEvent(next, true);
+    else if (l.outlookId && next.datum && outlookOn() && ['datum', 'tijd', 'actie', 'bedrijf', 'adres', 'plaats', 'herinnering'].some(k => l[k] !== next[k])) outlookEvent(next, true);
     else toast('Opgeslagen.');
     return true;
   }
@@ -1298,6 +1466,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const next = {
       ...l, log: [{ d: today, a: l.actie || f.via || '', u: f.uitkomst, t: tekst }, ...l.log].slice(0, 100), actie, datum, tijd,
       gearchiveerd: archive, gearchiveerdOp: archive ? today : '', gewijzigd: nowISO(), outlookId: '',
+      status: f.uitkomst === 'Interesse' && l.status === 'lead' ? 'prospect' : l.status,
     };
     const ok = await write(() => col.doc(id).set(toBody(next)));
     if (!ok) return;
@@ -1305,7 +1474,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     closeRow(true);
     renderAll();
     if (archive) toast(`${l.bedrijf} vastgelegd en naar het archief verplaatst.`);
-    else if (actie) toast(`Vastgelegd. Volgende: ${actie}${datum ? ` op ${shortDate(datum)}` : ' (nog zonder datum)'}.`);
+    else if (actie) toast(`Vastgelegd. Volgende: ${actie}${datum ? ` op ${shortDate(datum)}` : ' (nog zonder datum)'}${next.status !== l.status ? '. Status: potentiële klant' : ''}.`);
     else toast('Vastgelegd. Er staat nog geen volgende actie.');
     if (f.agenda && actie && datum) addToCalendar(next);
     if (sess.on && sessCurrent() === id) { sess.done++; setTimeout(nextInSession, 300); }
@@ -1373,15 +1542,16 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   }
   async function exportCsv() {
     if (!state.leads.length) return;
-    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Branche', 'Website', 'Actie', 'Datum', 'Tijd', 'Prioriteit', 'Notitie', 'Geen mail', 'Contactmomenten', 'Gearchiveerd', 'Laatst gewijzigd'];
+    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Branche', 'Website', 'Actie', 'Datum', 'Tijd', 'Prioriteit', 'Status', 'Notitie', 'Geen mail', 'Contactmomenten', 'Klantverslagen', 'Gearchiveerd', 'Laatst gewijzigd'];
     const cell = v => {
       let s = String(v ?? '');
       if (/^[=@]/.test(s) || /^[+\-](?![\d\s(])/.test(s)) s = "'" + s;
       return '"' + s.replace(/"/g, '""') + '"';
     };
     const lines = [head, ...[...state.leads].sort(byName).map(l => [
-      l.bedrijf, l.contact, l.email, l.telefoon, l.adres, l.plaats, l.branche, l.website, l.actie, l.datum, l.tijd, l.prioriteit, l.notitie, l.geenMail ? 'ja' : '',
+      l.bedrijf, l.contact, l.email, l.telefoon, l.adres, l.plaats, l.branche, l.website, l.actie, l.datum, l.tijd, l.prioriteit, statusLabel(l.status), l.notitie, l.geenMail ? 'ja' : '',
       l.log.map(x => `${x.d} ${x.a}${x.u ? ': ' + x.u : ''}${x.t ? ' (' + x.t + ')' : ''}`).join(' | '),
+      l.verslagen.map(v => `${v.datum} ${v.soort}: ${v.tekst.replace(/\s+/g, ' ')}${v.machines.length ? ' [' + v.machines.join(', ') + ']' : ''}`).join(' | '),
       l.gearchiveerd ? `ja (${l.gearchiveerdOp})` : '', l.gewijzigd.slice(0, 10),
     ])].map(r => r.map(cell).join(';'));
     saveFile(`leadnex-${todayISO()}.csv`, '\ufeff' + lines.join('\r\n'), 'text/csv;charset=utf-8');
@@ -1409,8 +1579,10 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     lines.push(`SUMMARY:${e(title)}`);
     if (loc) lines.push(`LOCATION:${e(loc)}`);
     if (desc) lines.push(`DESCRIPTION:${e(desc)}`);
-    // Herinnering: met tijd een half uur vooraf, zonder tijd om 08:05 die dag.
-    lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${e(title)}`, l.tijd ? 'TRIGGER:-PT30M' : 'TRIGGER:PT8H5M', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR');
+    // Herinnering: met tijd zoals ingesteld (standaard een half uur vooraf), zonder tijd om 08:05 die dag.
+    const h = validHerinnering(l.herinnering);
+    if (!l.tijd || h) lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${e(title)}`, !l.tijd ? 'TRIGGER:PT8H5M' : h === 1440 ? 'TRIGGER:-P1D' : `TRIGGER:-PT${h}M`, 'END:VALARM');
+    lines.push('END:VEVENT', 'END:VCALENDAR');
     return lines.map(fold).join('\r\n') + '\r\n';
   }
   function addToCalendar(l) {
@@ -2001,10 +2173,12 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const filtered = state.view !== 'vandaag';   // Vandaag toont altijd alles wat moet gebeuren
     if (filtered && q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie, l.website, l.branche].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
     if (filtered && state.branche && key(l.branche) !== key(state.branche)) return false;
+    if (filtered && state.status && l.status !== state.status) return false;
     if (state.view === 'archief') return !!l.gearchiveerd;
     if (l.gearchiveerd) return false;
     if (state.view === 'vandaag') return isDue(l, todayISO());
     if (state.view === 'kaart') return !kaart.alleenActie || !!l.actie;
+    if (buurtActive() && kaart.here && (!onMap(l) || distKm(kaart.here, l.geo) > buurtKm())) return false;
     if (state.view === 'acties') return !!l.actie && (!state.actie || key(l.actie) === key(state.actie));
     return true;
   }
@@ -2073,6 +2247,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const added = l.aangemaakt ? `<p class="meta">Toegevoegd op ${esc(shortDate(l.aangemaakt.slice(0, 10)))}</p>` : '';
     const archived = l.gearchiveerd && l.gearchiveerdOp ? `<p class="meta">Gearchiveerd op ${esc(shortDate(l.gearchiveerdOp))}</p>` : '';
     return `<div class="panel">
+      ${prepHtml(l)}
+      ${verslagenHtml(l)}
       <div class="pform">
         <div class="pgrid">
           ${input('bedrijf', 'Bedrijfsnaam', 'span2')}
@@ -2087,8 +2263,11 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
           <div class="field span2"><label for="p-${id}-datum">Wanneer</label>${whenHtml(`p-${id}-datum`, d.datum, ` data-field="datum"${ro}`, state.readOnly)}</div>
           <div class="field span2"><label for="p-${id}-tijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="p-${id}-tijd" data-field="tijd" value="${esc(d.tijd || '')}"${ro}></div>
           <div class="field span2"><label for="p-${id}-prioriteit">Prioriteit</label><select class="input" id="p-${id}-prioriteit" data-field="prioriteit"${state.readOnly ? ' disabled' : ''}>${prioOptions(d.prioriteit)}</select></div>
+          <div class="field span2"><label for="p-${id}-status">Status</label><select class="input" id="p-${id}-status" data-field="status"${state.readOnly ? ' disabled' : ''}>${statusOptions(d.status)}</select></div>
+          <div class="field span2"><label for="p-${id}-herinnering">Herinnering<span class="opt">bij een tijd</span></label><select class="input" id="p-${id}-herinnering" data-field="herinnering"${state.readOnly ? ' disabled' : ''}>${HERINNERING.map(([m, t]) => `<option value="${m}"${String(m) === String(d.herinnering) ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
           <div class="field span4"><label for="p-${id}-notitie">Notitie</label>
-            <textarea class="input" id="p-${id}-notitie" data-field="notitie" maxlength="2000" placeholder="Wat weet je over dit bedrijf?"${ro}>${esc(d.notitie)}</textarea></div>
+            <textarea class="input" id="p-${id}-notitie" data-field="notitie" maxlength="2000" placeholder="Wat weet je over dit bedrijf?"${ro}>${esc(d.notitie)}</textarea>
+            ${state.readOnly ? '' : `<p class="suggest smart" id="nsug-${id}"${suggestLine(d.notitie, 'n-sug', `nsug-${id}-b`) ? '' : ' hidden'}>${suggestLine(d.notitie, 'n-sug', `nsug-${id}-b`)}</p>`}</div>
           <label class="check span4" for="p-${id}-geenMail"><input type="checkbox" id="p-${id}-geenMail" data-field="geenMail"${d.geenMail ? ' checked' : ''}${state.readOnly ? ' disabled' : ''}>Wil geen mail ontvangen (wordt overgeslagen bij mailen)</label>
         </div>
         ${maps}
@@ -2114,8 +2293,10 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
         ${f.hint ? `<p class="suggest" role="status">${esc(f.hint)}</p>` : ''}
         <div class="field">
           <label for="f-${id}-tekst">Eigen uitkomst of toelichting<span class="opt">optioneel</span></label>
-          <input class="input" id="f-${id}-tekst" data-ffield="tekst" maxlength="200" value="${esc(f.tekst)}" placeholder="Bijv. sprak met de receptie, mailadres gekregen">
+          <input class="input" id="f-${id}-tekst" data-ffield="tekst" maxlength="200" value="${esc(f.tekst)}" placeholder="Bijv. sprak met de receptie, belt na de bouwvak terug">
+          <p class="suggest smart" id="fsug-${id}"${suggestLine(f.tekst, 'f-sug', `fsug-${id}-b`) ? '' : ' hidden'}>${suggestLine(f.tekst, 'f-sug', `fsug-${id}-b`)}</p>
         </div>
+        ${state.readOnly ? '' : `<button type="button" class="linkbtn vlink" id="fv-${id}" data-act="v-from-finish">${ic('mic')}Uitgebreid klantverslag inspreken</button>`}
       </section>
       <section class="step" aria-label="Volgende stap">
         <h3>Volgende stap</h3>
@@ -2149,8 +2330,9 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const contactCell = (l.telefoon || l.email)
       ? `<div class="cell contactinfo">${l.telefoon ? `<span class="telline">${pick(l.telefoon, 'Telefoonnummer', true)}${callLink(l)}${waLink(l)}</span>` : ''}${l.email ? pick(l.email, 'E-mailadres', false) : ''}${l.geenMail ? '<span class="meta">Wil geen mail</span>' : ''}</div>`
       : `<div class="cell contactinfo none"><span class="faint">–</span></div>`;
+    const dist = state.view === 'kaart' ? kaart.dist.get(l.id) : buurtActive() ? distTo(l) : null;
     const plaatsCell = (l.plaats || l.adres)
-      ? `<div class="cell plaats">${l.plaats ? `<span>${esc(l.plaats)}${state.view === 'kaart' && kaart.dist.has(l.id) ? ` <span class="dist">${fmtKm(kaart.dist.get(l.id))}</span>` : ''}</span>` : ''}${l.adres ? `<span class="meta">${esc(l.adres)}</span>` : ''}</div>`
+      ? `<div class="cell plaats">${l.plaats ? `<span>${esc(l.plaats)}${dist != null ? ` <span class="dist">${fmtKm(dist)}</span>` : ''}</span>` : ''}${l.adres ? `<span class="meta">${esc(l.adres)}</span>` : ''}</div>`
       : `<div class="cell plaats none"><span class="faint">–</span></div>`;
     let actie;
     if (l.gearchiveerd) actie = `<span class="faint">Gearchiveerd${l.gearchiveerdOp ? ' ' + esc(shortDate(l.gearchiveerdOp)) : ''}</span>`;
@@ -2166,7 +2348,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       <div class="row-main cols" data-act="toggle">
         <div class="cell first">${check}
           <button type="button" class="bedrijf" id="t-${id}" data-act="toggle" aria-expanded="${open && !finishing}">
-            <span class="name">${esc(l.bedrijf)}${prioBadge(l)}${l.voorbeeld ? '<span class="tag">Voorbeeld</span>' : ''}</span>
+            <span class="name">${esc(l.bedrijf)}${prioBadge(l)}${statusBadge(l)}${l.voorbeeld ? '<span class="tag">Voorbeeld</span>' : ''}</span>
             ${l.contact || l.branche ? `<span class="sub">${esc(l.contact)}${l.contact && l.branche ? ' · ' : ''}${l.branche ? `<span class="faint">${esc(l.branche)}</span>` : ''}</span>` : ''}
             ${info ? `<span class="meta">${esc(info)}</span>` : ''}
           </button>
@@ -2207,6 +2389,10 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const resetBtn = '<button type="button" class="btn" data-act="reset">Toon alle bedrijven</button>';
     if (!list.length && state.search.trim()) return emptyHtml('Geen bedrijven gevonden', 'Niets past bij je zoekterm.', resetBtn);
 
+    if (state.view === 'alles' && buurtActive() && kaart.here) {
+      if (!list.length) return emptyHtml('Niets in de buurt', `Er staan geen bedrijven binnen ${buurtKm()} km van je huidige plek. Kies in Meer een grotere afstand.`);
+      return sessStartHtml(list.filter(callable).length) + list.sort((a, b) => distTo(a) - distTo(b)).map(rowHtml).join('');
+    }
     if (state.view === 'alles') {
       if (!list.length) return emptyHtml('Alle bedrijven staan in het archief', 'Voeg hierboven een nieuw bedrijf toe of zet er een terug vanuit het archief.');
       const due = list.filter(l => isDue(l, today)).sort(byPrioDate);
@@ -2300,6 +2486,11 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const bcount = b => state.leads.filter(l => !l.gearchiveerd && key(l.branche) === key(b)).length;
     bsel.innerHTML = `<option value="">Alle branches</option>` + branches.map(b => `<option value="${esc(b)}"${key(b) === key(state.branche) ? ' selected' : ''}>${esc(b)} (${bcount(b)})</option>`).join('');
     bsel.classList.toggle('on', !!state.branche);
+    const ssel = $('statusSel'), scount = v => state.leads.filter(l => !l.gearchiveerd && l.status === v).length;
+    ssel.innerHTML = `<option value="">Leads en klanten</option>` + [['lead', 'Leads'], ['prospect', 'Potentiële klanten'], ['klant', 'Klanten']]
+      .map(([v, t]) => `<option value="${v}"${v === state.status ? ' selected' : ''}>${t} (${scount(v)})</option>`).join('');
+    ssel.classList.toggle('on', !!state.status);
+    ssel.hidden = state.page !== 'bedrijven';
     const plaatsen = new Map();
     state.leads.forEach(l => { if (l.plaats && !plaatsen.has(key(l.plaats))) plaatsen.set(key(l.plaats), l.plaats); });
     plaatsListEl.innerHTML = sortNames([...plaatsen.values()]).map(x => `<option value="${esc(x)}"></option>`).join('');
@@ -2352,7 +2543,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     });
   }
 
-  function renderAll() { renderMeta(); renderNav(); renderPage(); renderRows(); renderKaart(); renderSelBar(); renderSessBar(); if (mail.open) renderMailOut(); }
+  function renderAll() { renderMeta(); renderNav(); renderPage(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderAsk(); renderDup(); renderAi(); if (mail.open) renderMailOut(); }
   let renderQueued = false;
   function scheduleRender() {
     if (renderQueued) return;
@@ -2361,7 +2552,11 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   }
 
   function closeRow(silent) {
-    if (state.open) { delete drafts[state.open]; delete finishes[state.open]; }
+    stopDictation();
+    if (state.open) {
+      delete drafts[state.open]; delete finishes[state.open];
+      if (vdrafts[state.open] && !vdrafts[state.open].tekst.trim()) delete vdrafts[state.open];   // half ingesproken verslag blijft bewaard
+    }
     state.open = null;
     disarm();
     if (!silent) renderRows();
@@ -2376,6 +2571,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (state.mode === 'edit') drafts[id] = draftFrom(l);
     else finishes[id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false, via, hint: '' };
     renderRows();
+    if (state.mode === 'edit') requestPrep(id);
   }
   // Zorgt dat een bedrijf in de lijst te zien is: anders naar Alles (of Archief), zonder zoekterm en branchefilter.
   function revealLead(l) {
@@ -2400,6 +2596,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     closeRow(true);
     state.open = id; state.mode = 'edit'; drafts[id] = draftFrom(l);
     renderAll();
+    requestPrep(id);
     document.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 
@@ -2509,7 +2706,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   function renderKaart() {
     const panel = $('kaartPanel'), on = state.page === 'kaart' && !state.problem;
     panel.hidden = !on;
-    if (!on) { stopLocating(); return; }
+    if (!on) { if (!buurtActive()) stopLocating(); return; }
     pref.set('kaart', '1');
     if (!document.hidden) startLocating();
     scheduleGeocode();
@@ -3240,6 +3437,703 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     else toast(`${done} ${plural(done, 'bedrijf', 'bedrijven')} geïmporteerd.`);
   }
 
+  /* ---------- slimme datums: "na de bouwvak", "volgende week dinsdag om 10 uur" ---------- */
+  // Adviesdata bouwvak van Bouwend Nederland, als weeknummers: maandag van de eerste t/m vrijdag van de laatste week.
+  // Regio Noord: Groningen, Friesland, Drenthe, Overijssel, Flevoland en Noord-Holland.
+  const BOUWVAK = { 2026: { noord: [30, 32], midden: [32, 34], zuid: [31, 33] }, 2027: { noord: [30, 32], midden: [31, 33], zuid: [32, 34] } };
+  const REGIOS = [['noord', 'Noord'], ['midden', 'Midden'], ['zuid', 'Zuid']];
+  const bouwvakRegio = () => REGIOS.some(r => r[0] === pref.get('bouwvak')) ? pref.get('bouwvak') : 'noord';
+  function weekMonday(year, week) { const d = new Date(year, 0, 4); d.setDate(d.getDate() - ((d.getDay() + 6) % 7) + (week - 1) * 7); return d; }
+  function bouwvak(year, regio = bouwvakRegio()) {
+    const w = (BOUWVAK[year] || {})[regio] || [31, 33];   // jaar zonder advies: ongeveer midden in de zomer
+    const start = weekMonday(year, w[0]), end = weekMonday(year, w[1]);
+    end.setDate(end.getDate() + 4);
+    return { start: isoOf(start), end: isoOf(end), bekend: !!BOUWVAK[year] };
+  }
+  function easter(y) {
+    const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    return new Date(y, Math.floor((h + l - 7 * m + 114) / 31) - 1, ((h + l - 7 * m + 114) % 31) + 1);
+  }
+  const holidayCache = new Map();
+  function holidays(y) {
+    if (!holidayCache.has(y)) {
+      const e = easter(y), off = n => isoOf(new Date(e.getFullYear(), e.getMonth(), e.getDate() + n));
+      const koning = new Date(y, 3, 27).getDay() === 0 ? `${y}-04-26` : `${y}-04-27`;
+      holidayCache.set(y, new Set([`${y}-01-01`, off(1), koning, off(39), off(50), `${y}-12-25`, `${y}-12-26`, ...(y % 5 === 0 ? [`${y}-05-05`] : [])]));
+    }
+    return holidayCache.get(y);
+  }
+  const isWorkday = iso => { const d = parseISO(iso); return d.getDay() % 6 !== 0 && !holidays(d.getFullYear()).has(iso); };
+  function workdayFrom(iso) { let d = iso; for (let i = 0; i < 10 && !isWorkday(d); i++) d = addDays(d, 1); return d; }
+  function lastWorkdayOf(y, m) { let d = isoOf(new Date(y, m + 1, 0)); for (let i = 0; i < 10 && !isWorkday(d); i++) d = addDays(d, -1); return d; }
+  const MAANDEN = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+  const MAAND_RE = '(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december|jan|feb|mrt|apr|jun|jul|aug|sept|sep|okt|nov|dec)\\b';
+  const maandNr = s => s === 'mrt' ? 2 : MAANDEN.findIndex(m => m.startsWith(s.slice(0, 3)));
+  const DAGNAMEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+  const GETAL = { een: 1, 'één': 1, twee: 2, drie: 3, vier: 4, vijf: 5, zes: 6, acht: 8, tien: 10, twaalf: 12, 'een paar': 3 };
+  function planActie(t) {
+    if (/\b(terugbellen|nabellen|bel(t|len)?\b.{0,40}\bterug|terug te bellen|contact opnemen)\b/.test(t)) return canonAction('Bellen');
+    if (/offerte|prijsopgave/.test(t)) return canonAction('Offerte sturen');
+    if (/\b(demo|langs(komen)?|bezoek(en)?|afspraak|komen kijken|showroom|proefdraaien)\b/.test(t)) return canonAction('Bezoek');
+    if (/\b(mailen|brochure|info(rmatie)? (sturen|toesturen|opsturen)|toesturen|opsturen)\b/.test(t)) return canonAction('Mailen');
+    return canonAction('Bellen');
+  }
+  function findTime(t) {
+    let m = /\b(\d{1,2}):(\d{2})\b/.exec(t) || /\b(\d{1,2})\.(\d{2}) ?uur\b/.exec(t) || /\b(?:om|rond|vanaf|tegen) (\d{1,2})(?: ?uur)?\b(?![:.\-\/]?\d)/.exec(t) || /\b(\d{1,2}) ?uur\b/.exec(t);
+    let h, mi = 0;
+    if (m) { h = +m[1]; mi = +(m[2] || 0); }
+    else if ((m = /\bhalf (\d{1,2})\b/.exec(t))) { h = +m[1] - 1; mi = 30; }
+    else return '';
+    if (h >= 1 && h <= 6 && !/ochtends|morgens/.test(t)) h += 12;   // "om 3 uur" is binnen werktijd 15:00
+    return h <= 23 && mi <= 59 ? `${pad(h)}:${pad(mi)}` : '';
+  }
+  // Herkent datums en tijden in gewone taal. Geeft voorstellen terug, de meest concrete eerst.
+  function suggestDates(text, today = todayISO()) {
+    const t = ' ' + key(text).replace(/[,;!?()]/g, ' ').replace(/\s+/g, ' ') + ' ';
+    const out = [], tdy = parseISO(today), y = tdy.getFullYear(), tijd = findTime(t);
+    const add = (iso, label, exact, tm = '') => {
+      if (!iso) return;
+      const d = exact ? iso : workdayFrom(iso);
+      if (d < today || out.some(o => o.datum === d)) return;
+      out.push({ datum: d, label, tijd: exact ? (tijd || tm) : '' });
+    };
+    // Een datum zonder jaar die net voorbij is, gaat over het verleden; ver voorbij is volgend jaar bedoeld.
+    const ahead = (yy, mo, dd, hasYear) => {
+      let iso = isoOf(new Date(yy, mo, dd));
+      if (!hasYear && iso < today) iso = dayDiff(iso, today) > 60 ? isoOf(new Date(yy + 1, mo, dd)) : '';
+      return iso;
+    };
+    let m;
+    if ((m = new RegExp(`\\b(\\d{1,2})e? ${MAAND_RE}(?: (\\d{4}))?`).exec(t)) && +m[1] >= 1 && +m[1] <= 31) {
+      const mo = maandNr(m[2]);
+      add(ahead(m[3] ? +m[3] : y, mo, +m[1], !!m[3]), `${+m[1]} ${MAANDEN[mo]}`, true);
+    }
+    if ((m = /\b(\d{1,2})[-\/](\d{1,2})(?:[-\/](\d{4}|\d{2}))?\b/.exec(t)) && +m[2] >= 1 && +m[2] <= 12 && +m[1] >= 1 && +m[1] <= 31) {
+      add(ahead(m[3] ? (m[3].length === 2 ? 2000 + +m[3] : +m[3]) : y, +m[2] - 1, +m[1], !!m[3]), `${+m[1]} ${MAANDEN[+m[2] - 1]}`, true);
+    }
+    if ((m = /\b(vorige week |afgelopen |volgende week |komende |aanstaande |volgende )?(maandag|dinsdag|woensdag|donderdag|vrijdag)(ochtend|middag|morgen)?\b/.exec(t)) && !/^(vorige|afgelopen)/.test(m[1] || '')) {
+      const target = DAGNAMEN.indexOf(m[2]), d = new Date(tdy);
+      if (m[1] === 'volgende week ') d.setDate(d.getDate() - ((d.getDay() + 6) % 7) + 7 + target - 1);
+      else d.setDate(d.getDate() + (((target - d.getDay() + 7) % 7) || 7));
+      add(isoOf(d), `${m[1] ? m[1].trim() + ' ' : ''}${m[2]}${m[3] || ''}`, true, m[3] === 'middag' ? '14:00' : m[3] ? '09:00' : '');
+    }
+    if (/\bovermorgen\b/.test(t)) add(addDays(today, 2), 'overmorgen', true);
+    else if ((m = /\bmorgen(ochtend|middag)?\b/.exec(t))) add(addDays(today, 1), 'morgen' + (m[1] || ''), true, m[1] === 'middag' ? '14:00' : m[1] ? '09:00' : '');
+    if ((m = /\bover (?:ongeveer |circa |zo'?n )?(een paar|een|één|\d{1,2}|twee|drie|vier|vijf|zes|acht|tien|twaalf) (werkdagen|dagen|dag|weken|week|maanden|maand)\b/.exec(t))) {
+      const n = /^\d+$/.test(m[1]) ? +m[1] : GETAL[m[1]] || 1, u = m[2];
+      add(u.startsWith('werk') ? addWorkdays(today, n) : u.startsWith('dag') ? addDays(today, n) : u.startsWith('we') ? addDays(today, 7 * n)
+        : isoOf(new Date(y, tdy.getMonth() + n, tdy.getDate())), `over ${m[1]} ${u}`);
+    }
+    if (/\bover (een )?half jaar\b/.test(t)) add(isoOf(new Date(y, tdy.getMonth() + 6, tdy.getDate())), 'over een half jaar');
+    const monday = addDays(today, -((tdy.getDay() + 6) % 7));
+    if (/\b(volgende|komende) week\b/.test(t) && !/\bvolgende week (maandag|dinsdag|woensdag|donderdag|vrijdag)/.test(t)) add(addDays(monday, 7), 'volgende week');
+    if (/\beinde? (van )?(deze |de )?week\b/.test(t)) add(addDays(monday, 4), 'eind van de week');
+    if (/\beinde? (van )?(deze |de )?maand\b/.test(t)) add(lastWorkdayOf(y, tdy.getMonth()), 'eind van de maand', true);
+    if (/\b(begin |start )?(van )?(de )?volgende maand\b/.test(t)) add(isoOf(new Date(y, tdy.getMonth() + 1, 1)), 'begin volgende maand');
+    if ((m = new RegExp(`\\b(begin|half|medio|midden|eind|einde|in|na|vanaf) ${MAAND_RE}`).exec(t))) {
+      const mo = maandNr(m[2]), w = m[1], yy = mo < tdy.getMonth() || (mo === tdy.getMonth() && w === 'na') ? y + 1 : y;
+      let iso = /^eind/.test(w) ? lastWorkdayOf(yy, mo) : ['half', 'medio', 'midden'].includes(w) ? isoOf(new Date(yy, mo, 15)) : w === 'na' ? isoOf(new Date(yy, mo + 1, 1)) : isoOf(new Date(yy, mo, 1));
+      if (iso < today) iso = nextWorkday(today);
+      add(iso, `${w} ${MAANDEN[mo]}`);
+    }
+    if (/\b(na|eind|einde|vanaf) (de )?bouwvak/.test(t)) {
+      let b = bouwvak(y); if (b.end < today) b = bouwvak(y + 1);
+      add(workdayFrom(addDays(b.end, 1)), `na de bouwvak, regio ${REGIOS.find(r => r[0] === bouwvakRegio())[1]}${b.bekend ? '' : ' (ongeveer)'}`, true);
+    }
+    if (/\b(voor|vóór) (de )?bouwvak/.test(t)) { let b = bouwvak(y); if (b.start < today) b = bouwvak(y + 1); add(addDays(b.start, -14), 'vóór de bouwvak'); }
+    if (/\bna (de )?zomer(vakantie)?\b/.test(t) || (/\bna de vakantie\b/.test(t) && tdy.getMonth() >= 4 && tdy.getMonth() <= 7)) {
+      add(isoOf(new Date(isoOf(new Date(y, 8, 1)) < today ? y + 1 : y, 8, 1)), 'na de zomer');
+    }
+    if (/\bna (de )?(kerst|feestdagen|jaarwisseling|nieuwjaar)\b|\bbegin (van )?volgend jaar\b|\bin het nieuwe jaar\b/.test(t)) add(isoOf(new Date(tdy.getMonth() === 0 && tdy.getDate() < 5 ? y : y + 1, 0, 5)), 'na de feestdagen');
+    else if (/\bvolgend jaar\b/.test(t)) add(isoOf(new Date(y + 1, 0, 12)), 'volgend jaar');
+    if (/\bna (de )?pasen\b/.test(t)) { let e = easter(y); if (isoOf(e) < today) e = easter(y + 1); add(isoOf(new Date(e.getFullYear(), e.getMonth(), e.getDate() + 2)), 'na Pasen'); }
+    if (/\b(volgend|komend) kwartaal\b/.test(t)) add(isoOf(new Date(y, (Math.floor(tdy.getMonth() / 3) + 1) * 3, 1)), 'volgend kwartaal');
+    if ((m = /\b(?:q([1-4])|(eerste|tweede|derde|vierde) kwartaal)\b/.exec(t))) {
+      const q = m[1] ? +m[1] : ['eerste', 'tweede', 'derde', 'vierde'].indexOf(m[2]) + 1;
+      let iso = isoOf(new Date(y, (q - 1) * 3, 1));
+      if (isoOf(new Date(y, q * 3, 0)) < today) iso = isoOf(new Date(y + 1, (q - 1) * 3, 1)); else if (iso < today) iso = nextWorkday(today);
+      add(iso, `Q${q}`);
+    }
+    return out.slice(0, 3);
+  }
+  // Voorstel voor de opvolgtaak bij een tekst: welke actie en wanneer.
+  function planFromText(text) {
+    const opties = suggestDates(text);
+    return opties.length ? { actie: planActie(key(text)), opties } : null;
+  }
+  const fmtPlan = o => `${cap(fmtShort.format(parseISO(o.datum)).replace(/\./g, ''))}${o.tijd ? ' om ' + o.tijd : ''}`;
+  function suggestLine(text, act, idPrefix) {
+    const p = planFromText(text);
+    if (!p) return '';
+    return `${ic('alarm-clock')}<span>Herkend: <em>${esc(p.opties[0].label)}</em>.</span> ` + p.opties.map((o, i) =>
+      `<button type="button" class="linkbtn" id="${idPrefix}-${i}" data-act="${act}" data-i="${i}">${i ? esc(fmtPlan(o)) : `${esc(p.actie)} inplannen op ${esc(fmtPlan(o))}`}</button>`).join(' · ');
+  }
+
+  /* ---------- status: lead, potentiële klant, klant ---------- */
+  const statusBadge = l => l.status === 'lead' ? '' : `<span class="stag ${l.status}">${statusLabel(l.status)}</span>`;
+  const statusOptions = cur => STATUSES.map(([v, t]) => `<option value="${v}"${v === cur ? ' selected' : ''}>${t}</option>`).join('');
+
+  /* ---------- in de buurt (filter bij Bedrijven) ---------- */
+  const buurtKm = () => BUURT_KM.includes(+pref.get('buurtKm')) ? +pref.get('buurtKm') : 10;
+  const buurtActive = () => state.buurt && state.page === 'bedrijven' && state.view !== 'archief';
+  const distTo = l => kaart.here && onMap(l) ? distKm(kaart.here, l.geo) : null;
+  function renderBuurt() {
+    const btn = $('buurtBtn'), st = $('buurtStatus');
+    btn.hidden = state.page !== 'bedrijven';
+    btn.setAttribute('aria-pressed', String(state.buurt));
+    btn.innerHTML = `${ic('navigation-2')}In de buurt${state.buurt ? ` (${buurtKm()} km)` : ''}`;
+    const on = buurtActive();
+    st.hidden = !on;
+    if (!on) return;
+    if (!document.hidden) { startLocating(); scheduleGeocode(); }
+    const n = kaart.here ? state.leads.filter(inView).length : 0;
+    st.textContent = kaart.locError || (!kaart.here ? 'Je locatie zoeken…'
+      : `${n} ${plural(n, 'bedrijf', 'bedrijven')} binnen ${buurtKm()} km van je huidige plek, dichtstbij eerst.${kaart.geoBusy ? ` Adressen opzoeken: ${kaart.geoDone} van ${kaart.geoTotal}…` : ''}`);
+  }
+
+  /* ---------- Leadnex AI (Supabase Edge Function "leadnex-ai") ---------- */
+  const ai = { status: 'onbekend', model: '', checking: false };
+  const aiOn = () => ai.status === 'aan' && !state.local && !state.readOnly;
+  class AiFout extends Error { constructor(code, msg) { super(msg || code); this.code = code; } }
+  async function aiInvoke(task, body) {
+    if (!sb || state.local) throw new AiFout('lokaal');
+    if (!navigator.onLine) throw new AiFout('offline', 'Geen verbinding. Leadnex AI werkt alleen met internet.');
+    let res;
+    try { res = await sb.functions.invoke('leadnex-ai', { body: { task, ...body } }); }
+    catch { throw new AiFout('fout', 'Leadnex AI is niet bereikbaar. Probeer het later opnieuw.'); }
+    const { data, error } = res;
+    if (error) {
+      const r = error.context && typeof error.context.status === 'number' ? error.context : null;
+      let detail = null;
+      try { detail = r && typeof r.json === 'function' ? await r.json() : null; } catch {}
+      if (detail && detail.error) throw new AiFout(detail.error, detail.message);
+      if (r && r.status === 404) throw new AiFout('uit');
+      if (r && r.status === 401) throw new AiFout('jwt', 'Supabase weigert het inloggen bij de functie. Zet bij de functie leadnex-ai "Verify JWT with legacy secret" uit.');
+      // Geen antwoord (ook geen CORS): meestal is de functie nog niet geplaatst.
+      throw new AiFout(r ? 'fout' : 'uit', r ? 'Leadnex AI gaf een fout. Probeer het opnieuw.' : '');
+    }
+    if (!data || data.error) throw new AiFout((data && data.error) || 'fout', data && data.message);
+    return data;
+  }
+  const aiErrorText = e => (e && e.message && e.message !== e.code) ? e.message
+    : e && e.code === 'uit' ? 'Leadnex AI is nog niet ingesteld (zie Meer).' : 'Dat lukte niet. Probeer het opnieuw.';
+  async function aiCheck(force) {
+    if (!sb || state.local) { ai.status = 'lokaal'; renderAi(); return; }
+    const k = 'ai.' + state.uid;
+    let saved = null;
+    try { saved = JSON.parse(pref.get(k) || 'null'); } catch {}
+    if (!force && saved && Date.now() - saved.at < (saved.status === 'aan' ? 12 : 1) * 3600e3) { ai.status = saved.status; ai.model = saved.model || ''; renderAi(); return; }
+    if (ai.checking) return;
+    ai.checking = true; renderAi();
+    try { const r = await aiInvoke('ping', {}); ai.status = r.ok ? 'aan' : 'fout'; ai.model = r.model || ''; }
+    catch (e) { ai.status = ['uit', 'geen-sleutel', 'jwt'].includes(e.code) ? e.code : e.code === 'offline' && saved ? saved.status : 'fout'; ai.error = e.message; }
+    ai.checking = false;
+    if (ai.status !== 'fout') pref.set(k, JSON.stringify({ status: ai.status, model: ai.model, at: Date.now() }));
+    renderAi();
+    renderRows();
+  }
+  function renderAi() {
+    const st = $('aiStatus');
+    if (!st) return;
+    const txt = {
+      aan: 'Aan. Leadnex maakt nette verslagen met opvolgtaak, een gespreksvoorbereiding en beantwoordt vragen over je klantverslagen.',
+      uit: 'Nog niet ingesteld. Inspreken, verslagen en slimme datums werken ook zonder; alleen het netjes maken, de samenvatting en vragen stellen niet.',
+      'geen-sleutel': 'De functie staat in Supabase, maar de Anthropic API-sleutel ontbreekt of klopt niet.',
+      jwt: 'De functie staat in Supabase, maar weigert het inloggen. Zet bij de functie "Verify JWT with legacy secret" uit.',
+      lokaal: 'Alleen beschikbaar als je lijst online staat (inloggen met Supabase).',
+      fout: 'Controleren lukte niet. Probeer het later opnieuw.',
+      onbekend: 'Nog niet gecontroleerd.',
+    };
+    st.textContent = ai.checking ? 'Controleren…' : txt[ai.status] || txt.fout;
+    $('aiCheckBtn').hidden = ai.status === 'lokaal';
+    $('aiCheckBtn').disabled = ai.checking;
+    $('aiHelpBtn').hidden = ai.status === 'aan' || ai.status === 'lokaal';
+  }
+
+  /* ---------- klantverslagen ---------- */
+  const vdrafts = {}, vAll = new Set();
+  let armedVerslag = null, armedVerslagTimer = 0;
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  const newVid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  function newVerslagDraft(l, soort) {
+    return { soort: soort || (/bezoek|afspraak|demo/i.test(l.actie) ? 'Bezoek' : 'Telefoon'), datum: todayISO(), tekst: '', ruw: '', machines: '', interesse: '', afspraken: '', vragen: '',
+      plan: false, planTouched: false, vactie: '', vdatum: '', vtijd: '', vreden: '', herinnering: '30', agenda: false, aiStatus: '', statusOk: true, ai: false, busy: false, error: '', listening: false };
+  }
+  function verslagenHtml(l) {
+    const id = esc(l.id), v = vdrafts[l.id], list = l.verslagen, all = vAll.has(l.id);
+    const btns = state.readOnly || v ? '' : `<div class="btns">
+        <button type="button" class="btn small primary" id="vmicnew-${id}" data-act="v-new" data-mic="1">${ic('mic')}Inspreken</button>
+        <button type="button" class="btn small" id="vnew-${id}" data-act="v-new">${ic('notebook-pen')}Typen</button></div>`;
+    return `<section class="verslagen" aria-label="Klantverslagen">
+      <div class="vhead"><h3>Klantverslagen${list.length ? ` <span class="n">${list.length}</span>` : ''}</h3>${btns}</div>
+      ${v ? verslagEditorHtml(l, v) : ''}
+      ${list.length ? `<ol class="vlist">${(all ? list : list.slice(0, 2)).map(x => verslagItemHtml(x)).join('')}</ol>`
+        : v ? '' : `<p class="hint">Nog geen verslagen. Spreek na een gesprek of bezoek in wat er besproken is${aiOn() ? '; Leadnex maakt er een nette notitie met opvolgtaak van' : ''}.</p>`}
+      ${list.length > 2 ? `<button type="button" class="linkbtn" data-act="v-all">${all ? 'Minder tonen' : `Alle ${list.length} verslagen tonen`}</button>` : ''}
+    </section>`;
+  }
+  function verslagItemHtml(x) {
+    const armed = armedVerslag === x.id;
+    const facts = [x.machines.length && `<span class="vk">Machines</span>${x.machines.map(m => `<span class="mtag">${esc(m)}</span>`).join('')}`,
+      x.interesse && `<span class="vk">Interesse</span>${esc(INTERESSE.find(i => i[0] === x.interesse)[1])}`,
+      x.afspraken && `<span class="vk">Afspraken</span>${esc(x.afspraken)}`].filter(Boolean);
+    return `<li class="verslag">
+      <div class="vmeta"><time>${esc(cap(longDate(x.datum)))}</time><span>${esc(x.soort)}</span>${x.door === 'ai' ? `<span class="aitag">${ic('sparkles')}Leadnex</span>` : ''}
+        ${state.readOnly ? '' : `<button type="button" class="vdel${armed ? ' armed' : ''}" data-act="v-del" data-vid="${esc(x.id)}" aria-label="Verslag verwijderen">${armed ? 'Nogmaals tikken om te verwijderen' : ic('trash-2')}</button>`}</div>
+      <p class="vtekst">${esc(x.tekst)}</p>
+      ${facts.map(f => `<p class="vfact">${f}</p>`).join('')}
+      ${x.vragen.length ? `<div class="vq"><span class="vk">Vragen voor de volgende keer</span><ul>${x.vragen.map(q => `<li>${esc(q)}</li>`).join('')}</ul></div>` : ''}
+      ${x.ruw && x.ruw !== x.tekst ? `<details class="raw"><summary>Oorspronkelijke tekst</summary><p>${esc(x.ruw)}</p></details>` : ''}
+    </li>`;
+  }
+  const micBtn = (id, v) => `<button type="button" class="btn small mic${v.listening ? ' on' : ''}" id="vmic-${esc(id)}" data-act="v-mic" aria-pressed="${v.listening}">${ic(v.listening ? 'square' : 'mic')}${v.listening ? 'Stop' : 'Inspreken'}</button>`;
+  function verslagEditorHtml(l, v) {
+    const id = esc(l.id), dis = v.busy ? ' disabled' : '';
+    const sel = (f, opts, cur) => `<select class="input" id="v-${id}-${f}" data-vfield="${f}"${dis}>${opts.map(([val, t]) => `<option value="${esc(val)}"${String(val) === String(cur) ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>`;
+    return `<div class="veditor" id="ved-${id}">
+      <div class="vgrid">
+        <div class="field"><label for="v-${id}-soort">Soort</label>${sel('soort', SOORTEN.map(x => [x, x]), v.soort)}</div>
+        <div class="field"><label for="v-${id}-datum">Datum</label><input class="input" type="date" id="v-${id}-datum" data-vfield="datum" value="${esc(v.datum)}" max="${todayISO()}"${dis}></div>
+      </div>
+      <div class="field">
+        <div class="vlabel"><label for="vt-${id}">Wat is er besproken?</label>${micBtn(l.id, v)}</div>
+        <p class="hint vlive" id="vlive-${id}" role="status"${v.listening ? '' : ' hidden'}>Leadnex luistert. Praat rustig; tik op Stop als je klaar bent.</p>
+        <textarea class="input vtext" id="vt-${id}" data-vfield="tekst" maxlength="6000" rows="5" placeholder="Bijv. Gesproken met Jan. Interesse in een elektrische heftruck van 2,5 ton. Belt na de bouwvak terug."${dis}>${esc(v.tekst)}</textarea>
+      </div>
+      ${aiOn() ? `<div class="vai"><button type="button" class="btn accent" id="vai-${id}" data-act="v-ai"${dis || (!v.tekst.trim() ? ' disabled' : '')}>${ic('sparkles')}${v.busy ? 'Leadnex is bezig…' : v.ai ? 'Opnieuw laten maken' : 'Maak er een nette notitie van'}</button>
+          <span class="hint">${v.ai ? 'Gemaakt door Leadnex. Controleer het en pas aan waar nodig.' : 'Met de besproken machines, afspraken en een opvolgtaak.'}</span></div>` : ''}
+      ${v.error ? `<p class="warn" role="alert">${esc(v.error)}</p>` : ''}
+      <div class="vgrid">
+        <div class="field span2"><label for="v-${id}-machines">Besproken machines<span class="opt">optioneel, met komma's</span></label><input class="input" id="v-${id}-machines" data-vfield="machines" maxlength="300" value="${esc(v.machines)}" placeholder="Bijv. elektrische heftruck 2,5 t, reachtruck"${dis}></div>
+        <div class="field"><label for="v-${id}-interesse">Interesse</label>${sel('interesse', INTERESSE, v.interesse)}</div>
+        <div class="field"><label for="v-${id}-afspraken">Afspraken<span class="opt">optioneel</span></label><input class="input" id="v-${id}-afspraken" data-vfield="afspraken" maxlength="1000" value="${esc(v.afspraken)}"${dis}></div>
+        <div class="field span2"><label for="v-${id}-vragen">Vragen voor het volgende gesprek<span class="opt">één per regel</span></label><textarea class="input" id="v-${id}-vragen" data-vfield="vragen" rows="2" maxlength="1200"${dis}>${esc(v.vragen)}</textarea></div>
+      </div>
+      <div class="vplan" id="vplan-${id}">${vplanHtml(l, v)}</div>
+      <div class="pactions">
+        <button type="button" class="btn primary" id="vsave-${id}" data-act="v-save"${dis}>${ic('check')}Verslag opslaan</button>
+        <button type="button" class="btn" id="vcancel-${id}" data-act="v-cancel">Annuleren</button>
+      </div>
+    </div>`;
+  }
+  const vStatusSuggestion = (l, v) => {
+    const s = v.aiStatus || (l.status === 'lead' && ['hoog', 'middel'].includes(v.interesse) ? 'prospect' : '');
+    return s && s !== l.status ? s : '';
+  };
+  function vplanHtml(l, v) {
+    const id = esc(l.id), dis = v.busy ? ' disabled' : '';
+    const sug = suggestLine(v.tekst, 'v-sug', `vsug-${id}`), st = vStatusSuggestion(l, v);
+    return `<label class="check" for="v-${id}-plan"><input type="checkbox" id="v-${id}-plan" data-vfield="plan"${v.plan ? ' checked' : ''}${dis}>Opvolgtaak inplannen</label>
+      ${sug ? `<p class="suggest smart">${sug}</p>` : ''}
+      ${v.plan ? `<div class="vgrid">
+          <div class="field"><label for="v-${id}-vactie">Actie</label><input class="input" id="v-${id}-vactie" data-vfield="vactie" list="actieLijst" maxlength="40" value="${esc(v.vactie)}" placeholder="Bijv. Bellen"${dis}></div>
+          <div class="field"><label for="v-${id}-vtijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="v-${id}-vtijd" data-vfield="vtijd" value="${esc(v.vtijd)}"${dis}></div>
+          <div class="field span2"><label for="v-${id}-vdatum">Wanneer</label>${whenHtml(`v-${id}-vdatum`, v.vdatum, ' data-vfield="vdatum"', v.busy)}</div>
+          ${v.vtijd ? `<div class="field span2"><label for="v-${id}-herinnering">Herinnering</label><select class="input" id="v-${id}-herinnering" data-vfield="herinnering"${dis}>${HERINNERING.map(([m, t]) => `<option value="${m}"${String(m) === String(v.herinnering) ? ' selected' : ''}>${t}</option>`).join('')}</select></div>` : ''}
+        </div>
+        ${v.vreden ? `<p class="hint">${ic('sparkles')} ${esc(v.vreden)}</p>` : ''}
+        ${l.actie ? `<p class="hint">Komt in plaats van de huidige actie: ${esc(l.actie)}${l.datum ? ' op ' + esc(shortDate(l.datum)) : ''}.</p>` : ''}
+        <label class="check" for="v-${id}-agenda"><input type="checkbox" id="v-${id}-agenda" data-vfield="agenda"${v.agenda ? ' checked' : ''}${dis}>${outlookOn() ? 'Ook in mijn Outlook-agenda zetten' : 'Ook in mijn agenda zetten'}${v.vtijd ? ', met herinnering' : ''}</label>` : ''}
+      ${st ? `<label class="check" for="v-${id}-statusOk"><input type="checkbox" id="v-${id}-statusOk" data-vfield="statusOk"${v.statusOk ? ' checked' : ''}${dis}>Status wijzigen naar ${esc(statusLabel(st))}</label>` : ''}`;
+  }
+  function renderVPlan(id) {
+    const l = byId(id), v = vdrafts[id], el = $('vplan-' + id);
+    if (!l || !v || !el || el.contains(document.activeElement)) return;
+    el.innerHTML = vplanHtml(l, v);
+  }
+  // Tekst veranderd: herkende datum meteen als opvolgtaak voorstellen, zolang je die niet zelf hebt aangepast.
+  let vSugTimer = 0;
+  function scheduleVSuggest(id) {
+    clearTimeout(vSugTimer);
+    vSugTimer = setTimeout(() => {
+      const v = vdrafts[id], l = byId(id);
+      if (!v || !l) return;
+      const p = planFromText(v.tekst);
+      if (p && !v.planTouched && !v.ai) applyPlan(v, p.actie, p.opties[0]);
+      renderVPlan(id);
+      const b = $('vai-' + id);
+      if (b) b.disabled = v.busy || !v.tekst.trim();
+    }, 350);
+  }
+  function applyPlan(v, actie, o) {
+    v.plan = true; v.vactie = v.vactie && v.planTouched ? v.vactie : actie; v.vdatum = o.datum; v.vtijd = o.tijd || v.vtijd; v.vreden = '';
+    if (o.tijd) v.agenda = true;
+  }
+  function openVerslag(id, mic, soort, prefill = '') {
+    const l = byId(id);
+    if (!l || state.readOnly) return;
+    if (state.open !== id || state.mode !== 'edit') { closeRow(true); state.open = id; state.mode = 'edit'; drafts[id] = draftFrom(l); }
+    vdrafts[id] = vdrafts[id] || newVerslagDraft(l, soort);
+    if (prefill && !vdrafts[id].tekst.trim()) vdrafts[id].tekst = prefill;
+    renderRows();
+    if (mic) startDictation(id); else $('vt-' + id)?.focus();
+    requestAnimationFrame(() => $('ved-' + id)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
+  }
+  function closeVerslag(id) { stopDictation(); delete vdrafts[id]; renderRows(); }
+
+  // Inspreken met de spraakherkenning van de browser (Chrome op Android gebruikt die van Google).
+  const dict = { rec: null, id: null, base: '' };
+  function renderMic(id) {
+    const v = vdrafts[id], b = $('vmic-' + id), live = $('vlive-' + id);
+    if (!v) return;
+    if (b) b.outerHTML = micBtn(id, v);
+    if (live) live.hidden = !v.listening;
+  }
+  function startDictation(id) {
+    const v = vdrafts[id];
+    if (!v) return;
+    if (!SpeechRec) { toast('Inspreken kan niet in deze browser. Tik in het tekstvak op de microfoon van je toetsenbord.', 7000); $('vt-' + id)?.focus(); return; }
+    stopDictation();
+    const rec = new SpeechRec();
+    rec.lang = 'nl-NL'; rec.continuous = true; rec.interimResults = true;
+    dict.rec = rec; dict.id = id; dict.base = v.tekst.trim() ? v.tekst.trim() + ' ' : '';
+    v.listening = true;
+    let finals = '';
+    const sentence = s => { s = s.trim(); return s ? s.charAt(0).toUpperCase() + s.slice(1) + (/[.!?]$/.test(s) ? ' ' : '. ') : ''; };
+    rec.onresult = e => {
+      let fin = '', interim = '';
+      for (let i = 0; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) fin += sentence(r[0].transcript); else interim += r[0].transcript; }
+      finals = fin;
+      const cur = vdrafts[id];
+      if (!cur) return;
+      cur.tekst = (dict.base + finals).trimEnd();
+      const ta = $('vt-' + id);
+      if (ta) { ta.value = (dict.base + finals + interim).trimEnd(); ta.scrollTop = ta.scrollHeight; }
+      scheduleVSuggest(id);
+    };
+    rec.onerror = e => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { toast('De microfoon is niet toegestaan. Sta de microfoon toe voor de app (Instellingen → Apps → Chrome → Machtigingen).', 8000); stopDictation(); }
+      else if (e.error === 'network') { toast('Inspreken heeft internet nodig. Typ het verslag, of probeer het straks opnieuw.', 6000); stopDictation(); }
+      else if (e.error === 'audio-capture') { toast('Er is geen microfoon gevonden.'); stopDictation(); }
+    };
+    // Android stopt na een stilte vanzelf; zolang je niet op Stop tikt, luistert de app verder.
+    rec.onend = () => {
+      if (dict.rec !== rec) return;
+      dict.base = (dict.base + finals).trimEnd() + ' '; finals = '';
+      try { rec.start(); } catch { stopDictation(); }
+    };
+    try { rec.start(); } catch { stopDictation(); toast('Inspreken lukte niet. Probeer het opnieuw.'); return; }
+    renderMic(id);
+  }
+  function stopDictation() {
+    const rec = dict.rec, id = dict.id;
+    dict.rec = null; dict.id = null;
+    if (rec) { try { rec.stop(); } catch {} }
+    if (id && vdrafts[id]) { vdrafts[id].listening = false; const ta = $('vt-' + id); if (ta) ta.value = vdrafts[id].tekst; renderMic(id); scheduleVSuggest(id); }
+  }
+
+  const listFrom = s => String(s || '').split(/[;\n]|,(?!\d)/).map(x => x.trim()).filter(Boolean);   // "2,5 t" blijft heel
+  async function saveVerslag(id) {
+    const l = byId(id), v = vdrafts[id];
+    if (!l || !v || state.readOnly) return;
+    stopDictation();
+    const tekst = v.tekst.trim();
+    if (!tekst) { toast('Spreek of typ eerst wat er besproken is.'); $('vt-' + id)?.focus(); return; }
+    const datum = parseISO(v.datum) && v.datum <= todayISO() ? v.datum : todayISO();
+    const item = { id: newVid(), datum, soort: v.soort, tekst: tekst.slice(0, 6000), ruw: v.ai && v.ruw && v.ruw !== tekst ? v.ruw.slice(0, 12000) : '',
+      machines: listFrom(v.machines).slice(0, 20), interesse: validInteresse(v.interesse), afspraken: v.afspraken.trim().slice(0, 1000),
+      vragen: v.vragen.split('\n').map(x => x.replace(/^[-•*]\s*/, '').trim()).filter(Boolean).slice(0, 8), door: v.ai ? 'ai' : '', gemaakt: nowISO() };
+    const actie = v.plan ? canonAction(v.vactie) : '';
+    if (v.plan && (!actie || !parseISO(v.vdatum))) { toast('Vul bij de opvolgtaak een actie en een datum in, of vink Opvolgtaak inplannen uit.'); return; }
+    const next = { ...l, verslagen: [item, ...l.verslagen].sort(byVerslag).slice(0, 200), gewijzigd: nowISO() };
+    // Een verslag telt als contactmoment, tenzij er die dag al iets is vastgelegd.
+    if (!l.log.some(x => x.d === datum)) next.log = [{ d: datum, a: v.soort, u: 'Verslag', t: clip(tekst.replace(/\s+/g, ' ').replace(/^- /, ''), 200) }, ...l.log].sort((a, b) => b.d.localeCompare(a.d)).slice(0, 100);
+    if (actie) {
+      const tijd = /^\d{2}:\d{2}$/.test(v.vtijd) ? v.vtijd : '';
+      Object.assign(next, { actie, datum: v.vdatum, tijd, herinnering: validHerinnering(+v.herinnering), gearchiveerd: false, gearchiveerdOp: '' });
+      if (l.datum !== next.datum || l.tijd !== tijd) next.outlookId = '';
+    }
+    const st = vStatusSuggestion(l, v);
+    if (st && v.statusOk) next.status = st;
+    const ok = await write(() => col.doc(id).set(toBody(next)));
+    if (!ok) return;
+    delete vdrafts[id];
+    if (actie) rememberAction(actie);
+    // Het formulier erboven laat de nieuwe actie en status zien, zonder je andere wijzigingen weg te gooien.
+    if (drafts[id]) Object.assign(drafts[id], { actie: next.actie, datum: next.datum, tijd: next.tijd, status: next.status, herinnering: String(next.herinnering) });
+    renderAll();
+    toast(`Verslag opgeslagen${actie ? `. Volgende: ${actie} op ${shortDate(next.datum)}${next.tijd ? ' om ' + next.tijd : ''}` : ''}${next.status !== l.status ? `. Status: ${statusLabel(next.status).toLowerCase()}` : ''}.`, 5000);
+    if (actie && v.agenda) addToCalendar(next);
+  }
+  async function deleteVerslag(id, vid) {
+    if (armedVerslag !== vid) {
+      armedVerslag = vid; clearTimeout(armedVerslagTimer);
+      armedVerslagTimer = setTimeout(() => { armedVerslag = null; renderRows(); }, 4000);
+      renderRows();
+      return;
+    }
+    armedVerslag = null; clearTimeout(armedVerslagTimer);
+    const l = byId(id);
+    if (!l) return;
+    const ok = await write(() => col.doc(id).set(toBody({ ...l, verslagen: l.verslagen.filter(x => x.id !== vid), gewijzigd: nowISO() })));
+    if (ok) { renderRows(); toast('Verslag verwijderd.'); }
+  }
+  // Wat Leadnex AI over een bedrijf meekrijgt.
+  function leadForAi(l, verslagen = 10) {
+    const o = { bedrijf: l.bedrijf, status: l.status };
+    for (const k of ['contact', 'plaats', 'branche', 'actie', 'datum', 'tijd']) if (l[k]) o[k] = l[k];
+    if (l.notitie) o.notitie = l.notitie.slice(0, 2000);
+    if (l.log.length) o.contactmomenten = l.log.slice(0, 15).map(x => [x.d, x.a, x.u, x.t].filter(Boolean).join(' · '));
+    if (l.verslagen.length && verslagen) o.verslagen = l.verslagen.slice(0, verslagen).map(v => {
+      const x = { datum: v.datum, soort: v.soort, tekst: v.tekst.slice(0, 3000) };
+      if (v.machines.length) x.machines = v.machines;
+      if (v.interesse) x.interesse = v.interesse;
+      if (v.afspraken) x.afspraken = v.afspraken;
+      if (v.vragen.length) x.vragen = v.vragen;
+      return x;
+    });
+    return o;
+  }
+  const bouwvakInfo = () => { const y = +todayISO().slice(0, 4), a = bouwvak(y), b = bouwvak(y + 1); return { regio: bouwvakRegio(), [y]: [a.start, a.end], [y + 1]: [b.start, b.end] }; };
+  async function aiVerslag(id) {
+    const l = byId(id), v = vdrafts[id];
+    if (!l || !v || v.busy) return;
+    stopDictation();
+    if (!v.tekst.trim()) { toast('Spreek of typ eerst wat er besproken is.'); return; }
+    v.busy = true; v.error = '';
+    renderRows();
+    const ruw = v.ai && v.ruw ? v.ruw : v.tekst;
+    try {
+      const r = await aiInvoke('verslag', { tekst: ruw, soort: v.soort, datum: v.datum, vandaag: todayISO(), regio: bouwvakRegio(), bouwvak: bouwvakInfo(),
+        hints: suggestDates(ruw).map(o => ({ datum: o.datum, tijd: o.tijd, betekenis: o.label })), acties: actionNames(), bedrijf: leadForAi(l, 3) });
+      const x = r.result || {}, cur = vdrafts[id];
+      if (!cur) return;
+      Object.assign(cur, {
+        ruw, tekst: str(x.notitie).trim() || cur.tekst, machines: strList(x.machines, 20, 80).join(', '), interesse: validInteresse(x.interesse),
+        afspraken: str(x.afspraken).trim(), vragen: strList(x.vragen, 8, 300).join('\n'), ai: true,
+        aiStatus: ['prospect', 'klant'].includes(x.status) ? x.status : '', statusOk: true,
+      });
+      const vv = x.vervolg || {};
+      if (vv.nodig && parseISO(vv.datum) && vv.datum >= todayISO() && vv.datum <= addDays(todayISO(), 800)) {
+        Object.assign(cur, { plan: true, planTouched: false, vactie: canonAction(str(vv.actie)) || planActie(key(ruw)), vdatum: vv.datum,
+          vtijd: /^\d{2}:\d{2}$/.test(vv.tijd) ? vv.tijd : '', vreden: str(vv.reden) });
+        cur.agenda = !!cur.vtijd;
+      } else if (vv.nodig === false) Object.assign(cur, { plan: false, vreden: '' });
+    } catch (e) {
+      const cur = vdrafts[id];
+      if (cur) cur.error = aiErrorText(e);
+      if (e.code === 'uit' || e.code === 'geen-sleutel') { ai.status = e.code; renderAi(); }
+    }
+    if (vdrafts[id]) vdrafts[id].busy = false;
+    renderRows();
+  }
+
+  /* ---------- gespreksvoorbereiding ---------- */
+  const hashStr = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+  const prepSig = l => hashStr(JSON.stringify([l.notitie, l.actie, l.datum, l.status, l.log.slice(0, 15), l.verslagen.slice(0, 10).map(v => [v.id, v.tekst, v.afspraken, v.vragen, v.machines])]));
+  const hasHistory = l => l.log.length > 0 || l.verslagen.length > 0 || !!l.notitie.trim();
+  // Alleen samenvatten (een AI-aanroep) als er echt iets samen te vatten valt.
+  const prepWorth = l => l.verslagen.length > 0 || l.log.filter(x => x.t).length >= 2 || l.notitie.trim().length > 120;
+  const prepBusy = new Set(), prepFailed = new Map();
+  function lastContactText(l) {
+    const x = l.log[0], v = l.verslagen[0];
+    if (v && (!x || v.datum >= x.d)) return `${cap(longDate(v.datum))}, ${v.soort.toLowerCase()}: ${clip(v.tekst.replace(/\s+/g, ' ').replace(/^- /, ''), 140)}`;
+    if (!x) return '';
+    const what = x.a === 'Mail' ? 'mail verstuurd' : x.a === 'WhatsApp' ? 'WhatsApp verstuurd' : [x.a, x.u].filter(Boolean).join(', ').toLowerCase();
+    return `${cap(longDate(x.d))}: ${what}${x.t ? ` (${x.t})` : ''}`;
+  }
+  function prepHtml(l) {
+    if (!hasHistory(l)) return '';
+    const id = esc(l.id), p = l.voorbereiding, fresh = !!p && p.sig === prepSig(l), useAi = fresh;
+    const machines = useAi && p.machines.length ? p.machines : [...new Set(l.verslagen.flatMap(v => v.machines))].slice(0, 8);
+    const afspraken = useAi && p.afspraken.length ? p.afspraken : l.verslagen.filter(v => v.afspraken).slice(0, 3).map(v => `${shortDate(v.datum)}: ${v.afspraken}`);
+    const v1 = l.verslagen.find(v => v.interesse);
+    const interesse = useAi && p.interesse ? p.interesse : v1 ? `${INTERESSE.find(i => i[0] === v1.interesse)[1]} (${shortDate(v1.datum)})` : '';
+    const vragen = useAi && p.vragen.length ? p.vragen : (l.verslagen.find(v => v.vragen.length) || { vragen: [] }).vragen;
+    const item = (k, v) => v ? `<div><dt>${k}</dt><dd>${v}</dd></div>` : '';
+    let status = '';
+    if (aiOn()) {
+      if (prepBusy.has(l.id)) status = '<span class="hint">Leadnex vat samen…</span>';
+      else if (fresh) status = `<button type="button" class="linkbtn" id="prep-${id}" data-act="prep-refresh">${ic('refresh-cw')}Vernieuwen</button>`;
+      else if (prepFailed.has(l.id)) status = `<span class="hint">${esc(prepFailed.get(l.id).msg)}</span> <button type="button" class="linkbtn" id="prep-${id}" data-act="prep-refresh">Opnieuw</button>`;
+    }
+    return `<section class="prep" aria-label="Gespreksvoorbereiding">
+      <div class="prep-head"><h3>${ic('sparkles')}Voorbereiding</h3>${status}</div>
+      ${useAi && p.samenvatting ? `<p class="psum">${esc(p.samenvatting)}</p>` : ''}
+      <dl class="pfacts">
+        ${item('Laatste contact', esc(useAi && p.laatsteContact || lastContactText(l)))}
+        ${item('Machines', machines.map(m => `<span class="mtag">${esc(m)}</span>`).join(''))}
+        ${item('Afspraken', afspraken.map(esc).join('<br>'))}
+        ${item('Interesse', esc(interesse))}
+        ${item('Volgende actie', l.actie ? esc(`${l.actie}${l.datum ? ', ' + shortDate(l.datum) : ''}${l.tijd ? ' om ' + l.tijd : ''}`) : '')}
+      </dl>
+      ${vragen.length ? `<div class="pq"><strong>Vraag bij het volgende gesprek</strong><ul>${vragen.map(q => `<li>${esc(q)}</li>`).join('')}</ul></div>` : ''}
+    </section>`;
+  }
+  async function requestPrep(id, force) {
+    const l = byId(id);
+    if (!l || !aiOn() || prepBusy.has(id) || !prepWorth(l)) return;
+    const sig = prepSig(l);
+    if (!force && ((l.voorbereiding && l.voorbereiding.sig === sig) || (prepFailed.has(id) && prepFailed.get(id).sig === sig))) return;
+    prepBusy.add(id); prepFailed.delete(id);
+    renderRows();
+    try {
+      const r = await aiInvoke('voorbereiding', { vandaag: todayISO(), bedrijf: leadForAi(l) });
+      const x = r.result || {};
+      const voorbereiding = validPrep({ sig, samenvatting: x.samenvatting, laatsteContact: x.laatsteContact, machines: x.machines, afspraken: x.afspraken, interesse: x.interesse, vragen: x.vragen, gemaakt: nowISO() });
+      if (byId(id)) await write(() => col.doc(id).update({ voorbereiding }));
+    } catch (e) { prepFailed.set(id, { sig, msg: aiErrorText(e) }); }
+    prepBusy.delete(id);
+    renderRows();
+  }
+
+  /* ---------- vragen over je klantverslagen ---------- */
+  const ask = { open: false, q: '', busy: false, res: null, error: '' };
+  const ASK_VOORBEELDEN = ['Welke bedrijven wilden een elektrische heftruck?', 'Wie wilde ik dit kwartaal terugbellen?', 'Welke potentiële klanten wachten op een offerte?'];
+  const STOPWOORDEN = new Set(('de het een en van voor met op in aan wie wat welke welk wanneer waar hoe die dat dit deze is zijn was waren heeft hebben had ik je jij wij we ze zij hij er '
+    + 'om te tot bij of als nog al ook niet geen wel wil wilde wilden willen kan kunnen moet moeten bedrijven bedrijf klanten klant mij mijn me over naar uit dan nu zo heb').split(' '));
+  function localAsk(q) {
+    const words = key(q).replace(/[^\p{L}\p{N}\s-]/gu, ' ').split(/\s+/).filter(w => w.length > 2 && !STOPWOORDEN.has(w));
+    if (!words.length) return [];
+    return state.leads.map(l => {
+      const hay = [l.notitie, ...l.verslagen.map(v => [v.tekst, v.machines.join(', '), v.afspraken, v.vragen.join(' ')].filter(Boolean).join(' · ')), ...l.log.map(x => x.t || '')].filter(Boolean).join(' · ');
+      const k = key(hay), hits = words.filter(w => k.includes(w) || (w.length > 5 && k.includes(w.slice(0, -1))));
+      if (!hits.length) return null;
+      const i = Math.max(0, k.indexOf(hits[0]) - 50);
+      return { l, score: hits.length, snippet: (i ? '…' : '') + clip(hay.slice(i), 150) };
+    }).filter(Boolean).sort((a, b) => b.score - a.score || byName(a.l, b.l)).slice(0, 15);
+  }
+  function askHtml() {
+    const r = ask.res;
+    let answer = '';
+    if (ask.error) answer = `<p class="warn" role="alert">${esc(ask.error)}</p>`;
+    else if (r && r.ai) {
+      const hits = r.bedrijven.map(b => ({ l: byId(b.id), reden: b.reden })).filter(x => x.l);
+      answer = `<div class="answer"><p>${esc(r.antwoord).replace(/\n/g, '<br>')}</p>
+        ${hits.length ? `<ul class="askhits">${hits.map(x => `<li><button type="button" class="linkbtn" data-goto="${esc(x.l.id)}">${esc(x.l.bedrijf)}</button>${x.l.plaats ? ` <span class="faint">${esc(x.l.plaats)}</span>` : ''}<span class="meta">${esc(x.reden)}</span></li>`).join('')}</ul>` : ''}
+        ${r.afgekapt ? `<p class="hint">Je lijst is groot: Leadnex heeft naar de ${r.aantal} meest recente bedrijven gekeken.</p>` : ''}</div>`;
+    } else if (r) {
+      answer = r.hits.length ? `<div class="answer"><p class="hint">Gevonden in je verslagen en notities:</p><ul class="askhits">${r.hits.map(x => `<li><button type="button" class="linkbtn" data-goto="${esc(x.l.id)}">${esc(x.l.bedrijf)}</button>${x.l.plaats ? ` <span class="faint">${esc(x.l.plaats)}</span>` : ''}<span class="meta">${esc(x.snippet)}</span></li>`).join('')}</ul></div>`
+        : '<p class="hint">Niets gevonden in je verslagen en notities.</p>';
+    }
+    return `<div class="card-head"><h2>${ic('message-circle-question')}Vraag het Leadnex</h2><button type="button" class="btn small ghost" data-ask="close">${ic('x')}Sluiten</button></div>
+      <p class="hint">${aiOn() ? 'Stel een vraag over je eigen klantverslagen, notities en contactmomenten.' : 'Zoekt in je klantverslagen, notities en contactmomenten. Met Leadnex AI aan krijg je een echt antwoord (zie Meer).'}</p>
+      <form class="askform" id="askForm"><input class="input" id="askQ" maxlength="300" enterkeyhint="search" placeholder="Bijv. ${esc(ASK_VOORBEELDEN[0])}" value="${esc(ask.q)}"${ask.busy ? ' disabled' : ''}>
+        <button type="submit" class="btn primary" id="askGo"${ask.busy ? ' disabled' : ''}>${ic(aiOn() ? 'sparkles' : 'search')}${ask.busy ? 'Bezig…' : aiOn() ? 'Vraag' : 'Zoek'}</button></form>
+      <div class="chips">${ASK_VOORBEELDEN.map((x, i) => `<button type="button" class="chip" data-ask-ex="${i}">${esc(x)}</button>`).join('')}</div>
+      ${answer}`;
+  }
+  function renderAsk() {
+    const el = $('askPanel');
+    el.hidden = !ask.open || state.page !== 'bedrijven';
+    $('askBtn').setAttribute('aria-expanded', String(ask.open));
+    if (!el.hidden) withFocus(el, () => { el.innerHTML = askHtml(); });
+  }
+  async function runAsk(q) {
+    q = q.trim().slice(0, 300);
+    if (!q || ask.busy) return;
+    ask.q = q; ask.error = ''; ask.res = null;
+    if (!aiOn()) { ask.res = { ai: false, hits: localAsk(q) }; renderAsk(); return; }
+    ask.busy = true; renderAsk();
+    try {
+      const r = await aiInvoke('vraag', { vraag: q, vandaag: todayISO() });
+      ask.res = { ai: true, antwoord: str(r.result && r.result.antwoord), bedrijven: Array.isArray(r.result && r.result.bedrijven) ? r.result.bedrijven : [], afgekapt: !!r.afgekapt, aantal: r.aantal || 0 };
+    } catch (e) {
+      ask.error = aiErrorText(e) + ' Hieronder wat er letterlijk in je verslagen staat.';
+      ask.res = { ai: false, hits: localAsk(q) };
+    }
+    ask.busy = false; renderAsk();
+  }
+
+  /* ---------- dubbele bedrijven ---------- */
+  function similarName(x, y) {
+    if (!x || !y) return false;
+    const A = new Set(x.split(' ')), B = new Set(y.split(' '));
+    const [small, big] = A.size <= B.size ? [A, B] : [B, A];
+    const common = [...small].filter(w => big.has(w)).length;
+    return (common === small.size && (small.size >= 2 || [...small][0].length >= 6)) || common / new Set([...A, ...B]).size >= 0.75;
+  }
+  function dupReasons(a, b) {
+    const ka = leadKeys(a), kb = leadKeys(b), r = [];
+    if (ka.p && ka.p === kb.p) r.push('zelfde telefoonnummer');
+    if (ka.e && ka.e === kb.e) r.push('zelfde e-mailadres');
+    if (ka.d.some(x => kb.d.includes(x))) r.push('zelfde website of maildomein');
+    if (ka.n && ka.n === kb.n) r.push('zelfde naam');
+    else if (similarName(ka.n, kb.n) && key(a.plaats) && key(a.plaats) === key(b.plaats)) r.push('bijna dezelfde naam in dezelfde plaats');
+    return r;
+  }
+  // Mogelijke dubbele: zelfde naam, telefoon, e-mail of domein, of bijna dezelfde naam in dezelfde plaats.
+  let dupCache = { leads: null, ignore: '', pairs: [] };
+  const weight = l => l.log.length + 2 * l.verslagen.length + (l.actie ? 1 : 0) + (l.gearchiveerd ? 0 : 1);   // bovenaan: het bedrijf met de meeste geschiedenis
+  function dupPairs() {
+    const ignoreRaw = pref.get('nietDubbel') || '[]';
+    if (dupCache.leads === state.leads && dupCache.ignore === ignoreRaw) return dupCache.pairs;
+    let ignore;
+    try { ignore = new Set(JSON.parse(ignoreRaw)); } catch { ignore = new Set(); }
+    const buckets = new Map(), put = (k, l) => { if (!k) return; if (!buckets.has(k)) buckets.set(k, []); buckets.get(k).push(l); };
+    state.leads.forEach(l => {
+      const k = leadKeys(l);
+      put(k.n && 'n:' + k.n, l); put(k.p && 'p:' + k.p, l); put(k.e && 'e:' + k.e, l); k.d.forEach(d => put('d:' + d, l));
+      const first = k.n.split(' ').find(w => w.length >= 3);
+      if (first && l.plaats) put('f:' + first + '|' + key(l.plaats), l);
+    });
+    const pairs = new Map();
+    buckets.forEach(list => {
+      if (list.length < 2 || list.length > 40) return;
+      for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
+        const [a, b] = [list[i], list[j]].sort((x, y) => weight(y) - weight(x) || (x.aangemaakt || '').localeCompare(y.aangemaakt || '') || x.id.localeCompare(y.id));
+        const pk = a.id + '|' + b.id;
+        if (pairs.has(pk) || ignore.has(pk)) continue;
+        const r = dupReasons(a, b);
+        if (r.length) pairs.set(pk, { a, b, r });
+      }
+    });
+    dupCache = { leads: state.leads, ignore: ignoreRaw, pairs: [...pairs.values()] };
+    return dupCache.pairs;
+  }
+  const rankStatus = s => ({ lead: 0, prospect: 1, klant: 2 })[s] || 0;
+  function mergedLead(a, b) {
+    const pick = k => a[k] || b[k] || '';
+    const seen = new Set();
+    const log = [...a.log, ...b.log].sort((x, y) => y.d.localeCompare(x.d)).filter(x => { const k = JSON.stringify(x); return !seen.has(k) && seen.add(k); });
+    const verslagen = [...a.verslagen, ...b.verslagen.filter(v => !a.verslagen.some(w => w.id === v.id))].sort(byVerslag).slice(0, 200);
+    const act = a.actie ? a : b.actie ? b : a;
+    return { ...a, contact: pick('contact'), email: pick('email'), telefoon: pick('telefoon'), adres: pick('adres'), plaats: pick('plaats'), website: pick('website'), branche: pick('branche'),
+      notitie: [...new Set([a.notitie, b.notitie].map(x => x.trim()).filter(Boolean))].join('\n\n').slice(0, 2000),
+      actie: act.actie, datum: act.datum, tijd: act.tijd, herinnering: act.herinnering, outlookId: act.outlookId,
+      prioriteit: prioRank(a) <= prioRank(b) ? a.prioriteit : b.prioriteit, status: rankStatus(a.status) >= rankStatus(b.status) ? a.status : b.status,
+      log: log.slice(0, 100), verslagen, geenMail: a.geenMail || b.geenMail,
+      gearchiveerd: a.gearchiveerd && b.gearchiveerd, gearchiveerdOp: a.gearchiveerd && b.gearchiveerd ? a.gearchiveerdOp : '',
+      geo: a.adres ? a.geo : b.adres ? b.geo : a.geo || b.geo, aangemaakt: [a.aangemaakt, b.aangemaakt].filter(Boolean).sort()[0] || a.aangemaakt,
+      voorbeeld: a.voorbeeld && b.voorbeeld, gewijzigd: nowISO(), voorbereiding: null };
+  }
+  const dupPanel = { open: false };
+  function dupHtml() {
+    const pairs = dupPairs();
+    const side = l => `<div class="dupside"><strong>${esc(l.bedrijf)}</strong>${statusBadge(l)}<span class="meta">${esc([l.plaats, l.telefoon, l.email].filter(Boolean).join(' · ') || 'geen gegevens')}</span>
+      <span class="meta">${l.verslagen.length} ${plural(l.verslagen.length, 'verslag', 'verslagen')} · ${l.log.length} contactmomenten${l.actie ? ' · ' + esc(l.actie) : ''}${l.gearchiveerd ? ' · in archief' : ''}</span></div>`;
+    return `<div class="card-head"><h2>${ic('merge')}Dubbele bedrijven</h2><button type="button" class="btn small ghost" data-dup="close">${ic('x')}Sluiten</button></div>
+      ${pairs.length ? `<p class="hint">Bij samenvoegen blijven alle gegevens, contactmomenten en verslagen bewaard in het bovenste bedrijf; het andere verdwijnt.</p>
+        <ol class="duplist">${pairs.slice(0, 50).map(p => `<li class="duppair">
+          <div class="dupcols">${side(p.a)}${side(p.b)}</div>
+          <p class="hint">${esc(cap(p.r.join(', ')))}</p>
+          <div class="btns"><button type="button" class="btn small primary" data-dup="merge" data-a="${esc(p.a.id)}" data-b="${esc(p.b.id)}">${ic('merge')}Samenvoegen</button>
+            <button type="button" class="btn small" data-dup="ignore" data-a="${esc(p.a.id)}" data-b="${esc(p.b.id)}">Geen dubbel</button>
+            <button type="button" class="btn small ghost" data-goto="${esc(p.a.id)}">Openen</button></div></li>`).join('')}</ol>`
+        : '<p class="hint">Geen dubbele bedrijven gevonden.</p>'}`;
+  }
+  function renderDup() {
+    const n = dupPairs().length;
+    $('dupStatus').textContent = n ? `${n} ${plural(n, 'bedrijf staat', 'bedrijven staan')} mogelijk dubbel in je lijst.` : 'Geen dubbele bedrijven gevonden.';
+    $('dupBtn').hidden = !n && !dupPanel.open;
+    const notice = $('dupNotice');
+    notice.hidden = !n || state.page !== 'bedrijven' || state.readOnly || pref.get('dupGezien') === String(n);
+    if (!notice.hidden) notice.querySelector('span').textContent = `${n} ${plural(n, 'bedrijf staat', 'bedrijven staan')} mogelijk dubbel in je lijst.`;
+    const el = $('dupPanel');
+    el.hidden = !dupPanel.open || state.page !== 'meer';
+    if (!el.hidden) withFocus(el, () => { el.innerHTML = dupHtml(); });
+  }
+  async function mergeDup(aId, bId) {
+    const a = byId(aId), b = byId(bId);
+    if (!a || !b || state.readOnly) return;
+    const ok = await write(() => col.doc(aId).set(toBody(mergedLead(a, b))));
+    if (!ok) return;
+    const ok2 = await write(() => col.doc(bId).delete());
+    renderAll();
+    toast(ok2 ? `${b.bedrijf} is samengevoegd met ${a.bedrijf}.` : `Samengevoegd, maar ${b.bedrijf} kon niet worden verwijderd. Probeer het opnieuw.`);
+  }
+
   /* ---------- gebeurtenissen ---------- */
   addForm.addEventListener('submit', addLead);
   const cam = { stream: null, torch: false };
@@ -3411,6 +4305,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (!row) return;
     const id = row.dataset.id;
     if (act === 'select') { toggleSelect(id, el.checked); return; }
+    if (act.startsWith('v-') || act.endsWith('-sug') || act === 'prep-refresh') { smartAction(act, id, el); return; }
     if (act === 'qmail' || act === 'wa') {
       const l = byId(id);
       if (!l) return;
@@ -3444,14 +4339,73 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     else if (act === 'restore') archiveLead(id, false);
     else if (act === 'delete') deleteLead(id);
   });
+  // Verslagen, slimme datums en voorbereiding in een geopend bedrijf.
+  function smartAction(act, id, el) {
+    const l = byId(id);
+    if (!l) return;
+    const pick = (text, i) => { const p = planFromText(text); return p && p.opties[+i] ? { actie: p.actie, o: p.opties[+i] } : null; };
+    if (act === 'v-new') openVerslag(id, !!el.dataset.mic);
+    else if (act === 'v-from-finish') {
+      const f = finishes[id], tekst = f ? [f.uitkomst, f.tekst.trim()].filter(Boolean).join('. ') : '';
+      openVerslag(id, true, /bezoek|afspraak/i.test(l.actie) ? 'Bezoek' : 'Telefoon', tekst ? tekst.replace(/\.?$/, '. ') : '');
+    }
+    else if (act === 'v-mic') { const v = vdrafts[id]; if (v && v.listening) stopDictation(); else if (v) startDictation(id); }
+    else if (act === 'v-ai') aiVerslag(id);
+    else if (act === 'v-save') saveVerslag(id);
+    else if (act === 'v-cancel') closeVerslag(id);
+    else if (act === 'v-del') deleteVerslag(id, el.dataset.vid);
+    else if (act === 'v-all') { if (vAll.has(id)) vAll.delete(id); else vAll.add(id); renderRows(); }
+    else if (act === 'v-sug') { const v = vdrafts[id], x = v && pick(v.tekst, el.dataset.i); if (x) { v.planTouched = true; applyPlan(v, x.actie, x.o); renderRows(); } }
+    else if (act === 'n-sug') {
+      const d = drafts[id], x = d && pick(d.notitie, el.dataset.i);
+      if (!x) return;
+      d.datum = x.o.datum; if (x.o.tijd) d.tijd = x.o.tijd; if (!d.actie.trim()) d.actie = x.actie;
+      renderRows();
+      toast('Actie en datum ingevuld. Tik op Opslaan om ze te bewaren.');
+    }
+    else if (act === 'f-sug') {
+      const f = finishes[id], x = f && pick(f.tekst, el.dataset.i);
+      if (!x) return;
+      f.datum = x.o.datum; if (x.o.tijd) f.tijd = x.o.tijd; if (!f.actie || f.uitkomst === 'Geen gehoor') f.actie = x.actie;
+      f.archief = false; f.hint = '';
+      renderRows();
+    }
+    else if (act === 'prep-refresh') requestPrep(id, true);
+  }
+  function updateSug(elId, text, act) {
+    const el = $(elId);
+    if (!el) return;
+    const h = suggestLine(text, act, elId + '-b');
+    el.innerHTML = h; el.hidden = !h;
+  }
   function onField(e) {
     const t = e.target, row = t.closest('.row');
     if (!row) return;
     const id = row.dataset.id;
+    if (t.dataset.vfield && vdrafts[id]) {
+      const v = vdrafts[id], f = t.dataset.vfield;
+      if (t.type === 'checkbox') {
+        if (e.type !== 'change') return;
+        v[f] = t.checked;
+        if (f === 'plan') {
+          v.planTouched = true;
+          if (t.checked && !v.vdatum) { const p = planFromText(v.tekst); if (p) applyPlan(v, p.actie, p.opties[0]); else v.vactie = v.vactie || canonAction('Bellen'); }
+        }
+        if (f === 'plan' || f === 'agenda') renderRows();
+        return;
+      }
+      v[f] = t.value;
+      if (f === 'tekst' && e.type === 'input') scheduleVSuggest(id);
+      if (['vactie', 'vdatum', 'vtijd'].includes(f)) v.planTouched = true;
+      if (e.type === 'change' && ['interesse', 'vtijd', 'soort'].includes(f)) renderRows();
+      return;
+    }
     if (t.dataset.field && drafts[id]) {
       if (t.type === 'checkbox') { if (e.type === 'change') drafts[id][t.dataset.field] = t.checked; }
       else drafts[id][t.dataset.field] = t.value;
+      if (t.dataset.field === 'notitie' && e.type === 'input') updateSug('nsug-' + id, t.value, 'n-sug');
     }
+    if (t.dataset.ffield === 'tekst' && finishes[id] && e.type === 'input') updateSug('fsug-' + id, t.value, 'f-sug');
     if (t.dataset.ffield && finishes[id]) {
       if (t.type === 'checkbox' && t.dataset.ffield === 'agenda') { if (e.type === 'change') finishes[id].agenda = t.checked; }
       else if (t.type === 'checkbox') {
@@ -3475,6 +4429,51 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     }
     else if (e.key === 'Escape') { e.preventDefault(); closeRow(); document.getElementById('t-' + id)?.focus(); }
   });
+
+  $('askBtn').addEventListener('click', () => { ask.open = !ask.open; renderAsk(); if (ask.open) $('askQ')?.focus(); });
+  $('askPanel').addEventListener('submit', e => { e.preventDefault(); runAsk($('askQ').value); });
+  $('askPanel').addEventListener('input', e => { if (e.target.id === 'askQ') ask.q = e.target.value; });
+  $('askPanel').addEventListener('click', e => {
+    const g = e.target.closest('[data-goto]');
+    if (g) { gotoLead(g.dataset.goto); return; }
+    const x = e.target.closest('[data-ask-ex]');
+    if (x) { runAsk(ASK_VOORBEELDEN[+x.dataset.askEx]); return; }
+    if (e.target.closest('[data-ask="close"]')) { ask.open = false; renderAsk(); }
+  });
+  $('statusSel').addEventListener('change', e => { state.status = e.target.value; pref.set('statusFilter', state.status); renderAll(); });
+  $('buurtBtn').addEventListener('click', () => {
+    state.buurt = !state.buurt;
+    pref.set('buurt', state.buurt ? '1' : '');
+    if (state.buurt && state.view === 'archief') setView('alles');
+    if (!state.buurt && state.page !== 'kaart') stopLocating();
+    renderAll();
+  });
+  $('bouwvakSel').innerHTML = REGIOS.map(([v, t]) => `<option value="${v}"${v === bouwvakRegio() ? ' selected' : ''}>Regio ${t}</option>`).join('');
+  $('buurtSel').innerHTML = BUURT_KM.map(km => `<option value="${km}"${km === buurtKm() ? ' selected' : ''}>${km} km</option>`).join('');
+  $('bouwvakSel').addEventListener('change', e => { pref.set('bouwvak', e.target.value); renderAll(); });
+  $('buurtSel').addEventListener('change', e => { pref.set('buurtKm', e.target.value); renderAll(); });
+  $('aiCheckBtn').addEventListener('click', () => aiCheck(true));
+  $('aiHelpBtn').addEventListener('click', () => { const h = $('aiHelp'); h.hidden = !h.hidden; $('aiHelpBtn').setAttribute('aria-expanded', String(!h.hidden)); });
+  $('dupBtn').addEventListener('click', () => { dupPanel.open = !dupPanel.open; renderDup(); if (dupPanel.open) $('dupPanel').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+  $('dupPanel').addEventListener('click', e => {
+    const g = e.target.closest('[data-goto]');
+    if (g) { gotoLead(g.dataset.goto); return; }
+    const b = e.target.closest('[data-dup]');
+    if (!b) return;
+    if (b.dataset.dup === 'close') { dupPanel.open = false; renderDup(); }
+    else if (b.dataset.dup === 'merge') mergeDup(b.dataset.a, b.dataset.b);
+    else if (b.dataset.dup === 'ignore') {
+      let list = [];
+      try { list = JSON.parse(pref.get('nietDubbel') || '[]'); } catch {}
+      pref.set('nietDubbel', JSON.stringify([...list, b.dataset.a + '|' + b.dataset.b].slice(-500)));
+      renderAll();
+    }
+  });
+  $('dupNotice').addEventListener('click', e => {
+    if (e.target.closest('#dupNoticeGo')) { dupPanel.open = true; setPage('meer'); requestAnimationFrame(() => $('dupPanel').scrollIntoView({ block: 'start' })); }
+    else if (e.target.closest('#dupNoticeHide')) { pref.set('dupGezien', String(dupPairs().length)); renderDup(); }
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopDictation(); });
 
   mailPanel.addEventListener('click', e => {
     const handoff = e.target.closest('a[data-handoff]');
@@ -4277,7 +5276,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (l.tijd) {
       const [hh, mi] = l.tijd.split(':').map(Number), start = Date.UTC(y, m - 1, d, hh, mi);
       return { ...ev, isAllDay: false, showAs: 'busy', start: { dateTime: iso(start), timeZone: tz }, end: { dateTime: iso(start + 3600000), timeZone: tz },
-        isReminderOn: true, reminderMinutesBeforeStart: 30 };
+        isReminderOn: validHerinnering(l.herinnering) > 0, reminderMinutesBeforeStart: validHerinnering(l.herinnering) };
     }
     // Zonder tijd: een dag-item dat je agenda niet blokkeert. De ochtendmelding herinnert je eraan.
     return { ...ev, isAllDay: true, showAs: 'free', isReminderOn: false,
@@ -4510,6 +5509,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     window.addEventListener('hashchange', openFromNotification);
     renderPush();
     renderAll();
+    aiCheck(false);
   }
 
   const loginErr = m => { $('loginErr').textContent = m || ''; $('loginErr').hidden = !m; };
