@@ -1,6 +1,6 @@
 // Service worker: maakt de app installeerbaar, laat hem openen zonder bereik
 // en toont de ochtendmelding met de acties van vandaag.
-const CACHE = 'koude-acquisitie-v13';
+const CACHE = 'koude-acquisitie-v14';
 const DATA_CACHE = 'koude-acq-data';   // hierin zet de app de actielijst voor de ochtendmelding
 const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest', './vendor/supabase.js', './icons/icon-192.png', './icons/icon-512.png', './icons/badge-96.png'];
 
@@ -75,7 +75,7 @@ self.addEventListener('push', event => {
     const opts = { icon: 'icons/icon-192.png', badge: 'icons/badge-96.png', tag: 'dagtaken', renotify: true, data: { url: './#vandaag' } };
     if (m) return self.registration.showNotification(m.title, { ...opts, body: tip ? m.body + '\n' + tip : m.body });
     if (tip) return self.registration.showNotification('Back-up maken', { ...opts, body: tip + ' Open de app en tik onderaan op Back-up maken.' });
-    if (msg.test) return self.registration.showNotification('Koude Acquisitie', { ...opts, body: 'Meldingen werken. Er staan vandaag geen acties op je lijst.' });
+    if (msg.test) return self.registration.showNotification('Leadnex', { ...opts, body: 'Meldingen werken. Er staan vandaag geen acties op je lijst.' });
     // Geen acties vandaag: geen melding.
   })());
 });

@@ -1,4 +1,4 @@
--- Koude Acquisitie: database-opzet voor Supabase.
+-- Leadnex: database-opzet voor Supabase.
 -- Plak dit in Supabase → SQL Editor → New query, en klik op Run.
 
 create table if not exists public.docs (

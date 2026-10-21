@@ -1,18 +1,21 @@
-# Koude Acquisitie
+# Leadnex
 
-Installeerbare web-app (PWA) voor koude acquisitie: bedrijven, acties, contactmomenten, mailteksten en import uit Excel.
+Installeerbare web-app (PWA) voor acquisitie: bedrijven, acties, contactmomenten, mailteksten en import uit Excel.
 Zonder verdere instellingen bewaart de app alles op het apparaat zelf (geen account nodig). Maak af en toe een back-up via de knop onderaan.
 Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supabase-database (zie hieronder); de app vraagt dan om in te loggen.
 
 ## Wat de app doet
 
 - Bedrijven met contactpersoon, telefoon, e-mail, adres, branche en website; acties met datum, tijd en prioriteit.
+- Vijf tabbladen: **Vandaag**, **Bedrijven**, **Kaart**, **Nieuw** en **Meer** (op de telefoon onderin, op de computer bovenin).
 - **Vandaag**: wat er vandaag (of eerder) moet gebeuren, met elke ochtend om 08:05 een melding.
 - **Belsessie**: de lijst een voor een afbellen. Na elk gesprek staat "Hoe ging het?" open, ook als je vanuit de lijst belt.
 - **Vaste opvolgstappen** na geen gehoor: de volgende werkdag, na twee werkdagen, na drie keer een mail (daarna vanzelf nabellen), na vijf keer voorstel om te archiveren.
 - **Kaart**: bedrijven bij jou in de buurt (2, 5, 10 of 25 km), met route langs de dichtstbijzijnde. Adressen worden één keer opgezocht bij de Locatieserver van PDOK (Kadaster) en bij het bedrijf bewaard; de kaart komt ook van PDOK.
 - **Mailen**: per bedrijf of aan iedereen in de lijst (filter op branche of actie), in BCC in mails van hooguit 50 adressen, met mailteksten.
-- **Delen naar de app** vanuit Google Maps of Chrome, **visitekaartje scannen**, **in telefooncontacten** zetten, import uit Excel, export naar CSV, back-up.
+- **WhatsApp** per bedrijf (06- en Belgische 04-nummers), met een begroeting en de voornaam alvast ingevuld.
+- **Werken zonder bereik**: wijzigingen blijven op de telefoon in een wachtrij en gaan vanzelf online zodra er weer verbinding is.
+- **Delen naar de app** vanuit Google Maps, de Google-app of Chrome (naam, adres en telefoon worden zo nodig aangevuld via PDOK of OpenStreetMap), **visitekaartje scannen**, **in telefooncontacten** zetten, import uit Excel, export naar CSV, back-up.
 
 ## Bestanden
 
@@ -42,7 +45,7 @@ De app staat dan op `https://<gebruikersnaam>.github.io/<repository>/`.
 Met een koppeling verstuurt de app mails vanuit je eigen mailbox (ook persoonlijk per bedrijf, in één keer) en zet hij afspraken direct in je Outlook-agenda. Zonder koppeling opent de app je mail-app en downloadt hij een agenda-bestand (.ics).
 
 1. Ga naar [entra.microsoft.com](https://entra.microsoft.com) → **App-registraties** → **Nieuwe registratie**.
-2. Naam: `Koude Acquisitie`. Accounttype: **Alleen één tenant** (je eigen organisatie).
+2. Naam: `Leadnex`. Accounttype: **Alleen één tenant** (je eigen organisatie).
 3. Omleidings-URI: platform **Toepassing met één pagina (SPA)**, adres `https://<gebruikersnaam>.github.io/<repository>/` (precies het adres van de app, met `/` aan het eind).
 4. **API-machtigingen** → **Een machtiging toevoegen** → **Microsoft Graph** → **Gedelegeerde machtigingen**: `Mail.ReadWrite`, `Mail.Send`, `Calendars.ReadWrite`, `offline_access` (en `User.Read`, staat er al). Klik op **Beheerderstoestemming verlenen**.
 5. Zet de **Toepassings-ID (client-ID)** en **Map-ID (tenant-ID)** van de pagina **Overzicht** in `config.js` (`outlookClientId`, `outlookTenant`), of vul ze in de app in onderaan bij **Outlook → Koppelen**.
@@ -58,4 +61,4 @@ Log in en kies onderaan **Back-up terugzetten**. Kies het bestand `koude-acquisi
 
 ## Auteursrecht
 © 2026 Silvan H. Alle rechten voorbehouden. Gebruik, kopiëren of verspreiden van deze app of de code is niet toegestaan zonder schriftelijke toestemming; zie `LICENSE`.
-De onderdelen in `vendor/` vallen onder hun eigen licenties: Supabase-bibliotheek (MIT), SheetJS (Apache-2.0), Tesseract.js (Apache-2.0) en Leaflet (BSD-2-Clause); zie `vendor/THIRD_PARTY.md`.
+De onderdelen in `vendor/` vallen onder hun eigen licenties: Supabase-bibliotheek (MIT), SheetJS (Apache-2.0), Tesseract.js (Apache-2.0), Leaflet (BSD-2-Clause) en de Lucide-pictogrammen (ISC); zie `vendor/THIRD_PARTY.md`.

@@ -1,13 +1,13 @@
 {
-  "name": "Koude Acquisitie",
-  "short_name": "Acquisitie",
-  "description": "Bedrijven, acties en contactmomenten voor koude acquisitie.",
+  "name": "Leadnex",
+  "short_name": "Leadnex",
+  "description": "Bedrijven, acties en contactmomenten voor acquisitie.",
   "lang": "nl",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#383E42",
-  "theme_color": "#383E42",
+  "background_color": "#1F252B",
+  "theme_color": "#1F252B",
   "icons": [
     {
       "src": "icons/icon-192.png",

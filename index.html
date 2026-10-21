@@ -1,12 +1,12 @@
 <!doctype html>
-<!-- Koude Acquisitie · © 2026 Silvan H. Alle rechten voorbehouden. Zie LICENSE. -->
+<!-- Leadnex · © 2026 Silvan H. Alle rechten voorbehouden. Zie LICENSE. -->
 <html lang="nl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Koude Acquisitie</title>
-<meta name="description" content="Bedrijven, acties en contactmomenten voor koude acquisitie.">
-<meta name="theme-color" content="#383E42">
+<title>Leadnex</title>
+<meta name="description" content="Leadnex: bedrijven, acties en contactmomenten voor acquisitie.">
+<meta name="theme-color" content="#1F252B">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="author" content="Silvan H.">
 <meta name="copyright" content="© 2026 Silvan H. Alle rechten voorbehouden.">
@@ -14,90 +14,407 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: antraciet kopband met gele onderrand (huisstijl), invoerkaart, overzicht Alles / Acties / Vandaag / Archief, en de lijst als gelinieerde rijen die openklappen. Import en mail openen als kaarten boven de lijst. */
+/* Vormgeving: rustige grijstinten met geel als accent. Een donkere appbalk bovenin, een tabbalk onderin (telefoon)
+   of in de appbalk (computer), en per tabblad één overzichtelijke pagina met kaarten. */
 :root {
   color-scheme: light;
-  --bg: #EFF0F1;
+  --bg: #F3F4F6;
   --surface: #FFFFFF;
-  --sunken: #F6F7F7;
-  --ink: #22272B;
-  --muted: #586066;
-  --faint: #899096;
-  --line: #DCDFE1;
-  --line-strong: #C3C8CB;
-  --focus: #22272B;
-  --geel: #F6B800;
-  --geel-hover: #E3A900;
-  --geel-ink: #22272B;
-  --geel-soft: #FFF2C7;
-  --geel-soft-ink: #4A3A00;
-  --tab-on: #383E42;
-  --tab-on-ink: #FFFFFF;
-  --danger: #B3322F;
-  --danger-soft: #FBE6E5;
-  --band: #383E42;
-  --band-ink: #FFFFFF;
-  --band-muted: #BCC2C6;
-  --band-line: #5A6268;
-  --shadow: 0 1px 2px rgba(34, 39, 43, .06), 0 4px 16px rgba(34, 39, 43, .05);
-  --f-display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --sunken: #F6F7F9;
+  --ink: #1C2126;
+  --muted: #5A636B;
+  --faint: #8B939A;
+  --line: #E4E7EB;
+  --line-strong: #CFD5DB;
+  --focus: #F6B800;
+  --brand: #F6B800;
+  --brand-hover: #E8AD00;
+  --brand-ink: #1C2126;
+  --brand-soft: #FFF5D1;
+  --brand-soft-ink: #5C4700;
+  --primary: #1F252B;
+  --primary-hover: #343C43;
+  --primary-ink: #FFFFFF;
+  --appbar: #1F252B;
+  --appbar-ink: #FFFFFF;
+  --appbar-muted: #A9B2B9;
+  --danger: #C0352F;
+  --danger-soft: #FDECEB;
+  --ok: #0E7A43;
+  --ok-soft: #E2F5EA;
+  --shadow-sm: 0 1px 2px rgba(28, 33, 38, .06);
+  --shadow: 0 1px 2px rgba(28, 33, 38, .05), 0 6px 20px rgba(28, 33, 38, .06);
+  --radius: 14px;
+  --nav-h: 64px;
   --f-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #1B1F22; --surface: #24292D; --sunken: #202427; --ink: #ECEEEF; --muted: #A2A9AE; --faint: #737B82;
-    --line: #343A3F; --line-strong: #464D53; --focus: #F6B800;
-    --geel: #F6B800; --geel-hover: #FFC933; --geel-ink: #1B1F22; --geel-soft: #3B3212; --geel-soft-ink: #F7CD4F;
-    --tab-on: #ECEEEF; --tab-on-ink: #1B1F22;
-    --danger: #F28B87; --danger-soft: #3C1D1C;
-    --band: #2C3236; --band-ink: #FFFFFF; --band-muted: #AEB5BA; --band-line: #4A5258;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 16px rgba(0, 0, 0, .25);
     color-scheme: dark;
+    --bg: #111518; --surface: #1A1F23; --sunken: #15191C; --ink: #E8EBED; --muted: #A3ACB3; --faint: #737C83;
+    --line: #283036; --line-strong: #3A434A;
+    --brand-soft: #3A3010; --brand-soft-ink: #F5CE5A; --brand-hover: #FFC52E;
+    --primary: #E8EBED; --primary-hover: #FFFFFF; --primary-ink: #111518;
+    --appbar: #15191C; --appbar-ink: #FFFFFF; --appbar-muted: #9AA3AA;
+    --danger: #F28B85; --danger-soft: #3B1C1B; --ok: #6FDC9C; --ok-soft: #133426;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .3);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #1B1F22; --surface: #24292D; --sunken: #202427; --ink: #ECEEEF; --muted: #A2A9AE; --faint: #737B82;
-  --line: #343A3F; --line-strong: #464D53; --focus: #F6B800;
-  --geel: #F6B800; --geel-hover: #FFC933; --geel-ink: #1B1F22; --geel-soft: #3B3212; --geel-soft-ink: #F7CD4F;
-  --tab-on: #ECEEEF; --tab-on-ink: #1B1F22;
-  --danger: #F28B87; --danger-soft: #3C1D1C;
-  --band: #2C3236; --band-ink: #FFFFFF; --band-muted: #AEB5BA; --band-line: #4A5258;
-  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 16px rgba(0, 0, 0, .25);
   color-scheme: dark;
+  --bg: #111518; --surface: #1A1F23; --sunken: #15191C; --ink: #E8EBED; --muted: #A3ACB3; --faint: #737C83;
+  --line: #283036; --line-strong: #3A434A;
+  --brand-soft: #3A3010; --brand-soft-ink: #F5CE5A; --brand-hover: #FFC52E;
+  --primary: #E8EBED; --primary-hover: #FFFFFF; --primary-ink: #111518;
+  --appbar: #15191C; --appbar-ink: #FFFFFF; --appbar-muted: #9AA3AA;
+  --danger: #F28B85; --danger-soft: #3B1C1B; --ok: #6FDC9C; --ok-soft: #133426;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .3);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; }
+html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 var(--f-body); -webkit-font-smoothing: antialiased; }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
-body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
 button, input, select, textarea { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-
+.ic { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .gutter {
   max-width: 1120px; margin: 0 auto;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 
-/* Kopband */
-.band { background: var(--band); color: var(--band-ink); border-bottom: 5px solid var(--geel); }
-.band-inner { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px 24px; padding-block: calc(22px + env(safe-area-inset-top, 0px)) 22px; }
-.band-text { display: grid; gap: 6px; min-width: 0; }
-.band-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.eyebrow { margin: 0; font: 500 12px/1.2 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--geel); }
-h1 { margin: 0; font: 800 clamp(30px, 4.6vw, 44px)/1 var(--f-display); font-stretch: 88%; letter-spacing: -.01em; text-wrap: balance; }
-.summary { margin: 0; color: var(--band-muted); }
-.summary strong { color: var(--band-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
-.band :focus-visible, .selbar :focus-visible { outline-color: var(--geel); }
+/* Appbalk */
+.appbar { position: sticky; top: 0; z-index: 12; background: var(--appbar); color: var(--appbar-ink); box-shadow: 0 1px 0 rgba(0, 0, 0, .2); }
+.appbar-inner { display: flex; align-items: center; gap: 12px; min-height: 58px; padding-top: env(safe-area-inset-top, 0px); }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; margin-right: auto; color: inherit; text-decoration: none; }
+.brand-mark { width: 32px; height: 32px; flex: none; border-radius: 9px; }
+.brand-name { font-weight: 700; font-size: 19px; letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.brand-name b { font-weight: 700; color: var(--brand); }
+.appbar-date { font-size: 13px; color: var(--appbar-muted); white-space: nowrap; }
+.appbar :focus-visible, .selbar :focus-visible { outline-color: var(--brand); }
 
-.wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 22px 80px; }
-body.selecting .wrap, body.sessie .wrap { padding-bottom: 170px; }
+/* Navigatie: onderin op de telefoon, in de appbalk op de computer */
+.nav { display: flex; }
+.nav-item {
+  position: relative; display: flex; align-items: center; gap: 8px; border: 0; background: none; cursor: pointer;
+  color: inherit; font-weight: 600; font-size: 14px; text-decoration: none;
+}
+.nav-item .badge {
+  min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--brand); color: var(--brand-ink);
+  font: 700 11px/18px var(--f-body); text-align: center;
+}
+@media (min-width: 900px) {
+  .bottomnav { display: none; }
+  .topnav { display: flex; gap: 4px; }
+  .topnav .nav-item { min-height: 38px; padding: 0 14px; border-radius: 10px; color: var(--appbar-muted); }
+  .topnav .nav-item:hover { color: var(--appbar-ink); background: rgba(255, 255, 255, .06); }
+  .topnav .nav-item[aria-current="page"] { color: var(--appbar-ink); background: rgba(255, 255, 255, .1); box-shadow: inset 0 -2px 0 var(--brand); }
+  .topnav .nav-item.new { color: var(--brand-ink); background: var(--brand); }
+  .topnav .nav-item.new:hover { background: var(--brand-hover); color: var(--brand-ink); }
+}
+@media (max-width: 899.98px) {
+  .topnav { display: none; }
+  .bottomnav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 14; display: grid; grid-template-columns: repeat(5, 1fr);
+    background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -4px 16px rgba(28, 33, 38, .06);
+    padding: 6px max(6px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-right, 0px));
+  }
+  .bottomnav .nav-item { flex-direction: column; justify-content: center; gap: 3px; min-height: 52px; color: var(--muted); font-size: 11.5px; font-weight: 600; }
+  .bottomnav .nav-item .pill { display: grid; place-items: center; width: 52px; height: 30px; border-radius: 999px; transition: background-color .15s; }
+  .bottomnav .nav-item .ic { width: 22px; height: 22px; }
+  .bottomnav .nav-item[aria-current="page"] { color: var(--ink); }
+  .bottomnav .nav-item[aria-current="page"] .pill { background: var(--brand-soft); color: var(--brand-soft-ink); }
+  .bottomnav .nav-item.new .pill { background: var(--brand); color: var(--brand-ink); }
+  .bottomnav .nav-item .badge { position: absolute; top: 2px; left: calc(50% + 8px); }
+  body { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* Pagina */
+.wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 18px 40px; }
+body.selecting .wrap, body.sessie .wrap { padding-bottom: 150px; }
+.page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 16px; }
+.page-head h2 { margin: 0; font-size: 24px; line-height: 1.15; font-weight: 700; letter-spacing: -.02em; }
+.page-head .sub { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.stat { display: grid; gap: 2px; min-width: 0; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+.stat b { font-size: 24px; line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.stat.hot { background: var(--brand-soft); border-color: transparent; }
+.stat.hot span { color: var(--brand-soft-ink); }
+.stat.late b { color: var(--danger); }
+#summary { display: none; }
+
+/* Knoppen */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 42px; padding: 0 16px; border-radius: 10px;
+  border: 1px solid var(--line-strong); background: var(--surface); box-shadow: var(--shadow-sm);
+  font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; text-decoration: none; color: var(--ink);
+  transition: background-color .15s, border-color .15s, color .15s, box-shadow .15s;
+}
+.btn:hover { border-color: var(--faint); background: var(--sunken); }
+.btn:active { transform: translateY(1px); }
+.btn.small { min-height: 34px; padding: 0 12px; font-size: 13px; border-radius: 9px; }
+.btn.small .ic { width: 16px; height: 16px; }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+.btn.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+.btn.accent { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.btn.accent:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+.btn.on-band { background: transparent; border-color: rgba(255, 255, 255, .28); color: #fff; box-shadow: none; }
+.btn.on-band:hover, .btn.on-band[aria-expanded="true"] { border-color: var(--brand); background: rgba(255, 255, 255, .06); color: #fff; }
+.btn.danger { background: transparent; border-color: transparent; box-shadow: none; color: var(--danger); }
+.btn.danger:hover { background: var(--danger-soft); }
+.btn.danger.armed { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn.ghost { background: transparent; border-color: transparent; box-shadow: none; }
+.btn[aria-expanded="true"], .btn[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+.btn:disabled, .btn.disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.btn.disabled { pointer-events: none; }
+.linkbtn { padding: 0; border: 0; background: none; cursor: pointer; font-weight: 600; text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.inline-link { color: inherit; font-weight: 600; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.pactions, .btns { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.pactions .push { margin-left: auto; }
+
+/* Kaarten en meldingen */
+.card { display: grid; gap: 16px; min-width: 0; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.card-head h2, .card h3.title { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+.notice, .warn, .dupwarn { padding: 12px 16px; border-radius: 12px; background: var(--brand-soft); color: var(--ink); }
+.notice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.notice p { margin: 0; max-width: 68ch; }
+.warn, .dupwarn { margin: 0; font-size: 14px; padding: 10px 12px; }
+.hint { margin: 0; font-size: 13px; color: var(--muted); max-width: 70ch; }
+.faint { color: var(--faint); }
+.syncbar-top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; background: var(--brand-soft); color: var(--brand-soft-ink); font-size: 14px; font-weight: 600; }
+.syncbar-top.busy { background: var(--sunken); color: var(--muted); font-weight: 500; }
+
+/* Velden */
+.field { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.field > label { font-size: 13px; font-weight: 600; color: var(--muted); }
+.opt { margin-left: 4px; font-weight: 400; color: var(--faint); font-size: 12px; }
+.input {
+  width: 100%; min-height: 44px; padding: 9px 12px; border-radius: 10px;
+  border: 1px solid var(--line-strong); background: var(--surface); font-size: 15px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.input::placeholder { color: var(--faint); }
+.input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(246, 184, 0, .28); }
+.input[readonly], .input:disabled { background: var(--sunken); }
+.input:disabled { color: var(--faint); }
+textarea.input { min-height: 84px; resize: vertical; line-height: 1.45; }
+select.input { padding-right: 8px; }
+.searchbox { position: relative; flex: 1 1 240px; min-width: 0; }
+.searchbox .ic { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--faint); pointer-events: none; }
+.searchbox .input { padding-left: 38px; }
+.when { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.qd {
+  min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line-strong);
+  background: var(--surface); font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.qd:hover { border-color: var(--faint); }
+.qd[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.qd:disabled { opacity: .45; cursor: not-allowed; }
+.when .input { flex: 1 1 150px; width: auto; min-width: 140px; }
+.check { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+.check input, .sel { width: 20px; height: 20px; margin: 0; accent-color: var(--brand); flex: none; cursor: pointer; }
+.sel:disabled { cursor: not-allowed; opacity: .4; }
+
+/* Nieuw bedrijf */
+.add { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: end; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.add .span-when { grid-column: span 2; }
+.add .dupwarn { grid-column: 1 / 3; }
+.add .submit { grid-column: 3; display: flex; justify-content: flex-end; }
+.add .submit .btn { min-width: 160px; }
+@media (max-width: 760px) {
+  .add { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .add .span-when, .add .dupwarn, .add .submit { grid-column: 1 / -1; }
+  .add .submit .btn { flex: 1; min-height: 48px; }
+}
+@media (max-width: 520px) { .add { grid-template-columns: minmax(0, 1fr); } }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tile {
+  display: grid; justify-items: center; align-content: center; gap: 8px; min-height: 96px; padding: 12px 8px; border-radius: var(--radius);
+  border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow-sm); cursor: pointer; text-align: center;
+  font-size: 13.5px; font-weight: 600; transition: border-color .15s, background-color .15s;
+}
+.tile .ic { width: 26px; height: 26px; }
+.tile:hover { border-color: var(--faint); }
+.tile.main { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.tile.main:hover { background: var(--brand-hover); }
+.tile:disabled { opacity: .6; cursor: progress; }
+#scanMsg { display: block; }
+.scanlines { display: grid; gap: 8px; }
+.scanlines .hint { margin: 0; }
+.ocr-lines { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.ocr-lines li { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 12px; }
+.ocr-lines li + li { border-top: 1px solid var(--line); }
+.ocr-t { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
+.ocr-sel { flex: 0 0 auto; width: 142px; min-height: 36px; padding-block: 4px; font-size: 14px; color: var(--muted); }
+.ocr-sel.used { color: var(--ink); font-weight: 600; }
+.scanlines .raw summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+.scanlines .raw pre { margin: 6px 0 0; padding: 8px 10px; border-radius: 8px; background: var(--sunken); font: 12px/1.45 var(--f-mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Camera in de app: beeld over het hele scherm met een kader in de vorm van een visitekaartje. */
+.cam { position: fixed; inset: 0; z-index: 1000; background: #000; }
+.cam video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cam-frame { position: absolute; left: 50%; top: 44%; width: min(92vw, 70vh); aspect-ratio: 85 / 55; transform: translate(-50%, -50%);
+  border: 3px solid #F6B800; border-radius: 12px; box-shadow: 0 0 0 200vmax rgba(0, 0, 0, .5); pointer-events: none; }
+.cam-tip { position: absolute; left: 16px; right: 16px; top: max(16px, env(safe-area-inset-top)); margin: 0; text-align: center; color: #fff; font-weight: 600; text-shadow: 0 1px 3px #000; }
+.cam-bar { position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 18px 16px calc(22px + env(safe-area-inset-bottom)); }
+.cam-bar #camClose { justify-self: start; }
+.cam-bar #camTorch { justify-self: end; }
+.cam-shot { width: 76px; height: 76px; border-radius: 50%; border: 5px solid #fff; background: #F6B800; cursor: pointer; }
+.cam-shot:active { transform: scale(.94); }
+body.cam-open { overflow: hidden; }
+
+/* Overzicht: gesegmenteerde keuze, zoeken en filters */
+.overview { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.tools { display: flex; flex-wrap: wrap; flex: 1 1 420px; justify-content: flex-end; gap: 8px; min-width: 0; }
+.tabs { display: inline-flex; max-width: 100%; overflow-x: auto; padding: 4px; gap: 4px; border-radius: 12px; background: var(--sunken); border: 1px solid var(--line); }
+.tab {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 0 14px; border: 0; border-radius: 9px;
+  background: transparent; font-weight: 600; font-size: 14px; color: var(--muted); cursor: pointer; white-space: nowrap;
+}
+.tab:hover { color: var(--ink); }
+.tab[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+.tab .n, .chip .n { font: 500 12px/1 var(--f-mono); font-variant-numeric: tabular-nums; opacity: .75; }
+.branchesel { flex: 0 1 200px; min-width: 0; }
+.branchesel.on { border-color: var(--brand); box-shadow: 0 0 0 2px rgba(246, 184, 0, .3); }
+.hint.links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+@media (max-width: 640px) {
+  .tabs { display: flex; width: 100%; }
+  .tab { flex: 1 1 0; padding: 0 8px; }
+  .tools { flex-basis: 100%; }
+  .searchbox { flex-basis: 100%; }
+  .branchesel { flex: 1 1 0; }
+  .tools .btn { flex: 1 1 0; }
+}
+.filters { display: grid; gap: 8px; }
+.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px;
+  border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface);
+  font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.chip:hover { border-color: var(--faint); }
+.chip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); font-weight: 600; }
+.chip.toggle[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+.chip-group { display: inline-flex; }
+.chip-group .chip { border-top-right-radius: 0; border-bottom-right-radius: 0; padding-right: 10px; }
+.chip-x {
+  display: grid; place-items: center; width: 32px; min-height: 36px; padding: 0; cursor: pointer;
+  border: 1px solid var(--line-strong); border-left: 0; border-radius: 0 999px 999px 0; background: var(--surface); color: var(--muted); font-size: 16px; line-height: 1;
+}
+.chip-x:hover { color: var(--danger); background: var(--danger-soft); }
+.sep { width: 1px; height: 22px; background: var(--line-strong); margin: 0 2px; }
+
+/* Lijst */
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.cols { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr) minmax(0, 1.3fr) minmax(0, 1.1fr) 210px; gap: 16px; align-items: center; }
+.list-head { padding: 10px 18px; border-bottom: 1px solid var(--line); background: var(--sunken); }
+.list-head span { font-size: 12px; font-weight: 600; color: var(--muted); }
+#rows > * + * { border-top: 1px solid var(--line); }
+.group-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 18px; background: var(--sunken); font-size: 13px; font-weight: 700; color: var(--ink); }
+.group-head::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); flex: none; }
+.group-head.quiet::before { background: var(--line-strong); }
+.group-head .n { font: 500 12px/1 var(--f-mono); color: var(--muted); }
+.route { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink); text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.row-main { padding: 14px 18px; min-height: 64px; cursor: pointer; transition: background-color .12s; }
+.row-main:hover, .row.open > .row-main { background: var(--sunken); }
+.row.current { box-shadow: inset 4px 0 0 var(--brand); }
+.cell { min-width: 0; }
+.first { display: flex; align-items: flex-start; gap: 12px; }
+.first .sel { margin-top: 2px; }
+.bedrijf { display: grid; gap: 2px; justify-items: start; min-width: 0; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 4px; }
+.bedrijf .name { font-size: 16px; line-height: 1.25; font-weight: 700; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.bedrijf .sub { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.row.nomail .bedrijf .name { color: var(--faint); }
+.meta { font-size: 12.5px; line-height: 1.35; color: var(--faint); overflow-wrap: anywhere; }
+.tag { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; border: 1px dashed var(--line-strong); font-size: 11px; font-weight: 600; color: var(--muted); vertical-align: 2px; }
+.plaats { display: grid; gap: 2px; overflow-wrap: anywhere; }
+.contactinfo { display: grid; gap: 4px; justify-items: start; }
+.pick { max-width: 100%; cursor: copy; font-size: 14px; overflow-wrap: anywhere; border-bottom: 1px dashed transparent; -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+.pick:hover { border-bottom-color: var(--faint); }
+.pick.mono { font-family: var(--f-mono); font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.telline { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.call, .wa, .qmail {
+  display: none; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 0 14px; border-radius: 999px;
+  font-size: 13.5px; font-weight: 700; text-decoration: none; white-space: nowrap; border: 0; cursor: pointer;
+}
+.call { background: var(--brand); color: var(--brand-ink); }
+.call:hover { background: var(--brand-hover); }
+.wa { display: inline-flex; background: var(--ok-soft); color: var(--ok); padding: 0 12px; }
+.call .ic, .wa .ic { width: 16px; height: 16px; }
+.call.big, .wa.big { display: inline-flex; min-height: 50px; padding: 0 22px; font-size: 16px; }
+.call.big .ic, .wa.big .ic { width: 20px; height: 20px; }
+@media (pointer: coarse) { .call { display: inline-flex; } .wa:not(.big) .lbl { display: none; } .wa:not(.big) { width: 34px; padding: 0; } }
+.callbox { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 12px 14px; border-radius: 12px; background: var(--brand-soft); }
+.callbox .pick { flex-basis: 100%; font: 600 22px/1.25 var(--f-mono); font-variant-numeric: tabular-nums; }
+.touch-only { display: none; }
+@media (pointer: coarse) { .touch-only { display: inline; } .notice.touch-only { display: flex; } .mouse-only { display: none; } }
+.actie { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.atag { display: inline-flex; align-items: center; min-height: 26px; padding: 0 10px; border-radius: 999px; border: 0; cursor: pointer; background: var(--sunken); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; font-weight: 600; max-width: 100%; overflow-wrap: anywhere; text-align: left; }
+.atag:hover { box-shadow: inset 0 0 0 1px var(--faint); }
+.due { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 999px; white-space: nowrap; font-size: 12.5px; font-weight: 600; color: var(--muted); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.due.late { background: var(--danger-soft); color: var(--danger); box-shadow: none; }
+.due.today { background: var(--brand); color: var(--brand-ink); box-shadow: none; }
+.acts { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.acts .btn.small { box-shadow: none; }
+.more { width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--muted); cursor: pointer; flex: none; }
+.more:hover { background: var(--line); }
+.chev { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
+.row.open .chev { transform: translateY(2px) rotate(-135deg); }
+.prio { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1.5; vertical-align: 2px; }
+.prio.hoog { background: var(--danger-soft); color: var(--danger); }
+.prio.laag { background: var(--sunken); color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); }
+.dist { margin-left: 4px; padding: 1px 8px; border-radius: 999px; background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); font-size: 12px; font-weight: 600; white-space: nowrap; }
+@media (max-width: 760px) {
+  .list-head { display: none; }
+  .row-main { padding: 14px 16px; }
+  .row-main.cols { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; grid-template-areas: "first first" "plaats plaats" "contact contact" "actie acts"; }
+  .row-main .first { grid-area: first; }
+  .row-main .plaats { grid-area: plaats; color: var(--muted); font-size: 14px; }
+  .row-main .contactinfo { grid-area: contact; }
+  .row-main .actie { grid-area: actie; margin-top: 2px; }
+  .row-main .acts { grid-area: acts; margin-top: 2px; }
+  .row-main .more, .row-main .cell.none { display: none; }
+}
+
+/* Detail en afronden */
+.panel { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 20px 28px; padding: 8px 18px 22px; background: var(--sunken); }
+.pform { display: grid; gap: 14px; min-width: 0; }
+.pgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.span2 { grid-column: span 2; } .span4 { grid-column: 1 / -1; }
+.log { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.log h3 { margin: 0; font-size: 13px; font-weight: 700; }
+.log ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.log li { display: grid; gap: 1px; overflow-wrap: anywhere; padding-left: 12px; border-left: 2px solid var(--line); }
+.log time { font-size: 12px; color: var(--faint); font-weight: 600; }
+.log .t { color: var(--muted); font-size: 14px; }
+.log .none { margin: 0; font-size: 13.5px; color: var(--faint); }
+.finish { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 28px; padding: 8px 18px 22px; background: var(--sunken); }
+.step { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.step h3 { margin: 0; font-size: 16px; font-weight: 700; }
+.step h3 .faint { font-weight: 500; }
+.outcomes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.oc { min-height: 46px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface); font-size: 14.5px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow-sm); }
+.oc:hover { border-color: var(--faint); }
+.oc[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+.suggest { margin: 4px 0 0; padding: 10px 12px; border-left: 4px solid var(--brand); border-radius: 0 10px 10px 0; background: var(--surface); font-size: 14px; }
+.finish .pactions { grid-column: 1 / -1; }
+.finish .pactions .btn.primary { min-width: 180px; }
+@media (max-width: 860px) { .panel { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 760px) { .finish { grid-template-columns: minmax(0, 1fr); } .finish .pactions .btn { flex: 1; min-height: 48px; } }
+@media (max-width: 560px) { .pgrid { grid-template-columns: minmax(0, 1fr); } .pgrid > * { grid-column: 1 / -1; } .panel .pactions .btn { flex: 1 1 calc(50% - 4px); } }
+.sess-start { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); background: var(--brand-soft); }
+.sess-start .hint { margin: 0; flex: 1 1 200px; color: var(--brand-soft-ink); }
+
+/* Kaart */
 .kaart { display: grid; gap: 10px; padding: 10px; }
 .kaart-map { height: min(52vh, 440px); min-height: 260px; border-radius: 10px; overflow: hidden; background: var(--sunken); z-index: 0; }
 .kaart-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
@@ -106,276 +423,18 @@ body.selecting .wrap, body.sessie .wrap { padding-bottom: 170px; }
 .kaart-legend .dot { display: inline-block; flex: 0 0 auto; width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #22272B; margin-left: 8px; }
 .kaart-legend .dot:first-child { margin-left: 0; }
 .dot.due { background: #F6B800; } .dot.act { background: #FFFFFF; } .dot.none { background: #A2A9AE; } .dot.approx { background: #FFFFFF; border-style: dashed; }
-.kpop { display: grid; gap: 4px; font: 14px/1.35 var(--f-body); color: #22272B; }
+.kpop { display: grid; gap: 4px; font: 14px/1.35 var(--f-body); color: #1C2126; }
 .kpop strong { font-size: 15px; }
 .kpop-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .kpop .btn { min-height: 34px; padding: 0 10px; font-size: 13px; }
-.leaflet-container a.btn { color: #22272B; }
-.dist { margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--sunken); border: 1px solid var(--line); font-size: 12px; font-weight: 600; white-space: nowrap; }
-.kaart-mis { padding: 12px 16px; margin: 0; }
-.sess-start { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
-.sess-start .hint { margin: 0; flex: 1 1 200px; }
-.row.current { box-shadow: inset 4px 0 0 var(--geel); }
-.suggest { margin: 4px 0 0; padding: 8px 12px; border-left: 4px solid var(--geel); border-radius: 0 8px 8px 0; background: var(--sunken); font-size: 14px; }
-
-/* Knoppen */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 40px; padding: 0 16px; border-radius: 8px;
-  border: 1px solid var(--line-strong); background: var(--surface);
-  font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; text-decoration: none; color: var(--ink);
-  transition: background-color .15s, border-color .15s, color .15s;
-}
-.btn:hover { border-color: var(--ink); }
-.btn.small { min-height: 32px; padding: 0 12px; font-size: 13px; }
-.btn.primary { background: var(--geel); border-color: var(--geel); color: var(--geel-ink); }
-.btn.primary:hover { background: var(--geel-hover); border-color: var(--geel-hover); }
-.btn.dark { background: var(--tab-on); border-color: var(--tab-on); color: var(--tab-on-ink); }
-.btn.dark:hover { opacity: .9; border-color: var(--tab-on); }
-.btn.on-band { background: transparent; border-color: var(--band-line); color: var(--band-ink); }
-.btn.on-band:hover, .btn.on-band[aria-expanded="true"] { border-color: var(--geel); background: transparent; color: var(--band-ink); }
-.btn.danger { background: transparent; border-color: transparent; color: var(--danger); }
-.btn.danger:hover { background: var(--danger-soft); }
-.btn.danger.armed { background: var(--danger); border-color: var(--danger); color: var(--surface); }
-.btn[aria-expanded="true"], .btn[aria-pressed="true"] { background: var(--tab-on); border-color: var(--tab-on); color: var(--tab-on-ink); }
-.btn:disabled, .btn.disabled { opacity: .5; cursor: not-allowed; }
-.btn.disabled { pointer-events: none; }
-.btn:disabled:hover { border-color: var(--line-strong); }
-.linkbtn { padding: 0; border: 0; background: none; cursor: pointer; font-weight: 600; text-decoration: underline; text-decoration-color: var(--geel); text-underline-offset: 3px; }
-.inline-link { color: inherit; font-weight: 600; text-decoration-color: var(--geel); text-underline-offset: 3px; }
-
-/* Kaarten */
-.card { display: grid; gap: 16px; min-width: 0; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
-.card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
-.card-head h2, .add-title { margin: 0; font: 700 17px/1.2 var(--f-display); font-stretch: 92%; }
-
-/* Velden */
-.add {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: end;
-  padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow);
-}
-.add-title { grid-column: 1 / -1; }
-.add .span-when { grid-column: span 2; }
-.add .dupwarn { grid-column: 1 / 3; }
-.add .submit { grid-column: 3; display: flex; justify-content: flex-end; }
-.field { display: grid; gap: 6px; min-width: 0; align-content: start; }
-.field > label { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
-.opt { margin-left: 4px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--faint); font-size: 12px; }
-.input {
-  width: 100%; min-height: 40px; padding: 8px 11px; border-radius: 8px;
-  border: 1px solid var(--line-strong); background: var(--surface); font-size: 15px;
-}
-.input::placeholder { color: var(--faint); }
-.input:focus { outline: 2px solid var(--geel); outline-offset: 0; border-color: var(--focus); }
-.input[readonly], .input:disabled { background: var(--sunken); }
-.input:disabled { color: var(--faint); }
-textarea.input { min-height: 80px; resize: vertical; line-height: 1.45; }
-select.input { padding-right: 8px; }
-@media (max-width: 760px) {
-  .add { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .add .span-when, .add .dupwarn, .add .submit { grid-column: 1 / -1; }
-  .add .submit .btn { flex: 1; }
-}
-@media (max-width: 520px) { .add { grid-template-columns: minmax(0, 1fr); } }
-
-.when { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.qd {
-  min-height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line-strong);
-  background: var(--surface); font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
-}
-.qd:hover { border-color: var(--ink); }
-.qd[aria-pressed="true"] { background: var(--geel); border-color: var(--geel); color: var(--geel-ink); }
-.qd:disabled { opacity: .45; cursor: not-allowed; }
-.when .input { flex: 1 1 150px; width: auto; min-width: 140px; }
-
-.check { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
-.check input, .sel { width: 18px; height: 18px; margin: 0; accent-color: var(--geel); flex: none; cursor: pointer; }
-.sel:disabled { cursor: not-allowed; opacity: .4; }
-
-.notice, .warn, .dupwarn {
-  padding: 12px 16px; border-radius: 10px; background: var(--geel-soft); color: var(--ink);
-}
-.notice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
-.notice p { margin: 0; max-width: 68ch; }
-.warn, .dupwarn { margin: 0; font-size: 14px; padding: 10px 12px; }
-.hint { margin: 0; font-size: 13px; color: var(--muted); max-width: 70ch; }
-
-/* Overzicht */
-.overview { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
-.tools { display: flex; flex: 1 1 320px; justify-content: flex-end; gap: 8px; min-width: 0; }
-.tabs { display: inline-flex; max-width: 100%; overflow-x: auto; padding: 3px; gap: 3px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line-strong); }
-.tab {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 16px; border: 0; border-radius: 7px;
-  background: transparent; font-weight: 600; font-size: 14.5px; cursor: pointer; white-space: nowrap;
-}
-.tab:hover { background: var(--sunken); }
-.tab[aria-pressed="true"] { background: var(--tab-on); color: var(--tab-on-ink); }
-.tab .n, .chip .n { font: 500 12.5px/1 var(--f-mono); font-variant-numeric: tabular-nums; opacity: .7; }
-.tab .n.hot { opacity: 1; padding: 3px 7px; border-radius: 999px; background: var(--geel); color: var(--geel-ink); }
-.search { flex: 1 1 220px; max-width: 360px; }
-.branchesel { flex: 0 1 190px; min-width: 0; }
-.branchesel.on { border-color: var(--geel); box-shadow: inset 0 0 0 1px var(--geel); }
-.hint.links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
-@media (max-width: 560px) {
-  .tabs { display: flex; width: 100%; }
-  .tab { flex: 1 1 auto; justify-content: center; padding: 0 8px; gap: 5px; font-size: 14px; }
-  .search { max-width: none; }
-  .tools { flex-wrap: wrap; }
-  .tools .btn { flex: 1; }
-  .branchesel { flex: 1 1 100%; }
-}
-/* Vijf tabbladen passen op een smalle telefoon: alleen het aantal bij Vandaag blijft staan. */
-@media (max-width: 420px) {
-  .tab { padding: 0 6px; }
-  .tab .n:not(.hot) { display: none; }
-}
-
-.filters { display: grid; gap: 8px; }
-.chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.chip {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 14px;
-  border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface);
-  font-size: 14px; font-weight: 500; cursor: pointer;
-}
-.chip:hover { border-color: var(--ink); }
-.chip[aria-pressed="true"] { background: var(--geel); border-color: var(--geel); color: var(--geel-ink); font-weight: 600; }
-.chip.toggle[aria-pressed="true"] { background: var(--tab-on); border-color: var(--tab-on); color: var(--tab-on-ink); }
-.chip-group { display: inline-flex; }
-.chip-group .chip { border-top-right-radius: 0; border-bottom-right-radius: 0; padding-right: 10px; }
-.chip-x {
-  display: grid; place-items: center; width: 32px; min-height: 36px; padding: 0; cursor: pointer;
-  border: 1px solid var(--line-strong); border-left: 0; border-radius: 0 999px 999px 0; background: var(--surface); color: var(--muted);
-  font-size: 16px; line-height: 1;
-}
-.chip-x:hover { color: var(--danger); background: var(--danger-soft); }
-.sep { width: 1px; height: 22px; background: var(--line-strong); margin: 0 2px; }
-
-/* Lijst */
-.list { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-.cols { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr) minmax(0, 1.3fr) minmax(0, 1.1fr) 196px; gap: 16px; align-items: center; }
-.list-head { padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--sunken); }
-.list-head span { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
-#rows > * + * { border-top: 1px solid var(--line); }
-.group-head {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 16px; background: var(--sunken);
-  font: 700 13px/1.2 var(--f-display); font-stretch: 92%; letter-spacing: .05em; text-transform: uppercase;
-}
-.group-head::before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: var(--geel); flex: none; }
-.group-head.quiet::before { background: var(--line-strong); }
-.group-head .n { font: 500 12px/1 var(--f-mono); color: var(--muted); letter-spacing: 0; }
-.route {
-  margin-left: auto; font: 600 13px/1.2 var(--f-body); letter-spacing: 0; text-transform: none; color: var(--ink);
-  text-decoration: underline; text-decoration-color: var(--geel); text-decoration-thickness: 2px; text-underline-offset: 3px;
-}
-.row-main { padding: 12px 16px; min-height: 62px; cursor: pointer; }
-.row-main:hover, .row.open { background: var(--sunken); }
-.cell { min-width: 0; }
-.first { display: flex; align-items: flex-start; gap: 12px; }
-.first .sel { margin-top: 2px; }
-.bedrijf { display: grid; gap: 2px; justify-items: start; min-width: 0; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 4px; }
-.bedrijf .name { font: 700 16px/1.25 var(--f-display); font-stretch: 94%; overflow-wrap: anywhere; }
-.bedrijf .sub { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
-.row.nomail .bedrijf .name { color: var(--faint); }
-.meta { font: 400 12px/1.35 var(--f-mono); color: var(--muted); overflow-wrap: anywhere; }
-.tag {
-  display: inline-block; margin-left: 8px; padding: 1px 6px; border-radius: 4px; border: 1px dashed var(--line-strong);
-  font: 500 10.5px/1.4 var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); vertical-align: 2px;
-}
-.plaats { display: grid; gap: 2px; overflow-wrap: anywhere; }
-.contactinfo { display: grid; gap: 2px; justify-items: start; }
-.pick {
-  max-width: 100%; cursor: copy; font-size: 14px; overflow-wrap: anywhere; border-bottom: 1px dashed transparent;
-  -webkit-user-select: text; user-select: text; -webkit-touch-callout: default;
-}
-.pick:hover { border-bottom-color: var(--faint); }
-.pick.mono { font-family: var(--f-mono); font-size: 13.5px; font-variant-numeric: tabular-nums; }
-.callbox { display: grid; gap: 4px; justify-items: start; padding: 10px 14px; border-radius: 10px; background: var(--geel-soft); }
-.telline { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
-.call {
-  display: none; align-items: center; justify-content: center; min-height: 32px; padding: 0 14px; border-radius: 999px;
-  background: var(--geel); color: var(--geel-ink); font-size: 13.5px; font-weight: 700; text-decoration: none; white-space: nowrap;
-}
-.call.big { display: inline-flex; min-height: 48px; padding: 0 20px; font-size: 16px; }
-@media (pointer: coarse) { .call { display: inline-flex; } }
-.callbox .pick { font: 600 22px/1.25 var(--f-mono); font-variant-numeric: tabular-nums; }
-.touch-only { display: none; }
-@media (pointer: coarse) {
-  .touch-only { display: inline; }
-  .notice.touch-only { display: flex; }
-  .mouse-only { display: none; }
-}
-.faint { color: var(--faint); }
-.actie { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
-.atag {
-  display: inline-flex; align-items: center; min-height: 26px; padding: 0 10px; border-radius: 6px; border: 0; cursor: pointer;
-  background: var(--geel-soft); color: var(--geel-soft-ink); font-size: 13px; font-weight: 600; max-width: 100%; overflow-wrap: anywhere; text-align: left;
-}
-.atag:hover { background: var(--geel); color: var(--geel-ink); }
-.due {
-  display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; white-space: nowrap;
-  font: 500 12px/1.4 var(--f-mono); color: var(--muted); background: var(--surface); border: 1px solid var(--line);
-}
-.due.late { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
-.due.today { background: var(--geel); color: var(--geel-ink); border-color: transparent; }
-.acts { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
-.more { width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer; flex: none; }
-.more:hover { background: var(--line); }
-.chev { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
-.row.open .chev { transform: translateY(2px) rotate(-135deg); }
-
-@media (max-width: 760px) {
-  .list-head { display: none; }
-  .row-main.cols {
-    grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px;
-    grid-template-areas: "first first" "plaats plaats" "contact contact" "actie acts";
-  }
-  .row-main .first { grid-area: first; }
-  .row-main .plaats { grid-area: plaats; color: var(--muted); }
-  .row-main .contactinfo { grid-area: contact; }
-  .row-main .actie { grid-area: actie; margin-top: 4px; }
-  .row-main .acts { grid-area: acts; margin-top: 4px; }
-  .row-main .more, .row-main .cell.none { display: none; }
-}
-
-/* Detail en afronden */
-.panel { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 20px 28px; padding: 6px 16px 20px; }
-.pform { display: grid; gap: 14px; min-width: 0; }
-.pgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.span2 { grid-column: span 2; } .span4 { grid-column: 1 / -1; }
-.pactions, .btns { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.pactions .push { margin-left: auto; }
-.log { display: grid; gap: 10px; align-content: start; min-width: 0; padding-left: 20px; border-left: 1px solid var(--line); }
-.log h3 { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
-.log ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.log li { display: grid; gap: 1px; overflow-wrap: anywhere; }
-.log time { font: 500 12px/1.3 var(--f-mono); color: var(--muted); }
-.log .t { color: var(--muted); font-size: 14px; }
-.log .none { margin: 0; font-size: 13.5px; color: var(--faint); }
-
-.finish { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 28px; padding: 8px 16px 20px; }
-.step { display: grid; gap: 12px; align-content: start; min-width: 0; }
-.step h3 { margin: 0; font: 700 16px/1.2 var(--f-display); font-stretch: 94%; }
-.step h3 .faint { font-weight: 500; }
-.outcomes { display: flex; flex-wrap: wrap; gap: 6px; }
-.oc {
-  min-height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line-strong);
-  background: var(--surface); font-size: 14px; font-weight: 600; cursor: pointer;
-}
-.oc:hover { border-color: var(--ink); }
-.oc[aria-pressed="true"] { background: var(--tab-on); border-color: var(--tab-on); color: var(--tab-on-ink); }
-.finish .pactions { grid-column: 1 / -1; }
-
-@media (max-width: 860px) {
-  .panel { grid-template-columns: minmax(0, 1fr); }
-  .log { padding-left: 0; border-left: 0; padding-top: 14px; border-top: 1px solid var(--line); }
-}
-@media (max-width: 760px) { .finish { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 560px) { .pgrid { grid-template-columns: minmax(0, 1fr); } .pgrid > * { grid-column: 1 / -1; } }
+.leaflet-container a.btn { color: #1C2126; }
+.leaflet-container a.btn.primary { color: #fff; }
+.kaart-mis { padding: 12px 18px; margin: 0; }
 
 /* Import */
 .imp-src { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px 24px; }
 .file { font-size: 14px; max-width: 100%; }
-.imp-wrap { overflow: auto; max-height: 420px; border: 1px solid var(--line); border-radius: 8px; }
+.imp-wrap { overflow: auto; max-height: 420px; border: 1px solid var(--line); border-radius: 10px; }
 .imp-table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 13.5px; }
 .imp-table th, .imp-table td { padding: 6px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; vertical-align: top; }
 .imp-table thead th { position: sticky; top: 0; z-index: 1; background: var(--sunken); }
@@ -388,7 +447,7 @@ select.input { padding-right: 8px; }
 .imp-sum { margin: 0; }
 .progress { display: grid; gap: 8px; }
 .bar { height: 10px; border-radius: 999px; background: var(--sunken); border: 1px solid var(--line); overflow: hidden; }
-.bar span { display: block; height: 100%; background: var(--geel); transition: width .2s; }
+.bar span { display: block; height: 100%; background: var(--brand); transition: width .2s; }
 @media (max-width: 760px) { .imp-src, .imp-opts { grid-template-columns: minmax(0, 1fr); } }
 
 /* Mail */
@@ -396,122 +455,99 @@ select.input { padding-right: 8px; }
 .mail-edit, .mail-out { display: grid; gap: 12px; align-content: start; min-width: 0; }
 textarea.mail-body { min-height: 240px; }
 .phs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
-.ph { min-height: 28px; padding: 0 8px; border-radius: 6px; border: 1px dashed var(--line-strong); background: var(--surface); font: 500 12px/1 var(--f-mono); cursor: pointer; }
-.ph:hover { border-color: var(--ink); }
+.ph { min-height: 30px; padding: 0 9px; border-radius: 8px; border: 1px dashed var(--line-strong); background: var(--surface); font: 500 12px/1 var(--f-mono); cursor: pointer; }
+.ph:hover { border-color: var(--faint); }
 .tplbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.tplbar .input { flex: 1 1 200px; width: auto; min-height: 32px; padding: 4px 10px; font-size: 14px; }
-.preview { display: grid; gap: 8px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--sunken); }
-.preview .lbl { font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.tplbar .input { flex: 1 1 200px; width: auto; min-height: 34px; padding: 4px 10px; font-size: 14px; }
+.preview { display: grid; gap: 8px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--sunken); }
+.preview .lbl { font-size: 12px; font-weight: 700; color: var(--muted); }
 .pv-subj { font-weight: 600; overflow-wrap: anywhere; }
 .pv-body { white-space: pre-wrap; font-size: 14px; max-height: 280px; overflow: auto; overflow-wrap: anywhere; }
 .steps { display: grid; gap: 14px; }
 .srow { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 6px 12px; align-items: start; }
 .srow p { margin: 2px 0 0; }
 .srow .btns, .srow > .hint { grid-column: 2; }
-.num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--geel); color: var(--geel-ink); font: 700 14px/1 var(--f-display); }
+.num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--brand); color: var(--brand-ink); font-weight: 700; font-size: 14px; }
 .pers-head { display: grid; gap: 2px; overflow-wrap: anywhere; }
-.pers-head strong { font: 700 17px/1.25 var(--f-display); font-stretch: 94%; }
-.done-box { display: grid; gap: 10px; padding: 16px; border-radius: 10px; background: var(--geel-soft); }
+.pers-head strong { font-size: 17px; font-weight: 700; }
+.done-box { display: grid; gap: 10px; padding: 16px; border-radius: 12px; background: var(--brand-soft); }
 .done-box p { margin: 0; }
+.ms-send { display: grid; gap: 8px; }
+.ms-send .hint { margin: 0; }
+details.alt { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+details.alt > summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 @media (max-width: 860px) { .mail-grid { grid-template-columns: minmax(0, 1fr); } }
 
-/* Selectiebalk */
-.selbar {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
-  background: var(--band); color: var(--band-ink); border-top: 4px solid var(--geel);
-  padding-top: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-}
-.selbar-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
-.selbar .count { margin-right: auto; font-weight: 600; }
-.selbar .hint { color: var(--band-muted); }
-
-.empty { display: grid; gap: 10px; justify-items: center; padding: 44px 16px; text-align: center; color: var(--muted); }
-.empty strong { color: var(--ink); font: 700 17px/1.3 var(--f-display); font-stretch: 94%; }
-.empty p { margin: 0; max-width: 52ch; }
-
-.toast {
-  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 20;
-  width: max-content; max-width: min(480px, calc(100% - 32px)); padding: 10px 16px; border-radius: 8px;
-  background: var(--band); color: var(--band-ink); border-left: 4px solid var(--geel); font-size: 14px; box-shadow: var(--shadow);
-  opacity: 0; pointer-events: none; transform: translate(-50%, 8px); transition: opacity .2s, transform .2s;
-}
-.toast.show { opacity: 1; transform: translate(-50%, 0); }
-body.sessie .toast, body.selecting .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
-
-/* Nieuw bedrijf in- en uitklappen */
-.add-title button { all: unset; display: flex; align-items: center; gap: 10px; width: 100%; cursor: pointer; }
-.add-title button:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: 4px; }
-.add-title button::after { content: ""; width: 8px; height: 8px; margin-left: auto; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-135deg); transition: transform .15s; }
-.add.collapsed { gap: 0; }
-.add.collapsed > :not(.add-title) { display: none !important; }
-.add.collapsed .add-title button::after { transform: rotate(45deg); }
-
-/* Prioriteit */
-.prio { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; font: 600 11px/1.5 var(--f-body); vertical-align: 2px; }
-.prio.hoog { background: var(--danger-soft); color: var(--danger); }
-.prio.laag { background: var(--sunken); color: var(--muted); border: 1px solid var(--line); }
-
-/* Visitekaartje scannen */
-.scanrow { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-.scanrow .hint { flex: 1 1 220px; }
-.scanlines { grid-column: 1 / -1; display: grid; gap: 8px; }
-/* Camera in de app: beeld over het hele scherm met een kader in de vorm van een visitekaartje. */
-.cam { position: fixed; inset: 0; z-index: 1000; background: #000; }
-.cam video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.cam-frame { position: absolute; left: 50%; top: 44%; width: min(92vw, 70vh); aspect-ratio: 85 / 55; transform: translate(-50%, -50%);
-  border: 3px solid #F6B800; border-radius: 12px; box-shadow: 0 0 0 200vmax rgba(0, 0, 0, .5); pointer-events: none; }
-.cam-tip { position: absolute; left: 16px; right: 16px; top: max(16px, env(safe-area-inset-top)); margin: 0; text-align: center; color: #fff; font-weight: 600; text-shadow: 0 1px 3px #000; }
-.cam-bar { position: absolute; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
-  padding: 18px 16px calc(22px + env(safe-area-inset-bottom)); }
-.cam-bar #camClose { justify-self: start; }
-.cam-bar #camTorch { justify-self: end; }
-.cam-shot { width: 76px; height: 76px; border-radius: 50%; border: 5px solid #fff; background: #F6B800; cursor: pointer; }
-.cam-shot:active { transform: scale(.94); }
-body.cam-open { overflow: hidden; }
-.scanlines .hint { margin: 0; }
-.ocr-lines { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
-.ocr-lines li { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 12px; }
-.ocr-lines li + li { border-top: 1px solid var(--line); }
-.ocr-t { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
-.ocr-sel { flex: 0 0 auto; width: 142px; min-height: 36px; padding-block: 4px; font-size: 14px; color: var(--muted); }
-.ocr-sel.used { color: var(--ink); font-weight: 600; }
-
-/* Ochtendmelding als kleine regel */
-.push-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 13px; }
-.push-line .linkbtn { font-size: 13px; }
+/* Meer: instellingen als groepen */
+.settings { display: grid; gap: 14px; }
+.set-group { display: grid; gap: 0; padding: 0; overflow: hidden; }
+.set-group > h3 { margin: 0; padding: 14px 18px 4px; font-size: 13px; font-weight: 700; color: var(--muted); }
+.set-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 12px 18px; }
+.set-row + .set-row { border-top: 1px solid var(--line); }
+.set-row > .ic { width: 20px; height: 20px; color: var(--muted); }
+.set-row .set-text { display: grid; gap: 2px; flex: 1 1 220px; min-width: 0; }
+.set-row .set-text strong { font-size: 15px; font-weight: 600; }
+.set-row .set-text span { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.push-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 14px; color: var(--ink); }
+.set-row > .push-line { flex: 1 1 220px; min-width: 0; margin: 0; }
+.push-line .linkbtn { font-size: 14px; }
 .push-line .input { flex-basis: 100%; font: 12px/1.4 var(--f-mono); }
-.copyright { margin: 6px 0 0; font-size: 12px; color: var(--faint); }
-.outlook-panel { display: grid; gap: 12px; }
+.install-row:has(#installBtn[hidden]) { display: none; }
+.copyright { margin: 6px 0 0; font-size: 12px; color: var(--faint); text-align: center; }
+.outlook-panel { display: grid; gap: 12px; margin: 0 18px 16px; }
 .outlook-panel p { margin: 0; }
 .olist { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
 .olist code { display: inline-block; margin: 4px 0; padding: 2px 6px; border-radius: 6px; background: var(--sunken); font: 13px/1.5 var(--f-mono); overflow-wrap: anywhere; cursor: pointer; }
 .ms-ids { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 16px; }
 .ms-ids .input { font-family: var(--f-mono); font-size: 14px; }
 @media (max-width: 560px) { .ms-ids { grid-template-columns: minmax(0, 1fr); } }
-.ms-send { display: grid; gap: 8px; }
-.ms-send .hint { margin: 0; }
-details.alt { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
-details.alt > summary { cursor: pointer; font-weight: 600; font-size: 14px; }
-details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
-.outlook-panel a { color: inherit; font-weight: 600; text-decoration-color: var(--geel); text-underline-offset: 3px; }
+.outlook-panel a { color: inherit; font-weight: 600; text-decoration-color: var(--brand); text-underline-offset: 3px; }
+
+/* Balken onderin: selecteren en belsessie */
+.selbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
+  background: var(--appbar); color: #fff; box-shadow: 0 -6px 20px rgba(0, 0, 0, .18);
+  padding-top: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+}
+@media (max-width: 899.98px) { .selbar { bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)); padding-bottom: 12px; } }
+.selbar-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.selbar .count { margin-right: auto; font-weight: 600; }
+.selbar .hint { color: var(--appbar-muted); }
+.selbar .btn.primary { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+
+.empty { display: grid; gap: 10px; justify-items: center; padding: 44px 16px; text-align: center; color: var(--muted); }
+.empty strong { color: var(--ink); font-size: 17px; font-weight: 700; }
+.empty p { margin: 0; max-width: 52ch; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 20;
+  width: max-content; max-width: min(480px, calc(100% - 32px)); padding: 12px 16px; border-radius: 12px;
+  background: var(--appbar); color: #fff; font-size: 14px; box-shadow: var(--shadow);
+  opacity: 0; pointer-events: none; transform: translate(-50%, 8px); transition: opacity .2s, transform .2s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media (max-width: 899.98px) { .toast { bottom: calc(var(--nav-h) + 14px + env(safe-area-inset-bottom, 0px)); } }
+body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + env(safe-area-inset-bottom, 0px)); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
 
 /* Inloggen */
 .gate { min-height: 100vh; min-height: 100dvh; background: var(--bg); }
-.gate-band { background: var(--band); color: var(--band-ink); border-bottom: 5px solid var(--geel); }
-.gate-band .gutter { padding-block: calc(26px + env(safe-area-inset-top, 0px)) 22px; display: grid; gap: 6px; }
+.gate-band { background: var(--appbar); color: var(--appbar-ink); }
+.gate-band .gutter { padding-block: calc(28px + env(safe-area-inset-top, 0px)) 28px; display: grid; gap: 10px; max-width: 480px; }
+.gate-band .brand-mark { width: 44px; height: 44px; border-radius: 12px; }
+.gate-band .brand-name { font-size: 24px; }
+.gate-band h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+.eyebrow { margin: 0; font-size: 13px; font-weight: 600; color: var(--brand); }
 .gate-main { display: grid; gap: 14px; padding-block: 22px 40px; max-width: 480px; }
 .gate .card .field + .field { margin-top: 2px; }
-
-/* Onderkant */
-.foot { display: grid; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
-.foot-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.gate .pactions .btn.primary { flex: 1; min-height: 48px; }
 </style>
 </head>
 <body>
 
 <div class="gate" id="gate">
-  <div class="gate-band"><div class="gutter"><p class="eyebrow">Koude Acquisitie</p><h1 id="gateTitle">Koude Acquisitie</h1></div></div>
+  <div class="gate-band"><div class="gutter"><div class="brand"><svg class="brand-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M128 356 L222 262 L286 314 L388 196" fill="none" stroke="#F6B800" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/><path d="M312 190 L392 190 L392 270" fill="none" stroke="#F6B800" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-name">Lead<b>nex</b></span></div><h1 id="gateTitle">Leadnex</h1></div></div>
   <main class="gutter gate-main">
     <form class="card" id="loginForm" autocomplete="on" novalidate hidden>
       <div class="field"><label for="loginEmail">E-mailadres</label><input class="input" id="loginEmail" type="email" autocomplete="username" inputmode="email"></div>
@@ -537,37 +573,87 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 
 
 <div id="app" hidden>
-<header class="band">
-  <div class="gutter band-inner">
-    <div class="band-text">
-      <p class="eyebrow" id="today">&nbsp;</p>
-      <h1>Koude Acquisitie</h1>
-      <p class="summary" id="summary">Lijst laden…</p>
-    </div>
-    <div class="band-actions">
-      <button type="button" class="btn on-band" id="installBtn" hidden>App installeren</button>
-      <button type="button" class="btn on-band" id="importBtn" hidden>Importeren uit Excel</button>
-    </div>
+<header class="appbar">
+  <div class="gutter appbar-inner">
+    <a class="brand" href="#" data-page="vandaag" aria-label="Leadnex, naar Vandaag">
+      <svg class="brand-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M128 356 L222 262 L286 314 L388 196" fill="none" stroke="#F6B800" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/><path d="M312 190 L392 190 L392 270" fill="none" stroke="#F6B800" stroke-width="52" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="brand-name">Lead<b>nex</b></span>
+    </a>
+    <nav class="nav topnav" id="topNav" aria-label="Hoofdmenu"></nav>
+    <span class="appbar-date" id="today">&nbsp;</span>
   </div>
 </header>
 
 <main class="gutter wrap">
-  <section class="card" id="importPanel" aria-label="Importeren uit Excel" hidden></section>
   <div class="notice" id="restoreNotice" hidden></div>
   <div class="notice" id="backupNotice" hidden></div>
   <div class="notice" id="outlookNotice" hidden></div>
+  <div class="syncbar-top" id="syncBar" role="status" hidden></div>
+  <div class="notice" id="roNote" hidden>
+    <p>Je bekijkt deze lijst. Alleen de eigenaar en mensen met bewerkrechten kunnen bedrijven toevoegen of wijzigen.</p>
+  </div>
+  <div class="notice" id="exampleNotice" hidden>
+    <p><strong>Dit zijn voorbeelden.</strong> Ze laten zien hoe de lijst werkt. Verwijder ze zodra je je eigen bedrijven gaat invullen.</p>
+    <button type="button" class="btn" id="clearExamples">Voorbeelden verwijderen</button>
+  </div>
 
-  <form class="add" id="addForm" autocomplete="off" novalidate>
-    <h2 class="add-title"><button type="button" id="addToggle" aria-expanded="true">Nieuw bedrijf</button></h2>
-    <div class="scanrow">
-      <button type="button" class="btn small" id="scanBtn">Visitekaartje scannen</button>
-      <button type="button" class="btn small" id="pickBtn">Foto uit galerij</button>
-      <button type="button" class="btn small" id="pasteBtn">Plakken</button>
-      <input type="file" id="scanFile" accept="image/*" capture="environment" hidden>
-      <input type="file" id="pickFile" accept="image/*" hidden>
-      <span class="hint" id="scanMsg">Maak een foto van een kaartje, of kopieer een bedrijf in Google Maps of Chrome en tik op Plakken.</span>
+  <!-- Vandaag -->
+  <div class="page-head" data-show="vandaag">
+    <div><h2>Vandaag</h2><p class="sub" id="todayLong"></p></div>
+  </div>
+  <div class="stats" id="stats" data-show="vandaag"></div>
+  <p id="summary">Lijst laden…</p>
+
+  <!-- Bedrijven -->
+  <div class="page-head" data-show="bedrijven">
+    <div><h2>Bedrijven</h2><p class="sub" id="bedrijvenSub"></p></div>
+  </div>
+  <!-- Kaart -->
+  <div class="page-head" data-show="kaart">
+    <div><h2>In de buurt</h2><p class="sub">Bedrijven rond je huidige plek, de dichtstbijzijnde eerst.</p></div>
+  </div>
+
+  <div class="overview" data-show="bedrijven kaart">
+    <div class="tabs" id="tabs" aria-label="Welke bedrijven"></div>
+    <div class="tools">
+      <label class="searchbox"><span class="sr">Zoeken</span><i data-ic="search"></i><input class="input search" id="search" type="search" placeholder="Zoek op bedrijf, naam, plaats of telefoon"></label>
+      <select class="input branchesel" id="brancheSel" aria-label="Branche" hidden></select>
+      <button type="button" class="btn" id="mailBtn" hidden>Mail versturen</button>
     </div>
-    <div class="scanlines" id="scanLines" hidden></div>
+  </div>
+
+  <div class="filters" id="filters" hidden>
+    <div class="chips" id="chips" aria-label="Filter op actie"></div>
+    <p class="hint">Elke actie die je bij een bedrijf invult, komt hier automatisch bij als filter.</p>
+  </div>
+
+  <section class="card kaart" id="kaartPanel" aria-label="Kaart" hidden>
+    <div class="kaart-map" id="kaartMap"></div>
+    <div class="kaart-bar"><div class="chips" id="kaartChips"></div><button type="button" class="btn small" id="kaartMe"><i data-ic="locate-fixed"></i>Mijn locatie</button></div>
+    <p class="hint" id="kaartStatus" role="status" hidden></p>
+    <p class="hint kaart-legend"><span class="dot due"></span>Vandaag te doen <span class="dot act"></span>Met actie <span class="dot none"></span>Zonder actie <span class="dot approx"></span>Alleen plaats bekend</p>
+  </section>
+  <section class="card" id="mailPanel" aria-label="Mail versturen" hidden></section>
+
+  <section class="list" id="listSection" aria-label="Bedrijven" data-show="vandaag bedrijven kaart">
+    <div class="list-head cols" aria-hidden="true"><span>Bedrijf</span><span>Plaats</span><span>Telefoon en e-mail</span><span>Actie</span><span></span></div>
+    <div id="rows"><div class="empty"><p>Lijst laden…</p></div></div>
+  </section>
+
+  <!-- Nieuw bedrijf -->
+  <div class="page-head" data-show="nieuw">
+    <div><h2>Nieuw bedrijf</h2><p class="sub">Vul zelf in, scan een visitekaartje of plak gegevens uit Google Maps.</p></div>
+  </div>
+  <div class="tiles" data-show="nieuw">
+    <button type="button" class="tile main" id="scanBtn"><i data-ic="scan-line"></i>Visitekaartje scannen</button>
+    <button type="button" class="tile" id="pickBtn"><i data-ic="image"></i>Foto uit galerij</button>
+    <button type="button" class="tile" id="pasteBtn"><i data-ic="clipboard-paste"></i>Plakken</button>
+  </div>
+  <input type="file" id="scanFile" accept="image/*" capture="environment" hidden>
+  <input type="file" id="pickFile" accept="image/*" hidden>
+  <p class="hint" id="scanMsg" data-show="nieuw">Scan een visitekaartje, of kopieer een bedrijf in Google Maps of Chrome en tik op Plakken.</p>
+  <div class="scanlines" id="scanLines" hidden></div>
+  <form class="add" id="addForm" autocomplete="off" novalidate>
     <div class="field">
       <label for="addBedrijf">Bedrijfsnaam</label>
       <input class="input" id="addBedrijf" maxlength="120" placeholder="Bijv. Drukkerij De Vries">
@@ -614,78 +700,59 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     </div>
     <div class="dupwarn" id="dupWarn" hidden></div>
     <div class="submit">
-      <button type="submit" class="btn primary" id="addBtn">Toevoegen</button>
+      <button type="submit" class="btn primary" id="addBtn"><i data-ic="plus"></i>Toevoegen</button>
     </div>
   </form>
   <datalist id="actieLijst"></datalist>
   <datalist id="plaatsLijst"></datalist>
   <datalist id="brancheLijst"></datalist>
 
-  <div class="notice" id="roNote" hidden>
-    <p>Je bekijkt deze lijst. Alleen de eigenaar en mensen met bewerkrechten kunnen bedrijven toevoegen of wijzigen.</p>
+  <!-- Meer -->
+  <div class="page-head" data-show="meer">
+    <div><h2>Meer</h2><p class="sub">Account, meldingen, koppelingen en je gegevens.</p></div>
   </div>
-
-  <div class="notice" id="exampleNotice" hidden>
-    <p><strong>Dit zijn voorbeelden.</strong> Ze laten zien hoe de lijst werkt. Verwijder ze zodra je je eigen bedrijven gaat invullen.</p>
-    <button type="button" class="btn" id="clearExamples">Voorbeelden verwijderen</button>
+  <section class="card" id="importPanel" aria-label="Importeren uit Excel" hidden></section>
+  <div class="settings" data-show="meer">
+    <section class="card set-group" aria-label="Account">
+      <h3>Account</h3>
+      <div class="set-row"><i data-ic="user"></i><div class="set-text"><strong>Opslag</strong><span id="who"></span></div>
+        <button type="button" class="btn small" id="logoutBtn"><i data-ic="log-out"></i>Uitloggen</button></div>
+      <div class="set-row install-row"><i data-ic="smartphone"></i><div class="set-text"><strong>App installeren</strong><span>Zet de app tussen je apps, met een eigen icoon.</span></div>
+        <button type="button" class="btn small" id="installBtn" hidden>Installeren</button></div>
+    </section>
+    <section class="card set-group" aria-label="Meldingen en koppelingen">
+      <h3>Meldingen en koppelingen</h3>
+      <div class="set-row"><i data-ic="bell"></i>
+        <p class="push-line" id="pushLine">
+          <span id="pushStatus">Ochtendmelding 08:05</span>
+          <button type="button" class="linkbtn" id="pushOn" hidden>Aanzetten</button>
+          <button type="button" class="linkbtn" id="pushTest" hidden>Testmelding</button>
+          <button type="button" class="linkbtn" id="pushCopy" hidden>Koppelcode</button>
+          <textarea class="input" id="pushCode" rows="3" readonly hidden aria-label="Koppelcode"></textarea>
+        </p></div>
+      <div class="set-row"><i data-ic="mail"></i>
+        <p class="push-line" id="outlookLine">
+          <span id="outlookStatus">Outlook</span>
+          <button type="button" class="linkbtn" id="outlookLogin" hidden>Koppelen</button>
+          <button type="button" class="linkbtn" id="outlookSig" hidden>Handtekening</button>
+          <button type="button" class="linkbtn" id="outlookOff" hidden>Ontkoppelen</button>
+        </p></div>
+      <section class="outlook-panel" id="outlookPanel" aria-label="Outlook" hidden></section>
+    </section>
+    <section class="card set-group" aria-label="Gegevens">
+      <h3>Gegevens</h3>
+      <div class="set-row"><i data-ic="file-spreadsheet"></i><div class="set-text"><strong>Importeren uit Excel</strong><span>Een lijst met bedrijven inlezen uit Excel of CSV.</span></div>
+        <button type="button" class="btn small" id="importBtn" hidden>Importeren</button></div>
+      <div class="set-row"><i data-ic="download"></i><div class="set-text"><strong>Exporteren</strong><span>Alle bedrijven als CSV-bestand, te openen in Excel.</span></div>
+        <button type="button" class="btn small" id="exportBtn">Exporteer naar CSV</button></div>
+      <div class="set-row"><i data-ic="save"></i><div class="set-text"><strong>Back-up</strong><span>Een kopie van je lijst en mailteksten, om terug te zetten op elk apparaat.</span></div>
+        <div class="btns"><button type="button" class="btn small" id="backupBtn">Back-up maken</button><button type="button" class="btn small" id="restoreBtn">Back-up terugzetten</button></div>
+        <input type="file" id="restoreFile" accept=".json,application/json" hidden></div>
+    </section>
+    <p class="copyright">© 2026 Silvan H. Alle rechten voorbehouden.</p>
   </div>
-
-  <div class="overview">
-    <div class="tabs" id="tabs" aria-label="Overzicht"></div>
-    <div class="tools">
-      <input class="input search" id="search" type="search" placeholder="Zoek op bedrijf, naam, plaats, e-mail of telefoon" aria-label="Zoeken">
-      <select class="input branchesel" id="brancheSel" aria-label="Branche" hidden></select>
-      <button type="button" class="btn" id="mailBtn" hidden>Mail versturen</button>
-    </div>
-  </div>
-
-  <div class="filters" id="filters" hidden>
-    <div class="chips" id="chips" aria-label="Filter op actie"></div>
-    <p class="hint">Elke actie die je bij een bedrijf invult, komt hier automatisch bij als filter.</p>
-  </div>
-
-  <section class="card kaart" id="kaartPanel" aria-label="Kaart" hidden>
-    <div class="kaart-map" id="kaartMap"></div>
-    <div class="kaart-bar"><div class="chips" id="kaartChips"></div><button type="button" class="btn small" id="kaartMe">Mijn locatie</button></div>
-    <p class="hint" id="kaartStatus" role="status" hidden></p>
-    <p class="hint kaart-legend"><span class="dot due"></span>Vandaag te doen <span class="dot act"></span>Met actie <span class="dot none"></span>Zonder actie <span class="dot approx"></span>Alleen plaats bekend</p>
-  </section>
-  <section class="card" id="mailPanel" aria-label="Mail versturen" hidden></section>
-
-  <section class="list" aria-label="Bedrijven">
-    <div class="list-head cols" aria-hidden="true"><span>Bedrijf</span><span>Plaats</span><span>Telefoon en e-mail</span><span>Actie</span><span></span></div>
-    <div id="rows"><div class="empty"><p>Lijst laden…</p></div></div>
-  </section>
-
-  <footer class="foot">
-    <div class="foot-row">
-      <span class="meta" id="who"></span>
-      <div class="btns">
-        <button type="button" class="btn small" id="exportBtn">Exporteer naar CSV</button>
-        <button type="button" class="btn small" id="backupBtn">Back-up maken</button>
-        <button type="button" class="btn small" id="restoreBtn">Back-up terugzetten</button>
-        <input type="file" id="restoreFile" accept=".json,application/json" hidden>
-        <button type="button" class="btn small" id="logoutBtn">Uitloggen</button>
-      </div>
-    </div>
-    <p class="hint">Met Back-up terugzetten zet je ook je lijst uit de Claude-app over.</p>
-    <p class="hint push-line" id="pushLine">
-      <span id="pushStatus">Ochtendmelding 08:05</span>
-      <button type="button" class="linkbtn" id="pushOn" hidden>Aanzetten</button>
-      <button type="button" class="linkbtn" id="pushTest" hidden>Testmelding</button>
-      <button type="button" class="linkbtn" id="pushCopy" hidden>Koppelcode</button>
-      <textarea class="input" id="pushCode" rows="3" readonly hidden aria-label="Koppelcode"></textarea>
-    </p>
-    <p class="hint push-line" id="outlookLine">
-      <span id="outlookStatus">Outlook</span>
-      <button type="button" class="linkbtn" id="outlookLogin" hidden>Koppelen</button>
-      <button type="button" class="linkbtn" id="outlookSig" hidden>Handtekening</button>
-      <button type="button" class="linkbtn" id="outlookOff" hidden>Ontkoppelen</button>
-    </p>
-    <section class="card outlook-panel" id="outlookPanel" aria-label="Outlook" hidden></section>
-    <p class="hint copyright">© 2026 Silvan H. Alle rechten voorbehouden.</p>
-  </footer>
 </main>
+<nav class="nav bottomnav" id="bottomNav" aria-label="Hoofdmenu"></nav>
 
 <div class="cam" id="cam" role="dialog" aria-modal="true" aria-label="Visitekaartje fotograferen" hidden>
   <video id="camVideo" playsinline muted autoplay></video>
@@ -750,6 +817,10 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   ];
 
   const $ = id => document.getElementById(id);
+  // Pictogrammen: Lucide (ISC-licentie), alleen de vormen die de app gebruikt.
+  const ICONS = {"phone": "<path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "mail": "<path d=\"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7\" /> <rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" />", "message-circle": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "navigation": "<polygon points=\"3 11 22 2 13 21 11 13 3 11\" />", "calendar-check": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"m9 15 2 2 4-4\" />", "calendar": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "list": "<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "ellipsis": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />", "settings": "<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "camera": "<path d=\"M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z\" /> <circle cx=\"12\" cy=\"13\" r=\"3\" />", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <circle cx=\"9\" cy=\"9\" r=\"2\" /> <path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\" />", "clipboard-paste": "<path d=\"M11 14h10\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v1.344\" /> <path d=\"m17 18 4-4-4-4\" /> <path d=\"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113\" /> <rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" />", "search": "<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "upload": "<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />", "download": "<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />", "archive": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />", "archive-restore": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h2\" /> <path d=\"M20 8v11a2 2 0 0 1-2 2h-2\" /> <path d=\"m9 15 3-3 3 3\" /> <path d=\"M12 12v9\" />", "trash-2": "<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "log-out": "<path d=\"m16 17 5-5-5-5\" /> <path d=\"M21 12H9\" /> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 6v6l4 2\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /> <path d=\"m21.854 2.147-10.94 10.939\" />", "scan-line": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\" /> <path d=\"M17 3h2a2 2 0 0 1 2 2v2\" /> <path d=\"M21 17v2a2 2 0 0 1-2 2h-2\" /> <path d=\"M7 21H5a2 2 0 0 1-2-2v-2\" /> <path d=\"M7 12h10\" />", "contact": "<path d=\"M16 2v2\" /> <path d=\"M7 21v-2a2 2 0 012-2h6a2 2 0 012 2v2\" /> <path d=\"M8 2v2\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />", "house": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "flashlight": "<path d=\"M12 13v1\" /> <path d=\"M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z\" /> <path d=\"M6 6h12\" />", "locate-fixed": "<line x1=\"2\" x2=\"5\" y1=\"12\" y2=\"12\" /> <line x1=\"19\" x2=\"22\" y1=\"12\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"5\" /> <line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\" /> <circle cx=\"12\" cy=\"12\" r=\"7\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "file-spreadsheet": "<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M8 13h2\" /> <path d=\"M14 13h2\" /> <path d=\"M8 17h2\" /> <path d=\"M14 17h2\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "wifi-off": "<path d=\"M12 20h.01\" /> <path d=\"M8.5 16.429a5 5 0 0 1 7 0\" /> <path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\" /> <path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\" /> <path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\" /> <path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\" /> <path d=\"m2 2 20 20\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m16 9-5.5 5.5L8 12\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "layout-list": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" /> <path d=\"M14 4h7\" /> <path d=\"M14 9h7\" /> <path d=\"M14 15h7\" /> <path d=\"M14 20h7\" />", "list-checks": "<path d=\"M13 5h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" />", "mail-plus": "<path d=\"M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8\" /> <path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" /> <path d=\"M19 16v6\" /> <path d=\"M16 19h6\" />", "phone-call": "<path d=\"M13 2a9 9 0 0 1 9 9\" /> <path d=\"M13 6a5 5 0 0 1 5 5\" /> <path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />"};
+  const ic = (n, cls = '') => `<svg class="ic${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+  document.querySelectorAll('i[data-ic]').forEach(el => { el.outerHTML = ic(el.dataset.ic); });
   const rowsEl = $('rows'), tabsEl = $('tabs'), chipsEl = $('chips'), filtersEl = $('filters');
   const summaryEl = $('summary'), todayEl = $('today'), actieListEl = $('actieLijst'), plaatsListEl = $('plaatsLijst');
   const addForm = $('addForm'), addBtn = $('addBtn'), addWhenEl = $('addWhen'), dupWarnEl = $('dupWarn');
@@ -802,7 +873,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   function nextWorkday(iso) { const d = parseISO(iso); do { d.setDate(d.getDate() + 1); } while (d.getDay() === 0 || d.getDay() === 6); return isoOf(d); }
   function addWorkdays(iso, n) { let d = iso; for (let i = 0; i < n; i++) d = nextWorkday(d); return d; }
   // Hoe vaak achter elkaar geen gehoor. Een mail ertussen telt niet als contact.
-  function noAnswerStreak(l) { let n = 0; for (const e of l.log || []) { if (e.a === 'Mail') continue; if (e.u === 'Geen gehoor') n++; else break; } return n; }
+  function noAnswerStreak(l) { let n = 0; for (const e of l.log || []) { if (e.a === 'Mail' || e.a === 'WhatsApp') continue; if (e.u === 'Geen gehoor') n++; else break; } return n; }
   const callable = l => !!l && !l.gearchiveerd && String(l.telefoon || '').replace(/\D/g, '').length >= 6;
   function dayDiff(from, to) {
     const a = parseISO(from), b = parseISO(to);
@@ -963,8 +1034,21 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     }
   }
   const telHref = v => 'tel:' + String(v || '').replace(/[^\d+]/g, '');
+  // WhatsApp: alleen bij mobiele nummers (NL 06, BE 04), met een begroeting die al klaarstaat.
+  function waNumber(tel) {
+    let d = String(tel || '').replace(/[^\d+]/g, '').replace(/^\+/, '').replace(/^00/, '');
+    if (/^0[1-9]/.test(d)) d = '31' + d.slice(1);
+    return /^(316\d{8}|324\d{8})$/.test(d) ? d : '';
+  }
+  function waHref(l) {
+    const h = new Date().getHours(), p = contactParts(l.contact);
+    const hello = `${h < 12 ? 'Goedemorgen' : h < 18 ? 'Goedemiddag' : 'Goedenavond'}${p.voornaam ? ' ' + p.voornaam : ''},\n\n`;
+    return `https://wa.me/${waNumber(l.telefoon)}?text=${encodeURIComponent(hello)}`;
+  }
+  const waLink = (l, cls = 'wa') => waNumber(l.telefoon)
+    ? `<a class="${cls}" href="${esc(waHref(l))}" target="_blank" rel="noopener" data-act="wa" aria-label="WhatsApp naar ${esc(l.bedrijf)}">${ic('message-circle')}<span class="lbl">WhatsApp</span></a>` : '';
   const callLink = (l, label = 'Bel', cls = 'call') => String(l.telefoon || '').replace(/\D/g, '').length >= 6
-    ? `<a class="${cls}" href="${esc(telHref(l.telefoon))}" data-act="call" aria-label="Bel ${esc(l.bedrijf)}">${label}</a>` : '';
+    ? `<a class="${cls}" href="${esc(telHref(l.telefoon))}" data-act="call" aria-label="Bel ${esc(l.bedrijf)}">${ic('phone')}<span>${label}</span></a>` : '';
 
   /* Google Maps */
   const placeQuery = l => l.adres ? [l.adres, l.plaats].filter(Boolean).join(', ') : [l.bedrijf, l.plaats].filter(Boolean).join(', ');
@@ -977,7 +1061,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const url = 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(dest) +
       (way.length ? '&waypoints=' + encodeURIComponent(way.join('|')) : '');
     const label = stops.length === 1 ? 'Open in Google Maps' : `Route openen (${use.length} stops${stops.length > 10 ? ', max. 10' : ''})`;
-    return `<a class="route" href="${esc(url)}" target="_blank" rel="noopener">${label}</a>`;
+    return `<a class="route" href="${esc(url)}" target="_blank" rel="noopener">${ic('route')}${label}</a>`;
   }
 
   /* ---------- gegevens ---------- */
@@ -1085,7 +1169,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const any = c.bedrijf.trim() || c.telefoon.trim() || c.email.trim();
     const hits = any ? lookup(buildIndex(state.leads), c).slice(0, 3) : [];
     const sig = hits.map(h => h.id).join(',');
-    if (sig !== dupSig) { dupSig = sig; dupAcked = false; addBtn.textContent = 'Toevoegen'; }
+    if (sig !== dupSig) { dupSig = sig; dupAcked = false; addBtn.innerHTML = ic('plus') + 'Toevoegen'; }
     dupWarnEl.hidden = !hits.length;
     dupWarnEl.innerHTML = hits.length ? `<strong>Lijkt al in je lijst te staan:</strong> ` + hits.map(h =>
       `<button type="button" class="linkbtn" data-goto="${esc(h.id)}">${esc(h.bedrijf)}</button>` +
@@ -1103,7 +1187,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const hits = checkAddDupes();
     if (hits.length && !dupAcked) {
       dupAcked = true;
-      addBtn.textContent = 'Toch toevoegen';
+      addBtn.innerHTML = ic('plus') + 'Toch toevoegen';
       toast('Dit bedrijf lijkt al in je lijst te staan. Klik op Toch toevoegen als het een ander bedrijf is.');
       return;
     }
@@ -1122,11 +1206,10 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     rememberAction(actie);
     addForm.reset();
     clearScanLines();
-    $('scanMsg').textContent = 'Maak een foto van een kaartje, of kopieer een bedrijf in Google Maps of Chrome en tik op Plakken.';
+    $('scanMsg').textContent = 'Scan een visitekaartje, of kopieer een bedrijf in Google Maps of Chrome en tik op Plakken.';
     syncWhen(addWhenEl.querySelector('.when'));
-    dupSig = ''; dupAcked = false; addBtn.textContent = 'Toevoegen'; dupWarnEl.hidden = true;
+    dupSig = ''; dupAcked = false; addBtn.innerHTML = ic('plus') + 'Toevoegen'; dupWarnEl.hidden = true;
     $('addBedrijf').focus();
-    if (!inView(lead)) { setView('alles'); state.search = ''; searchEl.value = ''; }
     renderAll();
     toast(`${bedrijf} staat op je lijst${datum ? `, actie ${actie} op ${shortDate(datum)}` : ''}.`);
   }
@@ -1277,7 +1360,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       l.log.map(x => `${x.d} ${x.a}${x.u ? ': ' + x.u : ''}${x.t ? ' (' + x.t + ')' : ''}`).join(' | '),
       l.gearchiveerd ? `ja (${l.gearchiveerdOp})` : '', l.gewijzigd.slice(0, 10),
     ])].map(r => r.map(cell).join(';'));
-    saveFile(`koude-acquisitie-${todayISO()}.csv`, '\ufeff' + lines.join('\r\n'), 'text/csv;charset=utf-8');
+    saveFile(`leadnex-${todayISO()}.csv`, '\ufeff' + lines.join('\r\n'), 'text/csv;charset=utf-8');
     toast('Export opgeslagen in je downloads.');
   }
 
@@ -1288,7 +1371,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const z = d => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
     const [y, m, dd] = l.datum.split('-').map(Number);
     const title = `${l.actie} – ${l.bedrijf}`;
-    const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Koude Acquisitie//NL', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
+    const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Leadnex//NL', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
       `UID:${l.id}-${l.datum.replace(/-/g, '')}@koude-acquisitie`, `DTSTAMP:${z(new Date())}`];
     if (l.tijd) {
       const [hh, mi] = l.tijd.split(':').map(Number);
@@ -1622,7 +1705,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 
   const SCAN_FIELDS = [['bedrijf', 'Bedrijf', 'addBedrijf'], ['contact', 'Contact', 'addContact'], ['email', 'E-mail', 'addEmail'],
     ['telefoon', 'Telefoon', 'addTelefoon'], ['adres', 'Adres', 'addAdres'], ['plaats', 'Plaats', 'addPlaats'], ['website', 'Website', 'addWebsite']];
-  const scan = { lines: [], use: [], src: '' };
+  const scan = { lines: [], use: [], src: '', raw: null };
   function fillAddForm(found) {
     setAddOpen(true);
     let n = 0;
@@ -1632,46 +1715,125 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   }
   function renderScanLines() {
     const el = $('scanLines');
-    el.hidden = !scan.lines.length;
-    if (!scan.lines.length) { el.innerHTML = ''; return; }
+    // Wat er via delen binnenkwam, letterlijk: handig om te zien waarom iets niet werd herkend.
+    const raw = scan.raw ? `<details class="raw"><summary>Wat er binnenkwam</summary><pre>${esc([scan.raw.title && 'Titel: ' + scan.raw.title, scan.raw.text && 'Tekst: ' + scan.raw.text, scan.raw.url && 'Link: ' + scan.raw.url].filter(Boolean).join('\n'))}</pre></details>` : '';
+    el.hidden = !scan.lines.length && !raw;
+    if (!scan.lines.length) { el.innerHTML = raw; return; }
     el.innerHTML = `<p class="hint">${scan.src === 'deel' ? 'Dit kwam mee met delen.' : 'Dit las de app op het kaartje.'} Staat iets niet goed? Kies bij de regel in welk veld hij hoort.</p>
       <ul class="ocr-lines">${scan.lines.map((t, i) => `<li><span class="ocr-t">${esc(t)}</span><select class="input ocr-sel${scan.use[i] ? ' used' : ''}" id="ocr-${i}" data-ocr="${i}" aria-label="Veld voor ${esc(t)}">
-        <option value="">Niet gebruiken</option>${SCAN_FIELDS.map(([k, label]) => `<option value="${k}"${scan.use[i] === k ? ' selected' : ''}>${label}</option>`).join('')}</select></li>`).join('')}</ul>`;
+        <option value="">Niet gebruiken</option>${SCAN_FIELDS.map(([k, label]) => `<option value="${k}"${scan.use[i] === k ? ' selected' : ''}>${label}</option>`).join('')}</select></li>`).join('')}</ul>${raw}`;
   }
-  function clearScanLines() { scan.lines = []; scan.use = []; scan.src = ''; renderScanLines(); }
+  function clearScanLines() { scan.lines = []; scan.use = []; scan.src = ''; scan.raw = null; renderScanLines(); }
 
   /* ---------- delen naar de app ---------- */
-  const isMapsUrl = u => /(google\.[a-z.]+\/maps|maps\.app\.goo\.gl|goo\.gl\/maps|maps\.google\.|g\.co\/kgs|share\.google)/i.test(u);
+  const isMapsUrl = u => /(google\.[a-z.]+\/maps|maps\.app\.goo\.gl|goo\.gl\/maps|maps\.google\.|g\.co\/kgs|share\.google|search\.app)/i.test(u);
+  const isShortGoogle = u => /\/\/(?:share\.google|search\.app|maps\.app\.goo\.gl|goo\.gl|g\.co)\//i.test(u);
   const isSocialUrl = u => /\/\/(?:[a-z0-9-]+\.)*(linkedin|facebook|instagram|twitter|x|youtube|tiktok|google|bing|wa|whatsapp|t)\.(com|me|co|nl)\b/i.test(u);
-  function handleShare(sh) {
-    const urls = [...new Set(`${sh.text}\n${sh.url}`.match(/https?:\/\/[^\s<>"]+/g) || [])];
-    const lines = String(sh.text || '').split(/\r?\n/).map(t => t.replace(/https?:\/\/[^\s<>"]+/g, '').replace(/\s+/g, ' ').trim()).filter(t => /\p{L}|\d{3}/u.test(t));
-    // Paginatitel van een website: "Hoekstra Installatietechniek | Installateur in Deventer" → het eerste deel.
-    const title = String(sh.title || '').split(/\s+[|–—·-]\s+|:\s/)[0].trim();
-    if (title && !lines.some(t => key(t) === key(title))) lines.unshift(title);
-    // Een volledige Google Maps-link bevat de naam: google.com/maps/place/Bakkerij+Van+Dalen/@52.2,6.1
-    urls.forEach(u => {
-      const m = /\/maps\/place\/([^/@?#]+)/.exec(u);
-      let name = '';
-      try { name = m ? decodeURIComponent(m[1].replace(/\+/g, ' ')).trim() : ''; } catch {}
-      if (name && !lines.some(t => key(t).includes(key(name.split(',')[0])))) lines.unshift(...name.split(/,\s*/).filter(Boolean));
+  // zoekopdracht in kleine letters → Hoofdletters, behalve tussenvoegsels
+  const niceCase = s => s !== s.toLowerCase() ? s : s.replace(/\S+/g, (w, i) => i && /^(van|de|der|den|het|'t|en|op|in|aan|bij|te|ter|ten)$/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1));
+  const nameTokens = s => key(s).replace(/[^a-z0-9à-ÿ ]+/g, ' ').split(/\s+/).filter(w => w.length > 1 && !/^(bv|b|v|vof|nv|de|het|van|der|den|en|the|and)$/.test(w));
+  // Wat er in de links zelf staat: de naam (google.com/maps/place/Naam), de zoekopdracht (?q=) en de plek (!3d52.2!4d6.1).
+  function shareHints(urls) {
+    const out = { names: [], query: '', coords: null };
+    for (const u of urls) {
+      let x;
+      try { x = new URL(u); } catch { continue; }
+      const dec = v => { try { return decodeURIComponent(v.replace(/\+/g, ' ')).trim(); } catch { return ''; } };
+      const place = /\/maps\/place\/([^/@?#]+)/.exec(x.pathname);
+      if (place && dec(place[1])) out.names.push(dec(place[1]));
+      const q = /google\.|goo\.gl/.test(x.hostname) ? (x.searchParams.get('q') || x.searchParams.get('query') || '') : '';
+      if (q && !out.query && !/^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(q)) out.query = q.trim();
+      const d = /!3d(-?\d{1,3}\.\d+)!4d(-?\d{1,3}\.\d+)/.exec(u) || /@(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)/.exec(u) || /[?&](?:q|ll)=(-?\d{1,3}\.\d+),\s*(-?\d{1,3}\.\d+)/.exec(u);
+      if (d && !out.coords) out.coords = { lat: Number(d[1]), lon: Number(d[2]) };
+    }
+    return out;
+  }
+  // Adres bij een plek op de kaart (PDOK, alleen Nederland). Alleen als er binnen 75 meter een adres is.
+  async function pdokReverse(lat, lon) {
+    const res = await fetch(`https://api.pdok.nl/bzk/locatieserver/search/v3_1/reverse?lat=${lat}&lon=${lon}&type=adres&rows=1&fl=straatnaam,huis_nlt,postcode,woonplaatsnaam,afstand`);
+    if (!res.ok) return null;
+    const doc = ((await res.json()).response || {}).docs?.[0];
+    if (!doc || !doc.straatnaam || (doc.afstand !== undefined && doc.afstand > 75)) return null;
+    const pc = String(doc.postcode || '').replace(/^(\d{4})\s?([A-Z]{2})$/, '$1 $2');
+    return { adres: [`${doc.straatnaam} ${doc.huis_nlt || ''}`.trim(), pc].filter(Boolean).join(', '), plaats: doc.woonplaatsnaam || '' };
+  }
+  // Gegevens bij een bedrijfsnaam uit OpenStreetMap: adres, en soms telefoon en website. Alleen als de naam echt overeenkomt.
+  async function osmLookup(name, plaats) {
+    const want = nameTokens(name);
+    if (!want.length) return null;
+    const q = [name, plaats && !key(name).includes(key(plaats)) ? plaats : ''].filter(Boolean).join(' ');
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&extratags=1&namedetails=1&limit=5&countrycodes=nl,be&accept-language=nl&q=${encodeURIComponent(q)}`);
+    if (!res.ok) return null;
+    const hit = (await res.json()).find(r => {
+      const got = nameTokens(r.name || (r.namedetails && r.namedetails.name) || '');
+      return got.length && got.filter(t => want.includes(t)).length >= Math.min(2, got.length);
     });
-    const site = urls.find(u => !isMapsUrl(u) && !isSocialUrl(u));
-    if (!lines.length && !site) {
-      setAddOpen(true);
-      $('scanMsg').textContent = urls.length ? 'Er kwam alleen een kaartlink mee, zonder naam of adres. Vul de gegevens zelf in.' : 'Er kwam niets bruikbaars mee. Vul de gegevens zelf in.';
+    if (!hit) return null;
+    const a = hit.address || {}, x = hit.extratags || {};
+    return {
+      naam: hit.name || '',
+      adres: [[a.road, a.house_number].filter(Boolean).join(' '), a.postcode].filter(Boolean).join(', '),
+      plaats: a.city || a.town || a.village || a.municipality || '',
+      telefoon: x.phone || x['contact:phone'] || '',
+      website: cleanWebsite(x.website || x['contact:website'] || '').toLowerCase(),
+    };
+  }
+  async function handleShare(sh) {
+    const msg = $('scanMsg');
+    setAddOpen(true);
+    clearScanLines();
+    scan.raw = sh; scan.src = 'deel';
+    const urls = [...new Set(`${sh.text}\n${sh.url}`.match(/(?:https?:\/\/|geo:)[^\s<>"]+/g) || [])];
+    const hints = shareHints(urls);
+    // Tekstregels zonder links en zonder Google-reclameteksten ("Bekijk ... op Google Maps").
+    let lines = String(sh.text || '').split(/\r?\n/).map(t => t.replace(/(?:https?:\/\/|geo:)[^\s<>"]+/g, '').replace(/\s+/g, ' ').trim())
+      .map(t => { const m = /^(?:check out|bekijk|kijk eens naar)\s+(.+?)\s+(?:on|op)\s+google(?: maps)?\b/i.exec(t); return m ? m[1] : t; })
+      .filter(t => /\p{L}|\d{3}/u.test(t) && !/^(google( maps| zoeken| search)?|gedeeld via .*|shared via .*)$/i.test(t));
+    const title = String(sh.title || '').split(/\s+[|–—·-]\s+|:\s/)[0].trim();
+    if (title && !/^google( maps| zoeken| search)?$/i.test(title) && !lines.some(t => key(t) === key(title))) lines.unshift(title);
+    hints.names.forEach(nm => { if (!lines.some(t => key(t).includes(key(nm.split(',')[0])))) lines.unshift(...nm.split(/,\s*/).filter(Boolean)); });
+    if (hints.query && !lines.some(t => key(t).includes(key(hints.query.split(',')[0])))) lines.push(...hints.query.split(/,\s*/).filter(Boolean).map(niceCase));
+    const site = urls.find(u => /^https?:/.test(u) && !isMapsUrl(u) && !isSocialUrl(u));
+    if (!lines.length && !site && !hints.coords) {
+      renderScanLines();
+      msg.textContent = urls.some(isShortGoogle)
+        ? 'Google stuurde alleen een korte link mee (zonder naam of adres). Zet in de Google-app bij Instellingen het inkorten van links uit, of tik in Google op het adres, kopieer het en gebruik Plakken.'
+        : 'Er kwam niets bruikbaars mee. Vul de gegevens zelf in.';
       return;
     }
     const res = parseCard(lines.map(t => ({ t: cleanCardLine(t), h: 0 })));
-    if (!res.fields.website && site) { try { res.fields.website = cleanWebsite(new URL(site).hostname); } catch {} }
-    // Alleen een website: de naam van het domein als voorlopige bedrijfsnaam (hoekstra-installatie.nl → Hoekstra installatie).
-    if (!res.fields.bedrijf && !lines.length && res.fields.website) res.fields.bedrijf = cap(siteKey(res.fields.website).split('.')[0].replace(/-/g, ' '));
-    // Bij delen staat de naam bovenaan: die gaat voor als de app geen bedrijfsnaam herkende.
-    if (!res.fields.bedrijf && res.lines.length) { const i = res.use.findIndex(u => !u); if (i >= 0) { res.fields.bedrijf = calmCaps(res.lines[i]); res.use[i] = 'bedrijf'; } }
-    const n = fillAddForm(res.fields);
-    scan.lines = res.lines.slice(0, 24); scan.use = res.use.slice(0, 24); scan.src = 'deel';
+    const f = res.fields;
+    // Bij delen staat de naam bovenaan: de eerste gewone regel is het bedrijf (ook als hij op een persoonsnaam lijkt).
+    const first = res.lines.findIndex((t, i) => !res.use[i] || res.use[i] === 'contact');
+    if (first >= 0 && (!f.bedrijf || res.use[first] === 'contact') && first === res.lines.findIndex(t => /\p{L}{2}/u.test(t))) {
+      if (res.use[first] === 'contact') f.contact = '';
+      const old = res.use.indexOf('bedrijf');
+      if (old >= 0 && old !== first) res.use[old] = '';
+      f.bedrijf = niceCase(calmCaps(res.lines[first])); res.use[first] = 'bedrijf';
+    }
+    if (!f.website && site) { try { f.website = cleanWebsite(new URL(site).hostname); } catch {} }
+    if (!f.bedrijf && !res.lines.length && f.website) f.bedrijf = cap(siteKey(f.website).split('.')[0].replace(/-/g, ' '));
+    msg.textContent = 'Gegevens aanvullen…';
+    const found = [];
+    try {
+      if (!f.adres && hints.coords) {
+        const a = await pdokReverse(hints.coords.lat, hints.coords.lon);
+        if (a) { f.adres = a.adres; f.plaats = f.plaats || a.plaats; found.push('adres van de kaart'); }
+      }
+      if (f.bedrijf && (!f.adres || !f.telefoon || !f.website)) {
+        const o = await osmLookup(f.bedrijf, f.plaats);
+        if (o) {
+          if (o.naam && nameTokens(f.bedrijf).length > nameTokens(o.naam).length) f.bedrijf = o.naam;   // zoekopdracht met plaatsnaam erachter
+          if (!f.adres && o.adres) { f.adres = o.adres; f.plaats = f.plaats || o.plaats; found.push('adres'); }
+          if (!f.telefoon && o.telefoon) { f.telefoon = o.telefoon; found.push('telefoon'); }
+          if (!f.website && o.website) { f.website = o.website; found.push('website'); }
+        }
+      }
+    } catch {}
+    const n = fillAddForm(f);
+    scan.lines = res.lines.slice(0, 24); scan.use = res.use.slice(0, 24);
     renderScanLines();
-    $('scanMsg').textContent = `${n} ${plural(n, 'gegeven', 'gegevens')} overgenomen. Controleer ze en tik op Toevoegen.`;
+    msg.textContent = `${n} ${plural(n, 'gegeven', 'gegevens')} overgenomen${found.length ? ` (${found.join(', ')} opgezocht via ${found.includes('adres van de kaart') ? 'PDOK' : 'OpenStreetMap'})` : ''}. Controleer ze en tik op Toevoegen.`;
     addForm.scrollIntoView({ block: 'start', behavior: 'smooth' });
     $('addBedrijf').focus({ preventScroll: true });
   }
@@ -1761,13 +1923,60 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   }
 
   /* ---------- weergave ---------- */
-  function setView(v) { state.view = v; pref.set('view', v); }
+  // Tabbladen: Vandaag, Bedrijven (Alle / Met actie / Archief), Kaart, Nieuw en Meer.
+  const PAGES = ['vandaag', 'bedrijven', 'kaart', 'nieuw', 'meer'];
+  const pageOfView = v => v === 'vandaag' || v === 'kaart' ? v : 'bedrijven';
+  function setView(v) {
+    state.view = v; pref.set('view', v);
+    state.page = pageOfView(v); pref.set('page', state.page);
+    if (state.page === 'bedrijven') pref.set('bedrijvenView', v);
+  }
+  function setPage(p) {
+    if (!PAGES.includes(p)) p = 'vandaag';
+    if (p === 'vandaag' || p === 'kaart') setView(p);
+    else if (p === 'bedrijven') { const v = pref.get('bedrijvenView'); setView(['alles', 'acties', 'archief'].includes(v) ? v : 'alles'); }
+    else { state.page = p; pref.set('page', p); }
+    if (state.selecting && !['bedrijven', 'kaart', 'vandaag'].includes(state.page)) setSelecting(false);
+    closeRow(true);
+    renderAll();
+    window.scrollTo({ top: 0 });
+    if (p === 'nieuw' && !('ontouchstart' in window)) $('addBedrijf').focus({ preventScroll: true });
+  }
+  const NAV = [['vandaag', 'calendar-check', 'Vandaag'], ['bedrijven', 'building-2', 'Bedrijven'], ['kaart', 'map', 'Kaart'], ['nieuw', 'plus', 'Nieuw'], ['meer', 'ellipsis', 'Meer']];
+  function renderNav() {
+    const due = state.leads.filter(l => isDue(l, todayISO())).length;
+    const html = NAV.map(([p, icon, label]) => `<a href="#" class="nav-item${p === 'nieuw' ? ' new' : ''}" data-page="${p}"${state.page === p ? ' aria-current="page"' : ''}>
+      <span class="pill">${ic(icon)}</span><span>${label}</span>${p === 'vandaag' && due ? `<span class="badge">${due > 99 ? '99+' : due}</span>` : ''}</a>`).join('');
+    $('topNav').innerHTML = html;
+    $('bottomNav').innerHTML = html;
+  }
+  function renderPage() {
+    document.querySelectorAll('[data-show]').forEach(el => { el.hidden = !el.dataset.show.split(' ').includes(state.page); });
+    $('tabs').hidden = state.page !== 'bedrijven';
+    mailPanel.hidden = !mail.open || !['vandaag', 'bedrijven', 'kaart'].includes(state.page);
+    importPanel.hidden = !imp.open || state.page !== 'meer';
+    if (state.page !== 'nieuw') $('scanLines').hidden = true; else renderScanLines();
+  }
+  document.addEventListener('click', e => {
+    const a = e.target.closest('[data-page]');
+    if (!a) return;
+    e.preventDefault();
+    setPage(a.dataset.page);
+  });
   function setActie(a) { state.actie = a; pref.set('actie', a); }
+  {
+    // Bij het openen: het laatst gebruikte tabblad, met een passende weergave.
+    const p = PAGES.includes(pref.get('page')) ? pref.get('page') : 'vandaag';
+    state.page = p;
+    if (p === 'vandaag' || p === 'kaart') state.view = p;
+    else if (p === 'bedrijven' && !['alles', 'acties', 'archief'].includes(state.view)) state.view = 'alles';
+  }
 
   function inView(l) {
     const q = key(state.search);
-    if (q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie, l.website, l.branche].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
-    if (state.branche && key(l.branche) !== key(state.branche)) return false;
+    const filtered = state.view !== 'vandaag';   // Vandaag toont altijd alles wat moet gebeuren
+    if (filtered && q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie, l.website, l.branche].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
+    if (filtered && state.branche && key(l.branche) !== key(state.branche)) return false;
     if (state.view === 'archief') return !!l.gearchiveerd;
     if (l.gearchiveerd) return false;
     if (state.view === 'vandaag') return isDue(l, todayISO());
@@ -1803,7 +2012,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (!x) return '';
     let streak = 0;
     for (const e of l.log) { if (e.u === 'Geen gehoor') streak++; else break; }
-    const what = x.a === 'Mail' ? 'Mail verstuurd' : (x.u || clip(x.t, 50) || x.a);
+    const what = x.a === 'Mail' ? 'Mail verstuurd' : x.a === 'WhatsApp' ? 'WhatsApp verstuurd' : (x.u || clip(x.t, 50) || x.a);
     return `Laatst: ${what}${streak >= 2 ? ` (${streak}×)` : ''} · ${shortDate(x.d)}`;
   }
 
@@ -1821,17 +2030,17 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       `<div class="field ${span}"><label for="p-${id}-${k}">${label}</label>` +
       `<input class="input" id="p-${id}-${k}" data-field="${k}" type="${type}" maxlength="${max}" value="${esc(d[k])}"${extra}${ro}></div>`;
     const archiveBtn = l.gearchiveerd
-      ? `<button type="button" class="btn" id="arch-${id}" data-act="restore">Terugzetten in lijst</button>`
-      : `<button type="button" class="btn" id="arch-${id}" data-act="archive">Archiveren</button>`;
-    const mailB = mailable(l) ? `<button type="button" class="btn" id="mail-${id}" data-act="mail">Mail opstellen</button>` : '';
+      ? `<button type="button" class="btn" id="arch-${id}" data-act="restore">${ic('archive-restore')}Terugzetten in lijst</button>`
+      : `<button type="button" class="btn" id="arch-${id}" data-act="archive">${ic('archive')}Archiveren</button>`;
+    const mailB = mailable(l) ? `<button type="button" class="btn" id="mail-${id}" data-act="mail">${ic('mail')}Mail opstellen</button>` : '';
     const actions = state.readOnly ? '' : `
       <div class="pactions">
-        <button type="button" class="btn primary" id="save-${id}" data-act="save">Opslaan</button>
+        <button type="button" class="btn primary" id="save-${id}" data-act="save">${ic('check')}Opslaan</button>
         ${mailB}
-        <button type="button" class="btn" id="agenda-${id}" data-act="agenda">In agenda</button>
-        ${l.telefoon || l.email ? `<button type="button" class="btn" id="vcf-${id}" data-act="vcard">In contacten</button>` : ''}
+        <button type="button" class="btn" id="agenda-${id}" data-act="agenda">${ic('calendar')}In agenda</button>
+        ${l.telefoon || l.email ? `<button type="button" class="btn" id="vcf-${id}" data-act="vcard">${ic('contact')}In contacten</button>` : ''}
         ${archiveBtn}
-        <button type="button" class="btn danger push${armedDelete === l.id ? ' armed' : ''}" id="del-${id}" data-act="delete">${armedDelete === l.id ? 'Klik nogmaals om te verwijderen' : 'Verwijderen'}</button>
+        <button type="button" class="btn danger push${armedDelete === l.id ? ' armed' : ''}" id="del-${id}" data-act="delete">${ic('trash-2')}${armedDelete === l.id ? 'Klik nogmaals om te verwijderen' : 'Verwijderen'}</button>
       </div>`;
     const q = placeQuery(l);
     const links = [q && `<a class="inline-link" href="${esc(mapUrl(q))}" target="_blank" rel="noopener">Open ${l.adres ? 'adres' : 'bedrijf'} in Google Maps</a>`,
@@ -1875,7 +2084,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     return `<div class="finish">
       <section class="step" aria-label="Uitkomst">
         <h3>Hoe ging het? <span class="faint">${esc(l.actie || f.via || '')}</span></h3>
-        ${l.telefoon ? `<div class="callbox"><span class="pick" role="button" tabindex="0" id="cb-${id}" data-act="copy" data-copy="${esc(l.telefoon)}" data-label="Telefoonnummer">${esc(l.telefoon)}</span>${callLink(l, `Bel ${esc(l.telefoon)}`, 'call big')}</div>` : ''}
+        ${l.telefoon ? `<div class="callbox"><span class="pick" role="button" tabindex="0" id="cb-${id}" data-act="copy" data-copy="${esc(l.telefoon)}" data-label="Telefoonnummer">${esc(l.telefoon)}</span>${callLink(l, `Bel ${esc(l.telefoon)}`, 'call big')}${waLink(l, 'wa big')}</div>` : ''}
         <div class="outcomes">${OUTCOMES.map((o, i) =>
           `<button type="button" class="oc" id="oc-${id}-${i}" data-act="outcome" data-outcome="${o}" aria-pressed="${f.uitkomst === o}">${o}</button>`).join('')}</div>
         ${f.hint ? `<p class="suggest" role="status">${esc(f.hint)}</p>` : ''}
@@ -1903,7 +2112,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         <label class="check" for="f-${id}-archief"><input type="checkbox" id="f-${id}-archief" data-ffield="archief"${f.archief ? ' checked' : ''}>Archiveren, geen vervolg</label>
       </section>
       <div class="pactions">
-        <button type="button" class="btn primary" id="fin-${id}" data-act="finish">${inSess ? 'Vastleggen, volgende' : 'Vastleggen'}</button>
+        <button type="button" class="btn primary" id="fin-${id}" data-act="finish">${ic('check')}${inSess ? 'Vastleggen, volgende' : 'Vastleggen'}</button>
         ${inSess ? `<button type="button" class="btn" id="can-${id}" data-act="sess-skip">Overslaan</button>` : `<button type="button" class="btn" id="can-${id}" data-act="cancel">Annuleren</button>`}
       </div>
     </div>`;
@@ -1914,7 +2123,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const finishing = open && state.mode === 'finish';
     const pick = (val, label, mono) => `<span class="pick${mono ? ' mono' : ''}" role="button" tabindex="0" data-act="copy" data-copy="${esc(val)}" data-label="${label}" title="Klik om te kopiëren">${esc(val)}</span>`;
     const contactCell = (l.telefoon || l.email)
-      ? `<div class="cell contactinfo">${l.telefoon ? `<span class="telline">${pick(l.telefoon, 'Telefoonnummer', true)}${callLink(l)}</span>` : ''}${l.email ? pick(l.email, 'E-mailadres', false) : ''}${l.geenMail ? '<span class="meta">Wil geen mail</span>' : ''}</div>`
+      ? `<div class="cell contactinfo">${l.telefoon ? `<span class="telline">${pick(l.telefoon, 'Telefoonnummer', true)}${callLink(l)}${waLink(l)}</span>` : ''}${l.email ? pick(l.email, 'E-mailadres', false) : ''}${l.geenMail ? '<span class="meta">Wil geen mail</span>' : ''}</div>`
       : `<div class="cell contactinfo none"><span class="faint">–</span></div>`;
     const plaatsCell = (l.plaats || l.adres)
       ? `<div class="cell plaats">${l.plaats ? `<span>${esc(l.plaats)}${state.view === 'kaart' && kaart.dist.has(l.id) ? ` <span class="dist">${fmtKm(kaart.dist.get(l.id))}</span>` : ''}</span>` : ''}${l.adres ? `<span class="meta">${esc(l.adres)}</span>` : ''}</div>`
@@ -1942,8 +2151,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         ${contactCell}
         <div class="cell actie">${actie}</div>
         <div class="cell acts">
-          ${canMail && !state.selecting ? `<a class="btn small" id="qm-${id}" href="${esc(mailtoUrl(l.email))}" data-act="qmail">Mail</a>` : ''}
-          ${canFinish ? `<button type="button" class="btn small" id="af-${id}" data-act="afronden" aria-expanded="${finishing}">Afronden</button>` : ''}
+          ${canMail && !state.selecting ? `<a class="btn small" id="qm-${id}" href="${esc(mailtoUrl(l.email))}" data-act="qmail" aria-label="Mail naar ${esc(l.bedrijf)}">${ic('mail')}<span class="mouse-only">Mail</span></a>` : ''}
+          ${canFinish ? `<button type="button" class="btn small" id="af-${id}" data-act="afronden" aria-expanded="${finishing}">${ic('check')}Afronden</button>` : ''}
           ${state.selecting ? '' : '<button type="button" class="more" data-act="toggle" tabindex="-1" aria-hidden="true"><span class="chev"></span></button>'}
         </div>
       </div>
@@ -1952,7 +2161,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   }
 
   const sessStartHtml = n => !sess.on && !state.selecting && !state.readOnly && n
-    ? `<div class="sess-start"><button type="button" class="btn dark" id="sessStart" data-act="sess-start">Belsessie starten</button><span class="hint">${n} ${plural(n, 'bedrijf', 'bedrijven')} met telefoonnummer een voor een bellen en vastleggen.</span></div>` : '';
+    ? `<div class="sess-start"><button type="button" class="btn primary" id="sessStart" data-act="sess-start">${ic('phone-call')}Belsessie starten</button><span class="hint">${n} ${plural(n, 'bedrijf', 'bedrijven')} met telefoonnummer een voor een bellen en vastleggen.</span></div>` : '';
   const emptyHtml = (title, text, extra = '') => `<div class="empty"><strong>${esc(title)}</strong><p>${esc(text)}</p>${extra}</div>`;
   const groupHead = (label, n, extra = '', quiet = false) => `<div class="group-head${quiet ? ' quiet' : ''}"><span>${esc(label)}</span><span class="n">${n}</span>${extra}</div>`;
   function grouped(list, keyOf, labelOf, order, sorter, extraOf) {
@@ -1968,7 +2177,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (state.problem) return emptyHtml(state.problem.title, state.problem.text);
     if (!state.loaded) return `<div class="empty"><p>Lijst laden…</p></div>`;
     if (!state.leads.length) return emptyHtml('Nog geen bedrijven op je lijst',
-      state.readOnly ? 'Zodra er bedrijven zijn toegevoegd, zie je ze hier.' : 'Vul hierboven een bedrijfsnaam in en klik op Toevoegen, of importeer een lijst uit Excel.');
+      state.readOnly ? 'Zodra er bedrijven zijn toegevoegd, zie je ze hier.' : 'Tik op Nieuw om een bedrijf toe te voegen, of importeer een lijst uit Excel via Meer.');
     const list = state.leads.filter(inView);
     const today = todayISO();
     const resetBtn = '<button type="button" class="btn" data-act="reset">Toon alle bedrijven</button>';
@@ -2035,12 +2244,19 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const names = actionNames(), counts = actionCounts();
     if (state.loaded && state.actie && !names.some(x => key(x) === key(state.actie))) setActie('');
 
-    const tab = (v, label, count, hot) =>
-      `<button type="button" class="tab" data-view="${v}" aria-pressed="${state.view === v}">${label} <span class="n${hot && count ? ' hot' : ''}">${count}</span></button>`;
-    tabsEl.innerHTML = tab('alles', 'Alles', n) + tab('acties', 'Acties', withAction) + tab('vandaag', 'Vandaag', due, true) +
-      `<button type="button" class="tab" data-view="kaart" aria-pressed="${state.view === 'kaart'}">Kaart</button>` + tab('archief', 'Archief', archived);
+    const tab = (v, label, count) =>
+      `<button type="button" class="tab" data-view="${v}" aria-pressed="${state.view === v}">${label} <span class="n">${count}</span></button>`;
+    tabsEl.innerHTML = tab('alles', 'Alle', n) + tab('acties', 'Met actie', withAction) + tab('archief', 'Archief', archived);
+    $('todayLong').textContent = cap(fmtToday.format(new Date()));
+    $('bedrijvenSub').textContent = state.loaded ? `${n} ${plural(n, 'bedrijf', 'bedrijven')} · ${withAction} met een actie` : 'Lijst laden…';
+    // Contactmomenten deze week (vanaf maandag)
+    const monday = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return isoOf(d); })();
+    const week = state.leads.reduce((a, l) => a + l.log.filter(x => x.d >= monday).length, 0);
+    $('stats').innerHTML = `<div class="stat hot"><b>${due}</b><span>Vandaag te doen</span></div>` +
+      `<div class="stat${late ? ' late' : ''}"><b>${late}</b><span>Te laat</span></div>` +
+      `<div class="stat"><b>${week}</b><span>Contact deze week</span></div>`;
 
-    filtersEl.hidden = state.view !== 'acties' || !!state.problem;
+    filtersEl.hidden = state.page !== 'bedrijven' || state.view !== 'acties' || !!state.problem;
     let chips = `<button type="button" class="chip" data-actie="" aria-pressed="${!state.actie}">Alle acties <span class="n">${withAction}</span></button>` +
       names.map(name => {
         const c = counts.get(key(name)) || 0;
@@ -2073,8 +2289,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     importBtn.setAttribute('aria-expanded', String(imp.open));
     mailBtn.hidden = !ready || !state.leads.some(mailable);
     mailBtn.setAttribute('aria-pressed', String(state.selecting));
-    mailBtn.textContent = state.selecting ? 'Stop met selecteren' : 'Mail versturen';
-    addForm.hidden = state.readOnly || !!state.problem;
+    mailBtn.innerHTML = state.selecting ? `${ic('x')}Stop met selecteren` : `${ic('mail-plus')}Mail versturen`;
+    addForm.hidden = state.readOnly || !!state.problem || state.page !== 'nieuw';
     roNote.hidden = !state.readOnly;
     renderBackupNotice();
     if ($('addBedrijf').value || $('addTelefoon').value || $('addEmail').value) checkAddDupes();
@@ -2090,7 +2306,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       const ids = state.pendingMail.ids, one = ids.length === 1 ? byId(ids[0]) : null;
       withFocus(selInner, () => {
         selInner.innerHTML = `
-          <span class="count">Mail ${one ? 'aan ' + esc(one.bedrijf) : `aan ${ids.length} bedrijven`} verstuurd?</span>
+          <span class="count">${state.pendingMail.kind === 'wa' ? 'WhatsApp' : 'Mail'} ${one ? 'aan ' + esc(one.bedrijf) : `aan ${ids.length} bedrijven`} verstuurd?</span>
           <button type="button" class="btn primary" id="pmYes" data-s="pm-yes">Ja, vastleggen</button>
           <button type="button" class="btn on-band" id="pmNo" data-s="pm-no">Nee</button>`;
       });
@@ -2112,7 +2328,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     });
   }
 
-  function renderAll() { renderMeta(); renderRows(); renderKaart(); renderSelBar(); renderSessBar(); if (mail.open) renderMailOut(); }
+  function renderAll() { renderMeta(); renderNav(); renderPage(); renderRows(); renderKaart(); renderSelBar(); renderSessBar(); if (mail.open) renderMailOut(); }
   let renderQueued = false;
   function scheduleRender() {
     if (renderQueued) return;
@@ -2267,7 +2483,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   function stopLocating() { if (kaart.watch !== null) { navigator.geolocation.clearWatch(kaart.watch); kaart.watch = null; } }
 
   function renderKaart() {
-    const panel = $('kaartPanel'), on = state.view === 'kaart' && !state.problem;
+    const panel = $('kaartPanel'), on = state.page === 'kaart' && !state.problem;
     panel.hidden = !on;
     if (!on) { stopLocating(); return; }
     pref.set('kaart', '1');
@@ -2494,7 +2710,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     addrList(l.email).forEach(a => lines.push(`EMAIL;TYPE=INTERNET,WORK:${a}`));
     if (street || pc || l.plaats) lines.push(`ADR;TYPE=WORK:;;${e(street)};${e(l.plaats)};;${e(pc)};Nederland`);
     if (l.website) lines.push(`URL:${e(webHref(l.website))}`);
-    lines.push(`NOTE:${e(['Koude acquisitie', l.branche].filter(Boolean).join(' · '))}`, 'END:VCARD');
+    lines.push(`NOTE:${e(['Leadnex', l.branche].filter(Boolean).join(' · '))}`, 'END:VCARD');
     return lines.join('\r\n') + '\r\n';
   }
   function saveContact(l) {
@@ -2528,6 +2744,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (!list.length) { toast('Geen bedrijven met een e-mailadres geselecteerd.'); return; }
     list.sort((a, b) => byName(byId(a), byId(b)));
     if (mail.sending) { toast('Wacht even tot de mails zijn verstuurd.'); return; }
+    if (!['vandaag', 'bedrijven', 'kaart'].includes(state.page)) setPage('bedrijven');
     Object.assign(mail, { open: true, ids: list, mode: list.length === 1 ? 'pers' : 'bcc', index: 0, done: new Set(), skipped: new Set(), opened: new Set(), newName: null, armedDel: false, busy: false, sending: null });
     const ggTpl = state.sjablonen.find(t => /geen gehoor/i.test(t.naam));
     if (ggTpl && list.every(i => { const l = byId(i); return /^mail/i.test(l.actie || '') && noAnswerStreak(l) >= 2; })) applyTemplate(ggTpl.id);
@@ -2559,14 +2776,14 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       const fits = batches.every(b => mailtoUrl('', b.map(l => l.email).join(','), subj, body).length < MAILTO_MAX);
       const owa = mailtoUrl('', batches[0].map(l => l.email).join(','), subj, body);
       const opened = i => mail.opened && mail.opened.has(i);
-      const batchBtns = batches.map((b, i) => `<a class="btn ${opened(i) ? '' : 'dark'}" href="${esc(mailtoUrl('', b.map(l => l.email).join(','), subj, body))}" data-handoff="mail" data-batch="${i}">${opened(i) ? '✓ ' : ''}Mail ${i + 1} openen (${b.length})</a>`).join('');
+      const batchBtns = batches.map((b, i) => `<a class="btn ${opened(i) ? '' : 'accent'}" href="${esc(mailtoUrl('', b.map(l => l.email).join(','), subj, body))}" data-handoff="mail" data-batch="${i}">${opened(i) ? '✓ ' : ''}Mail ${i + 1} openen (${b.length})</a>`).join('');
       const copyBtns = `<button type="button" class="btn small" id="mCopyAddrs" data-m="copy-addrs">Kopieer ${n} adressen</button><button type="button" class="btn small" id="mCopySubj" data-m="copy-subj">Kopieer onderwerp</button><button type="button" class="btn small" id="mCopyBody" data-m="copy-body">Kopieer tekst</button>`;
       const steps = `
         <div class="steps">
           <div class="srow"><span class="num">1</span>
             ${fits && batches.length > 1 ? `<div><strong>Open de mails een voor een</strong><p class="hint">Het zijn ${n} adressen. Die gaan in ${batches.length} mails van hooguit ${batches[0].length} adressen in <strong>BCC</strong>, zodat niemand de andere adressen ziet en spamfilters ze doorlaten. Onderwerp en tekst zijn steeds ingevuld: open een mail, verstuur hem en open de volgende.</p></div>
             <div class="btns">${batchBtns}</div>` : fits ? `<div><strong>Open de nieuwe mail</strong><p class="hint">De ${n} adressen staan in <strong>BCC</strong>, zodat niemand de andere adressen ziet. Onderwerp en tekst zijn ingevuld.</p></div>
-            <div class="btns"><a class="btn dark" href="${esc(owa)}" data-handoff="mail">Open nieuwe mail</a></div>
+            <div class="btns"><a class="btn accent" href="${esc(owa)}" data-handoff="mail">Open nieuwe mail</a></div>
             <p class="hint">Opent je mail-app niet? Kopieer dan alles en plak het in een nieuwe mail, de adressen bij BCC:</p>
             <div class="btns">${copyBtns}</div>`
             : `<div><strong>Kopieer adressen, onderwerp en tekst</strong><p class="hint">Het zijn te veel adressen om in één keer te openen. Plak ze in een nieuwe mail in Outlook, de adressen bij <strong>BCC</strong>.</p></div>
@@ -2578,7 +2795,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       return `${tabs}
         ${personal ? '<p class="warn">In één mail aan iedereen worden {voornaam}, {bedrijf} en {plaats} niet per bedrijf ingevuld. Kies <strong>Persoonlijk per bedrijf</strong> als je dat wel wilt.</p>' : ''}
         ${viaMs ? `<div class="ms-send">
-          <div class="btns"><button type="button" class="btn primary" id="msSendBcc" data-m="ms-send-bcc"${off}>${mail.busy ? 'Bezig met versturen…' : 'Versturen via Outlook'}</button>
+          <div class="btns"><button type="button" class="btn primary" id="msSendBcc" data-m="ms-send-bcc"${off}>${ic('send')}${mail.busy ? 'Bezig met versturen…' : 'Versturen via Outlook'}</button>
             <button type="button" class="btn" id="msDraftBcc" data-m="ms-draft-bcc"${off}>In Concepten zetten</button></div>
           <p class="hint">${n > BCC_MAX ? `${Math.ceil(n / BCC_MAX)} mails van hooguit ${BCC_MAX} adressen` : 'Eén mail'} vanuit je eigen mailbox${acc && acc.mail ? ` (${esc(acc.mail)})` : ''}. De adressen staan in BCC, zodat niemand de andere adressen ziet; jij staat zelf in Aan. Na het versturen legt de app de mail bij elk bedrijf vast.</p>
         </div>` : ''}
@@ -2597,7 +2814,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     const nav = `${n > 1 ? '<button type="button" class="btn" id="mSkip" data-m="skip">Overslaan</button>' : ''}${mail.index > 0 ? '<button type="button" class="btn" id="mPrev" data-m="prev">Vorige</button>' : ''}`;
     const manual = `
       <div class="btns">
-        <a class="btn dark" href="${esc(owa)}" data-handoff="mail">Open nieuwe mail</a>
+        <a class="btn accent" href="${esc(owa)}" data-handoff="mail">Open nieuwe mail</a>
       </div>
       <div class="btns">
         <button type="button" class="btn small" id="mCopyTo" data-m="copy-to">Kopieer adres</button>
@@ -2610,9 +2827,9 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     return `${tabs}
       <div class="pers-head"><span class="meta">${n > 1 ? `${mail.index + 1} van ${n}` : 'Eén bedrijf'}${mail.done.has(l.id) ? ' · al vastgelegd' : ''}</span><strong>${esc(l.bedrijf)}</strong><span>${l.contact ? esc(l.contact) + ' · ' : ''}<span class="pick">${esc(l.email)}</span></span></div>
       ${viaMs ? `<div class="btns">
-          <button type="button" class="btn primary" id="msSend" data-m="ms-send"${off}>${mail.busy && !s ? 'Bezig met versturen…' : 'Versturen via Outlook'}</button>
+          <button type="button" class="btn primary" id="msSend" data-m="ms-send"${off}>${ic('send')}${mail.busy && !s ? 'Bezig met versturen…' : 'Versturen via Outlook'}</button>
           <button type="button" class="btn" id="msDraft" data-m="ms-draft"${off}>In Concepten</button>
-          ${rest > 1 ? `<button type="button" class="btn dark" id="msSendAll" data-m="ms-send-all"${off}>Alle ${rest} versturen</button>` : ''}
+          ${rest > 1 ? `<button type="button" class="btn accent" id="msSendAll" data-m="ms-send-all"${off}>Alle ${rest} versturen</button>` : ''}
         </div>
         ${s ? `<div class="progress"><div class="bar"><span style="width:${Math.round(s.done / s.total * 100)}%"></span></div>
           <p class="hint">Versturen: ${s.done} van ${s.total}. Tussen de mails zit steeds even tijd, zodat Outlook ze niet tegenhoudt.</p>
@@ -2665,6 +2882,12 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     withFocus(out, () => { out.innerHTML = mailOutHtml(); });
   }
 
+  async function logWhatsApp(id) {
+    const l = byId(id);
+    if (!l) return;
+    const log = logBody([{ d: todayISO(), a: 'WhatsApp', u: 'Verstuurd' }, ...l.log].slice(0, 100));
+    if (await write(() => col.doc(id).update({ log, gewijzigd: nowISO() }))) toast(`WhatsApp aan ${l.bedrijf} vastgelegd.`);
+  }
   async function logMail(ids, subject) {
     const today = todayISO();
     let ok = 0, follow = 0;
@@ -2931,7 +3154,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       </div>`;
   }
   function renderImport() {
-    importPanel.hidden = !imp.open;
+    importPanel.hidden = !imp.open || state.page !== 'meer';
     importBtn.setAttribute('aria-expanded', String(imp.open));
     if (!imp.open) { importPanel.innerHTML = ''; return; }
     withFocus(importPanel, () => { importPanel.innerHTML = importHtml(); });
@@ -3062,19 +3285,11 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     try { text = await navigator.clipboard.readText(); }
     catch { $('scanMsg').textContent = 'Plakken is niet toegestaan. Tik nog een keer op Plakken en kies Toestaan.'; return; }
     if (!text.trim()) { $('scanMsg').textContent = 'Er staat niets op het klembord. Kopieer eerst een bedrijf, bijvoorbeeld in Google Maps via Delen → Kopiëren.'; return; }
-    clearScanLines();
-    handleShare({ title: '', text, url: '' });
+    handleShare({ title: '', text, url: '' }).catch(e => console.error(e));
   });
   $('scanFile').addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; if (f) scanCard(f); });
   $('backupNotice').addEventListener('click', e => { if (e.target.closest('[data-backup]')) $('backupBtn').click(); });
-  const addToggle = $('addToggle');
-  const setAddOpen = open => { addForm.classList.toggle('collapsed', !open); addToggle.setAttribute('aria-expanded', String(open)); };
-  setAddOpen(!(window.matchMedia && matchMedia('(max-width: 760px)').matches));
-  addToggle.addEventListener('click', () => {
-    const open = addForm.classList.contains('collapsed');
-    setAddOpen(open);
-    if (open) $('addBedrijf').focus();
-  });
+  const setAddOpen = open => { if (open && state.page !== 'nieuw') setPage('nieuw'); };
   addForm.addEventListener('input', e => { if (['addBedrijf', 'addTelefoon', 'addEmail'].includes(e.target.id)) checkAddDupes(); });
   addForm.addEventListener('change', e => { if (e.target.dataset.ocr !== undefined) scanAssign(+e.target.dataset.ocr, e.target.value); });
   dupWarnEl.addEventListener('click', e => { const b = e.target.closest('[data-goto]'); if (b) gotoLead(b.dataset.goto); });
@@ -3130,10 +3345,11 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       setTimeout(() => { state.selecting = false; state.selected.clear(); renderAll(); }, 0);
     }
     else if (s === 'pm-yes') {
-      const ids = state.pendingMail ? state.pendingMail.ids : [];
+      const ids = state.pendingMail ? state.pendingMail.ids : [], wa = state.pendingMail && state.pendingMail.kind === 'wa';
       state.pendingMail = null;
       renderSelBar();
-      logMail(ids, '').then(ok => { if (ok) toast(`Mail vastgelegd bij ${ok} ${plural(ok, 'bedrijf', 'bedrijven')}.`); });
+      if (wa) logWhatsApp(ids[0]);
+      else logMail(ids, '').then(ok => { if (ok) toast(`Mail vastgelegd bij ${ok} ${plural(ok, 'bedrijf', 'bedrijven')}.`); });
     }
     else if (s === 'pm-no') { state.pendingMail = null; renderSelBar(); }
   });
@@ -3169,10 +3385,10 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (!row) return;
     const id = row.dataset.id;
     if (act === 'select') { toggleSelect(id, el.checked); return; }
-    if (act === 'qmail') {
+    if (act === 'qmail' || act === 'wa') {
       const l = byId(id);
       if (!l) return;
-      state.pendingMail = { ids: [id] };
+      state.pendingMail = { ids: [id], kind: act === 'wa' ? 'wa' : 'mail' };
       setTimeout(renderSelBar, 0);
       return;
     }
@@ -3331,9 +3547,56 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     toast('Geen verbinding. Je ziet de laatst opgeslagen lijst. Opslaan lukt weer zodra je internet hebt.', 6000);
   }
 
+  // Balk bovenin bij de online opslag: geen verbinding, of wijzigingen die nog verstuurd moeten worden.
+  let syncPending = 0;
+  function renderSyncBar(n = syncPending) {
+    syncPending = n;
+    const el = $('syncBar');
+    if (!el) return;
+    const offline = !navigator.onLine;
+    el.hidden = state.local || (!offline && !n);
+    el.classList.toggle('busy', !offline && n > 0);
+    el.textContent = offline
+      ? (n ? `Geen verbinding · ${n} ${plural(n, 'wijziging wacht', 'wijzigingen wachten')} en ${plural(n, 'wordt', 'worden')} verstuurd zodra je weer bereik hebt.` : 'Geen verbinding. Wat je vastlegt, wordt verstuurd zodra je weer bereik hebt.')
+      : `${n} ${plural(n, 'wijziging', 'wijzigingen')} versturen…`;
+  }
+  window.addEventListener('online', () => renderSyncBar());
+  window.addEventListener('offline', () => renderSyncBar());
+
   function createStore(sb, uid) {
     const cache = new Map(), subs = new Map(), loaded = new Set();
     const LS = 'koude-acq.cache.' + uid;
+    // Wachtrij: zonder verbinding blijven wijzigingen op het toestel staan en gaan ze later alsnog naar de online lijst.
+    const QK = 'koude-acq.wachtrij.' + uid;
+    let queue = [];
+    try { queue = JSON.parse(localStorage.getItem(QK) || '[]'); if (!Array.isArray(queue)) queue = []; } catch { queue = []; }
+    const saveQueue = () => { try { localStorage.setItem(QK, JSON.stringify(queue)); } catch {} renderSyncBar(queue.length); };
+    const isNetErr = err => !navigator.onLine || (err && err.status === 0) || /fetch|network|load failed|timed? ?out|offline|aborted/i.test(String((err && (err.message || err.details)) || err || ''));
+    const enqueue = (op, c, id, data) => { queue = queue.filter(q => !(q.c === c && q.id === id)); queue.push({ op, c, id, data }); saveQueue(); };
+    let flushing = false;
+    async function flush() {
+      if (flushing || !queue.length || !navigator.onLine) return;
+      flushing = true;
+      renderSyncBar(queue.length);
+      try {
+        while (queue.length) {
+          const q = queue[0];
+          let error;
+          try {
+            ({ error } = q.op === 'del'
+              ? await sb.from('docs').delete().eq('collection', q.c).eq('id', q.id)
+              : await sb.from('docs').upsert({ user_id: uid, collection: q.c, id: q.id, data: q.data, updated_at: new Date().toISOString() }, { onConflict: 'user_id,collection,id' }));
+          } catch (e) { error = e; }
+          if (error && isNetErr(error)) break;      // nog steeds geen verbinding: later opnieuw
+          queue.shift();                              // gelukt, of geweigerd (opnieuw proberen heeft dan geen zin)
+          if (error) console.error('[wachtrij]', error);
+          saveQueue();
+        }
+      } finally { flushing = false; }
+    }
+    window.addEventListener('online', () => flush());
+    setInterval(() => { if (queue.length) flush(); }, 30000);
+    setTimeout(() => { renderSyncBar(queue.length); flush(); }, 0);
     try {
       const saved = JSON.parse(localStorage.getItem(LS) || '{}');
       Object.entries(saved).forEach(([c, docs]) => cache.set(c, new Map(Object.entries(docs || {}))));
@@ -3360,6 +3623,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       const { data, error } = await sb.from('docs').select('id,data').eq('collection', c).limit(5000);
       if (error) throw storeError(error);
       cache.set(c, new Map((data || []).map(r => [r.id, r.data])));
+      // Wat nog in de wachtrij staat, gaat voor op wat online staat.
+      queue.filter(q => q.c === c).forEach(q => { if (q.op === 'del') colMap(c).delete(q.id); else colMap(c).set(q.id, q.data); });
       loaded.add(c);
       saveLocal();
       emit(c);
@@ -3368,21 +3633,25 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       const m = colMap(c), prev = m.get(id);
       m.set(id, data);
       emit(c);
+      saveLocal();
+      if (queue.length) { enqueue('put', c, id, data); flush(); return; }   // achter de wachtende wijzigingen aansluiten
       let error;
       try { ({ error } = await sb.from('docs').upsert({ user_id: uid, collection: c, id, data, updated_at: new Date().toISOString() }, { onConflict: 'user_id,collection,id' })); }
       catch (e) { error = e; }
-      if (error) { if (prev === undefined) m.delete(id); else m.set(id, prev); emit(c); throw storeError(error); }
-      saveLocal();
+      if (error && isNetErr(error)) { enqueue('put', c, id, data); return; }
+      if (error) { if (prev === undefined) m.delete(id); else m.set(id, prev); emit(c); saveLocal(); throw storeError(error); }
     }
     async function remove(c, id) {
       const m = colMap(c), prev = m.get(id);
       m.delete(id);
       emit(c);
+      saveLocal();
+      if (queue.length) { enqueue('del', c, id); flush(); return; }
       let error;
       try { ({ error } = await sb.from('docs').delete().eq('collection', c).eq('id', id)); }
       catch (e) { error = e; }
-      if (error) { if (prev !== undefined) m.set(id, prev); emit(c); throw storeError(error); }
-      saveLocal();
+      if (error && isNetErr(error)) { enqueue('del', c, id); return; }
+      if (error) { if (prev !== undefined) m.set(id, prev); emit(c); saveLocal(); throw storeError(error); }
     }
     function subscribe(c, fn, onError) {
       if (!subs.has(c)) subs.set(c, new Set());
@@ -3410,7 +3679,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       const q = { limit: () => q, onSnapshot: (next, onError) => subscribe(c, next, onError), doc: id => docRef(c, id || newId()), get: async () => snap(c) };
       return q;
     };
-    const refreshAll = () => [...subs.keys()].forEach(c => fetchCol(c).catch(offlineNotice));
+    const refreshAll = () => { flush(); [...subs.keys()].forEach(c => fetchCol(c).catch(offlineNotice)); };
 
     // Live bijwerken als je op een ander apparaat iets wijzigt.
     try {
@@ -3418,6 +3687,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
         .on('postgres_changes', { event: '*', schema: 'public', table: 'docs', filter: 'user_id=eq.' + uid }, p => {
           const row = p.eventType === 'DELETE' ? p.old : p.new;
           if (!row || !row.collection || (row.user_id && row.user_id !== uid)) { refreshAll(); return; }
+          if (queue.some(q => q.c === row.collection && q.id === row.id)) return;   // eigen wijziging wacht nog: die gaat voor
           if (p.eventType === 'DELETE') colMap(row.collection).delete(row.id);
           else colMap(row.collection).set(row.id, row.data);
           saveLocal();
@@ -3550,7 +3820,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       sjablonen: state.sjablonen.map(t => ({ id: t.id, naam: t.naam, onderwerp: t.onderwerp, tekst: t.tekst })),
       acties: state.acties,
     };
-    saveFile(`koude-acquisitie-backup-${todayISO()}.json`, JSON.stringify(data, null, 2), 'application/json');
+    saveFile(`leadnex-backup-${todayISO()}.json`, JSON.stringify(data, null, 2), 'application/json');
     pref.set('laatsteBackup', nowISO());
     renderBackupNotice();
     saveAgenda();
@@ -3734,7 +4004,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
   $('pushTest').addEventListener('click', async () => {
     try {
       const reg = await navigator.serviceWorker.ready;
-      const m = buildMessage(agendaItems(), todayISO()) || { title: 'Koude Acquisitie', body: 'Meldingen werken. Er staan vandaag geen acties op je lijst.' };
+      const m = buildMessage(agendaItems(), todayISO()) || { title: 'Leadnex', body: 'Meldingen werken. Er staan vandaag geen acties op je lijst.' };
       await reg.showNotification(m.title, { body: m.body, icon: 'icons/icon-192.png', badge: 'icons/badge-96.png', tag: 'dagtaken', renotify: true, data: { url: './#vandaag' } });
     } catch { toast('De testmelding lukte niet. Staan meldingen aan voor de app?'); }
   });
@@ -4043,7 +4313,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       <p>Eenmalig: maak in Microsoft 365 een app-registratie aan, zodat de app namens jou mag mailen en afspraken mag maken. Dat duurt ongeveer vijf minuten. Doe het op een computer en meld je aan met je werkaccount.</p>
       <ol class="olist">
         <li>Ga naar <a href="https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank" rel="noopener">entra.microsoft.com</a> → <strong>App-registraties</strong> → <strong>Nieuwe registratie</strong>.</li>
-        <li>Naam: <strong>Koude Acquisitie</strong>. Accounttype: <strong>Alleen één tenant</strong> (je eigen organisatie).</li>
+        <li>Naam: <strong>Leadnex</strong>. Accounttype: <strong>Alleen één tenant</strong> (je eigen organisatie).</li>
         <li>Omleidings-URI: kies <strong>Toepassing met één pagina (SPA)</strong> en vul in:<br><code class="pick" id="msRedirectUri" data-o="copy-uri" tabindex="0" role="button" title="Kopiëren">${esc(msRedirect())}</code><br>Klik op <strong>Registreren</strong>.</li>
         <li>Ga naar <strong>API-machtigingen</strong> → <strong>Een machtiging toevoegen</strong> → <strong>Microsoft Graph</strong> → <strong>Gedelegeerde machtigingen</strong>. Vink aan: <strong>Mail.ReadWrite</strong>, <strong>Mail.Send</strong>, <strong>Calendars.ReadWrite</strong> en <strong>offline_access</strong>. Klik daarna op <strong>Beheerderstoestemming verlenen</strong>.</li>
         <li>Kopieer op <strong>Overzicht</strong> de twee codes hieronder, of stuur ze naar Claude: dan staan ze meteen op al je apparaten.</li>
@@ -4137,7 +4407,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     $('loginForm').hidden = mode !== 'login';
     $('newPassForm').hidden = mode !== 'newpass';
     $('setupForm').hidden = mode !== 'setup';
-    $('gateTitle').textContent = { login: 'Inloggen', newpass: viaInvite ? 'Welkom' : 'Nieuw wachtwoord', setup: 'App koppelen' }[mode] || 'Koude Acquisitie';
+    $('gateTitle').textContent = { login: 'Inloggen', newpass: viaInvite ? 'Welkom' : 'Nieuw wachtwoord', setup: 'App koppelen' }[mode] || 'Leadnex';
     if (mode === 'newpass' && viaInvite && !msg) msg = 'Je bent uitgenodigd voor de app. Kies een wachtwoord; daarmee log je voortaan in, ook op andere apparaten.';
     $('gateMsg').textContent = msg || '';
     $('gateMsg').hidden = !msg;
@@ -4173,7 +4443,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       state.loaded = true;
       if (pref.get('kaart') === '1') scheduleGeocode();
       setTimeout(maybeOfferMove, 0);
-      if (first) setTimeout(() => { if (shareIn) handleShare(shareIn); else afterCall(); }, 0);
+      if (first) setTimeout(() => { if (shareIn) handleShare(shareIn).catch(e => console.error(e)); else afterCall(); }, 0);
       state.problem = null;
       saveAgenda();
       scheduleRender();
