@@ -1,6 +1,6 @@
 // Service worker: maakt de app installeerbaar, laat hem openen zonder bereik
 // en toont de ochtendmelding met de acties van vandaag.
-const CACHE = 'koude-acquisitie-v12';
+const CACHE = 'koude-acquisitie-v13';
 const DATA_CACHE = 'koude-acq-data';   // hierin zet de app de actielijst voor de ochtendmelding
 const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest', './vendor/supabase.js', './icons/icon-192.png', './icons/icon-512.png', './icons/badge-96.png'];
 

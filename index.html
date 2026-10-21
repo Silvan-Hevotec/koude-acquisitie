@@ -520,7 +520,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       <div class="pactions"><button type="submit" class="btn primary" id="loginBtn">Inloggen</button><button type="button" class="btn" id="forgotBtn">Wachtwoord vergeten</button></div>
     </form>
     <form class="card" id="newPassForm" novalidate hidden>
-      <div class="field"><label for="newPass">Nieuw wachtwoord</label><input class="input" id="newPass" type="password" autocomplete="new-password" minlength="8"></div>
+      <div class="field"><label for="newPass">Wachtwoord</label><input class="input" id="newPass" type="password" autocomplete="new-password" minlength="8"></div>
       <p class="hint">Minimaal 8 tekens.</p>
       <p class="warn" id="newPassErr" hidden></p>
       <div class="pactions"><button type="submit" class="btn primary" id="newPassBtn">Wachtwoord opslaan</button></div>
@@ -3628,6 +3628,10 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
     if (state.local || state.readOnly || pref.get('overgezet') || !appStore || !appStore.isLoaded('leads') || restoreData || restoreBusy) return;
     const d = localListData();
     if (!d) return;
+    // De lijst op het toestel hoort bij wie hier als eerste inlogt; een collega op hetzelfde toestel krijgt hem niet te zien.
+    const owner = pref.get('lokaalEigenaar');
+    if (owner && owner !== state.uid) return;
+    if (!owner && state.uid) pref.set('lokaalEigenaar', state.uid);
     if (d.leads.every(x => byId(x.id))) { pref.set('overgezet', nowISO()); return; }   // staat er al
     restoreData = { ...d, move: true };
     renderRestore();
@@ -4124,14 +4128,17 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 
   /* ---------- inloggen en opstarten ---------- */
   const gateEl = $('gate'), appEl = $('app');
-  let sb = null, started = false, inRecovery = /type=recovery/.test(location.hash);
+  // Link uit de mail "wachtwoord vergeten" of "uitnodiging": eerst een (nieuw) wachtwoord kiezen.
+  const viaInvite = /type=invite/.test(location.hash);
+  let sb = null, started = false, inRecovery = /type=(recovery|invite)/.test(location.hash);
   function showGate(mode, msg) {
     gateEl.hidden = false;
     appEl.hidden = true;
     $('loginForm').hidden = mode !== 'login';
     $('newPassForm').hidden = mode !== 'newpass';
     $('setupForm').hidden = mode !== 'setup';
-    $('gateTitle').textContent = { login: 'Inloggen', newpass: 'Nieuw wachtwoord', setup: 'App koppelen' }[mode] || 'Koude Acquisitie';
+    $('gateTitle').textContent = { login: 'Inloggen', newpass: viaInvite ? 'Welkom' : 'Nieuw wachtwoord', setup: 'App koppelen' }[mode] || 'Koude Acquisitie';
+    if (mode === 'newpass' && viaInvite && !msg) msg = 'Je bent uitgenodigd voor de app. Kies een wachtwoord; daarmee log je voortaan in, ook op andere apparaten.';
     $('gateMsg').textContent = msg || '';
     $('gateMsg').hidden = !msg;
   }
@@ -4151,6 +4158,7 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
       : 'Ingelogd als ' + (session.user.email || '');
     $('logoutBtn').hidden = !!localStore;
     state.local = !!localStore;
+    state.uid = session && session.user ? session.user.id : '';
     gateEl.hidden = true;
     appEl.hidden = false;
     const store = localStore || createStore(sb, session.user.id);
