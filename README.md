@@ -16,13 +16,14 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 - **WhatsApp** per bedrijf (06- en Belgische 04-nummers), met een begroeting en de voornaam alvast ingevuld.
 - **Werken zonder bereik**: wijzigingen blijven op de telefoon in een wachtrij en gaan vanzelf online zodra er weer verbinding is.
 - **Status** per bedrijf: lead, potentiële klant of klant, met een filter bij Bedrijven. Bij "Interesse" wordt een lead vanzelf potentiële klant.
-- **Klantverslagen** onder elk bedrijf: inspreken (spraakherkenning van Chrome) of typen, met besproken machines, interesse, afspraken en vragen voor de volgende keer. Een verslag telt als contactmoment en kan meteen een opvolgtaak inplannen.
+- **Klantverslagen** onder elk bedrijf: inspreken (spraakherkenning van Chrome) of typen. De app poetst de gesproken tekst op en vult de besproken machines, interesse, afspraken en opvolgtaak alvast in; je past aan waar nodig. Een verslag telt als contactmoment.
 - **Slimme datums**: de app herkent "na de bouwvak" (adviesdata per regio), "volgende week dinsdag om 10 uur", "over twee weken", "half november", "na de kerst", "in Q1" enzovoort en stelt de opvolgtaak voor, op een werkdag en niet op een feestdag. Bij een afspraak met tijd kun je een herinnering kiezen (15 minuten tot een dag vooraf) die mee gaat naar je agenda.
-- **Voorbereiding** bovenaan elk geopend bedrijf: laatste contact, besproken machines, afspraken, interesse en wat je bij het volgende gesprek moet vragen.
+- **Voorbereiding** bovenaan elk geopend bedrijf: laatste contact, besproken machines, afspraken, interesse en wat je bij het volgende gesprek kunt vragen.
 - **Dubbele bedrijven** worden herkend (zelfde naam, telefoon, e-mail of website, of bijna dezelfde naam in dezelfde plaats) en zijn in Meer samen te voegen zonder iets kwijt te raken.
 - **In de buurt**: filter bij Bedrijven op afstand van je huidige plek (afstand instelbaar in Meer).
-- **Vraag het Leadnex**: vragen over je eigen klantverslagen, zoals "Welke bedrijven wilden een elektrische heftruck?".
-- **Leadnex AI** (optioneel, zie hieronder): maakt van een ingesproken verslag een nette notitie met opvolgtaak, schrijft de voorbereiding en beantwoordt vragen. Zonder AI werken inspreken, verslagen, slimme datums en zoeken ook.
+- **Vraag het Leadnex**: vragen over je eigen klanten, zoals "Welke bedrijven wilden een elektrische heftruck?", "Wie wilde ik dit kwartaal terugbellen?" of "Welke potentiële klanten wachten op een offerte?". De app begrijpt periodes, acties en status en zoekt in je verslagen en notities.
+- Alles werkt in de app zelf: geen AI-dienst, geen extra account en geen kosten.
+- **Weergave**: licht, donker of zoals je telefoon (Meer → Voorkeuren).
 - **Delen naar de app** vanuit Google Maps, de Google-app of Chrome (naam, adres en telefoon worden zo nodig aangevuld via PDOK of OpenStreetMap), **visitekaartje scannen**, **in telefooncontacten** zetten, import uit Excel, export naar CSV, back-up.
 
 ## Bestanden
@@ -32,7 +33,6 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 | `index.html` | De app |
 | `config.js` | Koppeling met Supabase (Project URL en publishable/anon key) en Outlook (toepassings-ID en map-ID) |
 | `supabase.sql` | Maakt de tabel en de beveiliging aan in Supabase |
-| `supabase/functions/leadnex-ai/index.ts` | Leadnex AI: Supabase Edge Function die Claude (Anthropic) aanroept |
 | `manifest.webmanifest`, `sw.js`, `icons/` | Maken de app installeerbaar op Android |
 | `vendor/` | Supabase-bibliotheek 2.117.2, SheetJS 0.18.5 (Excel-import), Tesseract.js 5.1.1 (visitekaartjes lezen) en Leaflet 1.9.4 (kaart) |
 
@@ -61,20 +61,6 @@ Met een koppeling verstuurt de app mails vanuit je eigen mailbox (ook persoonlij
 
 Aanmelden gebeurt bij Microsoft zelf (code met PKCE, geen wachtwoord in de app). Microsoft laat een app als deze maximaal 24 uur aangemeld; daarna meldt de app zich meestal vanzelf opnieuw aan. Lukt dat niet, dan vraagt hij je even op Aanmelden te tikken.
 
-### 4. Leadnex AI (optioneel, nette verslagen, voorbereiding en vragen)
-Leadnex AI draait als Edge Function in je eigen Supabase-project. De Anthropic API-sleutel staat daar als geheim en komt nooit in de app of op de telefoon. Alleen ingelogde gebruikers kunnen de functie gebruiken, en bij een vraag leest de functie alleen de bedrijven van wie de vraag stelt.
-
-1. Maak op [console.anthropic.com](https://console.anthropic.com) een API-sleutel aan, zet er tegoed op en stel onder **Limits** een maandlimiet in.
-2. Open je project in Supabase → **Edge Functions** → **Deploy a new function** → **Via editor**. Naam: `leadnex-ai`. Plak de inhoud van `supabase/functions/leadnex-ai/index.ts` en klik **Deploy**.
-3. Zet bij de functie **Verify JWT with legacy secret** uit; de functie controleert zelf of je bent ingelogd (dat werkt met elke soort sleutel van het project).
-4. **Edge Functions → Secrets**: voeg `ANTHROPIC_API_KEY` toe met je sleutel.
-5. Tik in de app onder **Meer → Slimme functies** op **Opnieuw controleren**.
-
-Of met de Supabase CLI: `supabase functions deploy leadnex-ai --no-verify-jwt` en `supabase secrets set ANTHROPIC_API_KEY=...`.
-
-De functie gebruikt het model Claude Opus 5.5 met gestructureerde uitvoer. Kosten (tarief Anthropic): een paar cent per verslag of voorbereiding en ongeveer tien cent per vraag over je hele lijst; een volgende vraag binnen vijf minuten is goedkoper omdat de lijst dan uit de cache komt. Een voorbereiding wordt alleen gemaakt als er verslagen of notities zijn, en bewaard tot er iets verandert.
-Verslagen en vragen gaan voor de verwerking naar Anthropic. Komt de app op een ander adres te staan, zet dan het geheim `LEADNEX_ORIGIN` op dat adres.
-
 ## Op de telefoon installeren
 Open het adres in **Chrome**, log in en tik op **App installeren** (of menu ⋮ → **App installeren**).
 De app verschijnt tussen je apps, opent zonder adresbalk, en bellen en mailen openen direct je telefoon- en mail-app.
@@ -84,4 +70,4 @@ Log in en kies onderaan **Back-up terugzetten**. Kies het bestand `koude-acquisi
 
 ## Auteursrecht
 © 2026 Silvan H. Alle rechten voorbehouden. Gebruik, kopiëren of verspreiden van deze app of de code is niet toegestaan zonder schriftelijke toestemming; zie `LICENSE`.
-De Edge Function gebruikt de Anthropic TypeScript SDK (MIT), die Supabase bij het plaatsen ophaalt. De onderdelen in `vendor/` vallen onder hun eigen licenties: Supabase-bibliotheek (MIT), SheetJS (Apache-2.0), Tesseract.js (Apache-2.0), Leaflet (BSD-2-Clause) en de Lucide-pictogrammen (ISC); zie `vendor/THIRD_PARTY.md`.
+De onderdelen in `vendor/` vallen onder hun eigen licenties: Supabase-bibliotheek (MIT), SheetJS (Apache-2.0), Tesseract.js (Apache-2.0), Leaflet (BSD-2-Clause) en de Lucide-pictogrammen (ISC); zie `vendor/THIRD_PARTY.md`.

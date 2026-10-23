@@ -160,7 +160,7 @@ body.selecting .wrap, body.sessie .wrap { padding-bottom: 150px; }
 }
 .btn:hover { border-color: var(--faint); background: var(--sunken); }
 .btn:active { transform: translateY(1px); }
-.btn.small { min-height: 34px; padding: 0 12px; font-size: 13px; border-radius: 9px; }
+.btn.small { min-height: 36px; padding: 0 12px; font-size: 14px; border-radius: 9px; }
 .btn.small .ic { width: 16px; height: 16px; }
 .btn.primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
 .btn.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
@@ -587,8 +587,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .prep-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
 .prep-head h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 700; }
 .prep-head h3 .ic { width: 18px; height: 18px; color: var(--brand-soft-ink); }
-.prep-head .linkbtn { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; }
-.prep-head .linkbtn .ic { width: 14px; height: 14px; }
 .psum { margin: 0; font-size: 15px; }
 .pfacts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 20px; margin: 0; }
 .pfacts > div { min-width: 0; }
@@ -608,8 +606,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .verslag + .verslag { border-top: 1px solid var(--line); padding-top: 12px; }
 .vmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12.5px; color: var(--muted); }
 .vmeta time { font-weight: 700; color: var(--ink); }
-.aitag { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-soft-ink); font-size: 11px; font-weight: 700; }
-.aitag .ic { width: 12px; height: 12px; }
 .vdel { margin-left: auto; display: inline-flex; align-items: center; min-height: 28px; padding: 0 8px; border: 0; border-radius: 8px; background: none; color: var(--faint); font: inherit; font-size: 12.5px; cursor: pointer; }
 .vdel .ic { width: 16px; height: 16px; }
 .vdel:hover { color: var(--danger); background: var(--danger-soft); }
@@ -618,8 +614,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .vfact { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
 .vk { display: inline-block; min-width: 86px; margin-right: 6px; font-size: 12px; font-weight: 700; color: var(--muted); }
 .vq { font-size: 14px; }
-.verslag details.raw summary { cursor: pointer; font-size: 12.5px; color: var(--muted); }
-.verslag details.raw p { margin: 6px 0 0; font-size: 13.5px; color: var(--muted); white-space: pre-wrap; }
 .veditor { display: grid; gap: 12px; padding: 14px; border-radius: 12px; background: var(--sunken); border: 1px solid var(--line); }
 .vgrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 16px; }
 .vgrid > .span2 { grid-column: 1 / -1; }
@@ -635,7 +629,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 @keyframes mic-puls { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--danger) 25%, transparent); } }
 @media (prefers-reduced-motion: reduce) { .btn.mic.on { animation: none; } }
 .vlive { color: var(--danger); font-weight: 600; }
-.vai { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .vplan { display: grid; gap: 10px; padding-top: 4px; border-top: 1px dashed var(--line-strong); }
 .vplan .hint .ic { width: 14px; height: 14px; vertical-align: -2px; }
 
@@ -662,11 +655,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .dupside + .dupside { padding-left: 16px; border-left: 2px solid var(--line); }
 @media (max-width: 560px) { .dupside + .dupside { padding: 10px 0 0; border-left: 0; border-top: 1px solid var(--line); } }
 
-/* Meer: uitleg Leadnex AI */
-.ai-help { padding: 4px 18px 16px 52px; font-size: 14px; }
-.ai-help ol { margin: 0 0 8px; padding-left: 20px; display: grid; gap: 6px; }
-.ai-help code { font: 13px var(--f-mono); padding: 1px 5px; border-radius: 6px; background: var(--sunken); }
-@media (max-width: 520px) { .ai-help { padding-left: 18px; } }
 </style>
 </head>
 <body>
@@ -875,20 +863,10 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
         </p></div>
       <section class="outlook-panel" id="outlookPanel" aria-label="Outlook" hidden></section>
     </section>
-    <section class="card set-group" aria-label="Slimme functies">
-      <h3>Slimme functies</h3>
-      <div class="set-row"><i data-ic="sparkles"></i><div class="set-text"><strong>Leadnex AI</strong><span id="aiStatus">Nog niet gecontroleerd.</span></div>
-        <div class="btns"><button type="button" class="btn small" id="aiHelpBtn" aria-expanded="false" hidden>Zo zet je het aan</button><button type="button" class="btn small" id="aiCheckBtn">Opnieuw controleren</button></div></div>
-      <div class="ai-help" id="aiHelp" hidden>
-        <ol>
-          <li>Maak op <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> een API-sleutel aan, zet er tegoed op en stel een maandlimiet in.</li>
-          <li>Open je project in Supabase en kies <strong>Edge Functions</strong> → <strong>Deploy a new function</strong> → <strong>Via editor</strong>. Noem de functie <code>leadnex-ai</code>, plak de code uit <a href="https://github.com/Silvan-Hevotec/koude-acquisitie/blob/main/supabase/functions/leadnex-ai/index.ts" target="_blank" rel="noopener">supabase/functions/leadnex-ai/index.ts</a> en klik op <strong>Deploy</strong>.</li>
-          <li>Zet bij de functie <strong>Verify JWT with legacy secret</strong> uit. De functie controleert zelf of je bent ingelogd.</li>
-          <li>Voeg bij <strong>Edge Functions</strong> → <strong>Secrets</strong> het geheim <code>ANTHROPIC_API_KEY</code> toe, met je sleutel als waarde.</li>
-          <li>Tik hier op <strong>Opnieuw controleren</strong>.</li>
-        </ol>
-        <p class="hint">Verslagen en vragen gaan dan voor de verwerking naar Anthropic (Claude). Je collega's gebruiken dezelfde sleutel, maar zien alleen hun eigen bedrijven.</p>
-      </div>
+    <section class="card set-group" aria-label="Voorkeuren">
+      <h3>Voorkeuren</h3>
+      <div class="set-row"><i data-ic="sun"></i><div class="set-text"><strong>Weergave</strong><span>Licht, donker of zoals je telefoon is ingesteld.</span></div>
+        <select class="input set-sel" id="themaSel" aria-label="Weergave"><option value="">Zoals je telefoon</option><option value="licht">Licht</option><option value="donker">Donker</option></select></div>
       <div class="set-row"><i data-ic="alarm-clock"></i><div class="set-text"><strong>Bouwvak</strong><span>Voor slimme datums zoals "belt na de bouwvak terug".</span></div>
         <select class="input set-sel" id="bouwvakSel" aria-label="Bouwvak-regio"></select></div>
       <div class="set-row"><i data-ic="navigation-2"></i><div class="set-text"><strong>In de buurt</strong><span>Afstand voor het filter In de buurt bij Bedrijven.</span></div>
@@ -997,6 +975,14 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     get(k) { try { return localStorage.getItem('koude-acq.' + k); } catch { return null; } },
     set(k, v) { try { localStorage.setItem('koude-acq.' + k, v); } catch {} },
   };
+  // Weergave: zoals de telefoon, of altijd licht of donker. De meta-tag voorkomt dat Chrome de app zelf donker maakt.
+  function applyThema() {
+    const t = pref.get('thema'), root = document.documentElement;
+    if (t === 'licht') root.dataset.theme = 'light'; else if (t === 'donker') root.dataset.theme = 'dark'; else delete root.dataset.theme;
+    const meta = document.querySelector('meta[name="color-scheme"]');
+    if (meta) meta.content = t === 'licht' ? 'only light' : t === 'donker' ? 'dark' : 'light dark';
+  }
+  applyThema();
   let groupPrefs = {};
   try { groupPrefs = JSON.parse(pref.get('groep') || '{}') || {}; } catch { groupPrefs = {}; }
 
@@ -1250,27 +1236,21 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       gearchiveerd: d.gearchiveerd === true, gearchiveerdOp: parseISO(d.gearchiveerdOp) ? str(d.gearchiveerdOp).slice(0, 10) : '',
       aangemaakt: str(d.aangemaakt), gewijzigd: str(d.gewijzigd), voorbeeld: d.voorbeeld === true, outlookId: str(d.outlookId),
       website: str(d.website).trim(), branche: str(d.branche).trim(), geo: validGeo(d.geo),
-      status: validStatus(d.status), verslagen: normalizeVerslagen(d.verslagen), herinnering: validHerinnering(d.herinnering), voorbereiding: validPrep(d.voorbereiding),
+      status: validStatus(d.status), verslagen: normalizeVerslagen(d.verslagen), herinnering: validHerinnering(d.herinnering),
     };
   }
-  // Klantverslagen: nieuwste eerst. tekst is de (nette) notitie, ruw de oorspronkelijk ingesproken tekst.
+  // Klantverslagen: nieuwste eerst.
   const strList = (v, n, max) => Array.isArray(v) ? v.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim().slice(0, max)).slice(0, n) : [];
   const byVerslag = (a, b) => b.datum.localeCompare(a.datum) || b.gemaakt.localeCompare(a.gemaakt);
   function normalizeVerslagen(arr) {
     if (!Array.isArray(arr)) return [];
     return arr.filter(v => v && typeof v.tekst === 'string' && v.tekst.trim() && parseISO(v.datum)).map(v => ({
       id: str(v.id).slice(0, 24) || Math.random().toString(36).slice(2, 10), datum: v.datum.slice(0, 10), soort: SOORTEN.includes(v.soort) ? v.soort : 'Overig',
-      tekst: v.tekst.slice(0, 6000), ruw: str(v.ruw).slice(0, 12000), machines: strList(v.machines, 20, 80), interesse: validInteresse(v.interesse),
-      afspraken: str(v.afspraken).slice(0, 1000), vragen: strList(v.vragen, 8, 300), door: v.door === 'ai' ? 'ai' : '', gemaakt: str(v.gemaakt),
+      tekst: v.tekst.slice(0, 6000), machines: strList(v.machines, 20, 80), interesse: validInteresse(v.interesse),
+      afspraken: str(v.afspraken).slice(0, 1000), vragen: strList(v.vragen, 8, 300), gemaakt: str(v.gemaakt),
     })).sort(byVerslag).slice(0, 200);
   }
-  const verslagBody = v => { const b = { id: v.id, datum: v.datum, soort: v.soort, tekst: v.tekst, gemaakt: v.gemaakt }; for (const k of ['ruw', 'interesse', 'afspraken', 'door']) if (v[k]) b[k] = v[k]; for (const k of ['machines', 'vragen']) if (v[k].length) b[k] = v[k]; return b; };
-  // Gespreksvoorbereiding van Leadnex AI, bewaard bij het bedrijf. sig zegt op welke gegevens hij gebaseerd is.
-  function validPrep(p) {
-    if (!p || typeof p !== 'object' || typeof p.sig !== 'string') return null;
-    return { sig: p.sig, samenvatting: str(p.samenvatting).slice(0, 1500), laatsteContact: str(p.laatsteContact).slice(0, 300), machines: strList(p.machines, 12, 80),
-      afspraken: strList(p.afspraken, 8, 300), interesse: str(p.interesse).slice(0, 300), vragen: strList(p.vragen, 6, 300), gemaakt: str(p.gemaakt) };
-  }
+  const verslagBody = v => { const b = { id: v.id, datum: v.datum, soort: v.soort, tekst: v.tekst, gemaakt: v.gemaakt }; for (const k of ['interesse', 'afspraken']) if (v[k]) b[k] = v[k]; for (const k of ['machines', 'vragen']) if (v[k].length) b[k] = v[k]; return b; };
   // Plek op de kaart: coördinaten, of onthouden dat het adres niet gevonden is. q is het adres waarvoor gezocht is.
   function validGeo(g) {
     if (!g || typeof g !== 'object' || typeof g.q !== 'string') return null;
@@ -1288,7 +1268,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     };
     if (l.verslagen && l.verslagen.length) b.verslagen = l.verslagen.map(verslagBody);
     if (l.tijd && validHerinnering(l.herinnering) !== 30) b.herinnering = validHerinnering(l.herinnering);
-    if (validPrep(l.voorbereiding)) b.voorbereiding = validPrep(l.voorbereiding);
     if (l.voorbeeld) b.voorbeeld = true;
     if (l.outlookId) b.outlookId = l.outlookId;
     if (validGeo(l.geo)) b.geo = validGeo(l.geo);
@@ -2544,7 +2523,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     });
   }
 
-  function renderAll() { renderMeta(); renderNav(); renderPage(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderAsk(); renderDup(); renderAi(); if (mail.open) renderMailOut(); }
+  function renderAll() { renderMeta(); renderNav(); renderPage(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderAsk(); renderDup(); if (mail.open) renderMailOut(); }
   let renderQueued = false;
   function scheduleRender() {
     if (renderQueued) return;
@@ -2572,7 +2551,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (state.mode === 'edit') drafts[id] = draftFrom(l);
     else finishes[id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false, via, hint: '' };
     renderRows();
-    if (state.mode === 'edit') requestPrep(id);
   }
   // Zorgt dat een bedrijf in de lijst te zien is: anders naar Alles (of Archief), zonder zoekterm en branchefilter.
   function revealLead(l) {
@@ -2597,7 +2575,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     closeRow(true);
     state.open = id; state.mode = 'edit'; drafts[id] = draftFrom(l);
     renderAll();
-    requestPrep(id);
     document.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 
@@ -3593,63 +3570,36 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       : `${n} ${plural(n, 'bedrijf', 'bedrijven')} binnen ${buurtKm()} km van je huidige plek, dichtstbij eerst.${kaart.geoBusy ? ` Adressen opzoeken: ${kaart.geoDone} van ${kaart.geoTotal}…` : ''}`);
   }
 
-  /* ---------- Leadnex AI (Supabase Edge Function "leadnex-ai") ---------- */
-  const ai = { status: 'onbekend', model: '', checking: false };
-  const aiOn = () => ai.status === 'aan' && !state.local && !state.readOnly;
-  class AiFout extends Error { constructor(code, msg) { super(msg || code); this.code = code; } }
-  async function aiInvoke(task, body) {
-    if (!sb || state.local) throw new AiFout('lokaal');
-    if (!navigator.onLine) throw new AiFout('offline', 'Geen verbinding. Leadnex AI werkt alleen met internet.');
-    let res;
-    try { res = await sb.functions.invoke('leadnex-ai', { body: { task, ...body } }); }
-    catch { throw new AiFout('fout', 'Leadnex AI is niet bereikbaar. Probeer het later opnieuw.'); }
-    const { data, error } = res;
-    if (error) {
-      const r = error.context && typeof error.context.status === 'number' ? error.context : null;
-      let detail = null;
-      try { detail = r && typeof r.json === 'function' ? await r.json() : null; } catch {}
-      if (detail && detail.error) throw new AiFout(detail.error, detail.message);
-      if (r && r.status === 404) throw new AiFout('uit');
-      if (r && r.status === 401) throw new AiFout('jwt', 'Supabase weigert het inloggen bij de functie. Zet bij de functie leadnex-ai "Verify JWT with legacy secret" uit.');
-      // Geen antwoord (ook geen CORS): meestal is de functie nog niet geplaatst.
-      throw new AiFout(r ? 'fout' : 'uit', r ? 'Leadnex AI gaf een fout. Probeer het opnieuw.' : '');
+  /* ---------- verslag uit gesproken tekst: op het toestel zelf, zonder AI ---------- */
+  // Spraakherkenning schrijft vakwoorden vaak los en neemt "ehm" mee; dat poetsen we op.
+  const GETAL_EENHEID = { een: '1', 'één': '1', twee: '2', drie: '3', vier: '4', vijf: '5', zes: '6', zeven: '7', acht: '8', negen: '9', tien: '10', twaalf: '12', vijftien: '15', twintig: '20' };
+  const SPREEKFIX = [
+    [/\b(?:e+h+m*|u+h+m*|eu+h+)\b[,.]?\s*/gi, ''],
+    [/\bhef truck/gi, 'heftruck'], [/\breach truck/gi, 'reachtruck'], [/\bpallet (wagen|truck)/gi, 'pallet$1'], [/\border picker/gi, 'orderpicker'],
+    [/\bhoog werker/gi, 'hoogwerker'], [/\bschaar lift/gi, 'schaarlift'], [/\bveeg machine/gi, 'veegmachine'], [/\bschrob machine/gi, 'schrobmachine'], [/\bver reiker/gi, 'verreiker'],
+    [/\banderhalve\b/gi, '1,5'], [/\btwee(?:ë|e)nhalve\b|\btwee en een halve\b|\btwee en half\b/gi, '2,5'], [/\bdrie(?:ë|e)nhalve\b|\bdrie en een halve\b/gi, '3,5'],
+    [/\b(een|één|twee|drie|vier|vijf|zes|zeven|acht|negen|tien|twaalf|vijftien|twintig) (ton|kilo|meter)\b/gi, (m, n, u) => `${GETAL_EENHEID[n.toLowerCase()]} ${u}`],
+  ];
+  const cleanSpoken = s => SPREEKFIX.reduce((t, [re, to]) => t.replace(re, to), s).replace(/\s{2,}/g, ' ').trim();
+  const MACHINE_RE = /\b(?:(elektrische|elektrisch|diesel|gas|lpg|lithium|nieuwe|gebruikte|tweedehands) )?(heftrucks?|reachtrucks?|stapelaars?|palletwagens?|pallettrucks?|orderpickers?|knikarmhoogwerkers?|hoogwerkers?|schaarlift(?:en)?|verreikers?|telescoopladers?|zijladers?|meerwegheftrucks?|smalgangtrucks?|sleeptrekkers?|trekkers?|veegmachines?|schrobzuigmachines?|schrobmachines?|minigravers?|shovels?|acculaders?|accu(?:'s)?)\b(?: (?:van )?(\d+(?:[.,]\d+)?) ?(ton|kg|kilo|meter|m)\b)?/gi;
+  // Haalt machines, interesse en afspraken uit een verslag. Alleen een voorstel: je past het zelf aan.
+  function analyseTekst(text) {
+    const t = cleanSpoken(text), k = ' ' + key(t) + ' ';
+    let machines = [];
+    for (const m of t.matchAll(MACHINE_RE)) {
+      const naam = m[2].toLowerCase().replace(/'s$/, '').replace(/(lift)en$/, '$1').replace(/s$/, '');
+      const soort = m[1] ? m[1].toLowerCase().replace(/^elektrisch$/, 'elektrische') : '';
+      const maat = m[3] ? `${m[3].replace('.', ',')} ${/ton/i.test(m[4]) ? 't' : /kg|kilo/i.test(m[4]) ? 'kg' : 'm'}` : '';
+      machines.push([soort, naam, maat].filter(Boolean).join(' '));
     }
-    if (!data || data.error) throw new AiFout((data && data.error) || 'fout', data && data.message);
-    return data;
-  }
-  const aiErrorText = e => (e && e.message && e.message !== e.code) ? e.message
-    : e && e.code === 'uit' ? 'Leadnex AI is nog niet ingesteld (zie Meer).' : 'Dat lukte niet. Probeer het opnieuw.';
-  async function aiCheck(force) {
-    if (!sb || state.local) { ai.status = 'lokaal'; renderAi(); return; }
-    const k = 'ai.' + state.uid;
-    let saved = null;
-    try { saved = JSON.parse(pref.get(k) || 'null'); } catch {}
-    if (!force && saved && Date.now() - saved.at < (saved.status === 'aan' ? 12 : 1) * 3600e3) { ai.status = saved.status; ai.model = saved.model || ''; renderAi(); return; }
-    if (ai.checking) return;
-    ai.checking = true; renderAi();
-    try { const r = await aiInvoke('ping', {}); ai.status = r.ok ? 'aan' : 'fout'; ai.model = r.model || ''; }
-    catch (e) { ai.status = ['uit', 'geen-sleutel', 'jwt'].includes(e.code) ? e.code : e.code === 'offline' && saved ? saved.status : 'fout'; ai.error = e.message; }
-    ai.checking = false;
-    if (ai.status !== 'fout') pref.set(k, JSON.stringify({ status: ai.status, model: ai.model, at: Date.now() }));
-    renderAi();
-    renderRows();
-  }
-  function renderAi() {
-    const st = $('aiStatus');
-    if (!st) return;
-    const txt = {
-      aan: 'Aan. Leadnex maakt nette verslagen met opvolgtaak, een gespreksvoorbereiding en beantwoordt vragen over je klantverslagen.',
-      uit: 'Nog niet ingesteld. Inspreken, verslagen en slimme datums werken ook zonder; alleen het netjes maken, de samenvatting en vragen stellen niet.',
-      'geen-sleutel': 'De functie staat in Supabase, maar de Anthropic API-sleutel ontbreekt of klopt niet.',
-      jwt: 'De functie staat in Supabase, maar weigert het inloggen. Zet bij de functie "Verify JWT with legacy secret" uit.',
-      lokaal: 'Alleen beschikbaar als je lijst online staat (inloggen met Supabase).',
-      fout: 'Controleren lukte niet. Probeer het later opnieuw.',
-      onbekend: 'Nog niet gecontroleerd.',
-    };
-    st.textContent = ai.checking ? 'Controleren…' : txt[ai.status] || txt.fout;
-    $('aiCheckBtn').hidden = ai.status === 'lokaal';
-    $('aiCheckBtn').disabled = ai.checking;
-    $('aiHelpBtn').hidden = ai.status === 'aan' || ai.status === 'lokaal';
+    machines = [...new Set(machines)];
+    machines = machines.filter(x => !machines.some(y => y !== x && (y.startsWith(x + ' ') || y.endsWith(' ' + x))));   // "heftruck" valt weg naast "elektrische heftruck 2,5 t"
+    const interesse = /\b(geen (interesse|behoefte|budget)|niet ge[iï]nteresseerd|al een leverancier|niet nodig)\b/.test(k) ? 'geen'
+      : /\b(weinig interesse|voorlopig niet|niet nu|geen haast)\b/.test(k) ? 'laag'
+      : /\b(offerte|bestellen|bestelling|order|tekenen|concreet|zo snel mogelijk|budget|enthousiast|wil graag|demo|proefdraaien)\b/.test(k) ? 'hoog'
+      : /\b(interesse|ge[iï]nteresseerd|misschien|wellicht|denkt na|overweegt|ori[eë]nteert|terug)\b/.test(k) ? 'middel' : '';
+    const afspraken = t.split(/(?<=[.!?])\s+/).filter(z => /\b(belt|bellen|bel|stuur|sturen|stuurt|offerte|afspraak|langs|demo|terug|mailen|mail|toesturen|opsturen|komt|komen|inplannen)\b/i.test(z)).join(' ').slice(0, 300);
+    return { machines: machines.slice(0, 8), interesse, afspraken };
   }
 
   /* ---------- klantverslagen ---------- */
@@ -3658,8 +3608,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
   const newVid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   function newVerslagDraft(l, soort) {
-    return { soort: soort || (/bezoek|afspraak|demo/i.test(l.actie) ? 'Bezoek' : 'Telefoon'), datum: todayISO(), tekst: '', ruw: '', machines: '', interesse: '', afspraken: '', vragen: '',
-      plan: false, planTouched: false, vactie: '', vdatum: '', vtijd: '', vreden: '', herinnering: '30', agenda: false, aiStatus: '', statusOk: true, ai: false, busy: false, error: '', listening: false };
+    return { soort: soort || (/bezoek|afspraak|demo/i.test(l.actie) ? 'Bezoek' : 'Telefoon'), datum: todayISO(), tekst: '', machines: '', interesse: '', afspraken: '', vragen: '',
+      plan: false, planTouched: false, vactie: '', vdatum: '', vtijd: '', herinnering: '30', agenda: false, statusOk: true, listening: false, touched: {} };
   }
   function verslagenHtml(l) {
     const id = esc(l.id), v = vdrafts[l.id], list = l.verslagen, all = vAll.has(l.id);
@@ -3670,7 +3620,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       <div class="vhead"><h3>Klantverslagen${list.length ? ` <span class="n">${list.length}</span>` : ''}</h3>${btns}</div>
       ${v ? verslagEditorHtml(l, v) : ''}
       ${list.length ? `<ol class="vlist">${(all ? list : list.slice(0, 2)).map(x => verslagItemHtml(x)).join('')}</ol>`
-        : v ? '' : `<p class="hint">Nog geen verslagen. Spreek na een gesprek of bezoek in wat er besproken is${aiOn() ? '; Leadnex maakt er een nette notitie met opvolgtaak van' : ''}.</p>`}
+        : v ? '' : '<p class="hint">Nog geen verslagen. Spreek na een gesprek of bezoek in wat er besproken is; Leadnex vult de machines, interesse, afspraken en opvolgtaak alvast in.</p>'}
       ${list.length > 2 ? `<button type="button" class="linkbtn" data-act="v-all">${all ? 'Minder tonen' : `Alle ${list.length} verslagen tonen`}</button>` : ''}
     </section>`;
   }
@@ -3680,68 +3630,77 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       x.interesse && `<span class="vk">Interesse</span>${esc(INTERESSE.find(i => i[0] === x.interesse)[1])}`,
       x.afspraken && `<span class="vk">Afspraken</span>${esc(x.afspraken)}`].filter(Boolean);
     return `<li class="verslag">
-      <div class="vmeta"><time>${esc(cap(longDate(x.datum)))}</time><span>${esc(x.soort)}</span>${x.door === 'ai' ? `<span class="aitag">${ic('sparkles')}Leadnex</span>` : ''}
+      <div class="vmeta"><time>${esc(cap(longDate(x.datum)))}</time><span>${esc(x.soort)}</span>
         ${state.readOnly ? '' : `<button type="button" class="vdel${armed ? ' armed' : ''}" data-act="v-del" data-vid="${esc(x.id)}" aria-label="Verslag verwijderen">${armed ? 'Nogmaals tikken om te verwijderen' : ic('trash-2')}</button>`}</div>
       <p class="vtekst">${esc(x.tekst)}</p>
       ${facts.map(f => `<p class="vfact">${f}</p>`).join('')}
       ${x.vragen.length ? `<div class="vq"><span class="vk">Vragen voor de volgende keer</span><ul>${x.vragen.map(q => `<li>${esc(q)}</li>`).join('')}</ul></div>` : ''}
-      ${x.ruw && x.ruw !== x.tekst ? `<details class="raw"><summary>Oorspronkelijke tekst</summary><p>${esc(x.ruw)}</p></details>` : ''}
     </li>`;
   }
   const micBtn = (id, v) => `<button type="button" class="btn small mic${v.listening ? ' on' : ''}" id="vmic-${esc(id)}" data-act="v-mic" aria-pressed="${v.listening}">${ic(v.listening ? 'square' : 'mic')}${v.listening ? 'Stop' : 'Inspreken'}</button>`;
   function verslagEditorHtml(l, v) {
-    const id = esc(l.id), dis = v.busy ? ' disabled' : '';
-    const sel = (f, opts, cur) => `<select class="input" id="v-${id}-${f}" data-vfield="${f}"${dis}>${opts.map(([val, t]) => `<option value="${esc(val)}"${String(val) === String(cur) ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>`;
+    const id = esc(l.id);
+    const sel = (f, opts, cur) => `<select class="input" id="v-${id}-${f}" data-vfield="${f}">${opts.map(([val, t]) => `<option value="${esc(val)}"${String(val) === String(cur) ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>`;
     return `<div class="veditor" id="ved-${id}">
       <div class="vgrid">
         <div class="field"><label for="v-${id}-soort">Soort</label>${sel('soort', SOORTEN.map(x => [x, x]), v.soort)}</div>
-        <div class="field"><label for="v-${id}-datum">Datum</label><input class="input" type="date" id="v-${id}-datum" data-vfield="datum" value="${esc(v.datum)}" max="${todayISO()}"${dis}></div>
+        <div class="field"><label for="v-${id}-datum">Datum</label><input class="input" type="date" id="v-${id}-datum" data-vfield="datum" value="${esc(v.datum)}" max="${todayISO()}"></div>
       </div>
       <div class="field">
         <div class="vlabel"><label for="vt-${id}">Wat is er besproken?</label>${micBtn(l.id, v)}</div>
         <p class="hint vlive" id="vlive-${id}" role="status"${v.listening ? '' : ' hidden'}>Leadnex luistert. Praat rustig; tik op Stop als je klaar bent.</p>
-        <textarea class="input vtext" id="vt-${id}" data-vfield="tekst" maxlength="6000" rows="5" placeholder="Bijv. Gesproken met Jan. Interesse in een elektrische heftruck van 2,5 ton. Belt na de bouwvak terug."${dis}>${esc(v.tekst)}</textarea>
+        <textarea class="input vtext" id="vt-${id}" data-vfield="tekst" maxlength="6000" rows="5" placeholder="Bijv. Gesproken met Jan. Interesse in een elektrische heftruck van 2,5 ton. Belt na de bouwvak terug.">${esc(v.tekst)}</textarea>
+        <p class="hint">Leadnex vult hieronder alvast in wat het herkent. Pas aan waar nodig.</p>
       </div>
-      ${aiOn() ? `<div class="vai"><button type="button" class="btn accent" id="vai-${id}" data-act="v-ai"${dis || (!v.tekst.trim() ? ' disabled' : '')}>${ic('sparkles')}${v.busy ? 'Leadnex is bezig…' : v.ai ? 'Opnieuw laten maken' : 'Maak er een nette notitie van'}</button>
-          <span class="hint">${v.ai ? 'Gemaakt door Leadnex. Controleer het en pas aan waar nodig.' : 'Met de besproken machines, afspraken en een opvolgtaak.'}</span></div>` : ''}
-      ${v.error ? `<p class="warn" role="alert">${esc(v.error)}</p>` : ''}
       <div class="vgrid">
-        <div class="field span2"><label for="v-${id}-machines">Besproken machines<span class="opt">optioneel, met komma's</span></label><input class="input" id="v-${id}-machines" data-vfield="machines" maxlength="300" value="${esc(v.machines)}" placeholder="Bijv. elektrische heftruck 2,5 t, reachtruck"${dis}></div>
+        <div class="field span2"><label for="v-${id}-machines">Besproken machines<span class="opt">met komma's</span></label><input class="input" id="v-${id}-machines" data-vfield="machines" maxlength="300" value="${esc(v.machines)}" placeholder="Bijv. elektrische heftruck 2,5 t, reachtruck"></div>
         <div class="field"><label for="v-${id}-interesse">Interesse</label>${sel('interesse', INTERESSE, v.interesse)}</div>
-        <div class="field"><label for="v-${id}-afspraken">Afspraken<span class="opt">optioneel</span></label><input class="input" id="v-${id}-afspraken" data-vfield="afspraken" maxlength="1000" value="${esc(v.afspraken)}"${dis}></div>
-        <div class="field span2"><label for="v-${id}-vragen">Vragen voor het volgende gesprek<span class="opt">één per regel</span></label><textarea class="input" id="v-${id}-vragen" data-vfield="vragen" rows="2" maxlength="1200"${dis}>${esc(v.vragen)}</textarea></div>
+        <div class="field"><label for="v-${id}-afspraken">Afspraken<span class="opt">optioneel</span></label><input class="input" id="v-${id}-afspraken" data-vfield="afspraken" maxlength="1000" value="${esc(v.afspraken)}"></div>
+        <div class="field span2"><label for="v-${id}-vragen">Vragen voor het volgende gesprek<span class="opt">één per regel</span></label><textarea class="input" id="v-${id}-vragen" data-vfield="vragen" rows="2" maxlength="1200">${esc(v.vragen)}</textarea></div>
       </div>
       <div class="vplan" id="vplan-${id}">${vplanHtml(l, v)}</div>
       <div class="pactions">
-        <button type="button" class="btn primary" id="vsave-${id}" data-act="v-save"${dis}>${ic('check')}Verslag opslaan</button>
+        <button type="button" class="btn primary" id="vsave-${id}" data-act="v-save">${ic('check')}Verslag opslaan</button>
         <button type="button" class="btn" id="vcancel-${id}" data-act="v-cancel">Annuleren</button>
       </div>
     </div>`;
   }
   const vStatusSuggestion = (l, v) => {
-    const s = v.aiStatus || (l.status === 'lead' && ['hoog', 'middel'].includes(v.interesse) ? 'prospect' : '');
+    const s = l.status === 'lead' && ['hoog', 'middel'].includes(v.interesse) ? 'prospect' : '';
     return s && s !== l.status ? s : '';
   };
   function vplanHtml(l, v) {
-    const id = esc(l.id), dis = v.busy ? ' disabled' : '';
+    const id = esc(l.id);
     const sug = suggestLine(v.tekst, 'v-sug', `vsug-${id}`), st = vStatusSuggestion(l, v);
-    return `<label class="check" for="v-${id}-plan"><input type="checkbox" id="v-${id}-plan" data-vfield="plan"${v.plan ? ' checked' : ''}${dis}>Opvolgtaak inplannen</label>
+    return `<label class="check" for="v-${id}-plan"><input type="checkbox" id="v-${id}-plan" data-vfield="plan"${v.plan ? ' checked' : ''}>Opvolgtaak inplannen</label>
       ${sug ? `<p class="suggest smart">${sug}</p>` : ''}
       ${v.plan ? `<div class="vgrid">
-          <div class="field"><label for="v-${id}-vactie">Actie</label><input class="input" id="v-${id}-vactie" data-vfield="vactie" list="actieLijst" maxlength="40" value="${esc(v.vactie)}" placeholder="Bijv. Bellen"${dis}></div>
-          <div class="field"><label for="v-${id}-vtijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="v-${id}-vtijd" data-vfield="vtijd" value="${esc(v.vtijd)}"${dis}></div>
-          <div class="field span2"><label for="v-${id}-vdatum">Wanneer</label>${whenHtml(`v-${id}-vdatum`, v.vdatum, ' data-vfield="vdatum"', v.busy)}</div>
-          ${v.vtijd ? `<div class="field span2"><label for="v-${id}-herinnering">Herinnering</label><select class="input" id="v-${id}-herinnering" data-vfield="herinnering"${dis}>${HERINNERING.map(([m, t]) => `<option value="${m}"${String(m) === String(v.herinnering) ? ' selected' : ''}>${t}</option>`).join('')}</select></div>` : ''}
+          <div class="field"><label for="v-${id}-vactie">Actie</label><input class="input" id="v-${id}-vactie" data-vfield="vactie" list="actieLijst" maxlength="40" value="${esc(v.vactie)}" placeholder="Bijv. Bellen"></div>
+          <div class="field"><label for="v-${id}-vtijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="v-${id}-vtijd" data-vfield="vtijd" value="${esc(v.vtijd)}"></div>
+          <div class="field span2"><label for="v-${id}-vdatum">Wanneer</label>${whenHtml(`v-${id}-vdatum`, v.vdatum, ' data-vfield="vdatum"')}</div>
+          ${v.vtijd ? `<div class="field span2"><label for="v-${id}-herinnering">Herinnering</label><select class="input" id="v-${id}-herinnering" data-vfield="herinnering">${HERINNERING.map(([m, t]) => `<option value="${m}"${String(m) === String(v.herinnering) ? ' selected' : ''}>${t}</option>`).join('')}</select></div>` : ''}
         </div>
-        ${v.vreden ? `<p class="hint">${ic('sparkles')} ${esc(v.vreden)}</p>` : ''}
         ${l.actie ? `<p class="hint">Komt in plaats van de huidige actie: ${esc(l.actie)}${l.datum ? ' op ' + esc(shortDate(l.datum)) : ''}.</p>` : ''}
-        <label class="check" for="v-${id}-agenda"><input type="checkbox" id="v-${id}-agenda" data-vfield="agenda"${v.agenda ? ' checked' : ''}${dis}>${outlookOn() ? 'Ook in mijn Outlook-agenda zetten' : 'Ook in mijn agenda zetten'}${v.vtijd ? ', met herinnering' : ''}</label>` : ''}
-      ${st ? `<label class="check" for="v-${id}-statusOk"><input type="checkbox" id="v-${id}-statusOk" data-vfield="statusOk"${v.statusOk ? ' checked' : ''}${dis}>Status wijzigen naar ${esc(statusLabel(st))}</label>` : ''}`;
+        <label class="check" for="v-${id}-agenda"><input type="checkbox" id="v-${id}-agenda" data-vfield="agenda"${v.agenda ? ' checked' : ''}>${outlookOn() ? 'Ook in mijn Outlook-agenda zetten' : 'Ook in mijn agenda zetten'}${v.vtijd ? ', met herinnering' : ''}</label>` : ''}
+      ${st ? `<label class="check" for="v-${id}-statusOk"><input type="checkbox" id="v-${id}-statusOk" data-vfield="statusOk"${v.statusOk ? ' checked' : ''}>Status wijzigen naar ${esc(statusLabel(st))}</label>` : ''}`;
   }
   function renderVPlan(id) {
     const l = byId(id), v = vdrafts[id], el = $('vplan-' + id);
     if (!l || !v || !el || el.contains(document.activeElement)) return;
     el.innerHTML = vplanHtml(l, v);
+  }
+  // Wat in de tekst herkend wordt (machines, interesse, afspraken) alvast invullen, behalve wat je zelf hebt aangepast.
+  function autoFill(id) {
+    const v = vdrafts[id];
+    if (!v) return;
+    const a = analyseTekst(v.tekst);
+    const set = (f, val) => {
+      if (v.touched[f] || !val || v[f] === val) return;
+      v[f] = val;
+      const el = $(`v-${id}-${f}`);
+      if (el && document.activeElement !== el) el.value = val;
+    };
+    set('machines', a.machines.join(', ')); set('interesse', a.interesse); set('afspraken', a.afspraken);
   }
   // Tekst veranderd: herkende datum meteen als opvolgtaak voorstellen, zolang je die niet zelf hebt aangepast.
   let vSugTimer = 0;
@@ -3750,15 +3709,14 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     vSugTimer = setTimeout(() => {
       const v = vdrafts[id], l = byId(id);
       if (!v || !l) return;
+      autoFill(id);
       const p = planFromText(v.tekst);
-      if (p && !v.planTouched && !v.ai) applyPlan(v, p.actie, p.opties[0]);
+      if (p && !v.planTouched) applyPlan(v, p.actie, p.opties[0]);
       renderVPlan(id);
-      const b = $('vai-' + id);
-      if (b) b.disabled = v.busy || !v.tekst.trim();
     }, 350);
   }
   function applyPlan(v, actie, o) {
-    v.plan = true; v.vactie = v.vactie && v.planTouched ? v.vactie : actie; v.vdatum = o.datum; v.vtijd = o.tijd || v.vtijd; v.vreden = '';
+    v.plan = true; v.vactie = v.vactie && v.planTouched ? v.vactie : actie; v.vdatum = o.datum; v.vtijd = o.tijd || v.vtijd;
     if (o.tijd) v.agenda = true;
   }
   function openVerslag(id, mic, soort, prefill = '') {
@@ -3791,7 +3749,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     dict.rec = rec; dict.id = id; dict.base = v.tekst.trim() ? v.tekst.trim() + ' ' : '';
     v.listening = true;
     let finals = '';
-    const sentence = s => { s = s.trim(); return s ? s.charAt(0).toUpperCase() + s.slice(1) + (/[.!?]$/.test(s) ? ' ' : '. ') : ''; };
+    const sentence = s => { s = cleanSpoken(s); return s ? s.charAt(0).toUpperCase() + s.slice(1) + (/[.!?]$/.test(s) ? ' ' : '. ') : ''; };
     rec.onresult = e => {
       let fin = '', interim = '';
       for (let i = 0; i < e.results.length; i++) { const r = e.results[i]; if (r.isFinal) fin += sentence(r[0].transcript); else interim += r[0].transcript; }
@@ -3832,9 +3790,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const tekst = v.tekst.trim();
     if (!tekst) { toast('Spreek of typ eerst wat er besproken is.'); $('vt-' + id)?.focus(); return; }
     const datum = parseISO(v.datum) && v.datum <= todayISO() ? v.datum : todayISO();
-    const item = { id: newVid(), datum, soort: v.soort, tekst: tekst.slice(0, 6000), ruw: v.ai && v.ruw && v.ruw !== tekst ? v.ruw.slice(0, 12000) : '',
-      machines: listFrom(v.machines).slice(0, 20), interesse: validInteresse(v.interesse), afspraken: v.afspraken.trim().slice(0, 1000),
-      vragen: v.vragen.split('\n').map(x => x.replace(/^[-•*]\s*/, '').trim()).filter(Boolean).slice(0, 8), door: v.ai ? 'ai' : '', gemaakt: nowISO() };
+    const item = { id: newVid(), datum, soort: v.soort, tekst: tekst.slice(0, 6000), machines: listFrom(v.machines).slice(0, 20), interesse: validInteresse(v.interesse),
+      afspraken: v.afspraken.trim().slice(0, 1000), vragen: v.vragen.split('\n').map(x => x.replace(/^[-•*]\s*/, '').trim()).filter(Boolean).slice(0, 8), gemaakt: nowISO() };
     const actie = v.plan ? canonAction(v.vactie) : '';
     if (v.plan && (!actie || !parseISO(v.vdatum))) { toast('Vul bij de opvolgtaak een actie en een datum in, of vink Opvolgtaak inplannen uit.'); return; }
     const next = { ...l, verslagen: [item, ...l.verslagen].sort(byVerslag).slice(0, 200), gewijzigd: nowISO() };
@@ -3870,63 +3827,9 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const ok = await write(() => col.doc(id).set(toBody({ ...l, verslagen: l.verslagen.filter(x => x.id !== vid), gewijzigd: nowISO() })));
     if (ok) { renderRows(); toast('Verslag verwijderd.'); }
   }
-  // Wat Leadnex AI over een bedrijf meekrijgt.
-  function leadForAi(l, verslagen = 10) {
-    const o = { bedrijf: l.bedrijf, status: l.status };
-    for (const k of ['contact', 'plaats', 'branche', 'actie', 'datum', 'tijd']) if (l[k]) o[k] = l[k];
-    if (l.notitie) o.notitie = l.notitie.slice(0, 2000);
-    if (l.log.length) o.contactmomenten = l.log.slice(0, 15).map(x => [x.d, x.a, x.u, x.t].filter(Boolean).join(' · '));
-    if (l.verslagen.length && verslagen) o.verslagen = l.verslagen.slice(0, verslagen).map(v => {
-      const x = { datum: v.datum, soort: v.soort, tekst: v.tekst.slice(0, 3000) };
-      if (v.machines.length) x.machines = v.machines;
-      if (v.interesse) x.interesse = v.interesse;
-      if (v.afspraken) x.afspraken = v.afspraken;
-      if (v.vragen.length) x.vragen = v.vragen;
-      return x;
-    });
-    return o;
-  }
-  const bouwvakInfo = () => { const y = +todayISO().slice(0, 4), a = bouwvak(y), b = bouwvak(y + 1); return { regio: bouwvakRegio(), [y]: [a.start, a.end], [y + 1]: [b.start, b.end] }; };
-  async function aiVerslag(id) {
-    const l = byId(id), v = vdrafts[id];
-    if (!l || !v || v.busy) return;
-    stopDictation();
-    if (!v.tekst.trim()) { toast('Spreek of typ eerst wat er besproken is.'); return; }
-    v.busy = true; v.error = '';
-    renderRows();
-    const ruw = v.ai && v.ruw ? v.ruw : v.tekst;
-    try {
-      const r = await aiInvoke('verslag', { tekst: ruw, soort: v.soort, datum: v.datum, vandaag: todayISO(), regio: bouwvakRegio(), bouwvak: bouwvakInfo(),
-        hints: suggestDates(ruw).map(o => ({ datum: o.datum, tijd: o.tijd, betekenis: o.label })), acties: actionNames(), bedrijf: leadForAi(l, 3) });
-      const x = r.result || {}, cur = vdrafts[id];
-      if (!cur) return;
-      Object.assign(cur, {
-        ruw, tekst: str(x.notitie).trim() || cur.tekst, machines: strList(x.machines, 20, 80).join(', '), interesse: validInteresse(x.interesse),
-        afspraken: str(x.afspraken).trim(), vragen: strList(x.vragen, 8, 300).join('\n'), ai: true,
-        aiStatus: ['prospect', 'klant'].includes(x.status) ? x.status : '', statusOk: true,
-      });
-      const vv = x.vervolg || {};
-      if (vv.nodig && parseISO(vv.datum) && vv.datum >= todayISO() && vv.datum <= addDays(todayISO(), 800)) {
-        Object.assign(cur, { plan: true, planTouched: false, vactie: canonAction(str(vv.actie)) || planActie(key(ruw)), vdatum: vv.datum,
-          vtijd: /^\d{2}:\d{2}$/.test(vv.tijd) ? vv.tijd : '', vreden: str(vv.reden) });
-        cur.agenda = !!cur.vtijd;
-      } else if (vv.nodig === false) Object.assign(cur, { plan: false, vreden: '' });
-    } catch (e) {
-      const cur = vdrafts[id];
-      if (cur) cur.error = aiErrorText(e);
-      if (e.code === 'uit' || e.code === 'geen-sleutel') { ai.status = e.code; renderAi(); }
-    }
-    if (vdrafts[id]) vdrafts[id].busy = false;
-    renderRows();
-  }
 
   /* ---------- gespreksvoorbereiding ---------- */
-  const hashStr = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = (h * 33 + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
-  const prepSig = l => hashStr(JSON.stringify([l.notitie, l.actie, l.datum, l.status, l.log.slice(0, 15), l.verslagen.slice(0, 10).map(v => [v.id, v.tekst, v.afspraken, v.vragen, v.machines])]));
   const hasHistory = l => l.log.length > 0 || l.verslagen.length > 0 || !!l.notitie.trim();
-  // Alleen samenvatten (een AI-aanroep) als er echt iets samen te vatten valt.
-  const prepWorth = l => l.verslagen.length > 0 || l.log.filter(x => x.t).length >= 2 || l.notitie.trim().length > 120;
-  const prepBusy = new Set(), prepFailed = new Map();
   function lastContactText(l) {
     const x = l.log[0], v = l.verslagen[0];
     if (v && (!x || v.datum >= x.d)) return `${cap(longDate(v.datum))}, ${v.soort.toLowerCase()}: ${clip(v.tekst.replace(/\s+/g, ' ').replace(/^- /, ''), 140)}`;
@@ -3934,84 +3837,130 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const what = x.a === 'Mail' ? 'mail verstuurd' : x.a === 'WhatsApp' ? 'WhatsApp verstuurd' : [x.a, x.u].filter(Boolean).join(', ').toLowerCase();
     return `${cap(longDate(x.d))}: ${what}${x.t ? ` (${x.t})` : ''}`;
   }
+  // Vragen voor het volgende gesprek: wat je zelf noteerde, anders een voorstel op basis van wat er speelt.
+  function prepQuestions(l) {
+    const own = (l.verslagen.find(v => v.vragen.length) || { vragen: [] }).vragen;
+    if (own.length) return { eigen: true, vragen: own };
+    const t = key([l.notitie, l.actie, ...l.verslagen.slice(0, 3).map(v => `${v.tekst} ${v.afspraken}`), ...l.log.slice(0, 3).map(x => x.t || '')].join(' '));
+    const machine = l.verslagen.flatMap(v => v.machines)[0];
+    const q = [];
+    if (/offerte/.test(t)) q.push('Is de offerte goed ontvangen, en wanneer valt de beslissing?');
+    if (machine) q.push(`Wanneer moet de ${machine} er zijn, en gaat de voorkeur uit naar huur, lease of koop?`);
+    if (/\b(terug|bouwvak|later|nadenken|overleg|overleggen)\b/.test(t)) q.push('Is er intern al overlegd? Wie beslist er mee?');
+    if (!q.length) q.push('Wat is er sinds het vorige contact veranderd?', 'Wie beslist er mee over een aanschaf?');
+    return { eigen: false, vragen: q.slice(0, 3) };
+  }
   function prepHtml(l) {
     if (!hasHistory(l)) return '';
-    const id = esc(l.id), p = l.voorbereiding, fresh = !!p && p.sig === prepSig(l), useAi = fresh;
-    const machines = useAi && p.machines.length ? p.machines : [...new Set(l.verslagen.flatMap(v => v.machines))].slice(0, 8);
-    const afspraken = useAi && p.afspraken.length ? p.afspraken : l.verslagen.filter(v => v.afspraken).slice(0, 3).map(v => `${shortDate(v.datum)}: ${v.afspraken}`);
+    const machines = [...new Set(l.verslagen.flatMap(v => v.machines))].slice(0, 8);
+    const afspraken = l.verslagen.filter(v => v.afspraken).slice(0, 3).map(v => `${shortDate(v.datum)}: ${v.afspraken}`);
     const v1 = l.verslagen.find(v => v.interesse);
-    const interesse = useAi && p.interesse ? p.interesse : v1 ? `${INTERESSE.find(i => i[0] === v1.interesse)[1]} (${shortDate(v1.datum)})` : '';
-    const vragen = useAi && p.vragen.length ? p.vragen : (l.verslagen.find(v => v.vragen.length) || { vragen: [] }).vragen;
+    const interesse = v1 ? `${INTERESSE.find(i => i[0] === v1.interesse)[1]} (${shortDate(v1.datum)})` : '';
+    const q = prepQuestions(l);
+    const eerste = [...l.log.map(x => x.d), ...l.verslagen.map(v => v.datum)].sort()[0];
+    const n = l.log.length, nv = l.verslagen.length;
+    const overzicht = `${statusLabel(l.status)} · ${n} ${plural(n, 'contactmoment', 'contactmomenten')}${nv ? `, ${nv} ${plural(nv, 'verslag', 'verslagen')}` : ''}${eerste ? ` sinds ${shortDate(eerste)}` : ''}.`;
     const item = (k, v) => v ? `<div><dt>${k}</dt><dd>${v}</dd></div>` : '';
-    let status = '';
-    if (aiOn()) {
-      if (prepBusy.has(l.id)) status = '<span class="hint">Leadnex vat samen…</span>';
-      else if (fresh) status = `<button type="button" class="linkbtn" id="prep-${id}" data-act="prep-refresh">${ic('refresh-cw')}Vernieuwen</button>`;
-      else if (prepFailed.has(l.id)) status = `<span class="hint">${esc(prepFailed.get(l.id).msg)}</span> <button type="button" class="linkbtn" id="prep-${id}" data-act="prep-refresh">Opnieuw</button>`;
-    }
     return `<section class="prep" aria-label="Gespreksvoorbereiding">
-      <div class="prep-head"><h3>${ic('sparkles')}Voorbereiding</h3>${status}</div>
-      ${useAi && p.samenvatting ? `<p class="psum">${esc(p.samenvatting)}</p>` : ''}
+      <div class="prep-head"><h3>${ic('sparkles')}Voorbereiding</h3></div>
+      <p class="psum">${esc(overzicht)}</p>
       <dl class="pfacts">
-        ${item('Laatste contact', esc(useAi && p.laatsteContact || lastContactText(l)))}
+        ${item('Laatste contact', esc(lastContactText(l)))}
         ${item('Machines', machines.map(m => `<span class="mtag">${esc(m)}</span>`).join(''))}
         ${item('Afspraken', afspraken.map(esc).join('<br>'))}
         ${item('Interesse', esc(interesse))}
         ${item('Volgende actie', l.actie ? esc(`${l.actie}${l.datum ? ', ' + shortDate(l.datum) : ''}${l.tijd ? ' om ' + l.tijd : ''}`) : '')}
       </dl>
-      ${vragen.length ? `<div class="pq"><strong>Vraag bij het volgende gesprek</strong><ul>${vragen.map(q => `<li>${esc(q)}</li>`).join('')}</ul></div>` : ''}
+      <div class="pq"><strong>${q.eigen ? 'Vraag bij het volgende gesprek' : 'Voorstel: vraag bij het volgende gesprek'}</strong><ul>${q.vragen.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
     </section>`;
   }
-  async function requestPrep(id, force) {
-    const l = byId(id);
-    if (!l || !aiOn() || prepBusy.has(id) || !prepWorth(l)) return;
-    const sig = prepSig(l);
-    if (!force && ((l.voorbereiding && l.voorbereiding.sig === sig) || (prepFailed.has(id) && prepFailed.get(id).sig === sig))) return;
-    prepBusy.add(id); prepFailed.delete(id);
-    renderRows();
-    try {
-      const r = await aiInvoke('voorbereiding', { vandaag: todayISO(), bedrijf: leadForAi(l) });
-      const x = r.result || {};
-      const voorbereiding = validPrep({ sig, samenvatting: x.samenvatting, laatsteContact: x.laatsteContact, machines: x.machines, afspraken: x.afspraken, interesse: x.interesse, vragen: x.vragen, gemaakt: nowISO() });
-      if (byId(id)) await write(() => col.doc(id).update({ voorbereiding }));
-    } catch (e) { prepFailed.set(id, { sig, msg: aiErrorText(e) }); }
-    prepBusy.delete(id);
-    renderRows();
-  }
 
-  /* ---------- vragen over je klantverslagen ---------- */
-  const ask = { open: false, q: '', busy: false, res: null, error: '' };
+  /* ---------- vraag het Leadnex: vragen over je eigen klanten, zonder AI ---------- */
+  const ask = { open: false, q: '', res: null };
   const ASK_VOORBEELDEN = ['Welke bedrijven wilden een elektrische heftruck?', 'Wie wilde ik dit kwartaal terugbellen?', 'Welke potentiële klanten wachten op een offerte?'];
   const STOPWOORDEN = new Set(('de het een en van voor met op in aan wie wat welke welk wanneer waar hoe die dat dit deze is zijn was waren heeft hebben had ik je jij wij we ze zij hij er '
-    + 'om te tot bij of als nog al ook niet geen wel wil wilde wilden willen kan kunnen moet moeten bedrijven bedrijf klanten klant mij mijn me over naar uit dan nu zo heb').split(' '));
-  function localAsk(q) {
-    const words = key(q).replace(/[^\p{L}\p{N}\s-]/gu, ' ').split(/\s+/).filter(w => w.length > 2 && !STOPWOORDEN.has(w));
-    if (!words.length) return [];
-    return state.leads.map(l => {
-      const hay = [l.notitie, ...l.verslagen.map(v => [v.tekst, v.machines.join(', '), v.afspraken, v.vragen.join(' ')].filter(Boolean).join(' · ')), ...l.log.map(x => x.t || '')].filter(Boolean).join(' · ');
-      const k = key(hay), hits = words.filter(w => k.includes(w) || (w.length > 5 && k.includes(w.slice(0, -1))));
-      if (!hits.length) return null;
-      const i = Math.max(0, k.indexOf(hits[0]) - 50);
-      return { l, score: hits.length, snippet: (i ? '…' : '') + clip(hay.slice(i), 150) };
-    }).filter(Boolean).sort((a, b) => b.score - a.score || byName(a.l, b.l)).slice(0, 15);
+    + 'om te tot bij of als nog al ook niet geen wel wil wilde wilden willen kan kunnen moet moeten bedrijven bedrijf mij mijn me over naar uit dan nu zo heb '
+    + 'wacht wachten wachtte staan staat gaan gaat krijgen gekregen kregen sturen gestuurd zou zouden moest moesten iemand iets alle laten zien vertel noem lijst').split(' '));
+  // Een periode in de vraag: "deze week", "dit kwartaal", "in november" enzovoort.
+  function askPeriod(t, today = todayISO()) {
+    const d = parseISO(today), y = d.getFullYear(), m = d.getMonth(), monday = addDays(today, -((d.getDay() + 6) % 7));
+    const rng = (from, to, label) => ({ from, to, label });
+    const q = Math.floor(m / 3);
+    if (/\bvandaag\b/.test(t)) return rng(today, today, 'vandaag');
+    if (/\bmorgen\b/.test(t)) return rng(addDays(today, 1), addDays(today, 1), 'morgen');
+    if (/\bvolgende week\b/.test(t)) return rng(addDays(monday, 7), addDays(monday, 13), 'volgende week');
+    if (/\bdeze week\b/.test(t)) return rng(monday, addDays(monday, 6), 'deze week');
+    if (/\bvolgende maand\b/.test(t)) return rng(isoOf(new Date(y, m + 1, 1)), isoOf(new Date(y, m + 2, 0)), 'volgende maand');
+    if (/\bdeze maand\b/.test(t)) return rng(isoOf(new Date(y, m, 1)), isoOf(new Date(y, m + 1, 0)), 'deze maand');
+    if (/\b(volgend|komend) kwartaal\b/.test(t)) return rng(isoOf(new Date(y, q * 3 + 3, 1)), isoOf(new Date(y, q * 3 + 6, 0)), 'volgend kwartaal');
+    if (/\b(dit|deze) kwartaal\b/.test(t)) return rng(isoOf(new Date(y, q * 3, 1)), isoOf(new Date(y, q * 3 + 3, 0)), 'dit kwartaal');
+    if (/\bvolgend jaar\b/.test(t)) return rng(`${y + 1}-01-01`, `${y + 1}-12-31`, 'volgend jaar');
+    if (/\bdit jaar\b/.test(t)) return rng(`${y}-01-01`, `${y}-12-31`, 'dit jaar');
+    const mm = new RegExp(`\\b(?:in|eind|begin) ${MAAND_RE}`).exec(t);
+    if (mm) { const mo = maandNr(mm[1]), yy = mo < m ? y + 1 : y; return rng(isoOf(new Date(yy, mo, 1)), isoOf(new Date(yy, mo + 1, 0)), `in ${MAANDEN[mo]}`); }
+    return null;
+  }
+  const ASK_ACTIES = [[/\b(terug ?bellen|bellen|nabellen|bel)\b/, /bel/i, 'bellen'], [/\b(bezoek(en)?|langs(gaan|komen)?|afspraak|afspraken)\b/, /bezoek|afspraak|langs|demo/i, 'bezoek'],
+    [/\b(offertes?|prijsopgave)\b/, /offerte/i, 'offerte'], [/\b(mail(en)?|e-?mail)\b/, /mail/i, 'mailen']];
+  function askLocal(question) {
+    const t = ' ' + key(question).replace(/[?!.,]/g, ' ').replace(/\s+/g, ' ') + ' ';
+    const period = askPeriod(t);
+    const status = /potenti[eë]le klant|prospect/.test(t) ? 'prospect' : /\bklanten?\b/.test(t) ? 'klant' : /\bleads?\b/.test(t) ? 'lead' : '';
+    const act = ASK_ACTIES.find(a => a[0].test(t));
+    let words = t.replace(/potenti[eë]le klant(en)?|\bklanten?\b|\bleads?\b/g, ' ');
+    if (act) words = words.replace(act[0], ' ');
+    if (period) words = words.replace(/\b(vandaag|morgen|volgende|deze|dit|volgend|komend|week|maand|kwartaal|jaar|in|eind|begin)\b/g, ' ').replace(new RegExp(MAAND_RE, 'g'), ' ');
+    const kw = words.split(/\s+/).filter(w => w.length > 2 && !STOPWOORDEN.has(w));
+    const textOf = l => [l.notitie, ...l.verslagen.map(v => [v.tekst, v.machines.join(', '), v.afspraken, v.vragen.join(' ')].filter(Boolean).join(' · ')), ...l.log.map(x => x.t || '')].filter(Boolean).join(' · ');
+    const hitsKw = (k, w) => k.includes(w) || (w.length > 5 && k.includes(w.slice(0, -1)));
+    // Fragment rond de vondst, beginnend bij een onderdeel of zin in plaats van midden in een woord.
+    const snip = (hay, i) => {
+      const p = Math.max(hay.lastIndexOf(' · ', i), hay.lastIndexOf('. ', i));
+      let from = p < 0 ? 0 : p + (hay.startsWith(' · ', p) ? 3 : 2);
+      if (i - from > 60) from = hay.lastIndexOf(' ', i - 30) + 1;
+      return (from ? '…' : '') + clip(hay.slice(from), 140);
+    };
+    let list = state.leads.filter(l => !l.gearchiveerd || (period == null && status === '' && !act));
+    if (status) list = list.filter(l => l.status === status);
+    const out = [];
+    for (const l of list) {
+      const hay = textOf(l), k = key(hay);
+      let reden = '';
+      if (period) {
+        if (!l.datum || l.datum < period.from || l.datum > period.to) continue;
+        if (act && !act[1].test(l.actie) && !act[1].test(k)) continue;
+        reden = `${l.actie}${l.datum ? ' op ' + shortDate(l.datum) : ''}${l.tijd ? ' om ' + l.tijd : ''}`;
+      } else if (act) {
+        const inActie = act[1].test(l.actie), inTekst = act[1].test(k);
+        if (!inActie && !inTekst) continue;
+        reden = inActie ? `Actie: ${l.actie}${l.datum ? ' op ' + shortDate(l.datum) : ''}` : '';
+      }
+      const found = kw.filter(w => hitsKw(k, w));
+      if (kw.length && !found.length && !(period || act || status)) continue;
+      if (kw.length && (period || act) && !found.length && !reden) continue;
+      if (!reden && found.length) reden = snip(hay, k.indexOf(found[0]));
+      if (!reden && act) reden = snip(hay, Math.max(0, k.search(act[1])));
+      if (!reden) reden = l.actie ? `Actie: ${l.actie}${l.datum ? ' op ' + shortDate(l.datum) : ''}` : lastContactText(l) || statusLabel(l.status);
+      out.push({ l, reden, score: found.length * 2 + (period ? 1 : 0) + (act && act[1].test(l.actie) ? 1 : 0) });
+    }
+    // Komen alle zoekwoorden ergens samen voor, toon dan alleen die bedrijven.
+    const full = kw.length > 1 ? out.filter(x => kw.every(w => hitsKw(key(textOf(x.l)), w))) : [];
+    const hits = (full.length ? full : out).sort((a, b) => b.score - a.score || (a.l.datum || '9').localeCompare(b.l.datum || '9') || byName(a.l, b.l)).slice(0, 25);
+    // Kop boven het antwoord, bijvoorbeeld "Bellen dit kwartaal (1 okt – 31 dec): 2 bedrijven".
+    const delen = [status && STATUSES.find(x => x[0] === status)[1].toLowerCase().replace(/(klant)$/, '$1en').replace(/^lead$/, 'leads'),
+      act && (status ? `met ${act[2]}` : act[2]), period && `${period.label} (${shortDate(period.from)} – ${shortDate(period.to)})`, kw.length && `met "${kw.join(' ')}"`].filter(Boolean);
+    const kop = hits.length ? `${delen.length ? cap(delen.join(' ')) + ': ' : ''}${hits.length} ${plural(hits.length, 'bedrijf', 'bedrijven')}` : '';
+    return { kop, hits };
   }
   function askHtml() {
     const r = ask.res;
-    let answer = '';
-    if (ask.error) answer = `<p class="warn" role="alert">${esc(ask.error)}</p>`;
-    else if (r && r.ai) {
-      const hits = r.bedrijven.map(b => ({ l: byId(b.id), reden: b.reden })).filter(x => x.l);
-      answer = `<div class="answer"><p>${esc(r.antwoord).replace(/\n/g, '<br>')}</p>
-        ${hits.length ? `<ul class="askhits">${hits.map(x => `<li><button type="button" class="linkbtn" data-goto="${esc(x.l.id)}">${esc(x.l.bedrijf)}</button>${x.l.plaats ? ` <span class="faint">${esc(x.l.plaats)}</span>` : ''}<span class="meta">${esc(x.reden)}</span></li>`).join('')}</ul>` : ''}
-        ${r.afgekapt ? `<p class="hint">Je lijst is groot: Leadnex heeft naar de ${r.aantal} meest recente bedrijven gekeken.</p>` : ''}</div>`;
-    } else if (r) {
-      answer = r.hits.length ? `<div class="answer"><p class="hint">Gevonden in je verslagen en notities:</p><ul class="askhits">${r.hits.map(x => `<li><button type="button" class="linkbtn" data-goto="${esc(x.l.id)}">${esc(x.l.bedrijf)}</button>${x.l.plaats ? ` <span class="faint">${esc(x.l.plaats)}</span>` : ''}<span class="meta">${esc(x.snippet)}</span></li>`).join('')}</ul></div>`
-        : '<p class="hint">Niets gevonden in je verslagen en notities.</p>';
-    }
+    const answer = !r ? '' : r.hits.length
+      ? `<div class="answer"><p><strong>${esc(r.kop)}</strong></p><ul class="askhits">${r.hits.map(x => `<li><button type="button" class="linkbtn" data-goto="${esc(x.l.id)}">${esc(x.l.bedrijf)}</button>${x.l.plaats ? ` <span class="faint">${esc(x.l.plaats)}</span>` : ''}<span class="meta">${esc(x.reden)}</span></li>`).join('')}</ul></div>`
+      : '<p class="hint">Niets gevonden. Probeer andere woorden, of vraag naar een actie of periode, zoals "Wie moet ik deze week bellen?".</p>';
     return `<div class="card-head"><h2>${ic('message-circle-question')}Vraag het Leadnex</h2><button type="button" class="btn small ghost" data-ask="close">${ic('x')}Sluiten</button></div>
-      <p class="hint">${aiOn() ? 'Stel een vraag over je eigen klantverslagen, notities en contactmomenten.' : 'Zoekt in je klantverslagen, notities en contactmomenten. Met Leadnex AI aan krijg je een echt antwoord (zie Meer).'}</p>
-      <form class="askform" id="askForm"><input class="input" id="askQ" maxlength="300" enterkeyhint="search" placeholder="Bijv. ${esc(ASK_VOORBEELDEN[0])}" value="${esc(ask.q)}"${ask.busy ? ' disabled' : ''}>
-        <button type="submit" class="btn primary" id="askGo"${ask.busy ? ' disabled' : ''}>${ic(aiOn() ? 'sparkles' : 'search')}${ask.busy ? 'Bezig…' : aiOn() ? 'Vraag' : 'Zoek'}</button></form>
+      <p class="hint">Leadnex zoekt in je acties, klantverslagen, notities en contactmomenten.</p>
+      <form class="askform" id="askForm"><input class="input" id="askQ" maxlength="300" enterkeyhint="search" placeholder="Bijv. ${esc(ASK_VOORBEELDEN[1])}" value="${esc(ask.q)}">
+        <button type="submit" class="btn primary" id="askGo">${ic('search')}Zoek</button></form>
       <div class="chips">${ASK_VOORBEELDEN.map((x, i) => `<button type="button" class="chip" data-ask-ex="${i}">${esc(x)}</button>`).join('')}</div>
       ${answer}`;
   }
@@ -4021,20 +3970,12 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     $('askBtn').setAttribute('aria-expanded', String(ask.open));
     if (!el.hidden) withFocus(el, () => { el.innerHTML = askHtml(); });
   }
-  async function runAsk(q) {
+  function runAsk(q) {
     q = q.trim().slice(0, 300);
-    if (!q || ask.busy) return;
-    ask.q = q; ask.error = ''; ask.res = null;
-    if (!aiOn()) { ask.res = { ai: false, hits: localAsk(q) }; renderAsk(); return; }
-    ask.busy = true; renderAsk();
-    try {
-      const r = await aiInvoke('vraag', { vraag: q, vandaag: todayISO() });
-      ask.res = { ai: true, antwoord: str(r.result && r.result.antwoord), bedrijven: Array.isArray(r.result && r.result.bedrijven) ? r.result.bedrijven : [], afgekapt: !!r.afgekapt, aantal: r.aantal || 0 };
-    } catch (e) {
-      ask.error = aiErrorText(e) + ' Hieronder wat er letterlijk in je verslagen staat.';
-      ask.res = { ai: false, hits: localAsk(q) };
-    }
-    ask.busy = false; renderAsk();
+    if (!q) return;
+    ask.q = q;
+    ask.res = askLocal(q);
+    renderAsk();
   }
 
   /* ---------- dubbele bedrijven ---------- */
@@ -4097,7 +4038,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       log: log.slice(0, 100), verslagen, geenMail: a.geenMail || b.geenMail,
       gearchiveerd: a.gearchiveerd && b.gearchiveerd, gearchiveerdOp: a.gearchiveerd && b.gearchiveerd ? a.gearchiveerdOp : '',
       geo: a.adres ? a.geo : b.adres ? b.geo : a.geo || b.geo, aangemaakt: [a.aangemaakt, b.aangemaakt].filter(Boolean).sort()[0] || a.aangemaakt,
-      voorbeeld: a.voorbeeld && b.voorbeeld, gewijzigd: nowISO(), voorbereiding: null };
+      voorbeeld: a.voorbeeld && b.voorbeeld, gewijzigd: nowISO() };
   }
   const dupPanel = { open: false };
   function dupHtml() {
@@ -4306,7 +4247,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (!row) return;
     const id = row.dataset.id;
     if (act === 'select') { toggleSelect(id, el.checked); return; }
-    if (act.startsWith('v-') || act.endsWith('-sug') || act === 'prep-refresh') { smartAction(act, id, el); return; }
+    if (act.startsWith('v-') || act.endsWith('-sug')) { smartAction(act, id, el); return; }
     if (act === 'qmail' || act === 'wa') {
       const l = byId(id);
       if (!l) return;
@@ -4351,7 +4292,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       openVerslag(id, true, /bezoek|afspraak/i.test(l.actie) ? 'Bezoek' : 'Telefoon', tekst ? tekst.replace(/\.?$/, '. ') : '');
     }
     else if (act === 'v-mic') { const v = vdrafts[id]; if (v && v.listening) stopDictation(); else if (v) startDictation(id); }
-    else if (act === 'v-ai') aiVerslag(id);
     else if (act === 'v-save') saveVerslag(id);
     else if (act === 'v-cancel') closeVerslag(id);
     else if (act === 'v-del') deleteVerslag(id, el.dataset.vid);
@@ -4371,7 +4311,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       f.archief = false; f.hint = '';
       renderRows();
     }
-    else if (act === 'prep-refresh') requestPrep(id, true);
   }
   function updateSug(elId, text, act) {
     const el = $(elId);
@@ -4398,6 +4337,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       v[f] = t.value;
       if (f === 'tekst' && e.type === 'input') scheduleVSuggest(id);
       if (['vactie', 'vdatum', 'vtijd'].includes(f)) v.planTouched = true;
+      if (['machines', 'interesse', 'afspraken'].includes(f)) v.touched[f] = true;
       if (e.type === 'change' && ['interesse', 'vtijd', 'soort'].includes(f)) renderRows();
       return;
     }
@@ -4432,7 +4372,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   });
 
   $('askBtn').addEventListener('click', () => { ask.open = !ask.open; renderAsk(); if (ask.open) $('askQ')?.focus(); });
-  $('askPanel').addEventListener('submit', e => { e.preventDefault(); runAsk($('askQ').value); });
+  $('askPanel').addEventListener('submit', e => { e.preventDefault(); runAsk($('askQ').value); $('askQ')?.blur(); });
   $('askPanel').addEventListener('input', e => { if (e.target.id === 'askQ') ask.q = e.target.value; });
   $('askPanel').addEventListener('click', e => {
     const g = e.target.closest('[data-goto]');
@@ -4453,8 +4393,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   $('buurtSel').innerHTML = BUURT_KM.map(km => `<option value="${km}"${km === buurtKm() ? ' selected' : ''}>${km} km</option>`).join('');
   $('bouwvakSel').addEventListener('change', e => { pref.set('bouwvak', e.target.value); renderAll(); });
   $('buurtSel').addEventListener('change', e => { pref.set('buurtKm', e.target.value); renderAll(); });
-  $('aiCheckBtn').addEventListener('click', () => aiCheck(true));
-  $('aiHelpBtn').addEventListener('click', () => { const h = $('aiHelp'); h.hidden = !h.hidden; $('aiHelpBtn').setAttribute('aria-expanded', String(!h.hidden)); });
+  $('themaSel').value = pref.get('thema') || '';
+  $('themaSel').addEventListener('change', e => { pref.set('thema', e.target.value); applyThema(); });
   $('dupBtn').addEventListener('click', () => { dupPanel.open = !dupPanel.open; renderDup(); if (dupPanel.open) $('dupPanel').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
   $('dupPanel').addEventListener('click', e => {
     const g = e.target.closest('[data-goto]');
@@ -5510,7 +5450,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     window.addEventListener('hashchange', openFromNotification);
     renderPush();
     renderAll();
-    aiCheck(false);
   }
 
   const loginErr = m => { $('loginErr').textContent = m || ''; $('loginErr').hidden = !m; };
