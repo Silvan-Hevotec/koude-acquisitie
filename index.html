@@ -17,67 +17,70 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap">
 <style>
-/* Vormgeving: rustige grijstinten met geel als accent. Een donkere appbalk bovenin, een tabbalk onderin (telefoon)
-   of in de appbalk (computer), en per tabblad één overzichtelijke pagina met kaarten. */
+/* Vormgeving: warme, rustige neutrale tinten met het geel van het logo als accent. Een donkere appbalk, een tabbalk
+   onderin (telefoon) of in de appbalk (computer), en per tabblad één overzichtelijke pagina. Een bedrijf opent als
+   eigen scherm (telefoon) of als paneel rechts (computer). */
 :root {
   color-scheme: light;
-  --bg: #F3F4F6;
+  --bg: #F4F3EF;
   --surface: #FFFFFF;
-  --sunken: #F6F7F9;
-  --ink: #1C2126;
-  --muted: #5A636B;
-  --faint: #8B939A;
-  --line: #E4E7EB;
-  --line-strong: #CFD5DB;
+  --sunken: #F8F7F3;
+  --ink: #16171A;
+  --muted: #5E6066;
+  --faint: #8C8E93;
+  --line: #E8E6E0;
+  --line-strong: #D7D4CC;
   --focus: #FFD400;
   --brand: #FFD400;
-  --brand-hover: #F0C400;
-  --brand-ink: #1C2126;
-  --brand-soft: #FFF6C7;
+  --brand-hover: #F2C900;
+  --brand-ink: #16171A;
+  --brand-soft: #FFF5CC;
   --brand-soft-ink: #574600;
-  --primary: #16191B;
-  --primary-hover: #2C3135;
+  --primary: #16171A;
+  --primary-hover: #2C2E33;
   --primary-ink: #FFFFFF;
-  --appbar: #111315;
+  --appbar: #111214;
   --appbar-ink: #FFFFFF;
-  --appbar-muted: #A9B2B9;
-  --danger: #C0352F;
-  --danger-soft: #FDECEB;
-  --ok: #0E7A43;
-  --ok-soft: #E2F5EA;
-  --shadow-sm: 0 1px 2px rgba(28, 33, 38, .06);
-  --shadow: 0 1px 2px rgba(28, 33, 38, .05), 0 6px 20px rgba(28, 33, 38, .06);
-  --radius: 14px;
-  --nav-h: 64px;
+  --appbar-muted: #A9ABB0;
+  --danger: #BF3A2F;
+  --danger-soft: #FCEDEA;
+  --ok: #17784A;
+  --ok-soft: #E3F3EA;
+  --shadow-sm: 0 1px 2px rgba(22, 23, 26, .05);
+  --shadow: 0 1px 2px rgba(22, 23, 26, .04), 0 12px 32px rgba(22, 23, 26, .06);
+  --radius: 18px;
+  --r-ctl: 12px;
+  --nav-h: 68px;
   --f-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #111518; --surface: #1A1F23; --sunken: #15191C; --ink: #E8EBED; --muted: #A3ACB3; --faint: #737C83;
-    --line: #283036; --line-strong: #3A434A;
-    --brand-soft: #38320C; --brand-soft-ink: #FFDD4D; --brand-hover: #FFDF40;
-    --primary: #E8EBED; --primary-hover: #FFFFFF; --primary-ink: #111518;
-    --appbar: #0B0C0D; --appbar-ink: #FFFFFF; --appbar-muted: #9AA3AA;
-    --danger: #F28B85; --danger-soft: #3B1C1B; --ok: #6FDC9C; --ok-soft: #133426;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .3);
+    --bg: #0E0F11; --surface: #17181B; --sunken: #121315; --ink: #EDEDEA; --muted: #A3A5AA; --faint: #74767B;
+    --line: #26272B; --line-strong: #37393E;
+    --brand-soft: #36300C; --brand-soft-ink: #FFDE59; --brand-hover: #FFDF40;
+    --primary: #EDEDEA; --primary-hover: #FFFFFF; --primary-ink: #121315;
+    --appbar: #0A0B0C; --appbar-ink: #FFFFFF; --appbar-muted: #9C9EA3;
+    --danger: #F28B80; --danger-soft: #3A1D1A; --ok: #74D9A0; --ok-soft: #13301F;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 12px 32px rgba(0, 0, 0, .3);
   }
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #111518; --surface: #1A1F23; --sunken: #15191C; --ink: #E8EBED; --muted: #A3ACB3; --faint: #737C83;
-  --line: #283036; --line-strong: #3A434A;
-  --brand-soft: #38320C; --brand-soft-ink: #FFDD4D; --brand-hover: #FFDF40;
-  --primary: #E8EBED; --primary-hover: #FFFFFF; --primary-ink: #111518;
-  --appbar: #0B0C0D; --appbar-ink: #FFFFFF; --appbar-muted: #9AA3AA;
-  --danger: #F28B85; --danger-soft: #3B1C1B; --ok: #6FDC9C; --ok-soft: #133426;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 6px 20px rgba(0, 0, 0, .3);
+  --bg: #0E0F11; --surface: #17181B; --sunken: #121315; --ink: #EDEDEA; --muted: #A3A5AA; --faint: #74767B;
+  --line: #26272B; --line-strong: #37393E;
+  --brand-soft: #36300C; --brand-soft-ink: #FFDE59; --brand-hover: #FFDF40;
+  --primary: #EDEDEA; --primary-hover: #FFFFFF; --primary-ink: #121315;
+  --appbar: #0A0B0C; --appbar-ink: #FFFFFF; --appbar-muted: #9C9EA3;
+  --danger: #F28B80; --danger-soft: #3A1D1A; --ok: #74D9A0; --ok-soft: #13301F;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4); --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 12px 32px rgba(0, 0, 0, .3);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 var(--f-body); -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-body); -webkit-font-smoothing: antialiased; letter-spacing: -.003em; }
+.slabel { margin: 0; font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
 button, input, select, textarea { font: inherit; color: inherit; }
@@ -122,10 +125,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .topnav { display: none; }
   .bottomnav {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 14; display: grid; grid-template-columns: repeat(5, 1fr);
-    background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -4px 16px rgba(28, 33, 38, .06);
+    background: color-mix(in srgb, var(--surface) 88%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(16px); backdrop-filter: saturate(1.4) blur(16px);
+    border-top: 1px solid var(--line);
     padding: 6px max(6px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-right, 0px));
   }
-  .bottomnav .nav-item { flex-direction: column; justify-content: center; gap: 3px; min-height: 52px; color: var(--muted); font-size: 11.5px; font-weight: 600; }
+  .bottomnav .nav-item { flex-direction: column; justify-content: center; gap: 3px; min-height: 54px; color: var(--muted); font-size: 11.5px; font-weight: 600; letter-spacing: .01em; }
   .bottomnav .nav-item .pill { display: grid; place-items: center; width: 52px; height: 30px; border-radius: 999px; transition: background-color .15s; }
   .bottomnav .nav-item .ic { width: 22px; height: 22px; }
   .bottomnav .nav-item[aria-current="page"] { color: var(--ink); }
@@ -136,31 +140,35 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 
 /* Pagina */
-.wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 18px 40px; }
+.wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 22px 44px; }
 body.selecting .wrap, body.sessie .wrap { padding-bottom: 150px; }
 .page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 16px; }
-.page-head h2 { margin: 0; font-size: 24px; line-height: 1.15; font-weight: 700; letter-spacing: -.02em; }
-.page-head .sub { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+.page-head h2 { margin: 0; font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.03em; }
+.page-head .sub { margin: 4px 0 0; color: var(--muted); font-size: 14.5px; }
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.stat { display: grid; gap: 2px; min-width: 0; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
-.stat b { font-size: 24px; line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; }
-.stat span { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
-.stat.hot { background: var(--brand-soft); border-color: transparent; }
-.stat.hot span { color: var(--brand-soft-ink); }
+.stat { display: grid; gap: 4px; align-content: start; min-width: 0; padding: 14px 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.stat b { font-size: 30px; line-height: 1; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; line-height: 1.3; }
+.stat.hot { background: var(--appbar); border-color: var(--appbar); }
+.stat.hot b { color: var(--brand); }
+.stat.hot span { color: var(--appbar-muted); }
+:root[data-theme="dark"] .stat.hot { border-color: color-mix(in srgb, var(--brand) 35%, transparent); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stat.hot { border-color: color-mix(in srgb, var(--brand) 35%, transparent); } }
 .stat.late b { color: var(--danger); }
 #summary { display: none; }
 
 /* Knoppen */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 42px; padding: 0 16px; border-radius: 10px;
-  border: 1px solid var(--line-strong); background: var(--surface); box-shadow: var(--shadow-sm);
+  min-height: 44px; padding: 0 18px; border-radius: var(--r-ctl);
+  border: 1px solid var(--line-strong); background: var(--surface); box-shadow: none;
   font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; text-decoration: none; color: var(--ink);
   transition: background-color .15s, border-color .15s, color .15s, box-shadow .15s;
 }
 .btn:hover { border-color: var(--faint); background: var(--sunken); }
 .btn:active { transform: translateY(1px); }
-.btn.small { min-height: 36px; padding: 0 12px; font-size: 14px; border-radius: 9px; }
+.btn.small { min-height: 38px; padding: 0 14px; font-size: 14px; border-radius: 10px; }
+.btn.wide { min-width: 180px; }
 .btn.small .ic { width: 16px; height: 16px; }
 .btn.primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
 .btn.primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
@@ -181,10 +189,10 @@ body.selecting .wrap, body.sessie .wrap { padding-bottom: 150px; }
 .pactions .push { margin-left: auto; }
 
 /* Kaarten en meldingen */
-.card { display: grid; gap: 16px; min-width: 0; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.card { display: grid; gap: 16px; min-width: 0; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
 .card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
 .card-head h2, .card h3.title { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
-.notice, .warn, .dupwarn { padding: 12px 16px; border-radius: 12px; background: var(--brand-soft); color: var(--ink); }
+.notice, .warn, .dupwarn { padding: 14px 16px; border-radius: 16px; background: var(--brand-soft); color: var(--ink); }
 .notice { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
 .notice p { margin: 0; max-width: 68ch; }
 .warn, .dupwarn { margin: 0; font-size: 14px; padding: 10px 12px; }
@@ -198,7 +206,7 @@ body.selecting .wrap, body.sessie .wrap { padding-bottom: 150px; }
 .field > label { font-size: 13px; font-weight: 600; color: var(--muted); }
 .opt { margin-left: 4px; font-weight: 400; color: var(--faint); font-size: 12px; }
 .input {
-  width: 100%; min-height: 44px; padding: 9px 12px; border-radius: 10px;
+  width: 100%; min-height: 46px; padding: 10px 14px; border-radius: var(--r-ctl);
   border: 1px solid var(--line-strong); background: var(--surface); font-size: 15px;
   transition: border-color .15s, box-shadow .15s;
 }
@@ -209,11 +217,16 @@ body.selecting .wrap, body.sessie .wrap { padding-bottom: 150px; }
 textarea.input { min-height: 84px; resize: vertical; line-height: 1.45; }
 select.input { padding-right: 8px; }
 .searchbox { position: relative; flex: 1 1 240px; min-width: 0; }
-.searchbox .ic { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--faint); pointer-events: none; }
-.searchbox .input { padding-left: 38px; }
+.searchbox .ic { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--faint); pointer-events: none; }
+.searchbox .input { padding-left: 42px; min-height: 48px; border-radius: 14px; background: var(--surface); }
+.searchbox .input::-webkit-search-cancel-button {
+  -webkit-appearance: none; appearance: none; width: 18px; height: 18px; cursor: pointer; background: var(--muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M18 6 6 18M6 6l12 12'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M18 6 6 18M6 6l12 12'/%3E%3C/svg%3E") center / contain no-repeat;
+}
 .when { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .qd {
-  min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line-strong);
+  min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line-strong);
   background: var(--surface); font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
 }
 .qd:hover { border-color: var(--faint); }
@@ -225,7 +238,7 @@ select.input { padding-right: 8px; }
 .sel:disabled { cursor: not-allowed; opacity: .4; }
 
 /* Nieuw bedrijf */
-.add { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: end; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.add { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: end; padding: 20px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .add .span-when { grid-column: span 2; }
 .add .dupwarn { grid-column: 1 / 3; }
 .add .submit { grid-column: 3; display: flex; justify-content: flex-end; }
@@ -235,11 +248,18 @@ select.input { padding-right: 8px; }
   .add .span-when, .add .dupwarn, .add .submit { grid-column: 1 / -1; }
   .add .submit .btn { flex: 1; min-height: 48px; }
 }
-@media (max-width: 520px) { .add { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) {
+  .add { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .add .field:not(.pair) { grid-column: 1 / -1; }
+}
+.add .wide { grid-column: span 2; }
+.add .fsec { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; margin: 6px 0 -4px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.add .fsec:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.add .fsec span { font-size: 12.5px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--faint); }
 .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 .tile {
-  display: grid; justify-items: center; align-content: center; gap: 8px; min-height: 96px; padding: 12px 8px; border-radius: var(--radius);
-  border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow-sm); cursor: pointer; text-align: center;
+  display: grid; justify-items: center; align-content: center; gap: 10px; min-height: 104px; padding: 14px 8px; border-radius: var(--radius);
+  border: 1px solid var(--line); background: var(--surface); cursor: pointer; text-align: center;
   font-size: 13.5px; font-weight: 600; transition: border-color .15s, background-color .15s;
 }
 .tile .ic { width: 26px; height: 26px; }
@@ -272,28 +292,37 @@ select.input { padding-right: 8px; }
 .cam-shot:active { transform: scale(.94); }
 body.cam-open { overflow: hidden; }
 
-/* Overzicht: gesegmenteerde keuze, zoeken en filters */
-.overview { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.tools { display: flex; flex-wrap: wrap; flex: 1 1 420px; justify-content: flex-end; gap: 8px; min-width: 0; }
-.tabs { display: inline-flex; max-width: 100%; overflow-x: auto; padding: 4px; gap: 4px; border-radius: 12px; background: var(--sunken); border: 1px solid var(--line); }
+/* Overzicht: zoeken (of een vraag stellen), filters achter één knop, en Alle / Met actie / Archief */
+.overview { position: relative; display: grid; gap: 10px; }
+.searchrow { display: flex; gap: 8px; }
+.searchrow .searchbox { flex: 1 1 auto; }
+.filterbtn { flex: none; min-height: 48px; border-radius: 14px; gap: 8px; }
+.filterbtn .badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--brand); color: var(--brand-ink); font: 700 11.5px/20px var(--f-body); }
+.filterbtn[aria-expanded="true"] .badge { background: var(--brand); }
+@media (max-width: 420px) { .filterbtn span:not(.badge) { display: none; } .filterbtn { padding: 0 14px; } }
+/* Voorbeeldvragen zweven onder de zoekbalk, zodat de lijst niet verspringt als ze verdwijnen. */
+.overview .askex { display: none; }
+.overview:has(.search:focus:placeholder-shown) .askex { display: grid; }
+.askex { position: absolute; z-index: 6; top: 56px; left: 0; right: 0; gap: 4px; padding: 10px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 14px 40px rgba(0, 0, 0, .14); }
+.askex-kop { padding: 4px 8px 6px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.askex .chip { justify-content: flex-start; gap: 10px; width: 100%; min-height: 44px; padding: 8px 10px; border: 0; border-radius: 10px; background: transparent; white-space: normal; text-align: left; font-size: 14.5px; }
+.askex .chip:hover { background: var(--sunken); }
+.askex .chip .ic { flex: none; color: var(--muted); }
+.filterpanel { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; align-items: end; padding: 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.filterpanel .pactions { grid-column: 1 / -1; }
+.flabel { font-size: 13px; font-weight: 600; color: var(--muted); }
+.buurtbtn { width: 100%; justify-content: flex-start; }
+.activefilters .chip.on { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); font-weight: 600; min-height: 34px; }
+.activefilters .chip span { opacity: .7; font-size: 16px; line-height: 1; }
+.tabs { display: flex; width: 100%; max-width: 520px; overflow-x: auto; padding: 4px; gap: 4px; border-radius: 14px; background: var(--sunken); border: 1px solid var(--line); }
 .tab {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 0 14px; border: 0; border-radius: 9px;
+  display: inline-flex; flex: 1 1 0; align-items: center; justify-content: center; gap: 7px; min-height: 38px; padding: 0 12px; border: 0; border-radius: 10px;
   background: transparent; font-weight: 600; font-size: 14px; color: var(--muted); cursor: pointer; white-space: nowrap;
 }
 .tab:hover { color: var(--ink); }
 .tab[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
-.tab .n, .chip .n { font: 500 12px/1 var(--f-mono); font-variant-numeric: tabular-nums; opacity: .75; }
-.branchesel { flex: 0 1 200px; min-width: 0; }
-.branchesel.on { border-color: var(--brand); box-shadow: 0 0 0 2px rgba(255, 212, 0, .3); }
+.tab .n, .chip .n { font: 500 12px/1 var(--f-mono); font-variant-numeric: tabular-nums; opacity: .7; }
 .hint.links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
-@media (max-width: 640px) {
-  .tabs { display: flex; width: 100%; }
-  .tab { flex: 1 1 0; padding: 0 8px; }
-  .tools { flex-basis: 100%; }
-  .searchbox { flex-basis: 100%; }
-  .branchesel { flex: 1 1 0; }
-  .tools .btn { flex: 1 1 0; }
-}
 .filters { display: grid; gap: 8px; }
 .chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .chip {
@@ -313,106 +342,139 @@ body.cam-open { overflow: hidden; }
 .chip-x:hover { color: var(--danger); background: var(--danger-soft); }
 .sep { width: 1px; height: 22px; background: var(--line-strong); margin: 0 2px; }
 
-/* Lijst */
-.list { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-.cols { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr) minmax(0, 1.3fr) minmax(0, 1.1fr) 210px; gap: 16px; align-items: center; }
-.list-head { padding: 10px 18px; border-bottom: 1px solid var(--line); background: var(--sunken); }
-.list-head span { font-size: 12px; font-weight: 600; color: var(--muted); }
+/* Lijst: één rustige regel per bedrijf */
+.list { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 #rows > * + * { border-top: 1px solid var(--line); }
-.group-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 10px 18px; background: var(--sunken); font-size: 13px; font-weight: 700; color: var(--ink); }
-.group-head::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); flex: none; }
+.group-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 12px 18px 10px; background: var(--sunken); font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.group-head::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--brand); flex: none; }
 .group-head.quiet::before { background: var(--line-strong); }
-.group-head .n { font: 500 12px/1 var(--f-mono); color: var(--muted); }
-.route { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink); text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; }
-.row-main { padding: 14px 18px; min-height: 64px; cursor: pointer; transition: background-color .12s; }
-.row-main:hover, .row.open > .row-main { background: var(--sunken); }
+.group-head .n { font: 500 12px/1 var(--f-mono); letter-spacing: 0; color: var(--faint); }
+.route { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--ink); text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.row-main { display: flex; align-items: center; gap: 14px; padding: 15px 18px; cursor: pointer; transition: background-color .12s; }
+.row-main:hover { background: var(--sunken); }
+.row.open > .row-main { background: var(--brand-soft); }
 .row.current { box-shadow: inset 4px 0 0 var(--brand); }
-.cell { min-width: 0; }
-.first { display: flex; align-items: flex-start; gap: 12px; }
-.first .sel { margin-top: 2px; }
-.bedrijf { display: grid; gap: 2px; justify-items: start; min-width: 0; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 4px; }
-.bedrijf .name { font-size: 16px; line-height: 1.25; font-weight: 700; letter-spacing: -.01em; overflow-wrap: anywhere; }
-.bedrijf .sub { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.row-main .sel { flex: none; }
+.bedrijf { flex: 1 1 auto; display: grid; gap: 4px; justify-items: start; min-width: 0; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 4px; }
+.bedrijf .name { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 16.5px; line-height: 1.25; font-weight: 650; letter-spacing: -.012em; overflow-wrap: anywhere; }
+.bedrijf .name > span { margin-left: 0; vertical-align: 0; }
+.r-when { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; }
+.r-actie { font-weight: 600; }
 .row.nomail .bedrijf .name { color: var(--faint); }
-.meta { font-size: 12.5px; line-height: 1.35; color: var(--faint); overflow-wrap: anywhere; }
+.meta { font-size: 13px; line-height: 1.4; color: var(--faint); overflow-wrap: anywhere; }
+@media (min-width: 900px) {
+  .bedrijf { grid-template-columns: minmax(0, 1fr) minmax(220px, 34%); grid-template-areas: "name when" "meta when"; column-gap: 24px; align-items: center; }
+  .bedrijf .name { grid-area: name; }
+  .bedrijf .r-when { grid-area: when; justify-self: start; }
+  .bedrijf .meta { grid-area: meta; }
+  .acts { min-width: 124px; }
+}
 .tag { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; border: 1px dashed var(--line-strong); font-size: 11px; font-weight: 600; color: var(--muted); vertical-align: 2px; }
-.plaats { display: grid; gap: 2px; overflow-wrap: anywhere; }
-.contactinfo { display: grid; gap: 4px; justify-items: start; }
-.pick { max-width: 100%; cursor: copy; font-size: 14px; overflow-wrap: anywhere; border-bottom: 1px dashed transparent; -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+.pick { max-width: 100%; cursor: copy; overflow-wrap: anywhere; border-bottom: 1px dashed transparent; -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
 .pick:hover { border-bottom-color: var(--faint); }
-.pick.mono { font-family: var(--f-mono); font-size: 13.5px; font-variant-numeric: tabular-nums; }
-.telline { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.pick.mono { font-family: var(--f-mono); font-size: .95em; font-variant-numeric: tabular-nums; }
 .call, .wa, .qmail {
-  display: none; align-items: center; justify-content: center; gap: 6px; min-height: 34px; padding: 0 14px; border-radius: 999px;
-  font-size: 13.5px; font-weight: 700; text-decoration: none; white-space: nowrap; border: 0; cursor: pointer;
+  display: none; align-items: center; justify-content: center; gap: 6px; min-height: 38px; padding: 0 16px; border-radius: 999px;
+  font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; border: 0; cursor: pointer;
 }
 .call { background: var(--brand); color: var(--brand-ink); }
 .call:hover { background: var(--brand-hover); }
-.wa { display: inline-flex; background: var(--ok-soft); color: var(--ok); padding: 0 12px; }
-.call .ic, .wa .ic { width: 16px; height: 16px; }
-.call.big, .wa.big { display: inline-flex; min-height: 50px; padding: 0 22px; font-size: 16px; }
+.call.round { width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; }
+.call.round span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.call.round .ic { width: 19px; height: 19px; }
+.wa { display: inline-flex; background: var(--ok-soft); color: var(--ok); padding: 0 14px; }
+.call .ic, .wa .ic { width: 17px; height: 17px; }
+.call.big, .wa.big { display: inline-flex; min-height: 52px; padding: 0 24px; font-size: 16px; }
 .call.big .ic, .wa.big .ic { width: 20px; height: 20px; }
-@media (pointer: coarse) { .call { display: inline-flex; } .wa:not(.big) .lbl { display: none; } .wa:not(.big) { width: 34px; padding: 0; } }
-.callbox { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 12px 14px; border-radius: 12px; background: var(--brand-soft); }
-.callbox .pick { flex-basis: 100%; font: 600 22px/1.25 var(--f-mono); font-variant-numeric: tabular-nums; }
+@media (pointer: coarse) { .call { display: inline-flex; } }
+.callbox { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 16px; border-radius: 16px; background: var(--brand-soft); }
+.callbox .pick { flex-basis: 100%; font: 600 24px/1.25 var(--f-mono); font-variant-numeric: tabular-nums; }
 .touch-only { display: none; }
 @media (pointer: coarse) { .touch-only { display: inline; } .notice.touch-only { display: flex; } .mouse-only { display: none; } }
-.actie { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
-.atag { display: inline-flex; align-items: center; min-height: 26px; padding: 0 10px; border-radius: 999px; border: 0; cursor: pointer; background: var(--sunken); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); font-size: 13px; font-weight: 600; max-width: 100%; overflow-wrap: anywhere; text-align: left; }
-.atag:hover { box-shadow: inset 0 0 0 1px var(--faint); }
-.due { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 999px; white-space: nowrap; font-size: 12.5px; font-weight: 600; color: var(--muted); background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.due { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; white-space: nowrap; font-size: 12.5px; font-weight: 600; color: var(--muted); background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); }
 .due.late { background: var(--danger-soft); color: var(--danger); box-shadow: none; }
 .due.today { background: var(--brand); color: var(--brand-ink); box-shadow: none; }
-.acts { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
-.acts .btn.small { box-shadow: none; }
-.more { width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--muted); cursor: pointer; flex: none; }
-.more:hover { background: var(--line); }
-.chev { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .15s; }
-.row.open .chev { transform: translateY(2px) rotate(-135deg); }
+.acts { flex: none; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+@media (max-width: 560px) {
+  .acts .btn.small { width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; }
+  .acts .btn.small span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .acts .btn.small .ic { width: 19px; height: 19px; }
+}
 .prio { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1.5; vertical-align: 2px; }
 .prio.hoog { background: var(--danger-soft); color: var(--danger); }
 .prio.laag { background: var(--sunken); color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); }
-.dist { margin-left: 4px; padding: 1px 8px; border-radius: 999px; background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); font-size: 12px; font-weight: 600; white-space: nowrap; }
-@media (max-width: 760px) {
-  .list-head { display: none; }
-  .row-main { padding: 14px 16px; }
-  .row-main.cols { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; grid-template-areas: "first first" "plaats plaats" "contact contact" "actie acts"; }
-  .row-main .first { grid-area: first; }
-  .row-main .plaats { grid-area: plaats; color: var(--muted); font-size: 14px; }
-  .row-main .contactinfo { grid-area: contact; }
-  .row-main .actie { grid-area: actie; margin-top: 2px; }
-  .row-main .acts { grid-area: acts; margin-top: 2px; }
-  .row-main .more, .row-main .cell.none { display: none; }
-}
+.dist { padding: 1px 8px; border-radius: 999px; background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.answer-head { display: flex; align-items: flex-start; gap: 10px; padding: 14px 18px; background: var(--brand-soft); color: var(--brand-soft-ink); font-weight: 600; font-size: 14.5px; }
+.answer-head .ic { margin-top: 2px; }
 
-/* Detail en afronden */
-.panel { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 20px 28px; padding: 8px 18px 22px; background: var(--sunken); }
-.pform { display: grid; gap: 14px; min-width: 0; }
+/* Bedrijfspagina: eigen scherm op de telefoon, paneel rechts op de computer */
+body.sheet-open { overflow: hidden; }
+.sheet-backdrop { position: fixed; inset: 0; z-index: 30; background: rgba(10, 11, 12, .42); }
+.sheet { position: fixed; inset: 0; z-index: 31; overflow-y: auto; overscroll-behavior: contain; background: var(--bg); -webkit-overflow-scrolling: touch; }
+@media (min-width: 900px) {
+  .sheet { left: auto; width: min(660px, 100vw); border-left: 1px solid var(--line); box-shadow: -24px 0 60px rgba(0, 0, 0, .16); }
+}
+@media (max-width: 899.98px) { .sheet-backdrop { display: none; } }
+.sheet-head { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 12px;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px));
+  background: color-mix(in srgb, var(--bg) 90%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(14px); backdrop-filter: saturate(1.4) blur(14px); border-bottom: 1px solid var(--line); }
+.iconbtn { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.iconbtn:hover { border-color: var(--line-strong); }
+.sh-title { min-width: 0; }
+.sh-title h2 { margin: 0; font-size: 19px; line-height: 1.2; font-weight: 700; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.sh-title p { margin: 2px 0 0; font-size: 13.5px; color: var(--muted); overflow-wrap: anywhere; }
+.sheet-body { display: grid; gap: 14px; max-width: 660px; margin: 0 auto; padding: 16px max(16px, env(safe-area-inset-right, 0px)) calc(40px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+body.sessie .sheet-body { padding-bottom: 150px; }
+.quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(68px, 1fr)); gap: 10px; }
+.qa { display: grid; justify-items: center; gap: 6px; padding: 14px 6px 12px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); text-decoration: none; font-size: 12.5px; font-weight: 600; }
+.qa .ic { width: 22px; height: 22px; }
+.qa:hover { border-color: var(--line-strong); }
+.qa-call { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.qa-call:hover { background: var(--brand-hover); }
+.nextbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.nb-text { display: grid; gap: 4px; min-width: 0; }
+.nb-text strong { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 17px; font-weight: 650; letter-spacing: -.01em; }
+.stabs { position: sticky; top: calc(69px + env(safe-area-inset-top, 0px)); z-index: 2; display: flex; gap: 2px; padding: 4px; overflow-x: auto; border-radius: 14px; background: var(--sunken); border: 1px solid var(--line); }
+.stab { flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 38px; padding: 0 7px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-weight: 600; font-size: 14px; white-space: nowrap; cursor: pointer; }
+.stab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+.stab .n { font: 500 12px/1 var(--f-mono); opacity: .7; }
+.stab-body { display: grid; gap: 14px; }
+.scard { display: grid; gap: 14px; min-width: 0; padding: 18px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.scard-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.scard-head .linkbtn { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+.scard-head .linkbtn .ic { width: 16px; height: 16px; }
+.infolist { display: grid; gap: 12px; margin: 0; }
+.infolist > div { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.infolist dt { font-size: 13px; color: var(--muted); }
+.infolist dd { margin: 0; font-size: 15px; overflow-wrap: anywhere; }
+.infolist a { color: inherit; text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+@media (max-width: 420px) { .infolist > div { grid-template-columns: minmax(0, 1fr); gap: 1px; } }
+.note { display: grid; gap: 6px; padding-top: 12px; border-top: 1px solid var(--line); }
+.note p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.pform .slabel + .pgrid, .pform .slabel + .field { margin-top: -4px; }
+.pform .pactions { margin-top: 4px; }
 .pgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .span2 { grid-column: span 2; } .span4 { grid-column: 1 / -1; }
-.log { display: grid; gap: 10px; align-content: start; min-width: 0; padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
-.log h3 { margin: 0; font-size: 13px; font-weight: 700; }
-.log ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-.log li { display: grid; gap: 1px; overflow-wrap: anywhere; padding-left: 12px; border-left: 2px solid var(--line); }
+@media (max-width: 560px) { .pgrid { grid-template-columns: minmax(0, 1fr); } .pgrid > * { grid-column: 1 / -1; } .pform .pactions .btn { flex: 1; min-height: 50px; } }
+.more-actions .pactions .btn { flex: 1 1 calc(50% - 4px); }
+.log ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.log li { display: grid; gap: 1px; overflow-wrap: anywhere; padding-left: 14px; border-left: 2px solid var(--line); }
 .log time { font-size: 12px; color: var(--faint); font-weight: 600; }
 .log .t { color: var(--muted); font-size: 14px; }
-.log .none { margin: 0; font-size: 13.5px; color: var(--faint); }
-.finish { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 28px; padding: 8px 18px 22px; background: var(--sunken); }
-.step { display: grid; gap: 12px; align-content: start; min-width: 0; }
-.step h3 { margin: 0; font-size: 16px; font-weight: 700; }
+.log .none { margin: 0; font-size: 14px; color: var(--faint); }
+.finish { display: grid; gap: 14px; }
+.step { display: grid; gap: 12px; align-content: start; min-width: 0; padding: 18px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.step h3 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -.015em; }
 .step h3 .faint { font-weight: 500; }
 .outcomes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.oc { min-height: 46px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface); font-size: 14.5px; font-weight: 600; cursor: pointer; box-shadow: var(--shadow-sm); }
+.oc { min-height: 50px; padding: 0 14px; border-radius: 14px; border: 1px solid var(--line-strong); background: var(--surface); font-size: 15px; font-weight: 600; cursor: pointer; }
 .oc:hover { border-color: var(--faint); }
 .oc[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
-.suggest { margin: 4px 0 0; padding: 10px 12px; border-left: 4px solid var(--brand); border-radius: 0 10px 10px 0; background: var(--surface); font-size: 14px; }
-.finish .pactions { grid-column: 1 / -1; }
-.finish .pactions .btn.primary { min-width: 180px; }
-@media (max-width: 860px) { .panel { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 760px) { .finish { grid-template-columns: minmax(0, 1fr); } .finish .pactions .btn { flex: 1; min-height: 48px; } }
-@media (max-width: 560px) { .pgrid { grid-template-columns: minmax(0, 1fr); } .pgrid > * { grid-column: 1 / -1; } .panel .pactions .btn { flex: 1 1 calc(50% - 4px); } }
-.sess-start { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); background: var(--brand-soft); }
-.sess-start .hint { margin: 0; flex: 1 1 200px; color: var(--brand-soft-ink); }
+.suggest { margin: 4px 0 0; padding: 10px 12px; border-left: 3px solid var(--brand); border-radius: 0 12px 12px 0; background: var(--sunken); font-size: 14px; }
+.finish .pactions .btn { flex: 1; min-height: 50px; }
+.sess-start { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 16px 18px; background: var(--appbar); color: var(--appbar-ink); }
+.sess-start .hint { margin: 0; flex: 1 1 200px; color: var(--appbar-muted); }
+.sess-start .btn.primary { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
 
 /* Kaart */
 .kaart { display: grid; gap: 10px; padding: 10px; }
@@ -539,6 +601,8 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 .selbar .count { margin-right: auto; font-weight: 600; }
 .selbar .hint { color: var(--appbar-muted); }
 .selbar .btn.primary { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.sessbar { z-index: 32; }
+body.sheet-open .sessbar { bottom: 0; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
 
 .empty { display: grid; gap: 10px; justify-items: center; padding: 44px 16px; text-align: center; color: var(--muted); }
 .empty strong { color: var(--ink); font-size: 17px; font-weight: 700; }
@@ -582,10 +646,9 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .linkbtn.vlink .ic { width: 16px; height: 16px; }
 
 /* Voorbereiding bovenaan een geopend bedrijf */
-.panel > .prep, .panel > .verslagen { grid-column: 1 / -1; }
-.prep { display: grid; gap: 10px; padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--brand); }
+.prep { display: grid; gap: 12px; padding: 18px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); box-shadow: inset 4px 0 0 var(--brand); }
 .prep-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
-.prep-head h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 700; }
+.prep-head h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
 .prep-head h3 .ic { width: 18px; height: 18px; color: var(--brand-soft-ink); }
 .psum { margin: 0; font-size: 15px; }
 .pfacts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 20px; margin: 0; }
@@ -597,9 +660,9 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .mtag { display: inline-block; margin: 1px 4px 1px 0; padding: 1px 8px; border-radius: 999px; background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); font-size: 12.5px; font-weight: 600; }
 
 /* Klantverslagen */
-.verslagen { display: grid; gap: 12px; align-content: start; min-width: 0; padding: 14px 16px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.verslagen { display: grid; gap: 14px; align-content: start; min-width: 0; padding: 18px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
 .vhead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
-.vhead h3 { margin: 0; font-size: 15px; font-weight: 700; }
+.vhead h3 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
 .vhead h3 .n { font: 500 12px/1 var(--f-mono); color: var(--muted); }
 .vlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
 .verslag { display: grid; gap: 6px; padding: 10px 0 0 12px; border-left: 2px solid var(--line); }
@@ -611,7 +674,9 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .vdel:hover { color: var(--danger); background: var(--danger-soft); }
 .vdel.armed { background: var(--danger); color: #fff; font-weight: 600; }
 .vtekst { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; }
-.vfact { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+.vfact { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 8px; align-items: baseline; margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+.vfact .vv { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; min-width: 0; }
+.vfact .mtag { margin: 0; }
 .vk { display: inline-block; min-width: 86px; margin-right: 6px; font-size: 12px; font-weight: 700; color: var(--muted); }
 .vq { font-size: 14px; }
 .veditor { display: grid; gap: 12px; padding: 14px; border-radius: 12px; background: var(--sunken); border: 1px solid var(--line); }
@@ -619,7 +684,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .vgrid > .span2 { grid-column: 1 / -1; }
 @media (max-width: 520px) {
   .vgrid { grid-template-columns: minmax(0, 1fr); }
-  .panel > .prep, .panel > .verslagen { padding: 12px; }
   .veditor { padding: 12px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; }
 }
 .vlabel { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
@@ -632,19 +696,9 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .vplan { display: grid; gap: 10px; padding-top: 4px; border-top: 1px dashed var(--line-strong); }
 .vplan .hint .ic { width: 14px; height: 14px; vertical-align: -2px; }
 
-/* Vraag het Leadnex */
-.page-head #askBtn { flex: none; }
-.ask .card-head h2, #dupPanel .card-head h2 { display: flex; align-items: center; gap: 8px; }
-.ask .card-head .ic, #dupPanel .card-head .ic { width: 20px; height: 20px; }
-.askform { display: flex; gap: 8px; }
-.askform .input { flex: 1 1 auto; min-width: 0; }
-.askform .btn { flex: none; }
-.answer { display: grid; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--sunken); }
-.answer > p { margin: 0; }
-.askhits { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.askhits li { display: grid; gap: 1px; }
-.askhits .linkbtn { justify-self: start; font-size: 15px; text-align: left; }
-.ask .chips .chip { white-space: normal; text-align: left; }
+/* Antwoorden en dubbele bedrijven */
+#dupPanel .card-head h2 { display: flex; align-items: center; gap: 8px; }
+#dupPanel .card-head .ic { width: 20px; height: 20px; }
 
 /* Dubbele bedrijven */
 .duplist { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
@@ -712,7 +766,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 
   <!-- Vandaag -->
   <div class="page-head" data-show="vandaag">
-    <div><h2>Vandaag</h2><p class="sub" id="todayLong"></p></div>
+    <div><h2 id="greet">Vandaag</h2><p class="sub" id="todayLong"></p></div>
   </div>
   <div class="stats" id="stats" data-show="vandaag"></div>
   <p id="summary">Lijst laden…</p>
@@ -720,9 +774,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   <!-- Bedrijven -->
   <div class="page-head" data-show="bedrijven">
     <div><h2>Bedrijven</h2><p class="sub" id="bedrijvenSub"></p></div>
-    <button type="button" class="btn" id="askBtn" aria-expanded="false"><i data-ic="message-circle-question"></i>Vraag het Leadnex</button>
+    <button type="button" class="btn" id="mailBtn" hidden>Mail versturen</button>
   </div>
-  <section class="card ask" id="askPanel" aria-label="Vraag over je klantverslagen" hidden></section>
   <div class="notice" id="dupNotice" hidden><p><span></span></p><div class="btns"><button type="button" class="btn small" id="dupNoticeGo">Bekijken</button><button type="button" class="btn small ghost" id="dupNoticeHide">Verbergen</button></div></div>
   <!-- Kaart -->
   <div class="page-head" data-show="kaart">
@@ -730,16 +783,20 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   </div>
 
   <div class="overview" data-show="bedrijven kaart">
-    <div class="tabs" id="tabs" aria-label="Welke bedrijven"></div>
-    <div class="tools">
-      <label class="searchbox"><span class="sr">Zoeken</span><i data-ic="search"></i><input class="input search" id="search" type="search" placeholder="Zoek op bedrijf, naam, plaats of telefoon"></label>
-      <select class="input branchesel" id="brancheSel" aria-label="Branche" hidden></select>
-      <select class="input branchesel" id="statusSel" aria-label="Lead of klant" hidden></select>
-      <button type="button" class="btn buurtbtn" id="buurtBtn" aria-pressed="false" hidden>In de buurt</button>
-      <button type="button" class="btn" id="mailBtn" hidden>Mail versturen</button>
+    <div class="searchrow">
+      <label class="searchbox"><span class="sr">Zoeken of een vraag stellen</span><i data-ic="search"></i><input class="input search" id="search" type="search" enterkeyhint="search" autocomplete="off" placeholder="Zoek een bedrijf of stel een vraag"></label>
+      <button type="button" class="btn filterbtn" id="filterBtn" aria-expanded="false" aria-controls="filterPanel"><i data-ic="sliders-horizontal"></i><span>Filters</span></button>
     </div>
+    <div class="askex chips" id="askEx" aria-label="Voorbeeldvragen"></div>
+    <section class="filterpanel" id="filterPanel" aria-label="Filters" hidden>
+      <div class="field" id="brancheField"><label for="brancheSel">Branche</label><select class="input" id="brancheSel"></select></div>
+      <div class="field"><label for="statusSel">Soort relatie</label><select class="input" id="statusSel"></select></div>
+      <div class="field" id="buurtField"><span class="flabel">Afstand</span><button type="button" class="btn buurtbtn" id="buurtBtn" aria-pressed="false">In de buurt</button></div>
+      <div class="pactions"><button type="button" class="btn primary" id="filterDone">Klaar</button><button type="button" class="btn ghost" id="filterClear">Filters wissen</button></div>
+    </section>
+    <div class="tabs" id="tabs" aria-label="Welke bedrijven"></div>
+    <div class="chips activefilters" id="activeFilters" hidden></div>
   </div>
-
   <p class="hint buurt-status" id="buurtStatus" role="status" hidden></p>
   <div class="filters" id="filters" hidden>
     <div class="chips" id="chips" aria-label="Filter op actie"></div>
@@ -755,7 +812,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   <section class="card" id="mailPanel" aria-label="Mail versturen" hidden></section>
 
   <section class="list" id="listSection" aria-label="Bedrijven" data-show="vandaag bedrijven kaart">
-    <div class="list-head cols" aria-hidden="true"><span>Bedrijf</span><span>Plaats</span><span>Telefoon en e-mail</span><span>Actie</span><span></span></div>
     <div id="rows"><div class="empty"><p>Lijst laden…</p></div></div>
   </section>
 
@@ -773,52 +829,54 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   <p class="hint" id="scanMsg" data-show="nieuw">Scan een visitekaartje, of kopieer een bedrijf in Google Maps of Chrome en tik op Plakken.</p>
   <div class="scanlines" id="scanLines" hidden></div>
   <form class="add" id="addForm" autocomplete="off" novalidate>
-    <div class="field">
+    <p class="fsec">Bedrijf en contact <span>Alleen de bedrijfsnaam is verplicht</span></p>
+    <div class="field wide">
       <label for="addBedrijf">Bedrijfsnaam</label>
       <input class="input" id="addBedrijf" maxlength="120" placeholder="Bijv. Drukkerij De Vries">
     </div>
     <div class="field">
-      <label for="addContact">Contactpersoon<span class="opt">optioneel</span></label>
+      <label for="addContact">Contactpersoon</label>
       <input class="input" id="addContact" maxlength="120" placeholder="Naam">
     </div>
     <div class="field">
-      <label for="addEmail">E-mailadres<span class="opt">optioneel</span></label>
-      <input class="input" id="addEmail" type="email" maxlength="120" placeholder="naam@bedrijf.nl">
-    </div>
-    <div class="field">
-      <label for="addTelefoon">Telefoonnummer<span class="opt">optioneel</span></label>
+      <label for="addTelefoon">Telefoonnummer</label>
       <input class="input" id="addTelefoon" type="tel" maxlength="40" placeholder="Bijv. 06 12345678">
     </div>
     <div class="field">
-      <label for="addAdres">Adres<span class="opt">optioneel</span></label>
+      <label for="addEmail">E-mailadres</label>
+      <input class="input" id="addEmail" type="email" maxlength="120" placeholder="naam@bedrijf.nl">
+    </div>
+    <div class="field">
+      <label for="addAdres">Adres</label>
       <input class="input" id="addAdres" maxlength="120" placeholder="Straat en huisnummer">
     </div>
     <div class="field">
-      <label for="addPlaats">Plaats<span class="opt">optioneel</span></label>
+      <label for="addPlaats">Plaats</label>
       <input class="input" id="addPlaats" list="plaatsLijst" maxlength="60" placeholder="Bijv. Zwolle">
     </div>
     <div class="field">
-      <label for="addBranche">Branche<span class="opt">optioneel</span></label>
+      <label for="addBranche">Branche</label>
       <input class="input" id="addBranche" list="brancheLijst" maxlength="60" placeholder="Bijv. Installatietechniek">
     </div>
     <div class="field">
-      <label for="addWebsite">Website<span class="opt">optioneel</span></label>
+      <label for="addWebsite">Website</label>
       <input class="input" id="addWebsite" type="url" inputmode="url" maxlength="120" placeholder="www.bedrijf.nl">
     </div>
+    <p class="fsec">Volgende stap</p>
     <div class="field">
-      <label for="addActie">Actie<span class="opt">optioneel</span></label>
+      <label for="addActie">Actie</label>
       <input class="input" id="addActie" list="actieLijst" maxlength="40" placeholder="Kies of typ, bijv. Bezoek">
     </div>
-    <div class="field">
+    <div class="field pair">
       <label for="addPrio">Prioriteit</label>
       <select class="input" id="addPrio"><option value="hoog">Hoog</option><option value="normaal" selected>Normaal</option><option value="laag">Laag</option></select>
     </div>
-    <div class="field">
-      <label for="addStatus">Status</label>
+    <div class="field pair">
+      <label for="addStatus">Soort relatie</label>
       <select class="input" id="addStatus"><option value="lead" selected>Lead</option><option value="prospect">Potentiële klant</option><option value="klant">Klant</option></select>
     </div>
     <div class="field span-when">
-      <label for="addDatum">Wanneer<span class="opt">optioneel</span></label>
+      <label for="addDatum">Wanneer</label>
       <div id="addWhen"></div>
     </div>
     <div class="dupwarn" id="dupWarn" hidden></div>
@@ -899,6 +957,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     <button type="button" class="btn on-band" id="camTorch" aria-pressed="false" hidden>Lamp</button>
   </div>
 </div>
+<div class="sheet-backdrop" id="detailBackdrop" hidden></div>
+<div class="sheet" id="detail" role="dialog" aria-modal="true" aria-labelledby="detailTitle" hidden></div>
 <div class="selbar" id="selBar" hidden><div class="gutter selbar-inner" id="selInner"></div></div>
 <div class="selbar sessbar" id="sessBar" hidden><div class="gutter selbar-inner" id="sessInner"></div></div>
 </div>
@@ -958,7 +1018,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 
   const $ = id => document.getElementById(id);
   // Pictogrammen: Lucide (ISC-licentie), alleen de vormen die de app gebruikt.
-  const ICONS = {"phone": "<path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "mail": "<path d=\"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7\" /> <rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" />", "message-circle": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "navigation": "<polygon points=\"3 11 22 2 13 21 11 13 3 11\" />", "calendar-check": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"m9 15 2 2 4-4\" />", "calendar": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "list": "<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "ellipsis": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />", "settings": "<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "camera": "<path d=\"M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z\" /> <circle cx=\"12\" cy=\"13\" r=\"3\" />", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <circle cx=\"9\" cy=\"9\" r=\"2\" /> <path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\" />", "clipboard-paste": "<path d=\"M11 14h10\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v1.344\" /> <path d=\"m17 18 4-4-4-4\" /> <path d=\"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113\" /> <rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" />", "search": "<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "upload": "<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />", "download": "<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />", "archive": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />", "archive-restore": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h2\" /> <path d=\"M20 8v11a2 2 0 0 1-2 2h-2\" /> <path d=\"m9 15 3-3 3 3\" /> <path d=\"M12 12v9\" />", "trash-2": "<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "log-out": "<path d=\"m16 17 5-5-5-5\" /> <path d=\"M21 12H9\" /> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 6v6l4 2\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /> <path d=\"m21.854 2.147-10.94 10.939\" />", "scan-line": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\" /> <path d=\"M17 3h2a2 2 0 0 1 2 2v2\" /> <path d=\"M21 17v2a2 2 0 0 1-2 2h-2\" /> <path d=\"M7 21H5a2 2 0 0 1-2-2v-2\" /> <path d=\"M7 12h10\" />", "contact": "<path d=\"M16 2v2\" /> <path d=\"M7 21v-2a2 2 0 012-2h6a2 2 0 012 2v2\" /> <path d=\"M8 2v2\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />", "house": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "flashlight": "<path d=\"M12 13v1\" /> <path d=\"M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z\" /> <path d=\"M6 6h12\" />", "locate-fixed": "<line x1=\"2\" x2=\"5\" y1=\"12\" y2=\"12\" /> <line x1=\"19\" x2=\"22\" y1=\"12\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"5\" /> <line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\" /> <circle cx=\"12\" cy=\"12\" r=\"7\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "file-spreadsheet": "<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M8 13h2\" /> <path d=\"M14 13h2\" /> <path d=\"M8 17h2\" /> <path d=\"M14 17h2\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "wifi-off": "<path d=\"M12 20h.01\" /> <path d=\"M8.5 16.429a5 5 0 0 1 7 0\" /> <path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\" /> <path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\" /> <path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\" /> <path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\" /> <path d=\"m2 2 20 20\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m16 9-5.5 5.5L8 12\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "layout-list": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" /> <path d=\"M14 4h7\" /> <path d=\"M14 9h7\" /> <path d=\"M14 15h7\" /> <path d=\"M14 20h7\" />", "list-checks": "<path d=\"M13 5h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" />", "mail-plus": "<path d=\"M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8\" /> <path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" /> <path d=\"M19 16v6\" /> <path d=\"M16 19h6\" />", "phone-call": "<path d=\"M13 2a9 9 0 0 1 9 9\" /> <path d=\"M13 6a5 5 0 0 1 5 5\" /> <path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />", "mic": "<path d=\"M12 19v3\" /> <path d=\"M19 10v2a7 7 0 0 1-14 0v-2\" /> <rect x=\"9\" y=\"2\" width=\"6\" height=\"13\" rx=\"3\" />", "square": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" />", "merge": "<path d=\"m8 6 4-4 4 4\" /> <path d=\"M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22\" /> <path d=\"m20 22-5-5\" />", "history": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" /> <path d=\"M12 7v5l4 2\" />", "notebook-pen": "<path d=\"M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4\" /> <path d=\"M2 6h4\" /> <path d=\"M2 10h4\" /> <path d=\"M2 14h4\" /> <path d=\"M2 18h4\" /> <path d=\"M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z\" />", "message-circle-question": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" /> <path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\" /> <path d=\"M12 17h.01\" />", "refresh-cw": "<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\" /> <path d=\"M21 3v5h-5\" /> <path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\" /> <path d=\"M8 16H3v5\" />", "alarm-clock": "<circle cx=\"12\" cy=\"13\" r=\"8\" /> <path d=\"M12 9v4l2 2\" /> <path d=\"M5 3 2 6\" /> <path d=\"m22 6-3-3\" /> <path d=\"M6.38 18.7 4 21\" /> <path d=\"M17.64 18.67 20 21\" />", "navigation-2": "<polygon points=\"12 2 19 21 12 17 5 21 12 2\" />", "copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\" /> <path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\" />"};
+  const ICONS = {"phone": "<path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "mail": "<path d=\"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7\" /> <rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" />", "message-circle": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "navigation": "<polygon points=\"3 11 22 2 13 21 11 13 3 11\" />", "calendar-check": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"m9 15 2 2 4-4\" />", "calendar": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "list": "<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "ellipsis": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />", "settings": "<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "camera": "<path d=\"M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z\" /> <circle cx=\"12\" cy=\"13\" r=\"3\" />", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <circle cx=\"9\" cy=\"9\" r=\"2\" /> <path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\" />", "clipboard-paste": "<path d=\"M11 14h10\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v1.344\" /> <path d=\"m17 18 4-4-4-4\" /> <path d=\"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113\" /> <rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" />", "search": "<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "upload": "<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />", "download": "<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />", "archive": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />", "archive-restore": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h2\" /> <path d=\"M20 8v11a2 2 0 0 1-2 2h-2\" /> <path d=\"m9 15 3-3 3 3\" /> <path d=\"M12 12v9\" />", "trash-2": "<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "log-out": "<path d=\"m16 17 5-5-5-5\" /> <path d=\"M21 12H9\" /> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 6v6l4 2\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /> <path d=\"m21.854 2.147-10.94 10.939\" />", "scan-line": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\" /> <path d=\"M17 3h2a2 2 0 0 1 2 2v2\" /> <path d=\"M21 17v2a2 2 0 0 1-2 2h-2\" /> <path d=\"M7 21H5a2 2 0 0 1-2-2v-2\" /> <path d=\"M7 12h10\" />", "contact": "<path d=\"M16 2v2\" /> <path d=\"M7 21v-2a2 2 0 012-2h6a2 2 0 012 2v2\" /> <path d=\"M8 2v2\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />", "house": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "flashlight": "<path d=\"M12 13v1\" /> <path d=\"M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z\" /> <path d=\"M6 6h12\" />", "locate-fixed": "<line x1=\"2\" x2=\"5\" y1=\"12\" y2=\"12\" /> <line x1=\"19\" x2=\"22\" y1=\"12\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"5\" /> <line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\" /> <circle cx=\"12\" cy=\"12\" r=\"7\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "file-spreadsheet": "<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M8 13h2\" /> <path d=\"M14 13h2\" /> <path d=\"M8 17h2\" /> <path d=\"M14 17h2\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "wifi-off": "<path d=\"M12 20h.01\" /> <path d=\"M8.5 16.429a5 5 0 0 1 7 0\" /> <path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\" /> <path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\" /> <path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\" /> <path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\" /> <path d=\"m2 2 20 20\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m16 9-5.5 5.5L8 12\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "layout-list": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" /> <path d=\"M14 4h7\" /> <path d=\"M14 9h7\" /> <path d=\"M14 15h7\" /> <path d=\"M14 20h7\" />", "list-checks": "<path d=\"M13 5h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" />", "mail-plus": "<path d=\"M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8\" /> <path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" /> <path d=\"M19 16v6\" /> <path d=\"M16 19h6\" />", "phone-call": "<path d=\"M13 2a9 9 0 0 1 9 9\" /> <path d=\"M13 6a5 5 0 0 1 5 5\" /> <path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />", "mic": "<path d=\"M12 19v3\" /> <path d=\"M19 10v2a7 7 0 0 1-14 0v-2\" /> <rect x=\"9\" y=\"2\" width=\"6\" height=\"13\" rx=\"3\" />", "square": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" />", "merge": "<path d=\"m8 6 4-4 4 4\" /> <path d=\"M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22\" /> <path d=\"m20 22-5-5\" />", "notebook-pen": "<path d=\"M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4\" /> <path d=\"M2 6h4\" /> <path d=\"M2 10h4\" /> <path d=\"M2 14h4\" /> <path d=\"M2 18h4\" /> <path d=\"M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z\" />", "message-circle-question": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" /> <path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\" /> <path d=\"M12 17h.01\" />", "alarm-clock": "<circle cx=\"12\" cy=\"13\" r=\"8\" /> <path d=\"M12 9v4l2 2\" /> <path d=\"M5 3 2 6\" /> <path d=\"m22 6-3-3\" /> <path d=\"M6.38 18.7 4 21\" /> <path d=\"M17.64 18.67 20 21\" />", "navigation-2": "<polygon points=\"12 2 19 21 12 17 5 21 12 2\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />", "sliders-horizontal": "<path d=\"M10 5H3\" /> <path d=\"M12 19H3\" /> <path d=\"M14 3v4\" /> <path d=\"M16 17v4\" /> <path d=\"M21 12h-9\" /> <path d=\"M21 19h-5\" /> <path d=\"M21 5h-7\" /> <path d=\"M8 10v4\" /> <path d=\"M8 12H3\" />", "pencil-line": "<path d=\"M13 21h8\" /> <path d=\"m15 5 4 4\" /> <path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" />"};
   const ic = (n, cls = '') => `<svg class="ic${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
   document.querySelectorAll('i[data-ic]').forEach(el => { el.outerHTML = ic(el.dataset.ic); });
   const PIN = '<svg viewBox="0 0 30 40" aria-hidden="true"><path class="b" d="M15 38.5C15 38.5 3 25.6 3 15a12 12 0 0 1 24 0c0 10.6-12 23.5-12 23.5z"/><circle class="c" cx="15" cy="15" r="5"/></svg>';
@@ -1402,7 +1462,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const ok = await write(() => col.doc(id).set(toBody(next)));
     if (!ok) return false;
     rememberAction(actie);
-    closeRow(true);
+    drafts[id] = draftFrom(next);
+    state.tab = 'overzicht';
     renderAll();
     if (opts.agenda) addToCalendar(next);
     else if (l.outlookId && next.datum && outlookOn() && ['datum', 'tijd', 'actie', 'bedrijf', 'adres', 'plaats', 'herinnering'].some(k => l[k] !== next[k])) outlookEvent(next, true);
@@ -2148,8 +2209,10 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     else if (p === 'bedrijven' && !['alles', 'acties', 'archief'].includes(state.view)) state.view = 'alles';
   }
 
+  // Een zoekterm die als vraag begint of op een vraagteken eindigt, beantwoordt Leadnex (zie askLocal).
+  const isQuestion = s => /\?\s*$/.test(s) || /^\s*(wie|welke|welk|wat|wanneer|waar|hoeveel)\b/i.test(s);
   function inView(l) {
-    const q = key(state.search);
+    const q = state.page === 'bedrijven' && isQuestion(state.search) ? '' : key(state.search);
     const filtered = state.view !== 'vandaag';   // Vandaag toont altijd alles wat moet gebeuren
     if (filtered && q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie, l.website, l.branche].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
     if (filtered && state.branche && key(l.branche) !== key(state.branche)) return false;
@@ -2201,64 +2264,141 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       `${x.t ? `<span class="t">${esc(x.t)}</span>` : ''}</li>`).join('')}</ol>`;
   }
 
-  function editHtml(l) {
+  /* ---------- bedrijfspagina: opent als eigen scherm (telefoon) of als paneel rechts (computer) ---------- */
+  // Gegevens bewerken.
+  function formHtml(l) {
     const d = drafts[l.id] || (drafts[l.id] = draftFrom(l));
     const id = esc(l.id), ro = state.readOnly ? ' readonly' : '';
     const input = (k, label, span, type = 'text', max = 120, extra = '') =>
       `<div class="field ${span}"><label for="p-${id}-${k}">${label}</label>` +
       `<input class="input" id="p-${id}-${k}" data-field="${k}" type="${type}" maxlength="${max}" value="${esc(d[k])}"${extra}${ro}></div>`;
-    const archiveBtn = l.gearchiveerd
-      ? `<button type="button" class="btn" id="arch-${id}" data-act="restore">${ic('archive-restore')}Terugzetten in lijst</button>`
-      : `<button type="button" class="btn" id="arch-${id}" data-act="archive">${ic('archive')}Archiveren</button>`;
-    const mailB = mailable(l) ? `<button type="button" class="btn" id="mail-${id}" data-act="mail">${ic('mail')}Mail opstellen</button>` : '';
-    const actions = state.readOnly ? '' : `
+    const sel = (k, label, opts, extra = '') => `<div class="field span2"><label for="p-${id}-${k}">${label}${extra}</label><select class="input" id="p-${id}-${k}" data-field="${k}"${state.readOnly ? ' disabled' : ''}>${opts}</select></div>`;
+    return `<section class="scard pform" aria-label="Gegevens">
+      <h3 class="slabel">Bedrijf en contact</h3>
+      <div class="pgrid">
+        ${input('bedrijf', 'Bedrijfsnaam', 'span2')}
+        ${input('contact', 'Contactpersoon', 'span2')}
+        ${input('telefoon', 'Telefoonnummer', 'span2', 'tel', 40)}
+        ${input('email', 'E-mailadres', 'span2', 'email')}
+        ${input('adres', 'Adres', 'span2', 'text', 120, ' placeholder="Straat en huisnummer"')}
+        ${input('plaats', 'Plaats', 'span2', 'text', 60, ' list="plaatsLijst"')}
+        ${input('branche', 'Branche', 'span2', 'text', 60, ' list="brancheLijst"')}
+        ${input('website', 'Website', 'span2', 'url', 120, ' inputmode="url" placeholder="www.bedrijf.nl"')}
+        ${sel('status', 'Status', statusOptions(d.status))}
+        ${sel('prioriteit', 'Prioriteit', prioOptions(d.prioriteit))}
+      </div>
+      <h3 class="slabel">Volgende stap</h3>
+      <div class="pgrid">
+        ${input('actie', 'Actie', 'span2', 'text', 40, ' list="actieLijst" placeholder="Kies of typ, bijv. Bezoek"')}
+        <div class="field span2"><label for="p-${id}-tijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="p-${id}-tijd" data-field="tijd" value="${esc(d.tijd || '')}"${ro}></div>
+        <div class="field span4"><label for="p-${id}-datum">Wanneer</label>${whenHtml(`p-${id}-datum`, d.datum, ` data-field="datum"${ro}`, state.readOnly)}</div>
+        ${sel('herinnering', 'Herinnering', HERINNERING.map(([m, t]) => `<option value="${m}"${String(m) === String(d.herinnering) ? ' selected' : ''}>${t}</option>`).join(''), '<span class="opt">bij een tijd</span>')}
+      </div>
+      <h3 class="slabel">Notitie</h3>
+      <div class="field">
+        <label class="sr" for="p-${id}-notitie">Notitie</label>
+        <textarea class="input" id="p-${id}-notitie" data-field="notitie" maxlength="2000" placeholder="Wat weet je over dit bedrijf?"${ro}>${esc(d.notitie)}</textarea>
+        ${state.readOnly ? '' : `<p class="suggest smart" id="nsug-${id}"${suggestLine(d.notitie, 'n-sug', `nsug-${id}-b`) ? '' : ' hidden'}>${suggestLine(d.notitie, 'n-sug', `nsug-${id}-b`)}</p>`}
+      </div>
+      <label class="check" for="p-${id}-geenMail"><input type="checkbox" id="p-${id}-geenMail" data-field="geenMail"${d.geenMail ? ' checked' : ''}${state.readOnly ? ' disabled' : ''}>Wil geen mail ontvangen (wordt overgeslagen bij mailen)</label>
+      ${state.readOnly ? '' : `<div class="pactions"><button type="button" class="btn primary wide" id="save-${id}" data-act="save">${ic('check')}Opslaan</button></div>`}
+    </section>
+    ${state.readOnly ? '' : `<section class="scard more-actions" aria-label="Meer">
+      <h3 class="slabel">Meer</h3>
       <div class="pactions">
-        <button type="button" class="btn primary" id="save-${id}" data-act="save">${ic('check')}Opslaan</button>
-        ${mailB}
+        ${mailable(l) ? `<button type="button" class="btn" id="mail-${id}" data-act="mail">${ic('mail')}Mail met mailtekst</button>` : ''}
         <button type="button" class="btn" id="agenda-${id}" data-act="agenda">${ic('calendar')}In agenda</button>
         ${l.telefoon || l.email ? `<button type="button" class="btn" id="vcf-${id}" data-act="vcard">${ic('contact')}In contacten</button>` : ''}
-        ${archiveBtn}
-        <button type="button" class="btn danger push${armedDelete === l.id ? ' armed' : ''}" id="del-${id}" data-act="delete">${ic('trash-2')}${armedDelete === l.id ? 'Klik nogmaals om te verwijderen' : 'Verwijderen'}</button>
-      </div>`;
-    const q = placeQuery(l);
-    const links = [q && `<a class="inline-link" href="${esc(mapUrl(q))}" target="_blank" rel="noopener">Open ${l.adres ? 'adres' : 'bedrijf'} in Google Maps</a>`,
-      l.website && `<a class="inline-link" href="${esc(webHref(l.website))}" target="_blank" rel="noopener">Open website</a>`].filter(Boolean);
-    const maps = links.length ? `<p class="hint links">${links.join('')}</p>` : '';
-    const added = l.aangemaakt ? `<p class="meta">Toegevoegd op ${esc(shortDate(l.aangemaakt.slice(0, 10)))}</p>` : '';
-    const archived = l.gearchiveerd && l.gearchiveerdOp ? `<p class="meta">Gearchiveerd op ${esc(shortDate(l.gearchiveerdOp))}</p>` : '';
-    return `<div class="panel">
-      ${prepHtml(l)}
-      ${verslagenHtml(l)}
-      <div class="pform">
-        <div class="pgrid">
-          ${input('bedrijf', 'Bedrijfsnaam', 'span2')}
-          ${input('contact', 'Contactpersoon', 'span2')}
-          ${input('email', 'E-mailadres', 'span2', 'email')}
-          ${input('telefoon', 'Telefoonnummer', 'span2', 'tel', 40)}
-          ${input('adres', 'Adres', 'span2', 'text', 120, ' placeholder="Straat en huisnummer"')}
-          ${input('plaats', 'Plaats', 'span2', 'text', 60, ' list="plaatsLijst"')}
-          ${input('branche', 'Branche', 'span2', 'text', 60, ' list="brancheLijst"')}
-          ${input('website', 'Website', 'span2', 'url', 120, ' inputmode="url" placeholder="www.bedrijf.nl"')}
-          ${input('actie', 'Actie', 'span2', 'text', 40, ' list="actieLijst" placeholder="Kies of typ, bijv. Bezoek"')}
-          <div class="field span2"><label for="p-${id}-datum">Wanneer</label>${whenHtml(`p-${id}-datum`, d.datum, ` data-field="datum"${ro}`, state.readOnly)}</div>
-          <div class="field span2"><label for="p-${id}-tijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="p-${id}-tijd" data-field="tijd" value="${esc(d.tijd || '')}"${ro}></div>
-          <div class="field span2"><label for="p-${id}-prioriteit">Prioriteit</label><select class="input" id="p-${id}-prioriteit" data-field="prioriteit"${state.readOnly ? ' disabled' : ''}>${prioOptions(d.prioriteit)}</select></div>
-          <div class="field span2"><label for="p-${id}-status">Status</label><select class="input" id="p-${id}-status" data-field="status"${state.readOnly ? ' disabled' : ''}>${statusOptions(d.status)}</select></div>
-          <div class="field span2"><label for="p-${id}-herinnering">Herinnering<span class="opt">bij een tijd</span></label><select class="input" id="p-${id}-herinnering" data-field="herinnering"${state.readOnly ? ' disabled' : ''}>${HERINNERING.map(([m, t]) => `<option value="${m}"${String(m) === String(d.herinnering) ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
-          <div class="field span4"><label for="p-${id}-notitie">Notitie</label>
-            <textarea class="input" id="p-${id}-notitie" data-field="notitie" maxlength="2000" placeholder="Wat weet je over dit bedrijf?"${ro}>${esc(d.notitie)}</textarea>
-            ${state.readOnly ? '' : `<p class="suggest smart" id="nsug-${id}"${suggestLine(d.notitie, 'n-sug', `nsug-${id}-b`) ? '' : ' hidden'}>${suggestLine(d.notitie, 'n-sug', `nsug-${id}-b`)}</p>`}</div>
-          <label class="check span4" for="p-${id}-geenMail"><input type="checkbox" id="p-${id}-geenMail" data-field="geenMail"${d.geenMail ? ' checked' : ''}${state.readOnly ? ' disabled' : ''}>Wil geen mail ontvangen (wordt overgeslagen bij mailen)</label>
-        </div>
-        ${maps}
-        ${actions}
+        ${l.gearchiveerd ? `<button type="button" class="btn" id="arch-${id}" data-act="restore">${ic('archive-restore')}Terugzetten in lijst</button>`
+          : `<button type="button" class="btn" id="arch-${id}" data-act="archive">${ic('archive')}Archiveren</button>`}
+        <button type="button" class="btn danger${armedDelete === l.id ? ' armed' : ''}" id="del-${id}" data-act="delete">${ic('trash-2')}${armedDelete === l.id ? 'Tik nogmaals om te verwijderen' : 'Verwijderen'}</button>
       </div>
-      <aside class="log" aria-label="Contactmomenten">
-        <h3>Contactmomenten</h3>
-        ${logHtml(l)}
-        ${added}${archived}
-      </aside>
+    </section>`}`;
+  }
+  // Overzicht: de gegevens om te lezen en meteen te gebruiken.
+  function infoHtml(l) {
+    const id = esc(l.id);
+    const pick = (val, label, mono) => `<span class="pick${mono ? ' mono' : ''}" role="button" tabindex="0" data-act="copy" data-copy="${esc(val)}" data-label="${label}" title="Tik om te kopiëren">${esc(val)}</span>`;
+    const q = placeQuery(l);
+    const rows = [
+      ['Contactpersoon', l.contact && esc(l.contact)],
+      ['Telefoon', l.telefoon && pick(l.telefoon, 'Telefoonnummer', true)],
+      ['E-mail', l.email && pick(l.email, 'E-mailadres') + (l.geenMail ? ' <span class="faint">(wil geen mail)</span>' : '')],
+      ['Adres', (l.adres || l.plaats) && `<a href="${esc(mapUrl(q))}" target="_blank" rel="noopener">${esc([l.adres, l.plaats].filter(Boolean).join(', '))}</a>`],
+      ['Website', l.website && `<a href="${esc(webHref(l.website))}" target="_blank" rel="noopener">${esc(l.website)}</a>`],
+      ['Branche', l.branche && esc(l.branche)],
+    ].filter(r => r[1]);
+    return `<section class="scard info" aria-label="Gegevens">
+      <div class="scard-head"><h3 class="slabel">Gegevens</h3>${state.readOnly ? '' : `<button type="button" class="linkbtn" id="edit-${id}" data-act="tab" data-tab="gegevens">${ic('pencil-line')}Bewerken</button>`}</div>
+      ${rows.length ? `<dl class="infolist">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` : '<p class="hint">Nog geen contactgegevens. Tik op Bewerken om ze aan te vullen.</p>'}
+      ${l.notitie ? `<div class="note"><span class="slabel">Notitie</span><p>${esc(l.notitie)}</p></div>` : ''}
+    </section>`;
+  }
+  function historyHtml(l) {
+    return `<section class="scard log" aria-label="Contactmomenten">
+      <h3 class="slabel">Contactmomenten</h3>
+      ${logHtml(l)}
+      ${l.aangemaakt ? `<p class="meta">Toegevoegd op ${esc(shortDate(l.aangemaakt.slice(0, 10)))}</p>` : ''}
+      ${l.gearchiveerd && l.gearchiveerdOp ? `<p class="meta">Gearchiveerd op ${esc(shortDate(l.gearchiveerdOp))}</p>` : ''}
+    </section>`;
+  }
+  const SHEET_TABS = [['overzicht', 'Overzicht'], ['verslagen', 'Verslagen'], ['gegevens', 'Gegevens'], ['historie', 'Historie']];
+  function sheetHtml(l) {
+    const id = esc(l.id), finishing = state.mode === 'finish';
+    const tab = SHEET_TABS.some(t => t[0] === state.tab) ? state.tab : 'overzicht';
+    const q = placeQuery(l);
+    const quick = [
+      callable(l) && `<a class="qa qa-call" href="${esc(telHref(l.telefoon))}" data-lead="${id}" data-act="call">${ic('phone')}<span>Bellen</span></a>`,
+      waNumber(l.telefoon) && `<a class="qa" href="${esc(waHref(l))}" target="_blank" rel="noopener" data-act="wa">${ic('message-circle')}<span>WhatsApp</span></a>`,
+      mailable(l) && `<a class="qa" id="qm-${id}" href="${esc(mailtoUrl(l.email))}" data-act="qmail">${ic('mail')}<span>Mail</span></a>`,
+      q && `<a class="qa" href="${esc(mapUrl(q))}" target="_blank" rel="noopener">${ic('navigation')}<span>Route</span></a>`,
+    ].filter(Boolean);
+    const sub = [statusLabel(l.status), l.contact, l.plaats].filter(Boolean).map(esc).join(' · ');
+    const head = `<header class="sheet-head">
+      <button type="button" class="iconbtn" id="close-${id}" data-act="close" aria-label="Terug naar de lijst">${ic('arrow-left')}</button>
+      <div class="sh-title"><h2 id="detailTitle">${esc(l.bedrijf)}${prioBadge(l)}</h2><p>${sub}</p></div>
+    </header>`;
+    if (finishing) return `${head}<div class="sheet-body">${finishHtml(l)}</div>`;
+    let next;
+    if (l.gearchiveerd) next = `<div class="nextbar"><div class="nb-text"><span class="slabel">In het archief</span><strong>Sinds ${esc(shortDate(l.gearchiveerdOp) || 'onbekend')}</strong></div>${state.readOnly ? '' : `<button type="button" class="btn" data-act="restore">${ic('archive-restore')}Terugzetten</button>`}</div>`;
+    else next = `<div class="nextbar"><div class="nb-text"><span class="slabel">Volgende stap</span><strong>${l.actie ? esc(l.actie) : 'Nog niets gepland'}${l.actie ? ' ' + dueChip(l) : ''}</strong></div>
+      ${state.readOnly ? '' : l.actie ? `<button type="button" class="btn primary" id="afs-${id}" data-act="afronden">${ic('check')}Afronden</button>`
+        : `<button type="button" class="btn" id="plan-${id}" data-act="tab" data-tab="gegevens">${ic('calendar')}Plannen</button>`}</div>`;
+    const count = { verslagen: l.verslagen.length, historie: l.log.length };
+    const body = tab === 'verslagen' ? verslagenHtml(l)
+      : tab === 'gegevens' ? formHtml(l)
+      : tab === 'historie' ? historyHtml(l)
+      : (prepHtml(l) || (state.readOnly ? '' : `<section class="scard intro"><h3 class="slabel">Nog geen contact</h3><p class="hint">Bel of bezoek dit bedrijf en spreek daarna een verslag in. Leadnex onthoudt wat er besproken is en bereidt je volgende gesprek voor.</p>
+          <div class="pactions"><button type="button" class="btn" id="vmicnew2-${id}" data-act="v-new" data-mic="1">${ic('mic')}Verslag inspreken</button></div></section>`)) + infoHtml(l);
+    return `${head}<div class="sheet-body">
+      ${quick.length ? `<div class="quick">${quick.join('')}</div>` : ''}
+      ${next}
+      <nav class="stabs" role="tablist" aria-label="Onderdelen">${SHEET_TABS.map(([k, t]) => `<button type="button" role="tab" class="stab" id="tab-${k}-${id}" data-act="tab" data-tab="${k}" aria-selected="${tab === k}">${t}${count[k] ? ` <span class="n">${count[k]}</span>` : ''}</button>`).join('')}</nav>
+      <div class="stab-body" role="tabpanel">${body}</div>
     </div>`;
+  }
+  const detailEl = $('detail');
+  let sheetHist = false, ignorePop = false;
+  function renderDetail() {
+    const l = state.open && !state.selecting ? byId(state.open) : null;
+    detailEl.hidden = !l;
+    $('detailBackdrop').hidden = !l;
+    document.body.classList.toggle('sheet-open', !!l);
+    // Terugknop van Android sluit het bedrijf in plaats van de app.
+    if (l && !sheetHist) { history.pushState({ sheet: true }, ''); sheetHist = true; }
+    else if (!l && sheetHist) { sheetHist = false; if (history.state && history.state.sheet) { ignorePop = true; history.back(); } }
+    if (!l) { detailEl.innerHTML = ''; delete detailEl.dataset.id; return; }
+    if (detailEl.dataset.id !== l.id) { detailEl.dataset.id = l.id; detailEl.scrollTop = 0; }
+    withFocus(detailEl, () => { detailEl.innerHTML = sheetHtml(l); });
+  }
+  window.addEventListener('popstate', () => {
+    if (ignorePop) { ignorePop = false; return; }
+    if (sheetHist && !(history.state && history.state.sheet)) { sheetHist = false; closeRow(); }
+  });
+  function setSheetTab(t) {
+    state.tab = t;
+    renderDetail();
+    detailEl.querySelector('.stabs')?.scrollIntoView({ block: 'nearest' });
   }
 
   function finishHtml(l) {
@@ -2303,46 +2443,34 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     </div>`;
   }
 
-  function rowHtml(l) {
-    const open = state.open === l.id && !state.selecting, id = esc(l.id);
-    const finishing = open && state.mode === 'finish';
-    const pick = (val, label, mono) => `<span class="pick${mono ? ' mono' : ''}" role="button" tabindex="0" data-act="copy" data-copy="${esc(val)}" data-label="${label}" title="Klik om te kopiëren">${esc(val)}</span>`;
-    const contactCell = (l.telefoon || l.email)
-      ? `<div class="cell contactinfo">${l.telefoon ? `<span class="telline">${pick(l.telefoon, 'Telefoonnummer', true)}${callLink(l)}${waLink(l)}</span>` : ''}${l.email ? pick(l.email, 'E-mailadres', false) : ''}${l.geenMail ? '<span class="meta">Wil geen mail</span>' : ''}</div>`
-      : `<div class="cell contactinfo none"><span class="faint">–</span></div>`;
+  // Eén regel per bedrijf: naam, volgende stap en wat je moet weten. Tikken opent het bedrijf.
+  function rowHtml(l, reden = '') {
+    const id = esc(l.id);
     const dist = state.view === 'kaart' ? kaart.dist.get(l.id) : buurtActive() ? distTo(l) : null;
-    const plaatsCell = (l.plaats || l.adres)
-      ? `<div class="cell plaats">${l.plaats ? `<span>${esc(l.plaats)}${dist != null ? ` <span class="dist">${fmtKm(dist)}</span>` : ''}</span>` : ''}${l.adres ? `<span class="meta">${esc(l.adres)}</span>` : ''}</div>`
-      : `<div class="cell plaats none"><span class="faint">–</span></div>`;
-    let actie;
-    if (l.gearchiveerd) actie = `<span class="faint">Gearchiveerd${l.gearchiveerdOp ? ' ' + esc(shortDate(l.gearchiveerdOp)) : ''}</span>`;
-    else if (l.actie) actie = `<button type="button" class="atag" data-act="filter" data-actie="${esc(l.actie)}" title="Toon alle bedrijven met actie ${esc(l.actie)}">${esc(l.actie)}</button>${dueChip(l)}`;
-    else actie = `<span class="faint">Geen actie</span>`;
+    let when;
+    if (l.gearchiveerd) when = `<span class="faint">Gearchiveerd${l.gearchiveerdOp ? ' ' + esc(shortDate(l.gearchiveerdOp)) : ''}</span>`;
+    else if (l.actie) when = `<span class="r-actie">${esc(l.actie)}</span>${dueChip(l)}`;
+    else when = `<span class="faint">Geen actie gepland</span>`;
     const canMail = mailable(l);
     const check = state.selecting
       ? `<input type="checkbox" class="sel" id="sel-${id}" data-act="select"${state.selected.has(l.id) ? ' checked' : ''}${canMail ? '' : ' disabled'} aria-label="Selecteer ${esc(l.bedrijf)}" title="${canMail ? 'Selecteer voor mail' : l.geenMail ? 'Wil geen mail ontvangen' : 'Geen e-mailadres'}">`
       : '';
     const canFinish = !state.readOnly && !state.selecting && !l.gearchiveerd && l.actie;
-    const info = lastInfo(l);
-    return `<article class="row${open ? ' open' : ''}${state.selecting && !canMail ? ' nomail' : ''}${sessCurrent() === l.id ? ' current' : ''}" data-id="${id}">
-      <div class="row-main cols" data-act="toggle">
-        <div class="cell first">${check}
-          <button type="button" class="bedrijf" id="t-${id}" data-act="toggle" aria-expanded="${open && !finishing}">
-            <span class="name">${esc(l.bedrijf)}${prioBadge(l)}${statusBadge(l)}${l.voorbeeld ? '<span class="tag">Voorbeeld</span>' : ''}</span>
-            ${l.contact || l.branche ? `<span class="sub">${esc(l.contact)}${l.contact && l.branche ? ' · ' : ''}${l.branche ? `<span class="faint">${esc(l.branche)}</span>` : ''}</span>` : ''}
-            ${info ? `<span class="meta">${esc(info)}</span>` : ''}
-          </button>
-        </div>
-        ${plaatsCell}
-        ${contactCell}
-        <div class="cell actie">${actie}</div>
-        <div class="cell acts">
-          ${canMail && !state.selecting ? `<a class="btn small" id="qm-${id}" href="${esc(mailtoUrl(l.email))}" data-act="qmail" aria-label="Mail naar ${esc(l.bedrijf)}">${ic('mail')}<span class="mouse-only">Mail</span></a>` : ''}
-          ${canFinish ? `<button type="button" class="btn small" id="af-${id}" data-act="afronden" aria-expanded="${finishing}">${ic('check')}Afronden</button>` : ''}
-          ${state.selecting ? '' : '<button type="button" class="more" data-act="toggle" tabindex="-1" aria-hidden="true"><span class="chev"></span></button>'}
-        </div>
+    const meta = [l.contact, l.plaats].filter(Boolean).map(esc).join(' · ');
+    const info = reden || lastInfo(l);
+    return `<article class="row${state.open === l.id ? ' open' : ''}${state.selecting && !canMail ? ' nomail' : ''}${sessCurrent() === l.id ? ' current' : ''}" data-id="${id}">
+      <div class="row-main" data-act="toggle">
+        ${check}
+        <button type="button" class="bedrijf" id="t-${id}" data-act="toggle" aria-haspopup="dialog">
+          <span class="name">${esc(l.bedrijf)}${prioBadge(l)}${statusBadge(l)}${l.voorbeeld ? '<span class="tag">Voorbeeld</span>' : ''}</span>
+          <span class="r-when">${when}</span>
+          ${meta || dist != null || info ? `<span class="meta">${meta}${dist != null ? ` <span class="dist">${fmtKm(dist)}</span>` : ''}${info ? `${meta || dist != null ? ' · ' : ''}${esc(info)}` : ''}</span>` : ''}
+        </button>
+        ${state.selecting ? '' : `<div class="acts">
+          ${canFinish ? `<button type="button" class="btn small" id="af-${id}" data-act="afronden">${ic('check')}<span>Afronden</span></button>` : ''}
+          ${callLink(l, 'Bel', 'call round')}
+        </div>`}
       </div>
-      ${open ? (finishing ? finishHtml(l) : editHtml(l)) : ''}
     </article>`;
   }
 
@@ -2355,7 +2483,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     list.forEach(l => { const k = keyOf(l); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(l); });
     return [...groups.keys()].sort(order).map(k => {
       const items = groups.get(k).sort(sorter);
-      return groupHead(labelOf(k, items), items.length, extraOf ? extraOf(k, items) : '') + items.map(rowHtml).join('');
+      return groupHead(labelOf(k, items), items.length, extraOf ? extraOf(k, items) : '') + items.map(l => rowHtml(l)).join('');
     }).join('');
   }
 
@@ -2364,6 +2492,11 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (!state.loaded) return `<div class="empty"><p>Lijst laden…</p></div>`;
     if (!state.leads.length) return emptyHtml('Nog geen bedrijven op je lijst',
       state.readOnly ? 'Zodra er bedrijven zijn toegevoegd, zie je ze hier.' : 'Tik op Nieuw om een bedrijf toe te voegen, of importeer een lijst uit Excel via Meer.');
+    if (state.page === 'bedrijven' && isQuestion(state.search)) {
+      const r = askLocal(state.search);
+      return `<div class="answer-head" role="status">${ic('message-circle-question')}<span>${r.hits.length ? esc(r.kop) : 'Niets gevonden. Probeer andere woorden, of vraag naar een actie of periode, zoals "Wie moet ik deze week bellen?".'}</span></div>`
+        + r.hits.map(h => rowHtml(h.l, h.reden)).join('');
+    }
     const list = state.leads.filter(inView);
     const today = todayISO();
     const resetBtn = '<button type="button" class="btn" data-act="reset">Toon alle bedrijven</button>';
@@ -2371,15 +2504,15 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 
     if (state.view === 'alles' && buurtActive() && kaart.here) {
       if (!list.length) return emptyHtml('Niets in de buurt', `Er staan geen bedrijven binnen ${buurtKm()} km van je huidige plek. Kies in Meer een grotere afstand.`);
-      return sessStartHtml(list.filter(callable).length) + list.sort((a, b) => distTo(a) - distTo(b)).map(rowHtml).join('');
+      return sessStartHtml(list.filter(callable).length) + list.sort((a, b) => distTo(a) - distTo(b)).map(l => rowHtml(l)).join('');
     }
     if (state.view === 'alles') {
       if (!list.length) return emptyHtml('Alle bedrijven staan in het archief', 'Voeg hierboven een nieuw bedrijf toe of zet er een terug vanuit het archief.');
       const due = list.filter(l => isDue(l, today)).sort(byPrioDate);
       const rest = list.filter(l => !isDue(l, today)).sort(byName);
-      if (!due.length) return rest.map(rowHtml).join('');
-      return groupHead('Vandaag te doen', due.length) + due.map(rowHtml).join('') +
-        (rest.length ? groupHead('Overige bedrijven', rest.length, '', true) + rest.map(rowHtml).join('') : '');
+      if (!due.length) return rest.map(l => rowHtml(l)).join('');
+      return groupHead('Vandaag te doen', due.length) + due.map(l => rowHtml(l)).join('') +
+        (rest.length ? groupHead('Overige bedrijven', rest.length, '', true) + rest.map(l => rowHtml(l)).join('') : '');
     }
 
     const sessStart = sessStartHtml(list.filter(callable).length);
@@ -2397,7 +2530,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 
     if (state.view === 'archief') {
       if (!list.length) return emptyHtml('Het archief is leeg', 'Bedrijven die je archiveert, bijvoorbeeld na Geen interesse, vind je hier terug.');
-      return list.sort((a, b) => b.gearchiveerdOp.localeCompare(a.gearchiveerdOp) || byName(a, b)).map(rowHtml).join('');
+      return list.sort((a, b) => b.gearchiveerdOp.localeCompare(a.gearchiveerdOp) || byName(a, b)).map(l => rowHtml(l)).join('');
     }
 
     if (!list.length) {
@@ -2410,12 +2543,13 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
         (a, b) => (a ? 0 : 1) - (b ? 0 : 1) || cmp(a, b), byDateThenName,
         (k, items) => /bezoek/i.test(state.actie) ? routeLink(items) : '');
     }
-    return sessStart + list.sort(byDateThenName).map(rowHtml).join('');
+    return sessStart + list.sort(byDateThenName).map(l => rowHtml(l)).join('');
   }
 
   function renderRows() {
     if (state.open && !byId(state.open)) closeRow(true);
     withFocus(rowsEl, () => { rowsEl.innerHTML = listHtml(); });
+    renderDetail();
   }
 
   function renderMeta() {
@@ -2438,6 +2572,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       `<button type="button" class="tab" data-view="${v}" aria-pressed="${state.view === v}">${label} <span class="n">${count}</span></button>`;
     tabsEl.innerHTML = tab('alles', 'Alle', n) + tab('acties', 'Met actie', withAction) + tab('archief', 'Archief', archived);
     $('todayLong').textContent = cap(fmtToday.format(new Date()));
+    const uur = new Date().getHours();
+    $('greet').textContent = uur < 6 ? 'Goedenacht' : uur < 12 ? 'Goedemorgen' : uur < 18 ? 'Goedemiddag' : 'Goedenavond';
     $('bedrijvenSub').textContent = state.loaded ? `${n} ${plural(n, 'bedrijf', 'bedrijven')} · ${withAction} met een actie` : 'Lijst laden…';
     // Contactmomenten deze week (vanaf maandag)
     const monday = (() => { const d = new Date(); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return isoOf(d); })();
@@ -2462,7 +2598,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const branches = brancheNames(), bsel = $('brancheSel');
     if (state.loaded && state.branche && !branches.some(x => key(x) === key(state.branche))) { state.branche = ''; pref.set('branche', ''); }
     $('brancheLijst').innerHTML = branches.map(x => `<option value="${esc(x)}"></option>`).join('');
-    bsel.hidden = !branches.length;
+    $('brancheField').hidden = !branches.length;
     const bcount = b => state.leads.filter(l => !l.gearchiveerd && key(l.branche) === key(b)).length;
     bsel.innerHTML = `<option value="">Alle branches</option>` + branches.map(b => `<option value="${esc(b)}"${key(b) === key(state.branche) ? ' selected' : ''}>${esc(b)} (${bcount(b)})</option>`).join('');
     bsel.classList.toggle('on', !!state.branche);
@@ -2470,7 +2606,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     ssel.innerHTML = `<option value="">Leads en klanten</option>` + [['lead', 'Leads'], ['prospect', 'Potentiële klanten'], ['klant', 'Klanten']]
       .map(([v, t]) => `<option value="${v}"${v === state.status ? ' selected' : ''}>${t} (${scount(v)})</option>`).join('');
     ssel.classList.toggle('on', !!state.status);
-    ssel.hidden = state.page !== 'bedrijven';
     const plaatsen = new Map();
     state.leads.forEach(l => { if (l.plaats && !plaatsen.has(key(l.plaats))) plaatsen.set(key(l.plaats), l.plaats); });
     plaatsListEl.innerHTML = sortNames([...plaatsen.values()]).map(x => `<option value="${esc(x)}"></option>`).join('');
@@ -2523,7 +2658,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     });
   }
 
-  function renderAll() { renderMeta(); renderNav(); renderPage(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderAsk(); renderDup(); if (mail.open) renderMailOut(); }
+  function renderAll() { renderMeta(); renderNav(); renderPage(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderDup(); renderFilters(); if (mail.open) renderMailOut(); }
   let renderQueued = false;
   function scheduleRender() {
     if (renderQueued) return;
@@ -2543,13 +2678,15 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   }
   function openRow(id, mode, via = '') {
     if (state.open === id && (mode === 'toggle' || state.mode === mode)) { closeRow(); return; }
+    const vanuitScherm = state.open === id;
     closeRow(true);
     const l = byId(id);
     if (!l) { renderRows(); return; }
     state.open = id;
     state.mode = mode === 'finish' ? 'finish' : 'edit';
+    if (!vanuitScherm) state.tab = 'overzicht';
     if (state.mode === 'edit') drafts[id] = draftFrom(l);
-    else finishes[id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false, via, hint: '' };
+    else finishes[id] = { uitkomst: '', tekst: '', actie: l.actie, datum: '', tijd: '', agenda: false, archief: false, via, hint: '', vanuitScherm };
     renderRows();
   }
   // Zorgt dat een bedrijf in de lijst te zien is: anders naar Alles (of Archief), zonder zoekterm en branchefilter.
@@ -2569,14 +2706,12 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   function gotoLead(id) {
     const l = byId(id);
     if (!l) return;
-    state.selecting = false;
-    setView(l.gearchiveerd ? 'archief' : 'alles');
-    state.search = ''; searchEl.value = '';
+    if (state.selecting) setSelecting(false);
     closeRow(true);
-    state.open = id; state.mode = 'edit'; drafts[id] = draftFrom(l);
+    state.open = id; state.mode = 'edit'; state.tab = 'overzicht'; drafts[id] = draftFrom(l);
     renderAll();
-    document.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
+
 
   /* ---------- kaart: bedrijven bij jou in de buurt ---------- */
   // Adressen zoekt de app op bij de Locatieserver van PDOK (Kadaster); de achtergrondkaart komt ook van PDOK.
@@ -2796,7 +2931,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       return emptyHtml('Niets in de buurt', why) + foot;
     }
     const head = here ? (kaart.radius ? `Binnen ${kaart.radius} km, dichtstbij eerst` : 'Dichtstbij eerst') : 'Op de kaart';
-    return sessStartHtml(within.filter(callable).length) + groupHead(head, within.length, route) + within.map(rowHtml).join('') + foot;
+    return sessStartHtml(within.filter(callable).length) + groupHead(head, within.length, route) + within.map(l => rowHtml(l)).join('') + foot;
   }
   $('kaartChips').addEventListener('click', e => {
     const r = e.target.closest('[data-straal]');
@@ -2813,8 +2948,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (!b) return;
     const id = b.dataset.kaartOpen;
     if (kaart.map) kaart.map.closePopup();
-    if (document.querySelector(`.row[data-id="${CSS.escape(id)}"]`)) { if (state.open !== id) openRow(id, 'edit'); scrollToRow(id); }
-    else gotoLead(id);
+    gotoLead(id);
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopLocating(); else if (state.view === 'kaart') startLocating(); });
 
@@ -2875,7 +3009,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   try { const c = JSON.parse(localStorage.getItem('koude-acq.belt') || 'null'); if (c && c.id && Date.now() - c.t < 3600000) pendingCall = c; } catch {}
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href^="tel:"]');
-    const id = a && (a.dataset.lead || a.closest('.row')?.dataset.id);
+    const id = a && (a.dataset.lead || a.closest('.row, .sheet')?.dataset.id);
     if (!id) return;
     pendingCall = { id, t: Date.now() };
     try { localStorage.setItem('koude-acq.belt', JSON.stringify(pendingCall)); } catch {}
@@ -3558,9 +3692,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   const distTo = l => kaart.here && onMap(l) ? distKm(kaart.here, l.geo) : null;
   function renderBuurt() {
     const btn = $('buurtBtn'), st = $('buurtStatus');
-    btn.hidden = state.page !== 'bedrijven';
     btn.setAttribute('aria-pressed', String(state.buurt));
-    btn.innerHTML = `${ic('navigation-2')}In de buurt${state.buurt ? ` (${buurtKm()} km)` : ''}`;
+    btn.innerHTML = `${ic('navigation-2')}${state.buurt ? `In de buurt aan (${buurtKm()} km)` : 'Alleen in de buurt'}`;
     const on = buurtActive();
     st.hidden = !on;
     if (!on) return;
@@ -3626,9 +3759,9 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   }
   function verslagItemHtml(x) {
     const armed = armedVerslag === x.id;
-    const facts = [x.machines.length && `<span class="vk">Machines</span>${x.machines.map(m => `<span class="mtag">${esc(m)}</span>`).join('')}`,
-      x.interesse && `<span class="vk">Interesse</span>${esc(INTERESSE.find(i => i[0] === x.interesse)[1])}`,
-      x.afspraken && `<span class="vk">Afspraken</span>${esc(x.afspraken)}`].filter(Boolean);
+    const facts = [x.machines.length && `<span class="vk">Machines</span><span class="vv">${x.machines.map(m => `<span class="mtag">${esc(m)}</span>`).join('')}</span>`,
+      x.interesse && `<span class="vk">Interesse</span><span class="vv">${esc(INTERESSE.find(i => i[0] === x.interesse)[1])}</span>`,
+      x.afspraken && `<span class="vk">Afspraken</span><span class="vv">${esc(x.afspraken)}</span>`].filter(Boolean);
     return `<li class="verslag">
       <div class="vmeta"><time>${esc(cap(longDate(x.datum)))}</time><span>${esc(x.soort)}</span>
         ${state.readOnly ? '' : `<button type="button" class="vdel${armed ? ' armed' : ''}" data-act="v-del" data-vid="${esc(x.id)}" aria-label="Verslag verwijderen">${armed ? 'Nogmaals tikken om te verwijderen' : ic('trash-2')}</button>`}</div>
@@ -3725,6 +3858,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (state.open !== id || state.mode !== 'edit') { closeRow(true); state.open = id; state.mode = 'edit'; drafts[id] = draftFrom(l); }
     vdrafts[id] = vdrafts[id] || newVerslagDraft(l, soort);
     if (prefill && !vdrafts[id].tekst.trim()) vdrafts[id].tekst = prefill;
+    state.tab = 'verslagen';
     renderRows();
     if (mic) startDictation(id); else $('vt-' + id)?.focus();
     requestAnimationFrame(() => $('ved-' + id)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
@@ -3876,7 +4010,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   }
 
   /* ---------- vraag het Leadnex: vragen over je eigen klanten, zonder AI ---------- */
-  const ask = { open: false, q: '', res: null };
   const ASK_VOORBEELDEN = ['Welke bedrijven wilden een elektrische heftruck?', 'Wie wilde ik dit kwartaal terugbellen?', 'Welke potentiële klanten wachten op een offerte?'];
   const STOPWOORDEN = new Set(('de het een en van voor met op in aan wie wat welke welk wanneer waar hoe die dat dit deze is zijn was waren heeft hebben had ik je jij wij we ze zij hij er '
     + 'om te tot bij of als nog al ook niet geen wel wil wilde wilden willen kan kunnen moet moeten bedrijven bedrijf mij mijn me over naar uit dan nu zo heb '
@@ -3952,30 +4085,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     const kop = hits.length ? `${delen.length ? cap(delen.join(' ')) + ': ' : ''}${hits.length} ${plural(hits.length, 'bedrijf', 'bedrijven')}` : '';
     return { kop, hits };
   }
-  function askHtml() {
-    const r = ask.res;
-    const answer = !r ? '' : r.hits.length
-      ? `<div class="answer"><p><strong>${esc(r.kop)}</strong></p><ul class="askhits">${r.hits.map(x => `<li><button type="button" class="linkbtn" data-goto="${esc(x.l.id)}">${esc(x.l.bedrijf)}</button>${x.l.plaats ? ` <span class="faint">${esc(x.l.plaats)}</span>` : ''}<span class="meta">${esc(x.reden)}</span></li>`).join('')}</ul></div>`
-      : '<p class="hint">Niets gevonden. Probeer andere woorden, of vraag naar een actie of periode, zoals "Wie moet ik deze week bellen?".</p>';
-    return `<div class="card-head"><h2>${ic('message-circle-question')}Vraag het Leadnex</h2><button type="button" class="btn small ghost" data-ask="close">${ic('x')}Sluiten</button></div>
-      <p class="hint">Leadnex zoekt in je acties, klantverslagen, notities en contactmomenten.</p>
-      <form class="askform" id="askForm"><input class="input" id="askQ" maxlength="300" enterkeyhint="search" placeholder="Bijv. ${esc(ASK_VOORBEELDEN[1])}" value="${esc(ask.q)}">
-        <button type="submit" class="btn primary" id="askGo">${ic('search')}Zoek</button></form>
-      <div class="chips">${ASK_VOORBEELDEN.map((x, i) => `<button type="button" class="chip" data-ask-ex="${i}">${esc(x)}</button>`).join('')}</div>
-      ${answer}`;
-  }
-  function renderAsk() {
-    const el = $('askPanel');
-    el.hidden = !ask.open || state.page !== 'bedrijven';
-    $('askBtn').setAttribute('aria-expanded', String(ask.open));
-    if (!el.hidden) withFocus(el, () => { el.innerHTML = askHtml(); });
-  }
-  function runAsk(q) {
-    q = q.trim().slice(0, 300);
-    if (!q) return;
-    ask.q = q;
-    ask.res = askLocal(q);
-    renderAsk();
+  function renderAskEx() {
+    $('askEx').innerHTML = '<span class="askex-kop">Of stel een vraag, bijvoorbeeld</span>' + ASK_VOORBEELDEN.map((x, i) => `<button type="button" class="chip" data-ask-ex="${i}">${ic('message-circle-question')}<span>${esc(x)}</span></button>`).join('');
   }
 
   /* ---------- dubbele bedrijven ---------- */
@@ -4233,7 +4344,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (e.key === 'Escape' && state.selecting && !e.target.closest('.row')) setSelecting(false);
   });
 
-  rowsEl.addEventListener('click', e => {
+  function onRowsClick(e) {
     const el = e.target.closest('[data-act]');
     if (!el) return;
     const act = el.dataset.act;
@@ -4243,10 +4354,12 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (act === 'sess-start') { startSession(); return; }
     if (act === 'copy') { copyText(el.dataset.copy, el.dataset.label); return; }
     if (act === 'filter') { setView('acties'); setActie(el.dataset.actie); renderAll(); filtersEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return; }
-    const row = el.closest('.row');
+    const row = el.closest('.row, .sheet');
     if (!row) return;
     const id = row.dataset.id;
     if (act === 'select') { toggleSelect(id, el.checked); return; }
+    if (act === 'close') { closeRow(); $('t-' + id)?.focus({ preventScroll: true }); return; }
+    if (act === 'tab') { setSheetTab(el.dataset.tab); return; }
     if (act.startsWith('v-') || act.endsWith('-sug')) { smartAction(act, id, el); return; }
     if (act === 'qmail' || act === 'wa') {
       const l = byId(id);
@@ -4267,7 +4380,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     else if (act === 'afronden') openRow(id, 'finish');
     else if (act === 'outcome') applyOutcome(id, el.dataset.outcome);
     else if (act === 'finish') finishLead(id);
-    else if (act === 'cancel') { closeRow(); $(`af-${id}`)?.focus(); }
+    else if (act === 'cancel') { if (finishes[id] && finishes[id].vanuitScherm) openRow(id, 'edit'); else { closeRow(); $(`af-${id}`)?.focus(); } }
     else if (act === 'sess-skip') { sess.skipped++; nextInSession(); }
     else if (act === 'vcard') { const l = byId(id); if (l) saveContact(l); }
     else if (act === 'save') saveLead(id);
@@ -4280,7 +4393,10 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     else if (act === 'archive') archiveLead(id, true);
     else if (act === 'restore') archiveLead(id, false);
     else if (act === 'delete') deleteLead(id);
-  });
+  }
+  rowsEl.addEventListener('click', onRowsClick);
+  detailEl.addEventListener('click', onRowsClick);
+  $('detailBackdrop').addEventListener('click', () => closeRow());
   // Verslagen, slimme datums en voorbereiding in een geopend bedrijf.
   function smartAction(act, id, el) {
     const l = byId(id);
@@ -4319,7 +4435,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     el.innerHTML = h; el.hidden = !h;
   }
   function onField(e) {
-    const t = e.target, row = t.closest('.row');
+    const t = e.target, row = t.closest('.row, .sheet');
     if (!row) return;
     const id = row.dataset.id;
     if (t.dataset.vfield && vdrafts[id]) {
@@ -4359,29 +4475,63 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   }
   rowsEl.addEventListener('input', onField);
   rowsEl.addEventListener('change', onField);
-  rowsEl.addEventListener('keydown', e => {
+  detailEl.addEventListener('input', onField);
+  detailEl.addEventListener('change', onField);
+  function onRowsKey(e) {
     if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.pick[data-act="copy"]')) { e.preventDefault(); copyText(e.target.dataset.copy, e.target.dataset.label); return; }
     const f = e.target.closest('[data-field], [data-ffield]');
     if (!f) return;
-    const id = f.closest('.row').dataset.id;
+    const id = f.closest('.row, .sheet').dataset.id;
     if (e.key === 'Enter' && f.tagName === 'INPUT' && f.type !== 'checkbox' && !state.readOnly) {
       e.preventDefault();
       if (f.dataset.ffield) finishLead(id); else saveLead(id);
     }
-    else if (e.key === 'Escape') { e.preventDefault(); closeRow(); document.getElementById('t-' + id)?.focus(); }
+  }
+  rowsEl.addEventListener('keydown', onRowsKey);
+  detailEl.addEventListener('keydown', onRowsKey);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && state.open && !detailEl.hidden && $('cam').hidden) { e.preventDefault(); const id = state.open; closeRow(); $('t-' + id)?.focus({ preventScroll: true }); }
   });
 
-  $('askBtn').addEventListener('click', () => { ask.open = !ask.open; renderAsk(); if (ask.open) $('askQ')?.focus(); });
-  $('askPanel').addEventListener('submit', e => { e.preventDefault(); runAsk($('askQ').value); $('askQ')?.blur(); });
-  $('askPanel').addEventListener('input', e => { if (e.target.id === 'askQ') ask.q = e.target.value; });
-  $('askPanel').addEventListener('click', e => {
-    const g = e.target.closest('[data-goto]');
-    if (g) { gotoLead(g.dataset.goto); return; }
+  renderAskEx();
+  // Voorbeeldvragen onder de zoekbalk: tikken vult de vraag in (pointerdown, zodat de zoekbalk de focus houdt).
+  $('askEx').addEventListener('pointerdown', e => {
     const x = e.target.closest('[data-ask-ex]');
-    if (x) { runAsk(ASK_VOORBEELDEN[+x.dataset.askEx]); return; }
-    if (e.target.closest('[data-ask="close"]')) { ask.open = false; renderAsk(); }
+    if (!x) return;
+    e.preventDefault();
+    searchEl.value = state.search = ASK_VOORBEELDEN[+x.dataset.askEx];
+    renderRows(); renderSelBar();
+    searchEl.blur();
   });
   $('statusSel').addEventListener('change', e => { state.status = e.target.value; pref.set('statusFilter', state.status); renderAll(); });
+  let filterOpen = false;
+  function renderFilters() {
+    const panel = $('filterPanel'), btn = $('filterBtn'), chips = $('activeFilters');
+    const onList = state.page === 'bedrijven' || state.page === 'kaart';
+    panel.hidden = !filterOpen || !onList;
+    btn.setAttribute('aria-expanded', String(filterOpen && onList));
+    $('buurtField').hidden = state.page !== 'bedrijven';
+    const act = [state.branche && ['branche', state.branche], state.status && ['status', STATUSES.find(x => x[0] === state.status)[1]],
+      state.buurt && state.page === 'bedrijven' && ['buurt', `In de buurt (${buurtKm()} km)`]].filter(Boolean);
+    btn.innerHTML = `${ic('sliders-horizontal')}<span>Filters</span>${act.length ? `<span class="badge">${act.length}</span>` : ''}`;
+    chips.hidden = !act.length || !onList;
+    chips.innerHTML = act.map(([k, t]) => `<button type="button" class="chip on" data-clear="${k}" aria-label="Filter ${esc(t)} weghalen">${esc(t)}<span aria-hidden="true">×</span></button>`).join('');
+  }
+  $('filterBtn').addEventListener('click', () => { filterOpen = !filterOpen; renderFilters(); });
+  $('filterDone').addEventListener('click', () => { filterOpen = false; renderFilters(); });
+  $('filterClear').addEventListener('click', () => {
+    state.branche = ''; pref.set('branche', ''); state.status = ''; pref.set('statusFilter', '');
+    if (state.buurt) { state.buurt = false; pref.set('buurt', ''); if (state.page !== 'kaart') stopLocating(); }
+    renderAll();
+  });
+  $('activeFilters').addEventListener('click', e => {
+    const b = e.target.closest('[data-clear]');
+    if (!b) return;
+    if (b.dataset.clear === 'branche') { state.branche = ''; pref.set('branche', ''); }
+    else if (b.dataset.clear === 'status') { state.status = ''; pref.set('statusFilter', ''); }
+    else { state.buurt = false; pref.set('buurt', ''); if (state.page !== 'kaart') stopLocating(); }
+    renderAll();
+  });
   $('buurtBtn').addEventListener('click', () => {
     state.buurt = !state.buurt;
     pref.set('buurt', state.buurt ? '1' : '');

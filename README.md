@@ -7,6 +7,8 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 ## Wat de app doet
 
 - Bedrijven met contactpersoon, telefoon, e-mail, adres, branche en website; acties met datum, tijd en prioriteit.
+- **Bedrijfsscherm**: tik op een bedrijf en je krijgt een eigen scherm met grote knoppen (Bellen, WhatsApp, Mail, Route), de volgende stap en de tabbladen Overzicht, Verslagen, Gegevens en Historie. De terugknop van je telefoon sluit het weer.
+- **Eén zoekbalk**: zoek op naam, plaats of contactpersoon, of typ een vraag. Branche, soort relatie en In de buurt zitten achter de knop Filters.
 - Vijf tabbladen: **Vandaag**, **Bedrijven**, **Kaart**, **Nieuw** en **Meer** (op de telefoon onderin, op de computer bovenin).
 - **Vandaag**: wat er vandaag (of eerder) moet gebeuren, met elke ochtend om 08:05 een melding.
 - **Belsessie**: de lijst een voor een afbellen. Na elk gesprek staat "Hoe ging het?" open, ook als je vanuit de lijst belt.
@@ -21,7 +23,7 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 - **Voorbereiding** bovenaan elk geopend bedrijf: laatste contact, besproken machines, afspraken, interesse en wat je bij het volgende gesprek kunt vragen.
 - **Dubbele bedrijven** worden herkend (zelfde naam, telefoon, e-mail of website, of bijna dezelfde naam in dezelfde plaats) en zijn in Meer samen te voegen zonder iets kwijt te raken.
 - **In de buurt**: filter bij Bedrijven op afstand van je huidige plek (afstand instelbaar in Meer).
-- **Vraag het Leadnex**: vragen over je eigen klanten, zoals "Welke bedrijven wilden een elektrische heftruck?", "Wie wilde ik dit kwartaal terugbellen?" of "Welke potentiële klanten wachten op een offerte?". De app begrijpt periodes, acties en status en zoekt in je verslagen en notities.
+- **Vraag het Leadnex** (in de zoekbalk bij Bedrijven): vragen over je eigen klanten, zoals "Welke bedrijven wilden een elektrische heftruck?", "Wie wilde ik dit kwartaal terugbellen?" of "Welke potentiële klanten wachten op een offerte?". De app begrijpt periodes, acties en status en zoekt in je verslagen en notities.
 - Alles werkt in de app zelf: geen AI-dienst, geen extra account en geen kosten.
 - **Weergave**: licht, donker of zoals je telefoon (Meer → Voorkeuren).
 - **Delen naar de app** vanuit Google Maps, de Google-app of Chrome (naam, adres en telefoon worden zo nodig aangevuld via PDOK of OpenStreetMap), **visitekaartje scannen**, **in telefooncontacten** zetten, import uit Excel, export naar CSV, back-up.
