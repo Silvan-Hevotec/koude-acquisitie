@@ -10,7 +10,8 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 - **Bedrijfsscherm**: tik op een bedrijf en je krijgt een eigen scherm met grote knoppen (Bellen, WhatsApp, Mail, Route), de volgende stap en de tabbladen Overzicht, Verslagen, Gegevens en Historie. De terugknop van je telefoon sluit het weer.
 - **Eén zoekbalk**: zoek op naam, plaats of contactpersoon, of typ een vraag. Branche, soort relatie en In de buurt zitten achter de knop Filters.
 - Vijf tabbladen: **Vandaag**, **Bedrijven**, **Kaart**, **Nieuw** en **Meer** (op de telefoon onderin, op de computer bovenin).
-- **Vandaag**: wat er vandaag (of eerder) moet gebeuren, met elke ochtend om 08:05 een melding.
+- **Vandaag**: wat er vandaag (of eerder) moet gebeuren.
+- **Meldingen** op je telefoon: 's ochtends een overzicht van de acties van vandaag, en bij een actie met een tijd een melding op het tijdstip of 5 minuten tot een dag ervoor (zie [Meldingen](#meldingen)). Tik op de melding en het bedrijf gaat open.
 - **Belsessie**: de lijst een voor een afbellen. Na elk gesprek staat "Hoe ging het?" open, ook als je vanuit de lijst belt.
 - **Vaste opvolgstappen** na geen gehoor: de volgende werkdag, na twee werkdagen, na drie keer een mail (daarna vanzelf nabellen), na vijf keer voorstel om te archiveren.
 - **Kaart**: al je bedrijven in beeld, met een teller (hoeveel op de kaart, hoeveel zonder adres of met een adres dat niet gevonden is). Kies 2, 5, 10 of 25 km om te zien wat bij jou in de buurt is, met route langs de dichtstbijzijnde. Felle spelden: geel = vandaag te doen, oranje = met actie, paars = zonder actie, rode stip = hoge prioriteit. Adressen worden één keer opgezocht bij de Locatieserver van PDOK (Kadaster) en bij het bedrijf bewaard; de kaart komt ook van PDOK.
@@ -19,7 +20,7 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 - **Werken zonder bereik**: wijzigingen blijven op de telefoon in een wachtrij en gaan vanzelf online zodra er weer verbinding is.
 - **Status** per bedrijf: lead, potentiële klant of klant, met een filter bij Bedrijven. Bij "Interesse" wordt een lead vanzelf potentiële klant.
 - **Klantverslagen** onder elk bedrijf: inspreken (spraakherkenning van Chrome) of typen. De app poetst de gesproken tekst op en vult de besproken machines, interesse, afspraken en opvolgtaak alvast in; je past aan waar nodig. Een verslag telt als contactmoment.
-- **Slimme datums**: de app herkent "na de bouwvak" (adviesdata per regio), "volgende week dinsdag om 10 uur", "over twee weken", "half november", "na de kerst", "in Q1" enzovoort en stelt de opvolgtaak voor, op een werkdag en niet op een feestdag. Bij een afspraak met tijd kun je een herinnering kiezen (15 minuten tot een dag vooraf) die mee gaat naar je agenda.
+- **Slimme datums**: de app herkent "na de bouwvak" (adviesdata per regio), "volgende week dinsdag om 10 uur", "over twee weken", "half november", "na de kerst", "in Q1" enzovoort en stelt de opvolgtaak voor, op een werkdag en niet op een feestdag. Bij een afspraak met tijd kies je wanneer je een melding krijgt (op het tijdstip, of 5 minuten tot een dag vooraf); die gaat ook mee naar je agenda.
 - **Voorbereiding** bovenaan elk geopend bedrijf: laatste contact, besproken machines, afspraken, interesse en wat je bij het volgende gesprek kunt vragen.
 - **Dubbele bedrijven** worden herkend (zelfde naam, telefoon, e-mail of website, of bijna dezelfde naam in dezelfde plaats) en zijn in Meer samen te voegen zonder iets kwijt te raken.
 - **In de buurt**: filter bij Bedrijven op afstand van je huidige plek (afstand instelbaar in Meer).
@@ -35,6 +36,7 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 | `index.html` | De app |
 | `config.js` | Koppeling met Supabase (Project URL en publishable/anon key) en Outlook (toepassings-ID en map-ID) |
 | `supabase.sql` | Maakt de tabel en de beveiliging aan in Supabase |
+| `supabase/functions/leadnex-meldingen/index.ts`, `supabase/meldingen.sql` | De meldingsdienst in Supabase (zie [Meldingen](#meldingen)) |
 | `manifest.webmanifest`, `sw.js`, `icons/` | Maken de app installeerbaar op Android |
 | `vendor/` | Supabase-bibliotheek 2.117.2, SheetJS 0.18.5 (Excel-import), Tesseract.js 5.1.1 (visitekaartjes lezen) en Leaflet 1.9.4 (kaart) |
 
@@ -62,6 +64,20 @@ Met een koppeling verstuurt de app mails vanuit je eigen mailbox (ook persoonlij
 5. Zet de **Toepassings-ID (client-ID)** en **Map-ID (tenant-ID)** van de pagina **Overzicht** in `config.js` (`outlookClientId`, `outlookTenant`), of vul ze in de app in onderaan bij **Outlook → Koppelen**.
 
 Aanmelden gebeurt bij Microsoft zelf (code met PKCE, geen wachtwoord in de app). Microsoft laat een app als deze maximaal 24 uur aangemeld; daarna meldt de app zich meestal vanzelf opnieuw aan. Lukt dat niet, dan vraagt hij je even op Aanmelden te tikken.
+
+## Meldingen
+
+Leadnex stuurt 's ochtends een overzicht van de acties van vandaag (ook die zonder tijd), en bij elke actie met een tijd een melding op het tijdstip zelf of zoveel minuten ervoor. De standaard kies je in de app bij **Meer → Meldingen**; per actie pas je hem aan bij **Gegevens → Melding**.
+
+De meldingen komen van een kleine functie in je eigen Supabase-project, die elke minuut kijkt of er iets te melden is. Zo komen ze ook als de app dicht is. Eenmalig instellen, op de computer (ongeveer 5 minuten):
+
+1. **Functie aanmaken**: in Supabase → **Edge Functions** → **Deploy a new function** → **Via Editor**. Naam: `leadnex-meldingen`. Vervang de voorbeeldcode door de inhoud van [`supabase/functions/leadnex-meldingen/index.ts`](supabase/functions/leadnex-meldingen/index.ts) en klik op **Deploy function**.
+2. **JWT-controle uit**: open de functie → **Details** → zet **Verify JWT with legacy secret** (of **Enforce JWT Verification**) uit en klik op **Save changes**. De functie controleert zelf wie een testmelding vraagt.
+3. **Sleutel**: **Edge Functions → Secrets** → bij **Add new secret** de naam `VAPID_PRIVATE_KEY` en als waarde de privésleutel voor meldingen (die staat bewust niet in deze repository) → **Save**.
+4. **Elke minuut laten draaien**: **SQL Editor → New query**, plak de inhoud van [`supabase/meldingen.sql`](supabase/meldingen.sql) en klik op **Run**.
+5. Op je telefoon: **Meer → Meldingen op deze telefoon → Aanzetten** en tik op **Toestaan**. Je krijgt meteen een testmelding, en onder de knop staat of de meldingsdienst werkt.
+
+Kosten: geen. Elke minuut één aanroep is zo'n 45.000 per maand; het gratis Supabase-abonnement heeft er 500.000.
 
 ## Op de telefoon installeren
 Open het adres in **Chrome**, log in en tik op **App installeren** (of menu ⋮ → **App installeren**).

@@ -1,0 +1,246 @@
+// Leadnex: meldingen op je telefoon.
+//
+// Supabase roept deze functie elke minuut aan (zie supabase/meldingen.sql). De functie stuurt:
+//  - 's ochtends een overzicht van de acties van vandaag, op de tijd die je in de app instelt;
+//  - bij een actie met een tijd een herinnering op het tijdstip zelf of zoveel minuten ervoor.
+// Vanuit de app (Meer → Meldingen) wordt hij aangeroepen met {"status": true} om te zien of alles werkt,
+// en met {"test": true} voor een testmelding op jouw telefoons.
+//
+// Instellen in Supabase: Edge Functions → nieuwe functie "leadnex-meldingen" met deze code,
+// "Verify JWT" uit, en bij Edge Functions → Secrets het geheim VAPID_PRIVATE_KEY.
+// De functie gebruikt geen externe bibliotheken: versleutelen en ondertekenen gaat met WebCrypto.
+
+const APP_URL = 'https://silvan-hevotec.github.io/koude-acquisitie/';
+const VAPID_PUBLIC = 'BDz5_askKTOerYW4HV6sHD4GET_pLPTGSah3yEDccDjpEZTWyK0-lRdvAnYPSresTw1bs1VKjXSdPqmMHwFmGM8';
+const TZ = 'Europe/Amsterdam';
+const STANDAARD = { ochtend: '08:00', herinnering: 15 };   // zelfde standaard als in de app
+const OCHTEND_VENSTER = 30;     // minuten: mist de klok een paar rondes, dan komt het overzicht alsnog
+const HERINNER_VENSTER = 10;    // minuten
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
+type Sub = { user_id: string; id: string; data: { endpoint: string; keys: { p256dh: string; auth: string }; verlopen?: string } };
+type Lead = { user_id: string; id: string; bedrijf: string | null; actie: string | null; datum: string | null; tijd: string | null;
+  herinnering: number | null; gearchiveerd: boolean | null; plaats: string | null; contact: string | null; telefoon: string | null; prioriteit: string | null };
+type Bericht = { sleutel: string; title: string; body: string; tag: string; url: string; ttl: number };
+
+/* ---------- hulpjes ---------- */
+const te = new TextEncoder();
+const b64enc = (b: Uint8Array) => btoa(String.fromCharCode(...b)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const b64dec = (s: string) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - s.length % 4) % 4)), c => c.charCodeAt(0));
+const concat = (...parts: Uint8Array[]) => {
+  const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
+  let i = 0;
+  for (const p of parts) { out.set(p, i); i += p.length; }
+  return out;
+};
+const bs = (u: Uint8Array) => u as unknown as BufferSource;   // voor WebCrypto, ook met strengere TypeScript-typen
+const json = (x: unknown, status = 200) => new Response(JSON.stringify(x), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
+
+/* ---------- tijd in Nederland ---------- */
+const fmt = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' });
+function nl(t: number) {
+  const p = Object.fromEntries(fmt.formatToParts(new Date(t)).map(x => [x.type, x.value]));
+  return { datum: `${p.year}-${p.month}-${p.day}`, tijd: `${p.hour}:${p.minute}`, weekend: p.weekday === 'Sat' || p.weekday === 'Sun' };
+}
+const minuten = (hhmm: string) => +hhmm.slice(0, 2) * 60 + +hhmm.slice(3, 5);
+const plusDagen = (datum: string, n: number) => new Date(Date.UTC(+datum.slice(0, 4), +datum.slice(5, 7) - 1, +datum.slice(8, 10) + n)).toISOString().slice(0, 10);
+// Tijdstip op de klok in Nederland → milliseconden sinds 1970 (houdt rekening met zomer- en wintertijd).
+function tijdstip(datum: string, tijd: string) {
+  const wand = Date.UTC(+datum.slice(0, 4), +datum.slice(5, 7) - 1, +datum.slice(8, 10), +tijd.slice(0, 2), +tijd.slice(3, 5));
+  const verschil = (t: number) => { const p = nl(t); return Date.UTC(+p.datum.slice(0, 4), +p.datum.slice(5, 7) - 1, +p.datum.slice(8, 10), +p.tijd.slice(0, 2), +p.tijd.slice(3, 5)) - Math.floor(t / 60000) * 60000; };
+  let t = wand - verschil(wand);
+  const v2 = verschil(t);
+  if (wand - v2 !== t) t = wand - v2;
+  return t;
+}
+const kortDatum = (datum: string) => new Intl.DateTimeFormat('nl-NL', { timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(datum + 'T12:00:00Z'));
+
+/* ---------- database ---------- */
+function geheimeSleutel(): string {
+  const k = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (k) return k;
+  try { const o = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') || '{}'); if (o.default) return o.default; const v = Object.values(o)[0]; if (v) return String(v); } catch { /* geen lijst */ }
+  return Deno.env.get('SUPABASE_SECRET_KEY') || '';
+}
+async function db(pad: string, init: RequestInit = {}) {
+  const key = geheimeSleutel();
+  const headers: Record<string, string> = { apikey: key, 'Content-Type': 'application/json', ...(init.headers as Record<string, string> || {}) };
+  if (!key.startsWith('sb_')) headers.Authorization = `Bearer ${key}`;
+  const res = await fetch(`${Deno.env.get('SUPABASE_URL')}/rest/v1/${pad}`, { ...init, headers });
+  if (!res.ok) throw new Error(`database ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+const inLijst = (ids: string[]) => `in.(${ids.map(encodeURIComponent).join(',')})`;
+// Telefoons met meldingen aan. Een verlopen koppeling blijft staan met 'verlopen', zodat de app op die telefoon
+// bij het openen ziet dat hij een nieuwe moet maken.
+async function abonnementen(userId?: string): Promise<Sub[]> {
+  const rows: Sub[] = await db(`docs?collection=eq.push${userId ? `&user_id=eq.${encodeURIComponent(userId)}` : ''}&select=user_id,id,data`);
+  return rows.filter(s => s.data && s.data.endpoint && s.data.keys && !s.data.verlopen);
+}
+async function instellingen(users: string[]) {
+  const rows: { user_id: string; data: Record<string, unknown> }[] = await db(`docs?collection=eq.instellingen&id=eq.meldingen&user_id=${inLijst(users)}&select=user_id,data`);
+  return (uid: string) => {
+    const d = rows.find(r => r.user_id === uid)?.data || {};
+    const ochtend = typeof d.ochtend === 'string' && (d.ochtend === '' || /^\d\d:\d\d$/.test(d.ochtend)) ? d.ochtend : STANDAARD.ochtend;
+    const herinnering = Number.isInteger(d.herinnering) ? d.herinnering as number : STANDAARD.herinnering;
+    return { ochtend, herinnering };
+  };
+}
+// Eén keer versturen: de sleutel wordt vastgelegd; bestond hij al, dan is de melding al weg.
+async function claim(sleutel: string, userId: string) {
+  const rows = await db('meldlog?on_conflict=sleutel', { method: 'POST', headers: { Prefer: 'resolution=ignore-duplicates,return=representation' }, body: JSON.stringify([{ sleutel, user_id: userId }]) });
+  return Array.isArray(rows) && rows.length > 0;
+}
+const vrijgeven = (sleutel: string) => db(`meldlog?sleutel=eq.${encodeURIComponent(sleutel)}`, { method: 'DELETE' });
+
+/* ---------- web push (RFC 8291 en 8292) ---------- */
+async function hkdf(salt: Uint8Array, ikm: Uint8Array, info: Uint8Array, len: number) {
+  const key = await crypto.subtle.importKey('raw', bs(ikm), 'HKDF', false, ['deriveBits']);
+  return new Uint8Array(await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt: bs(salt), info: bs(info) }, key, len * 8));
+}
+async function versleutel(uaPublic: Uint8Array, authSecret: Uint8Array, tekst: Uint8Array) {
+  const ua = await crypto.subtle.importKey('raw', bs(uaPublic), { name: 'ECDH', namedCurve: 'P-256' }, false, []);
+  const eigen = await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits']) as CryptoKeyPair;
+  const eigenPublic = new Uint8Array(await crypto.subtle.exportKey('raw', eigen.publicKey));
+  const gedeeld = new Uint8Array(await crypto.subtle.deriveBits({ name: 'ECDH', public: ua }, eigen.privateKey, 256));
+  const ikm = await hkdf(authSecret, gedeeld, concat(te.encode('WebPush: info\0'), uaPublic, eigenPublic), 32);
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const cek = await hkdf(salt, ikm, te.encode('Content-Encoding: aes128gcm\0'), 16);
+  const nonce = await hkdf(salt, ikm, te.encode('Content-Encoding: nonce\0'), 12);
+  const aes = await crypto.subtle.importKey('raw', cek, 'AES-GCM', false, ['encrypt']);
+  const geheim = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce }, aes, concat(tekst, new Uint8Array([2]))));
+  const kop = new Uint8Array(21);
+  kop.set(salt, 0);
+  new DataView(kop.buffer).setUint32(16, 4096);
+  kop[20] = eigenPublic.length;
+  return concat(kop, eigenPublic, geheim);
+}
+async function vapidToken(aud: string) {
+  const pub = b64dec(VAPID_PUBLIC);
+  const jwk = { kty: 'EC', crv: 'P-256', x: b64enc(pub.slice(1, 33)), y: b64enc(pub.slice(33, 65)), d: (Deno.env.get('VAPID_PRIVATE_KEY') || '').trim() };
+  const key = await crypto.subtle.importKey('jwk', jwk, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
+  const kop = b64enc(te.encode(JSON.stringify({ typ: 'JWT', alg: 'ES256' })));
+  const inhoud = b64enc(te.encode(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: APP_URL })));
+  const handtekening = new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, key, te.encode(`${kop}.${inhoud}`)));
+  return `${kop}.${inhoud}.${b64enc(handtekening)}`;
+}
+async function push(sub: Sub, b: Bericht) {
+  const { endpoint, keys } = sub.data;
+  const body = await versleutel(b64dec(keys.p256dh), b64dec(keys.auth), te.encode(JSON.stringify({ type: 'melding', title: b.title, body: b.body, tag: b.tag, url: b.url })));
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { TTL: String(b.ttl), Urgency: 'high', 'Content-Encoding': 'aes128gcm', 'Content-Type': 'application/octet-stream', Authorization: `vapid t=${await vapidToken(new URL(endpoint).origin)}, k=${VAPID_PUBLIC}` },
+    body,
+  });
+  await res.body?.cancel();
+  return res.status;
+}
+// Naar alle telefoons van een gebruiker; verlopen koppelingen worden gemarkeerd.
+async function verstuur(subs: Sub[], b: Bericht) {
+  const r = { verstuurd: 0, verlopen: 0, fouten: [] as string[] };
+  for (const s of subs) {
+    let status = 0;
+    try { status = await push(s, b); } catch (e) { r.fouten.push(String((e as Error).message || e)); continue; }
+    if (status >= 200 && status < 300) r.verstuurd++;
+    else if (status === 404 || status === 410) {
+      r.verlopen++;
+      await db(`docs?collection=eq.push&user_id=eq.${encodeURIComponent(s.user_id)}&id=eq.${encodeURIComponent(s.id)}`, { method: 'PATCH', body: JSON.stringify({ data: { ...s.data, verlopen: new Date().toISOString() } }) }).catch(() => {});
+    } else r.fouten.push(`pushdienst ${status}`);
+  }
+  return r;
+}
+
+/* ---------- wat er in de meldingen staat ---------- */
+const rang = (l: Lead) => l.prioriteit === 'hoog' ? 0 : l.prioriteit === 'laag' ? 2 : 1;
+function ochtendBericht(uid: string, leads: Lead[], vandaag: string, weekend: boolean): Bericht | null {
+  const due = leads.filter(l => l.datum! <= vandaag)
+    .sort((a, b) => rang(a) - rang(b) || a.datum!.localeCompare(b.datum!) || (a.tijd || '99').localeCompare(b.tijd || '99') || (a.plaats || '').localeCompare(b.plaats || ''));
+  const vandaagZelf = due.filter(l => l.datum === vandaag);
+  if (!due.length || (weekend && !vandaagZelf.length)) return null;   // in het weekend alleen als er die dag echt iets staat
+  const lijst = weekend ? vandaagZelf : due;
+  const laat = lijst.filter(l => l.datum! < vandaag).length;
+  const regels = lijst.slice(0, 6).map(l => `${l.tijd && l.datum === vandaag ? l.tijd + ' ' : ''}${l.actie} · ${l.bedrijf}${l.plaats ? ` (${l.plaats})` : ''}${l.datum! < vandaag ? ' – te laat' : ''}${l.prioriteit === 'hoog' ? ' – hoog' : ''}`);
+  if (lijst.length > 6) regels.push(`en nog ${lijst.length - 6}`);
+  const n = lijst.length;
+  return { sleutel: `ochtend|${uid}|${vandaag}`, title: `Vandaag: ${n} ${n === 1 ? 'actie' : 'acties'}${laat ? `, ${laat} te laat` : ''}`, body: regels.join('\n'), tag: 'dagtaken', url: './#vandaag', ttl: 4 * 3600 };
+}
+function herinnerBericht(uid: string, l: Lead, vooraf: number, vandaag: string): Bericht {
+  const wanneer = l.datum === vandaag ? `om ${l.tijd}` : l.datum === plusDagen(vandaag, 1) ? `morgen om ${l.tijd}` : `${kortDatum(l.datum!)} om ${l.tijd}`;
+  const kop = vooraf === 0 ? `Nu: ${l.actie} ${l.bedrijf}` : `${l.actie} ${l.bedrijf} ${wanneer}`;
+  const details = [l.contact, l.telefoon, l.plaats].filter(Boolean).join(' · ');
+  const nu = vooraf === 0 ? `Gepland om ${l.tijd}.` : vooraf < 60 ? `Over ${vooraf} minuten.` : vooraf === 60 ? 'Over een uur.' : '';
+  return { sleutel: `herinner|${uid}|${l.id}|${l.datum}T${l.tijd}|${vooraf}`, title: kop, body: [nu, details].filter(Boolean).join('\n'), tag: `actie-${l.id}`, url: `./#bedrijf=${encodeURIComponent(l.id)}`, ttl: 1800 };
+}
+
+/* ---------- elke minuut ---------- */
+async function ronde(nu: number) {
+  await db('meldlog?on_conflict=sleutel', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify([{ sleutel: 'hartslag', verstuurd: new Date(nu).toISOString() }]) });
+  const subs = await abonnementen();
+  if (!subs.length) return { telefoons: 0, verstuurd: 0 };
+  const users = [...new Set(subs.map(s => s.user_id))];
+  const cfgVan = await instellingen(users);
+  const { datum: vandaag, tijd, weekend } = nl(nu);
+  const morgen = plusDagen(vandaag, 1);
+  const velden = 'user_id,id,bedrijf:data->>bedrijf,actie:data->>actie,datum:data->>datum,tijd:data->>tijd,herinnering:data->herinnering,gearchiveerd:data->gearchiveerd,plaats:data->>plaats,contact:data->>contact,telefoon:data->>telefoon,prioriteit:data->>prioriteit';
+  const leads: Lead[] = await db(`docs?collection=eq.leads&user_id=${inLijst(users)}&data->>datum=lte.${morgen}&data->>datum=gte.2000-01-01&select=${velden}`);
+  const totaal = { telefoons: subs.length, verstuurd: 0, verlopen: 0, fouten: [] as string[] };
+  for (const uid of users) {
+    const cfg = cfgVan(uid);
+    const mijn = leads.filter(l => l.user_id === uid && l.actie && l.bedrijf && /^\d{4}-\d\d-\d\d$/.test(l.datum || '') && l.gearchiveerd !== true);
+    const berichten: Bericht[] = [];
+    if (cfg.ochtend && minuten(tijd) >= minuten(cfg.ochtend) && minuten(tijd) < minuten(cfg.ochtend) + OCHTEND_VENSTER) {
+      const b = ochtendBericht(uid, mijn, vandaag, weekend);
+      if (b) berichten.push(b);
+    }
+    for (const l of mijn) {
+      if (!/^\d\d:\d\d$/.test(l.tijd || '')) continue;
+      const h = Number.isInteger(l.herinnering) ? l.herinnering! : cfg.herinnering;
+      if (h <= 0) continue;   // 0 = geen herinnering
+      const vooraf = h === 1 ? 0 : h;   // 1 = op het tijdstip zelf
+      const om = tijdstip(l.datum!, l.tijd!) - vooraf * 60000;
+      if (om <= nu && om > nu - HERINNER_VENSTER * 60000) berichten.push(herinnerBericht(uid, l, vooraf, vandaag));
+    }
+    const mijnSubs = subs.filter(s => s.user_id === uid);
+    for (const b of berichten) {
+      if (!await claim(b.sleutel, uid)) continue;
+      const r = await verstuur(mijnSubs, b);
+      totaal.verstuurd += r.verstuurd; totaal.verlopen += r.verlopen; totaal.fouten.push(...r.fouten);
+      if (!r.verstuurd && r.fouten.length) await vrijgeven(b.sleutel).catch(() => {});   // pushdienst even niet bereikbaar: volgende minuut opnieuw
+    }
+  }
+  if (tijd.endsWith(':00')) await db(`meldlog?verstuurd=lt.${new Date(nu - 3 * 86400000).toISOString()}`, { method: 'DELETE' }).catch(() => {});
+  return totaal;
+}
+
+/* ---------- vanuit de app: status of testmelding ---------- */
+async function vanApp(req: Request, body: { test?: boolean; status?: boolean }) {
+  if (!(Deno.env.get('VAPID_PRIVATE_KEY') || '').trim()) return json({ ok: false, fout: 'geen-sleutel', uitleg: 'Het geheim VAPID_PRIVATE_KEY ontbreekt in Supabase (Edge Functions → Secrets).' });
+  const res = await fetch(`${Deno.env.get('SUPABASE_URL')}/auth/v1/user`, { headers: { apikey: req.headers.get('apikey') || geheimeSleutel(), Authorization: req.headers.get('Authorization') || '' } });
+  if (!res.ok) return json({ ok: false, fout: 'niet-ingelogd', uitleg: 'Log opnieuw in en probeer het nog eens.' }, 401);
+  const user = await res.json();
+  const subs = await abonnementen(user.id);
+  const hartslag = ((await db('meldlog?sleutel=eq.hartslag&select=verstuurd')) || [])[0]?.verstuurd || null;
+  if (body.status) return json({ ok: true, telefoons: subs.length, hartslag });
+  if (!subs.length) return json({ ok: false, fout: 'geen-telefoon', uitleg: 'Er is nog geen telefoon gekoppeld. Zet de meldingen aan op je telefoon.' });
+  const cfg = (await instellingen([user.id]))(user.id);
+  const h = cfg.herinnering, wanneer = h <= 0 ? 'geen herinnering bij acties met een tijd' : h === 1 ? 'een herinnering op het tijdstip van een actie' : h === 1440 ? 'een herinnering een dag voor een actie met een tijd' : `een herinnering ${h} minuten voor een actie met een tijd`;
+  const r = await verstuur(subs, { sleutel: '', title: 'Meldingen werken', body: `${cfg.ochtend ? `Om ${cfg.ochtend} krijg je het overzicht van de dag, en ` : 'Je krijgt '}${wanneer}.`, tag: 'test', url: './#vandaag', ttl: 600 });
+  return json({ ok: r.verstuurd > 0, telefoons: subs.length, hartslag, ...r });
+}
+
+Deno.serve(async req => {
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
+  try {
+    const body = await req.json().catch(() => ({}));
+    if (body && (body.test || body.status)) return await vanApp(req, body);
+    return json(await ronde(Date.now()));
+  } catch (e) {
+    console.error(e);
+    return json({ ok: false, fout: String((e as Error).message || e) }, 500);
+  }
+});

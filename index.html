@@ -580,6 +580,9 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 .set-row .set-text span { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
 .push-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 14px; color: var(--ink); }
 .set-row > .push-line { flex: 1 1 220px; min-width: 0; margin: 0; }
+.set-row > .push-server { flex-basis: 100%; margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--sunken); color: var(--ink); font-size: 13.5px; }
+.set-row > .push-server.ok { background: var(--ok-soft); color: var(--ok); }
+.set-row > .push-server a { color: inherit; }
 .push-line .linkbtn { font-size: 14px; }
 .push-line .input { flex-basis: 100%; font: 12px/1.4 var(--f-mono); }
 .install-row:has(#installBtn[hidden]) { display: none; }
@@ -908,14 +911,13 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     </section>
     <section class="card set-group" aria-label="Meldingen en koppelingen">
       <h3>Meldingen en koppelingen</h3>
-      <div class="set-row"><i data-ic="bell"></i>
-        <p class="push-line" id="pushLine">
-          <span id="pushStatus">Ochtendmelding 08:05</span>
-          <button type="button" class="linkbtn" id="pushOn" hidden>Aanzetten</button>
-          <button type="button" class="linkbtn" id="pushTest" hidden>Testmelding</button>
-          <button type="button" class="linkbtn" id="pushCopy" hidden>Koppelcode</button>
-          <textarea class="input" id="pushCode" rows="3" readonly hidden aria-label="Koppelcode"></textarea>
-        </p></div>
+      <div class="set-row"><i data-ic="bell"></i><div class="set-text"><strong>Meldingen op deze telefoon</strong><span id="pushStatus">Meldingen</span></div>
+        <div class="btns"><button type="button" class="btn small primary" id="pushOn" hidden>Aanzetten</button><button type="button" class="btn small" id="pushTest" hidden>Testmelding</button><button type="button" class="btn small ghost" id="pushOff" hidden>Uitzetten</button></div>
+        <p class="hint push-server" id="pushServer" hidden></p></div>
+      <div class="set-row" id="meldOchtendRow"><i data-ic="sun"></i><div class="set-text"><strong>Overzicht van de dag</strong><span>Een melding met je acties van vandaag, ook die zonder tijd.</span></div>
+        <select class="input set-sel" id="meldOchtend" aria-label="Tijd van het overzicht van de dag"></select></div>
+      <div class="set-row" id="meldHerinneringRow"><i data-ic="alarm-clock"></i><div class="set-text"><strong>Melding bij een actie met tijd</strong><span>Standaard voor elke actie; per actie aan te passen bij Gegevens.</span></div>
+        <select class="input set-sel" id="meldHerinnering" aria-label="Standaard melding bij een actie met tijd"></select></div>
       <div class="set-row"><i data-ic="mail"></i>
         <p class="push-line" id="outlookLine">
           <span id="outlookStatus">Outlook</span>
@@ -994,7 +996,11 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   const STATUSES = [['lead', 'Lead'], ['prospect', 'Potentiële klant'], ['klant', 'Klant']];
   const SOORTEN = ['Bezoek', 'Telefoon', 'Overig'];
   const INTERESSE = [['', 'Onbekend'], ['hoog', 'Hoog'], ['middel', 'Middel'], ['laag', 'Laag'], ['geen', 'Geen']];
-  const HERINNERING = [[0, 'Geen'], [15, '15 minuten vooraf'], [30, 'Een half uur vooraf'], [60, 'Een uur vooraf'], [1440, 'Een dag vooraf']];
+  // Herinnering bij een actie met een tijd. 0 = geen, 1 = op het tijdstip zelf, anders minuten vooraf.
+  // Niets ingevuld (null) = de standaard uit Meer → Meldingen.
+  const HERINNERING = [[0, 'Geen'], [1, 'Op het tijdstip'], [5, '5 minuten vooraf'], [10, '10 minuten vooraf'], [15, '15 minuten vooraf'], [30, 'Een half uur vooraf'], [60, 'Een uur vooraf'], [1440, 'Een dag vooraf']];
+  const MELD_STANDAARD = { ochtend: '08:00', herinnering: 15 };   // zelfde standaard als de meldingsdienst in Supabase
+  let meld = { ...MELD_STANDAARD };
   const BUURT_KM = [2, 5, 10, 25, 50];
   const PLACEHOLDERS = ['{aanhef}', '{voornaam}', '{bedrijf}', '{plaats}'];
   const MAX_LEADS = 1000;
@@ -1081,7 +1087,13 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   const validStatus = v => v === 'prospect' || v === 'klant' ? v : 'lead';
   const statusLabel = v => STATUSES.find(x => x[0] === v)[1];
   const validInteresse = v => INTERESSE.some(x => x[0] === v) ? v : '';
-  const validHerinnering = v => HERINNERING.some(x => x[0] === v) ? v : 30;
+  const validHerinnering = v => HERINNERING.some(x => x[0] === v) ? v : null;
+  const parseHerinnering = v => v === '' || v === null || v === undefined ? null : validHerinnering(+v);
+  const herinneringVan = l => l.herinnering ?? meld.herinnering;
+  const minutenVooraf = h => h === 1 ? 0 : h;
+  const herinneringLabel = h => (HERINNERING.find(x => x[0] === h) || [0, 'Geen'])[1];
+  const herinneringOpties = cur => `<option value=""${cur === '' || cur === null || cur === undefined ? ' selected' : ''}>Standaard (${esc(herinneringLabel(meld.herinnering).toLowerCase())})</option>` +
+    HERINNERING.map(([m, t]) => `<option value="${m}"${String(m) === String(cur) ? ' selected' : ''}>${t}</option>`).join('');
   const mapPrio = v => { const k = String(v || '').trim().toLowerCase(); return /^(hoog|high|warm|heet|a|1)$/.test(k) ? 'hoog' : /^(laag|low|koud|c|3)$/.test(k) ? 'laag' : 'normaal'; };
   const mailable = l => !!l && !l.geenMail && /\S+@\S+\.\S+/.test(l.email || '');
 
@@ -1331,13 +1343,13 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       aangemaakt: l.aangemaakt, gewijzigd: l.gewijzigd, status: validStatus(l.status),
     };
     if (l.verslagen && l.verslagen.length) b.verslagen = l.verslagen.map(verslagBody);
-    if (l.tijd && validHerinnering(l.herinnering) !== 30) b.herinnering = validHerinnering(l.herinnering);
+    if (validHerinnering(l.herinnering) !== null) b.herinnering = l.herinnering;
     if (l.voorbeeld) b.voorbeeld = true;
     if (l.outlookId) b.outlookId = l.outlookId;
     if (validGeo(l.geo)) b.geo = validGeo(l.geo);
     return b;
   }
-  const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, website: l.website, branche: l.branche, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail, status: l.status, herinnering: String(l.herinnering) });
+  const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, website: l.website, branche: l.branche, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail, status: l.status, herinnering: l.herinnering === null || l.herinnering === undefined ? '' : String(l.herinnering) });
 
   let toastTimer = 0;
   function toast(msg, ms = 3600) {
@@ -1461,7 +1473,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       website: cleanWebsite(d.website), branche: canonBranche(d.branche),
       actie, datum: actie && parseISO(d.datum) ? d.datum : '', notitie: d.notitie.trim(), geenMail: !!d.geenMail, gewijzigd: nowISO(),
       tijd: actie && parseISO(d.datum) && /^\d{2}:\d{2}$/.test(d.tijd || '') ? d.tijd : '', prioriteit: validPrio(d.prioriteit),
-      status: validStatus(d.status), herinnering: validHerinnering(+d.herinnering),
+      status: validStatus(d.status), herinnering: parseHerinnering(d.herinnering),
     };
     const ok = await write(() => col.doc(id).set(toBody(next)));
     if (!ok) return false;
@@ -1624,9 +1636,9 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     lines.push(`SUMMARY:${e(title)}`);
     if (loc) lines.push(`LOCATION:${e(loc)}`);
     if (desc) lines.push(`DESCRIPTION:${e(desc)}`);
-    // Herinnering: met tijd zoals ingesteld (standaard een half uur vooraf), zonder tijd om 08:05 die dag.
-    const h = validHerinnering(l.herinnering);
-    if (!l.tijd || h) lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${e(title)}`, !l.tijd ? 'TRIGGER:PT8H5M' : h === 1440 ? 'TRIGGER:-P1D' : `TRIGGER:-PT${h}M`, 'END:VALARM');
+    // Herinnering: met tijd zoals ingesteld (Meer → Meldingen), zonder tijd 's ochtends op de tijd van het dagoverzicht.
+    const h = herinneringVan(l), ochtend = meld.ochtend || '08:00';
+    if (!l.tijd || h) lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${e(title)}`, !l.tijd ? `TRIGGER:PT${+ochtend.slice(0, 2)}H${+ochtend.slice(3)}M` : h === 1440 ? 'TRIGGER:-P1D' : `TRIGGER:-PT${minutenVooraf(h)}M`, 'END:VALARM');
     lines.push('END:VEVENT', 'END:VCALENDAR');
     return lines.map(fold).join('\r\n') + '\r\n';
   }
@@ -2183,6 +2195,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     renderAll();
     window.scrollTo({ top: 0 });
     if (p === 'nieuw' && !('ontouchstart' in window)) $('addBedrijf').focus({ preventScroll: true });
+    if (p === 'meer') { renderPush(); checkServer(); }
   }
   const NAV = [['vandaag', 'calendar-check', 'Vandaag'], ['bedrijven', 'building-2', 'Bedrijven'], ['kaart', 'map', 'Kaart'], ['nieuw', 'plus', 'Nieuw'], ['meer', 'ellipsis', 'Meer']];
   function renderNav() {
@@ -2297,7 +2310,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
         ${input('actie', 'Actie', 'span2', 'text', 40, ' list="actieLijst" placeholder="Kies of typ, bijv. Bezoek"')}
         <div class="field span2"><label for="p-${id}-tijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="p-${id}-tijd" data-field="tijd" value="${esc(d.tijd || '')}"${ro}></div>
         <div class="field span4"><label for="p-${id}-datum">Wanneer</label>${whenHtml(`p-${id}-datum`, d.datum, ` data-field="datum"${ro}`, state.readOnly)}</div>
-        ${sel('herinnering', 'Herinnering', HERINNERING.map(([m, t]) => `<option value="${m}"${String(m) === String(d.herinnering) ? ' selected' : ''}>${t}</option>`).join(''), '<span class="opt">bij een tijd</span>')}
+        ${sel('herinnering', 'Melding', herinneringOpties(d.herinnering), '<span class="opt">bij een tijd</span>')}
       </div>
       <h3 class="slabel">Notitie</h3>
       <div class="field">
@@ -3774,7 +3787,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   const newVid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   function newVerslagDraft(l, soort) {
     return { soort: soort || (/bezoek|afspraak|demo/i.test(l.actie) ? 'Bezoek' : 'Telefoon'), datum: todayISO(), tekst: '', machines: '', interesse: '', afspraken: '', vragen: '',
-      plan: false, planTouched: false, vactie: '', vdatum: '', vtijd: '', herinnering: '30', agenda: false, statusOk: true, listening: false, touched: {} };
+      plan: false, planTouched: false, vactie: '', vdatum: '', vtijd: '', herinnering: '', agenda: false, statusOk: true, listening: false, touched: {} };
   }
   function verslagenHtml(l) {
     const id = esc(l.id), v = vdrafts[l.id], list = l.verslagen, all = vAll.has(l.id);
@@ -3843,7 +3856,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
           <div class="field"><label for="v-${id}-vactie">Actie</label><input class="input" id="v-${id}-vactie" data-vfield="vactie" list="actieLijst" maxlength="40" value="${esc(v.vactie)}" placeholder="Bijv. Bellen"></div>
           <div class="field"><label for="v-${id}-vtijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="v-${id}-vtijd" data-vfield="vtijd" value="${esc(v.vtijd)}"></div>
           <div class="field span2"><label for="v-${id}-vdatum">Wanneer</label>${whenHtml(`v-${id}-vdatum`, v.vdatum, ' data-vfield="vdatum"')}</div>
-          ${v.vtijd ? `<div class="field span2"><label for="v-${id}-herinnering">Herinnering</label><select class="input" id="v-${id}-herinnering" data-vfield="herinnering">${HERINNERING.map(([m, t]) => `<option value="${m}"${String(m) === String(v.herinnering) ? ' selected' : ''}>${t}</option>`).join('')}</select></div>` : ''}
+          ${v.vtijd ? `<div class="field span2"><label for="v-${id}-herinnering">Melding</label><select class="input" id="v-${id}-herinnering" data-vfield="herinnering">${herinneringOpties(v.herinnering)}</select></div>` : ''}
         </div>
         ${l.actie ? `<p class="hint">Komt in plaats van de huidige actie: ${esc(l.actie)}${l.datum ? ' op ' + esc(shortDate(l.datum)) : ''}.</p>` : ''}
         <label class="check" for="v-${id}-agenda"><input type="checkbox" id="v-${id}-agenda" data-vfield="agenda"${v.agenda ? ' checked' : ''}>${outlookOn() ? 'Ook in mijn Outlook-agenda zetten' : 'Ook in mijn agenda zetten'}${v.vtijd ? ', met herinnering' : ''}</label>` : ''}
@@ -3965,7 +3978,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (!l.log.some(x => x.d === datum)) next.log = [{ d: datum, a: v.soort, u: 'Verslag', t: clip(tekst.replace(/\s+/g, ' ').replace(/^- /, ''), 200) }, ...l.log].sort((a, b) => b.d.localeCompare(a.d)).slice(0, 100);
     if (actie) {
       const tijd = /^\d{2}:\d{2}$/.test(v.vtijd) ? v.vtijd : '';
-      Object.assign(next, { actie, datum: v.vdatum, tijd, herinnering: validHerinnering(+v.herinnering), gearchiveerd: false, gearchiveerdOp: '' });
+      Object.assign(next, { actie, datum: v.vdatum, tijd, herinnering: parseHerinnering(v.herinnering), gearchiveerd: false, gearchiveerdOp: '' });
       if (l.datum !== next.datum || l.tijd !== tijd) next.outlookId = '';
     }
     const st = vStatusSuggestion(l, v);
@@ -3975,7 +3988,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     delete vdrafts[id];
     if (actie) rememberAction(actie);
     // Het formulier erboven laat de nieuwe actie en status zien, zonder je andere wijzigingen weg te gooien.
-    if (drafts[id]) Object.assign(drafts[id], { actie: next.actie, datum: next.datum, tijd: next.tijd, status: next.status, herinnering: String(next.herinnering) });
+    if (drafts[id]) Object.assign(drafts[id], { actie: next.actie, datum: next.datum, tijd: next.tijd, status: next.status, herinnering: next.herinnering === null ? '' : String(next.herinnering) });
     renderAll();
     toast(`Verslag opgeslagen${actie ? `. Volgende: ${actie} op ${shortDate(next.datum)}${next.tijd ? ' om ' + next.tijd : ''}` : ''}${next.status !== l.status ? `. Status: ${statusLabel(next.status).toLowerCase()}` : ''}.`, 5000);
     if (actie && v.agenda) addToCalendar(next);
@@ -5067,9 +5080,8 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     installBtn.hidden = true;
   });
 
-  /* ---------- ochtendmelding ---------- */
-  /* Om 08:05 stuurt een geplande taak van Claude een leeg signaal naar dit toestel. De service worker leest dan
-     de actielijst die de app hieronder klaarzet en toont een melding als er vandaag iets op staat. */
+  /* ---------- meldingen ---------- */
+  /* De actielijst staat ook klaar voor de service worker, voor een wek-signaal zonder inhoud (de oude ochtendmelding). */
   const VAPID_PUBLIC = 'BDz5_askKTOerYW4HV6sHD4GET_pLPTGSah3yEDccDjpEZTWyK0-lRdvAnYPSresTw1bs1VKjXSdPqmMHwFmGM8';
   const DATA_CACHE = 'koude-acq-data';
   let lastAgenda = '';
@@ -5086,17 +5098,6 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       .then(c => c.put(new URL('agenda.json', location.href).href, new Response(json, { headers: { 'Content-Type': 'application/json' } })))
       .catch(() => {});
   }
-  // Zelfde opbouw als in sw.js.
-  function buildMessage(items, today) {
-    const rank = x => x.prioriteit === 'hoog' ? 0 : x.prioriteit === 'laag' ? 2 : 1;
-    const due = items.filter(x => x.datum && x.datum <= today)
-      .sort((a, b) => rank(a) - rank(b) || a.datum.localeCompare(b.datum) || (a.tijd || '99').localeCompare(b.tijd || '99') || String(a.plaats || '').localeCompare(String(b.plaats || '')));
-    if (!due.length) return null;
-    const n = due.length, late = due.filter(x => x.datum < today).length;
-    const lines = due.slice(0, 6).map(x => `${x.tijd && x.datum === today ? x.tijd + ' ' : ''}${x.actie} · ${x.bedrijf}${x.plaats ? ' (' + x.plaats + ')' : ''}${x.datum < today ? ' – te laat' : ''}${x.prioriteit === 'hoog' ? ' – hoog' : ''}`);
-    if (n > 6) lines.push(`en nog ${n - 6}`);
-    return { title: `Vandaag: ${n} ${plural(n, 'actie', 'acties')}${late ? `, ${late} te laat` : ''}`, body: lines.join('\n') };
-  }
   const b64ToBytes = b64 => {
     const s = atob((b64 + '='.repeat((4 - b64.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/'));
     return Uint8Array.from(s, c => c.charCodeAt(0));
@@ -5106,55 +5107,147 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     try { const reg = await navigator.serviceWorker.getRegistration(); return reg ? await reg.pushManager.getSubscription() : null; }
     catch { return null; }
   }
-  const pushCode = sub => 'KA-PUSH:' + btoa(JSON.stringify(sub.toJSON()));
-  async function renderPush() {
-    const status = $('pushStatus'), on = $('pushOn'), copy = $('pushCopy'), test = $('pushTest');
-    if (!pushSupported()) {
-      status.textContent = 'Ochtendmelding: niet beschikbaar in deze browser.';
-      on.hidden = copy.hidden = test.hidden = true;
-      return;
-    }
-    const sub = await currentSub();
-    if (Notification.permission === 'denied') {
-      status.textContent = 'Ochtendmelding: geblokkeerd. Zet meldingen voor de app aan in de Android-instellingen.';
-      on.hidden = copy.hidden = test.hidden = true;
-    } else if (sub && Notification.permission === 'granted') {
-      status.textContent = 'Ochtendmelding 08:05: aan.';
-      on.hidden = true; copy.hidden = false; test.hidden = false;
-    } else {
-      status.textContent = 'Ochtendmelding 08:05: uit.';
-      on.hidden = false; copy.hidden = true; test.hidden = true;
-    }
+  /* De meldingen komen van de functie leadnex-meldingen in Supabase (supabase/functions). Die kijkt elke minuut of er
+     een dagoverzicht of een herinnering moet komen, en stuurt die naar de telefoons in de collectie push. De app zet
+     daar de koppeling van deze telefoon neer (en vernieuwt hem als hij verlopen is); de keuzes staan in instellingen/meldingen. */
+  const OCHTEND_TIJDEN = ['06:00', '06:30', '07:00', '07:30', '08:00', '08:30', '09:00', '09:30', '10:00'];
+  const UITLEG_URL = 'https://github.com/Silvan-Hevotec/koude-acquisitie#meldingen';
+  const push = { docs: new Map(), loaded: false, server: null, checkedAt: 0, busy: false, again: false };
+  let meldDoc = null, pushCol = null;
+  const meldAan = () => pref.get('meldingen') !== 'uit';
+  async function endpointId(endpoint) {
+    const h = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(endpoint)));
+    return [...h.slice(0, 12)].map(x => x.toString(16).padStart(2, '0')).join('');
   }
-  function showCode(sub) {
-    const code = pushCode(sub), box = $('pushCode');
-    box.value = code;
-    box.hidden = false;
-    copyText(code, 'Koppelcode', false);
+  function toestelNaam() {
+    const ua = navigator.userAgent;
+    const os = /Android/i.test(ua) ? 'Android' : /iPhone|iPad/i.test(ua) ? 'iPhone' : /Windows/i.test(ua) ? 'Windows' : /Mac/i.test(ua) ? 'Mac' : 'Toestel';
+    const br = /Edg\//.test(ua) ? 'Edge' : /SamsungBrowser/.test(ua) ? 'Samsung Internet' : /Chrome\//.test(ua) ? 'Chrome' : /Firefox\//.test(ua) ? 'Firefox' : /Safari\//.test(ua) ? 'Safari' : 'browser';
+    return `${os} · ${br}`;
+  }
+  // Zorgt dat de koppeling van deze telefoon in de database staat. Heeft de meldingsdienst hem als verlopen
+  // gemarkeerd, dan maakt de app een nieuwe.
+  async function ensurePush() {
+    if (!pushSupported() || !pushCol || !push.loaded || state.local || state.readOnly || Notification.permission !== 'granted' || !meldAan()) return null;
+    if (push.busy) { push.again = true; return null; }   // nieuwe gegevens tijdens het controleren: daarna nog een keer
+    push.busy = true; push.again = false;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      let id = sub ? await endpointId(sub.endpoint) : '';
+      const oud = id && push.docs.get(id);
+      if (sub && oud && oud.verlopen) { await sub.unsubscribe().catch(() => {}); sub = null; await write(() => pushCol.doc(id).delete()); push.docs.delete(id); }
+      if (!sub) { sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(VAPID_PUBLIC) }); id = await endpointId(sub.endpoint); }
+      if (!push.docs.has(id)) {
+        const j = sub.toJSON();
+        const data = { endpoint: j.endpoint, keys: { p256dh: j.keys.p256dh, auth: j.keys.auth }, toestel: toestelNaam(), aangemaakt: nowISO() };
+        if (!await write(() => pushCol.doc(id).set(data))) return null;
+        push.docs.set(id, data);
+      }
+      return id;
+    } catch (e) { console.error(e); return null; }
+    finally { push.busy = false; if (push.again) setTimeout(() => ensurePush().then(renderPush), 0); }
+  }
+  async function meldServer(body) {
+    const c = window.KA_CONFIG || {};
+    let token = '';
+    try { const { data } = await sb.auth.getSession(); token = data && data.session ? data.session.access_token : ''; } catch {}
+    if (!token) return { ok: false, fout: 'niet-ingelogd' };
+    let res;
+    try {
+      res = await fetch(`${String(c.supabaseUrl).replace(/\/$/, '')}/functions/v1/leadnex-meldingen`, { method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: c.supabaseKey, Authorization: 'Bearer ' + token }, body: JSON.stringify(body) });
+    } catch { return { ok: false, fout: 'geen-verbinding' }; }
+    if (res.status === 404) return { ok: false, fout: 'geen-functie' };
+    const j = await res.json().catch(() => ({}));
+    return res.ok || j.fout ? j : { ok: false, fout: 'server ' + res.status };
+  }
+  // Kijkt (hooguit eens per 5 minuten) of de meldingsdienst in Supabase klaarstaat en elke minuut draait.
+  async function checkServer(force = false) {
+    if (state.local || !sb || (!force && Date.now() - push.checkedAt < 300000)) return;
+    push.checkedAt = Date.now();
+    push.server = await meldServer({ status: true });
+    renderPush();
+  }
+  function serverTekst(r) {
+    if (!r) return null;
+    const uitleg = ` <a href="${UITLEG_URL}" target="_blank" rel="noopener">Uitleg</a>`;
+    if (r.fout === 'geen-functie') return { tekst: 'De meldingsdienst in Supabase is nog niet ingesteld. Dat is eenmalig.' + uitleg };
+    if (r.fout === 'geen-sleutel') return { tekst: 'In Supabase ontbreekt nog het geheim VAPID_PRIVATE_KEY (Edge Functions → Secrets).' + uitleg };
+    if (r.fout === 'geen-verbinding') return { tekst: 'De meldingsdienst is nu niet bereikbaar. Controleer je internet.' };
+    if (r.fout === 'niet-ingelogd') return { tekst: 'Log opnieuw in om de meldingen te controleren.' };
+    if (r.fout) return { tekst: `De meldingsdienst gaf een fout (${esc(r.fout)}).` + uitleg };
+    const hart = r.hartslag ? Date.parse(r.hartslag) : 0;
+    if (!hart || Date.now() - hart > 5 * 60000) return { tekst: 'De meldingsdienst staat klaar, maar wordt nog niet elke minuut gestart: voer meldingen.sql uit in Supabase en zet bij de functie Verify JWT uit.' + uitleg };
+    return { ok: true, tekst: `De meldingsdienst werkt${r.telefoons ? ` (${r.telefoons} ${plural(r.telefoons, 'telefoon', 'telefoons')} gekoppeld)` : ''}.` };
+  }
+  async function renderPush() {
+    const status = $('pushStatus'), on = $('pushOn'), off = $('pushOff'), test = $('pushTest'), srv = $('pushServer');
+    const och = $('meldOchtend'), her = $('meldHerinnering');
+    const tijden = meld.ochtend && !OCHTEND_TIJDEN.includes(meld.ochtend) ? [...OCHTEND_TIJDEN, meld.ochtend].sort() : OCHTEND_TIJDEN;
+    och.innerHTML = `<option value="">Uit</option>` + tijden.map(t => `<option value="${t}"${t === meld.ochtend ? ' selected' : ''}>${t}</option>`).join('');
+    her.innerHTML = HERINNERING.map(([m, t]) => `<option value="${m}"${m === meld.herinnering ? ' selected' : ''}>${t}</option>`).join('');
+    och.disabled = her.disabled = state.readOnly;
+    $('meldOchtendRow').hidden = $('meldHerinneringRow').hidden = state.local || !pushSupported();   // zonder meldingsdienst niets te kiezen
+    let tekst, kan = false, aan = false;
+    if (!pushSupported()) tekst = 'Meldingen zijn in deze browser niet mogelijk.';
+    else if (state.local) tekst = 'Meldingen werken alleen met online opslag.';
+    else if (Notification.permission === 'denied') tekst = 'Geblokkeerd. Zet meldingen voor Leadnex aan in de instellingen van je telefoon: Instellingen → Apps → Leadnex → Meldingen.';
+    else {
+      kan = true;
+      aan = Notification.permission === 'granted' && meldAan() && !!(await currentSub());
+      const h = meld.herinnering, wat = [meld.ochtend && `om ${meld.ochtend} het overzicht van de dag`, h > 0 && (h === 1 ? 'een melding op het tijdstip van een actie' : `een melding ${herinneringLabel(h).toLowerCase()}`)].filter(Boolean);
+      tekst = aan ? `Aan${wat.length ? `: ${wat.join(' en ')}` : ''}.` : 'Uit. Zet ze aan om het overzicht van de dag en herinneringen bij acties te krijgen.';
+    }
+    status.textContent = tekst;
+    on.hidden = !kan || aan; off.hidden = !aan; test.hidden = !aan;
+    const st = aan || (kan && push.server && push.server.fout) ? serverTekst(push.server) : null;
+    srv.hidden = !st;
+    if (st) { srv.innerHTML = st.tekst; srv.classList.toggle('ok', !!st.ok); }
+  }
+  async function saveMeld(patch) {
+    meld = { ...meld, ...patch };
+    renderPush(); renderRows();
+    if (meldDoc && !state.local) await write(() => meldDoc.set({ ...meld, gewijzigd: nowISO() }));
+  }
+  $('meldOchtend').addEventListener('change', e => saveMeld({ ochtend: e.target.value }));
+  $('meldHerinnering').addEventListener('change', e => saveMeld({ herinnering: validHerinnering(+e.target.value) ?? MELD_STANDAARD.herinnering }));
+  async function testMelding() {
+    const r = await meldServer({ test: true });
+    push.server = r; push.checkedAt = Date.now();
+    if (r.ok) toast('Testmelding verstuurd. Je krijgt hem zo op je telefoon.');
+    else {
+      // De dienst in Supabase werkt nog niet: dan in elk geval laten zien dat deze telefoon meldingen kan tonen.
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        await reg.showNotification('Leadnex', { body: 'Deze telefoon kan meldingen tonen. De meldingsdienst in Supabase moet nog worden ingesteld.', icon: 'icons/icon-192.png', badge: 'icons/badge-96.png', tag: 'test' });
+      } catch {}
+      toast('De melding kwam van de telefoon zelf. Zie de uitleg bij Meldingen om de meldingsdienst in te stellen.', 7000);
+    }
+    renderPush();
   }
   $('pushOn').addEventListener('click', async () => {
     if (!pushSupported()) return;
     const perm = await Notification.requestPermission();
-    if (perm !== 'granted') { toast('Zonder toestemming kan de app geen meldingen tonen.'); renderPush(); return; }
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      const sub = (await reg.pushManager.getSubscription())
-        || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(VAPID_PUBLIC) });
-      saveAgenda();
-      showCode(sub);
-      toast('Meldingen staan aan. Plak de koppelcode in je gesprek met Claude, dan zet Claude de ochtendmelding aan.', 8000);
-    } catch {
-      toast('Aanzetten lukte niet. Controleer je internetverbinding en probeer het opnieuw.');
-    }
-    renderPush();
+    if (perm !== 'granted') { toast('Zonder toestemming kan de app geen meldingen tonen. Zet ze aan bij Instellingen → Apps → Leadnex → Meldingen.', 7000); renderPush(); return; }
+    pref.set('meldingen', 'aan');
+    const id = await ensurePush();
+    if (!id) { toast('Aanzetten lukte niet. Controleer je internetverbinding en probeer het opnieuw.'); renderPush(); return; }
+    await testMelding();
   });
-  $('pushCopy').addEventListener('click', async () => { const sub = await currentSub(); if (sub) showCode(sub); });
-  $('pushTest').addEventListener('click', async () => {
+  $('pushTest').addEventListener('click', async () => { await ensurePush(); testMelding(); });
+  $('pushOff').addEventListener('click', async () => {
+    pref.set('meldingen', 'uit');
     try {
-      const reg = await navigator.serviceWorker.ready;
-      const m = buildMessage(agendaItems(), todayISO()) || { title: 'Leadnex', body: 'Meldingen werken. Er staan vandaag geen acties op je lijst.' };
-      await reg.showNotification(m.title, { body: m.body, icon: 'icons/icon-192.png', badge: 'icons/badge-96.png', tag: 'dagtaken', renotify: true, data: { url: './#vandaag' } });
-    } catch { toast('De testmelding lukte niet. Staan meldingen aan voor de app?'); }
+      const sub = await currentSub();
+      if (sub) {
+        const id = await endpointId(sub.endpoint);
+        await sub.unsubscribe();
+        if (pushCol && push.docs.has(id)) { await write(() => pushCol.doc(id).delete()); push.docs.delete(id); }
+      }
+    } catch {}
+    toast('Meldingen staan uit op deze telefoon.');
+    renderPush();
   });
 
   /* ---------- Outlook (Microsoft 365) ---------- */
@@ -5399,7 +5492,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (l.tijd) {
       const [hh, mi] = l.tijd.split(':').map(Number), start = Date.UTC(y, m - 1, d, hh, mi);
       return { ...ev, isAllDay: false, showAs: 'busy', start: { dateTime: iso(start), timeZone: tz }, end: { dateTime: iso(start + 3600000), timeZone: tz },
-        isReminderOn: validHerinnering(l.herinnering) > 0, reminderMinutesBeforeStart: validHerinnering(l.herinnering) };
+        isReminderOn: herinneringVan(l) > 0, reminderMinutesBeforeStart: minutenVooraf(herinneringVan(l)) };
     }
     // Zonder tijd: een dag-item dat je agenda niet blokkeert. De ochtendmelding herinnert je eraan.
     return { ...ev, isAllDay: true, showAs: 'free', isReminderOn: false,
@@ -5548,6 +5641,14 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   const gateEl = $('gate'), appEl = $('app');
   // Link uit de mail "wachtwoord vergeten" of "uitnodiging": eerst een (nieuw) wachtwoord kiezen.
   const viaInvite = /type=invite/.test(location.hash);
+  // Een melding over een actie opent dat bedrijf, zodra de lijst geladen is.
+  let openNaLaden = '';
+  function openWachtend() {
+    if (!openNaLaden || !state.loaded) return;
+    const id = openNaLaden;
+    openNaLaden = '';
+    if (byId(id)) setTimeout(() => gotoLead(id), 0);
+  }
   let sb = null, started = false, inRecovery = /type=(recovery|invite)/.test(location.hash);
   function showGate(mode, msg) {
     gateEl.hidden = false;
@@ -5590,6 +5691,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       state.leads = snap.docs.filter(d => d.exists).map(normalize);
       state.loaded = true;
       if (pref.get('kaart') === '1') scheduleGeocode();
+      openWachtend();
       setTimeout(maybeOfferMove, 0);
       if (first) setTimeout(() => { if (shareIn) handleShare(shareIn).catch(e => console.error(e)); else afterCall(); }, 0);
       state.problem = null;
@@ -5608,6 +5710,22 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       scheduleRender();
       maybeSeed();
     });
+    meldDoc = store.doc('instellingen/meldingen');
+    meldDoc.onSnapshot(snap => {
+      const d = snap.exists ? snap.data() || {} : {};
+      meld = {
+        ochtend: typeof d.ochtend === 'string' && (d.ochtend === '' || /^\d\d:\d\d$/.test(d.ochtend)) ? d.ochtend : MELD_STANDAARD.ochtend,
+        herinnering: validHerinnering(d.herinnering) ?? MELD_STANDAARD.herinnering,
+      };
+      renderPush();
+      scheduleRender();
+    });
+    pushCol = store.collection('push');
+    pushCol.limit(50).onSnapshot(snap => {
+      push.docs = new Map(snap.docs.filter(d => d.exists).map(d => [d.id, d.data() || {}]));
+      push.loaded = true;
+      ensurePush().then(renderPush);
+    });
     sjCol.limit(200).onSnapshot(snap => {
       state.sjablonen = snap.docs.filter(d => d.exists).map(d => {
         const x = d.data() || {};
@@ -5623,9 +5741,12 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     window.addEventListener('online', () => store.refreshAll());
     setInterval(() => { if (!document.hidden) store.refreshAll(); }, 120000);
     const openFromNotification = () => {
-      if (location.hash !== '#vandaag') return;
-      setView('vandaag');
+      const h = location.hash;
+      if (h === '#vandaag') setView('vandaag');
+      else if (h.startsWith('#bedrijf=')) { openNaLaden = decodeURIComponent(h.slice(9)); setView('vandaag'); }
+      else return;
       history.replaceState(null, '', location.pathname);
+      openWachtend();
       renderAll();
     };
     openFromNotification();

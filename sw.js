@@ -1,6 +1,6 @@
 // Service worker: maakt de app installeerbaar, laat hem openen zonder bereik
 // en toont de ochtendmelding met de acties van vandaag.
-const CACHE = 'koude-acquisitie-v21';
+const CACHE = 'koude-acquisitie-v22';
 const DATA_CACHE = 'koude-acq-data';   // hierin zet de app de actielijst voor de ochtendmelding
 const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest', './vendor/supabase.js', './icons/icon-192.png', './icons/icon-512.png', './icons/badge-96.png', './icons/logo-mark.png', './icons/logo-wordmark.png'];
 
@@ -68,6 +68,15 @@ function backupReminder(agenda) {
 self.addEventListener('push', event => {
   let msg = {};
   try { msg = event.data ? event.data.json() : {}; } catch { msg = {}; }
+  // Melding met inhoud van de meldingsdienst in Supabase: dagoverzicht, herinnering bij een actie of testmelding.
+  if (msg.type === 'melding' && msg.title) {
+    event.waitUntil(self.registration.showNotification(String(msg.title).slice(0, 120), {
+      body: String(msg.body || '').slice(0, 600), icon: 'icons/icon-192.png', badge: 'icons/badge-96.png',
+      tag: String(msg.tag || 'leadnex'), renotify: true, vibrate: [200, 100, 200], data: { url: msg.url || './#vandaag' },
+    }));
+    return;
+  }
+  // Wek-signaal zonder inhoud: de melding maken uit de actielijst die de app klaarzette.
   event.waitUntil((async () => {
     const agenda = await readAgenda();
     const m = buildMessage(agenda && agenda.items, todayISO());
@@ -78,6 +87,12 @@ self.addEventListener('push', event => {
     if (msg.test) return self.registration.showNotification('Leadnex', { ...opts, body: 'Meldingen werken. Er staan vandaag geen acties op je lijst.' });
     // Geen acties vandaag: geen melding.
   })());
+});
+
+// Vernieuwt de telefoon de koppeling zelf, dan meteen een nieuwe aanvragen; de app zet die bij het openen in de database.
+self.addEventListener('pushsubscriptionchange', event => {
+  const opts = event.oldSubscription && event.oldSubscription.options;
+  if (opts && opts.applicationServerKey) event.waitUntil(self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: opts.applicationServerKey }).catch(() => {}));
 });
 
 self.addEventListener('notificationclick', event => {
