@@ -2176,26 +2176,51 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (!f.website && site) { try { f.website = cleanWebsite(new URL(site).hostname); } catch {} }
     if (!f.bedrijf && !res.lines.length && f.website) f.bedrijf = cap(siteKey(f.website).split('.')[0].replace(/-/g, ' '));
     msg.textContent = 'Gegevens aanvullen…';
-    const found = [];
+    const found = [], bronnen = [];
+    const zet = (k, v, label, bron) => {
+      if (f[k] || !v) return;
+      f[k] = v;
+      if (label && !found.includes(label)) found.push(label);
+      if (bron && !bronnen.includes(bron)) bronnen.push(bron);
+    };
     try {
       if (!f.adres && hints.coords) {
         const a = await pdokReverse(hints.coords.lat, hints.coords.lon);
-        if (a) { f.adres = a.adres; f.plaats = f.plaats || a.plaats; found.push('adres van de kaart'); }
+        if (a) { zet('adres', a.adres, 'adres', 'de kaart (PDOK)'); zet('plaats', a.plaats); }
       }
       if (f.bedrijf && (!f.adres || !f.telefoon || !f.website)) {
         const o = await osmLookup(f.bedrijf, f.plaats);
         if (o) {
           if (o.naam && nameTokens(f.bedrijf).length > nameTokens(o.naam).length) f.bedrijf = o.naam;   // zoekopdracht met plaatsnaam erachter
-          if (!f.adres && o.adres) { f.adres = o.adres; f.plaats = f.plaats || o.plaats; found.push('adres'); }
-          if (!f.telefoon && o.telefoon) { f.telefoon = o.telefoon; found.push('telefoon'); }
-          if (!f.website && o.website) { f.website = o.website; found.push('website'); }
+          if (!f.adres && o.adres) { zet('adres', o.adres, 'adres', 'OpenStreetMap'); zet('plaats', o.plaats); }
+          zet('telefoon', o.telefoon, 'telefoon', 'OpenStreetMap');
+          zet('website', o.website, 'website', 'OpenStreetMap');
+        }
+      }
+      // Wat nog ontbreekt: de meldingsdienst in Supabase kijkt op Google Maps en op de website van het bedrijf.
+      if (f.bedrijf && sb && !state.local && (!f.adres || !f.telefoon || !f.website || !f.email)) {
+        msg.textContent = 'Adres, telefoon en website zoeken…';
+        const r = await meldServer({ verrijk: { naam: f.bedrijf, plaats: f.plaats || '', url: urls.find(u => /\/\/(www\.)?google\.[a-z.]+\/(maps|search)/.test(u)) || '', website: f.website || '' } });
+        if (r && r.ok) {
+          const bron = (r.bronnen || []).map(x => x === 'Google Maps' ? 'Google Maps' : 'de website van het bedrijf').filter((x, i, l) => l.indexOf(x) === i).join(' en ') || 'internet';
+          if (!f.adres && r.adres) { zet('adres', [r.adres, r.postcode].filter(Boolean).join(', '), 'adres', bron); zet('plaats', r.plaats); }
+          else if (!f.plaats && r.plaats) zet('plaats', r.plaats, 'plaats', bron);
+          zet('telefoon', r.telefoon, 'telefoon', bron);
+          zet('website', r.website ? cleanWebsite(r.website).toLowerCase() : '', 'website', bron);
+          zet('email', /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(r.email || '') ? r.email.toLowerCase() : '', 'e-mail', bron);
+          zet('branche', r.branche ? canonBranche(r.branche) : '', 'branche', bron);
         }
       }
     } catch {}
-    const n = fillAddForm(f);
+    // Google zet de plaats soms achter de naam ("Bakkerij Van Dalen Dedemsvaart"): die hoort bij Plaats.
+    if (f.plaats && f.bedrijf && key(f.bedrijf).endsWith(' ' + key(f.plaats)) && nameTokens(f.bedrijf).length > nameTokens(f.plaats).length)
+      f.bedrijf = f.bedrijf.slice(0, f.bedrijf.length - f.plaats.length).trim().replace(/[,·-]$/, '').trim();
+    const n = fillAddForm(f) + (f.branche ? 1 : 0);
+    $('addBranche').value = f.branche || '';
     scan.lines = res.lines.slice(0, 24); scan.use = res.use.slice(0, 24);
     renderScanLines();
-    msg.textContent = `${n} ${plural(n, 'gegeven', 'gegevens')} overgenomen${found.length ? ` (${found.join(', ')} opgezocht via ${found.includes('adres van de kaart') ? 'PDOK' : 'OpenStreetMap'})` : ''}. Controleer ze en tik op Toevoegen.`;
+    const lijst = x => x.length > 1 ? `${x.slice(0, -1).join(', ')} en ${x[x.length - 1]}` : x.join('');
+    msg.textContent = `${n} ${plural(n, 'gegeven', 'gegevens')} ingevuld${found.length ? ` (${lijst(found)} gevonden via ${lijst(bronnen)})` : ''}. Controleer ze en tik op Toevoegen.`;
     addForm.scrollIntoView({ block: 'start', behavior: 'smooth' });
     $('addBedrijf').focus({ preventScroll: true });
   }

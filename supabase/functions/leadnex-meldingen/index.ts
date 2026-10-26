@@ -6,7 +6,8 @@
 // Vanuit de app (Meer → Meldingen) wordt hij aangeroepen met {"status": true} om te zien of alles werkt,
 // en met {"test": true} voor een testmelding op jouw telefoons.
 // Daarnaast opent hij voor de app een korte Google-link ({"link": "https://share.google/..."}): bij delen vanuit
-// Google komt vaak alleen zo'n link mee, en de app kan die zelf niet volgen.
+// Google komt vaak alleen zo'n link mee, en de app kan die zelf niet volgen. En met {"verrijk": {...}} zoekt hij
+// bij een gedeeld bedrijf het adres, de telefoon, de website en het e-mailadres erbij.
 //
 // Instellen in Supabase: Edge Functions → nieuwe functie "leadnex-meldingen" met deze code,
 // "Verify JWT" uit, en bij Edge Functions → Secrets het geheim VAPID_PRIVATE_KEY.
@@ -243,9 +244,158 @@ async function linkOpenen(start: string) {
   return url === start ? '' : url;
 }
 
+
+/* ---------- gegevens aanvullen bij een gedeeld bedrijf ---------- */
+// Zoekt adres, telefoon, website en e-mail: eerst op de Google Maps-pagina van het bedrijf, dan op de eigen website
+// (ook de contactpagina). Is de website onbekend, dan zoekt hij die op via DuckDuckGo. Alles met korte tijdslimieten.
+type Gevonden = { adres?: string; postcode?: string; plaats?: string; telefoon?: string; website?: string; email?: string; branche?: string; bronnen: string[] };
+const GOOGLE_KOEKJES = 'CONSENT=YES+cb.20250101-00-p0.nl+FX+000; SOCS=CAESEwgDEgk0ODE3Nzk3MjQaAmVuIAEaBgiA_LyaBg';
+const GEEN_BEDRIJFSSITE = /(^|\.)(google|gstatic|googleusercontent|googleapis|youtube|facebook|fb|instagram|linkedin|twitter|x|tiktok|pinterest|wikipedia|tripadvisor|yelp|foursquare|telefoonboek|detelefoongids|goudengids|openingstijden|openingstijden-nu|cylex|cylex-nederland|oozo|drimble|kvk|bedrijvenregister|bedrijfsgegevens|indebuurt|indeed|werkzoeken|nationalevacaturebank|booking|thuisbezorgd|waze|apple|bing|duckduckgo|yahoo|marktplaats|trustpilot|kiyoh|klantenvertellen|companyinfo|graydon|allebedrijvenin|bedrijfstelefoonnummer|infobel|hotfrog|yelu|tuugo|nl\.kompass|europages|zoominfo|dnb|opencorporates|wanderlog|restaurantguru|thefork|iens|funda|jaap)\.[a-z.]+$/i;
+const haal = async (url: string, extra: Record<string, string> = {}) => {
+  const res = await fetch(url, { redirect: 'follow', signal: AbortSignal.timeout(5000), headers: { 'User-Agent': BROWSER, 'Accept-Language': 'nl-NL,nl;q=0.9', Accept: 'text/html,application/xhtml+xml', ...extra } });
+  if (!res.ok) { await res.body?.cancel(); return ''; }
+  return (await res.text()).slice(0, 1500000);
+};
+const ontsnap = (t: string) => t.replace(/\\u003d/gi, '=').replace(/\\u0026/gi, '&').replace(/\\x3d/gi, '=').replace(/\\x26/gi, '&').replace(/\\u0027/gi, "'").replace(/\\\//g, '/')
+  .replace(/&amp;/g, '&').replace(/&#39;|&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&nbsp;|&#160;/g, ' ').replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n));
+const tekstVan = (html: string) => ontsnap(html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, ' ').replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|li|tr|h\d|address|span)>/gi, '\n').replace(/<[^>]+>/g, ' ')).replace(/[ \t]+/g, ' ');
+// Nederlands of Belgisch telefoonnummer, zoals het er staat.
+function telefoonUit(t: string) {
+  const re = /(?:\+|00)3[12][\s.\-]?(?:\(0\)[\s.\-]?)?[1-9](?:[\s.\-]?\d){7,8}|\b0[1-9](?:[\s.\-]?\d){8}\b/g;
+  for (const m of t.match(re) || []) {
+    const d = m.replace(/\(0\)/, '').replace(/\D/g, '').replace(/^00/, '');
+    if (/^0\d{9}$/.test(d) || /^31\d{9}$/.test(d) || /^32\d{8,9}$/.test(d)) return m.replace(/\s+/g, ' ').trim();
+  }
+  return '';
+}
+const POSTCODE_ADRES = /([A-ZÀ-ſ][\p{L}'.\-]+(?:\s[\p{L}'.\-]+){0,4}\s\d{1,5}(?:\s?[a-zA-Z](?![\p{L}]))?(?:[\s\-]+\d{1,4})?)\s*[,\n]?\s*(\d{4}\s?[A-Z]{2})\s*,?\s+([A-ZÀ-ſ'][\p{L}'\-]+(?:[ \t][\p{L}'\-]+){0,3})/gu;
+// Plaatsnaam: het eerste woord, plus wat erbij hoort ('Den Haag', 'Alphen aan den Rijn', 'Sint Anthonis').
+function plaatsVan(t: string) {
+  const w = t.split(/\s+/), uit = [w[0]];
+  const verbind = /^(aan|den|de|op|bij|in|ter|te|a\/d)$/;
+  for (let i = 1; i < w.length; i++) {
+    if (verbind.test(w[i]) && w[i + 1]) { uit.push(w[i]); continue; }
+    if (verbind.test(uit[uit.length - 1]) || (i === 1 && /^(Den|De|Het|Sint|St\.?|Nieuw|Oud|Groot|Klein|West|Oost|Noord|Zuid|Ter|Ten)$/.test(w[0]))) { uit.push(w[i]); continue; }
+    break;
+  }
+  return uit.join(' ');
+}
+function adresUit(t: string) {
+  for (const m of t.matchAll(POSTCODE_ADRES)) {
+    if (/^(postbus|antwoordnummer|kvk|btw|iban)\b/i.test(m[1])) continue;
+    return { adres: m[1].replace(/\s+/g, ' ').trim(), postcode: m[2].replace(/^(\d{4})\s?([A-Z]{2})$/, '$1 $2'), plaats: plaatsVan(m[3].trim()) };
+  }
+  return null;
+}
+const emailUit = (t: string) => (t.match(/[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}/gi) || []).find(e => !/(example|sentry|wixpress|domain|email|jouw|your|naam)\.|\.(png|jpg|gif|webp)$/i.test(e)) || '';
+function aanvullen(g: Gevonden, x: Partial<Gevonden>, bron: string) {
+  let iets = false;
+  for (const k of ['adres', 'postcode', 'plaats', 'telefoon', 'website', 'email', 'branche'] as const) if (!g[k] && x[k]) { g[k] = x[k]; iets = true; }
+  if (iets && !g.bronnen.includes(bron)) g.bronnen.push(bron);
+}
+// schema.org-gegevens (LocalBusiness/Organization) die veel websites meegeven
+function jsonLd(html: string): Partial<Gevonden> {
+  const out: Partial<Gevonden> = {};
+  for (const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
+    let data: unknown;
+    try { data = JSON.parse(m[1].trim()); } catch { continue; }
+    const stack: unknown[] = [data];
+    while (stack.length) {
+      const o = stack.pop();
+      if (Array.isArray(o)) { stack.push(...o); continue; }
+      if (!o || typeof o !== 'object') continue;
+      const r = o as Record<string, unknown>;
+      if (!out.telefoon && typeof r.telephone === 'string') out.telefoon = telefoonUit(r.telephone) || r.telephone.trim();
+      if (!out.email && typeof r.email === 'string') out.email = r.email.replace(/^mailto:/i, '').trim();
+      const a = r.address as Record<string, unknown> | undefined;
+      if (!out.adres && a && typeof a === 'object' && typeof a.streetAddress === 'string') {
+        out.adres = a.streetAddress.trim();
+        if (typeof a.postalCode === 'string') out.postcode = a.postalCode.trim().replace(/^(\d{4})\s?([A-Za-z]{2})$/, (_, x, y) => `${x} ${y.toUpperCase()}`);
+        if (typeof a.addressLocality === 'string') out.plaats = a.addressLocality.trim();
+      }
+      Object.values(r).forEach(v => { if (v && typeof v === 'object') stack.push(v); });
+    }
+  }
+  return out;
+}
+function uitPagina(html: string): Partial<Gevonden> {
+  const ld = jsonLd(html), t = tekstVan(html);
+  const tel = (html.match(/href=["']tel:([^"']+)["']/i) || [])[1];
+  const mail = (html.match(/href=["']mailto:([^"'?]+)/i) || [])[1];
+  const a = adresUit(t);
+  return {
+    telefoon: ld.telefoon || (tel ? telefoonUit(decodeURIComponent(tel)) || decodeURIComponent(tel).trim() : '') || telefoonUit(t),
+    email: ld.email || (mail ? decodeURIComponent(mail).trim() : '') || emailUit(t),
+    adres: ld.adres || a?.adres, postcode: ld.adres ? ld.postcode : a?.postcode, plaats: ld.adres ? ld.plaats : a?.plaats,
+  };
+}
+// Google Maps-pagina: titel "Naam · Adres", en in de pagina-gegevens telefoon en website.
+async function uitGoogleMaps(url: string): Promise<Partial<Gevonden>> {
+  const html = ontsnap(await haal(url, { Cookie: GOOGLE_KOEKJES }).catch(() => ''));
+  if (!html) return {};
+  const out: Partial<Gevonden> = {};
+  const og = (html.match(/<meta[^>]+(?:property|itemprop)=["'](?:og:title|name)["'][^>]+content=["']([^"']+)["']/i) || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|itemprop)=["'](?:og:title|name)["']/i) || [])[1] || '';
+  const a = adresUit(og.split(' · ').slice(1).join(', ')) || adresUit(og);
+  if (a) Object.assign(out, a);
+  // Soort bedrijf uit de beschrijving ("★★★★☆ · Autogarage"): het eerste stuk zonder cijfers en sterren.
+  const besch = (html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i) || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i) || [])[1] || '';
+  const soort = besch.split(/\s*·\s*/).map(x => x.trim()).find(x => x && x.length <= 40 && !/[\d★☆]/.test(x));
+  if (soort) out.branche = soort;
+  const blok = html.slice(0, 1200000);
+  out.telefoon = telefoonUit((blok.match(/"((?:\+|00)3[12][\d\s\-]{8,14}|0[1-9][\d\s\-]{8,12})"/) || [])[1] || '');
+  const site = [...blok.matchAll(/\/url\?q=(https?:\/\/[^&"\\\s]+)/g)].map(m => { try { return decodeURIComponent(m[1]); } catch { return m[1]; } })
+    .find(u => { try { return !GEEN_BEDRIJFSSITE.test(new URL(u).hostname); } catch { return false; } });
+  if (site) out.website = site;
+  if (!out.adres) { const b = adresUit(tekstVan(blok)); if (b) Object.assign(out, b); }
+  return out;
+}
+const naamDelen = (naam: string) => naam.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(/[^a-z0-9]+/).filter(w => w.length >= 4 && !/^(bakkerij|garage|groothandel|bouwbedrijf|transport|installatie|techniek|holding|services|nederland|bedrijf)$/.test(w));
+// Website van het bedrijf zoeken: het eerste resultaat dat geen gids of sociaal netwerk is en bij de naam past.
+async function zoekWebsite(naam: string, plaats: string) {
+  const html = await haal(`https://html.duckduckgo.com/html/?q=${encodeURIComponent([naam, plaats].filter(Boolean).join(' '))}&kl=nl-nl`).catch(() => '');
+  const delen = naamDelen(naam);
+  for (const m of html.matchAll(/href=["'][^"']*uddg=([^&"']+)/g)) {
+    let u = '';
+    try { u = decodeURIComponent(m[1]); } catch { continue; }
+    let host = '';
+    try { host = new URL(u).hostname.replace(/^www\./, ''); } catch { continue; }
+    if (GEEN_BEDRIJFSSITE.test(host)) continue;
+    const plat = host.replace(/[^a-z0-9]/g, '');
+    if (!delen.length || delen.some(d => plat.includes(d))) return u;
+  }
+  return '';
+}
+async function verrijk(v: { naam?: string; plaats?: string; url?: string; website?: string }) {
+  const g: Gevonden = { bronnen: [] };
+  const naam = String(v.naam || '').slice(0, 120), plaats = String(v.plaats || '').slice(0, 60);
+  if (v.website) g.website = /^https?:\/\//.test(v.website) ? v.website : 'https://' + v.website;
+  let url = String(v.url || '');
+  if (/^https:\/\/(www\.)?google\.[a-z.]+\/search/.test(url)) {
+    const q = new URL(url).searchParams.get('q') || naam;
+    url = q ? `https://www.google.com/maps/search/${encodeURIComponent(q)}?hl=nl` : '';
+  } else if (!/^https:\/\/(www\.)?google\.[a-z.]+\/maps/.test(url)) url = naam ? `https://www.google.com/maps/search/${encodeURIComponent([naam, plaats].filter(Boolean).join(' '))}?hl=nl` : '';
+  if (url) aanvullen(g, await uitGoogleMaps(url).catch(() => ({})), 'Google Maps');
+  if (!g.website && naam) { const w = await zoekWebsite(naam, g.plaats || plaats).catch(() => ''); if (w) { g.website = w; g.bronnen.push('zoeken'); } }
+  if (g.website && (!g.telefoon || !g.adres || !g.email)) {
+    let basis = '';
+    try { basis = new URL(g.website).origin; } catch { /* ongeldig */ }
+    if (basis) {
+      const thuis = await haal(g.website).catch(() => '');
+      aanvullen(g, uitPagina(thuis), 'website');
+      if (!g.telefoon || !g.adres || !g.email) {
+        const link = (thuis.match(/href=["']((?!mailto:|tel:)[^"']*contact[^"']*)["']/i) || [])[1];
+        const contact = link ? new URL(link, g.website).href : basis + '/contact';
+        if (new URL(contact).origin === basis) aanvullen(g, uitPagina(await haal(contact).catch(() => '')), 'website');
+      }
+    }
+  }
+  if (g.website) { try { const u = new URL(g.website); g.website = u.hostname + (u.pathname === '/' ? '' : u.pathname.replace(/\/$/, '')); } catch { /* laten */ } }
+  return g;
+}
+
 /* ---------- vanuit de app: status of testmelding ---------- */
-async function vanApp(req: Request, body: { test?: boolean; status?: boolean; link?: string }) {
-  if (!body.link && !(Deno.env.get('VAPID_PRIVATE_KEY') || '').trim()) return json({ ok: false, fout: 'geen-sleutel', uitleg: 'Het geheim VAPID_PRIVATE_KEY ontbreekt in Supabase (Edge Functions → Secrets).' });
+async function vanApp(req: Request, body: { test?: boolean; status?: boolean; link?: string; verrijk?: { naam?: string; plaats?: string; url?: string; website?: string } }) {
+  if (!body.link && !body.verrijk && !(Deno.env.get('VAPID_PRIVATE_KEY') || '').trim()) return json({ ok: false, fout: 'geen-sleutel', uitleg: 'Het geheim VAPID_PRIVATE_KEY ontbreekt in Supabase (Edge Functions → Secrets).' });
   const res = await fetch(`${Deno.env.get('SUPABASE_URL')}/auth/v1/user`, { headers: { apikey: req.headers.get('apikey') || geheimeSleutel(), Authorization: req.headers.get('Authorization') || '' } });
   if (!res.ok) return json({ ok: false, fout: 'niet-ingelogd', uitleg: 'Log opnieuw in en probeer het nog eens.' }, 401);
   const user = await res.json();
@@ -254,6 +404,7 @@ async function vanApp(req: Request, body: { test?: boolean; status?: boolean; li
     const url = await linkOpenen(body.link).catch(() => '');
     return json(url ? { ok: true, url } : { ok: false, fout: 'link-niet-geopend' });
   }
+  if (body.verrijk) return json({ ok: true, ...(await verrijk(body.verrijk)) });
   const subs = await abonnementen(user.id);
   const hartslag = ((await db('meldlog?sleutel=eq.hartslag&select=verstuurd')) || [])[0]?.verstuurd || null;
   if (body.status) return json({ ok: true, telefoons: subs.length, hartslag });
@@ -268,7 +419,7 @@ Deno.serve(async req => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   try {
     const body = await req.json().catch(() => ({}));
-    if (body && (body.test || body.status || body.link)) return await vanApp(req, body);
+    if (body && (body.test || body.status || body.link || body.verrijk)) return await vanApp(req, body);
     return json(await ronde(Date.now()));
   } catch (e) {
     console.error(e);
