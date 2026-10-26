@@ -1,17 +1,18 @@
 # Leadnex
 
-Installeerbare web-app (PWA) voor acquisitie: bedrijven, acties, contactmomenten, mailteksten en import uit Excel.
+Installeerbare web-app (PWA) voor acquisitie en het dagelijkse werk: bedrijven en klanten, acties, een planbord met afspraken, taken en notities, contactmomenten, mailteksten en import uit Excel.
 Zonder verdere instellingen bewaart de app alles op het apparaat zelf (geen account nodig). Maak af en toe een back-up via de knop onderaan.
 Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supabase-database (zie hieronder); de app vraagt dan om in te loggen.
 
 ## Wat de app doet
 
-- Bedrijven met contactpersoon, telefoon, e-mail, adres, branche en website; acties met datum, tijd en prioriteit.
+- Bedrijven met klantnummer, contactpersoon, telefoon, e-mail, adres, branche en website; acties met datum, tijd en prioriteit.
 - **Bedrijfsscherm**: tik op een bedrijf en je krijgt een eigen scherm met grote knoppen (Bellen, WhatsApp, Mail, Route), de volgende stap en de tabbladen Overzicht, Verslagen, Gegevens en Historie. De terugknop van je telefoon sluit het weer.
 - **Eén zoekbalk**: zoek op naam, plaats of contactpersoon, of typ een vraag. Branche, soort relatie en In de buurt zitten achter de knop Filters.
-- Vijf tabbladen: **Vandaag**, **Bedrijven**, **Kaart**, **Nieuw** en **Meer** (op de telefoon onderin, op de computer bovenin).
-- **Vandaag**: wat er vandaag (of eerder) moet gebeuren.
-- **Meldingen** op je telefoon: 's ochtends een overzicht van de acties van vandaag, en bij een actie met een tijd een melding op het tijdstip of 5 minuten tot een dag ervoor (zie [Meldingen](#meldingen)). Tik op de melding en het bedrijf gaat open.
+- Tabbladen: **Vandaag**, **Planbord**, **Bedrijven** (met Lijst/Kaart), **Nieuw** en **Meer** (op de telefoon onderin, op de computer bovenin, met Kaart als eigen tabblad).
+- **Vandaag**: wat er vandaag (of eerder) moet gebeuren, met je eigen afspraken en taken bovenaan.
+- **Planbord** in plaats van een losse agenda: per week de acties bij bedrijven en je eigen **afspraken** (met tijd, eindtijd, plek en melding), **taken** (af te vinken, ook zonder datum) en **notities** (doorzoekbaar, vast te pinnen). Alles kan aan een bedrijf gekoppeld worden en staat dan ook bij dat bedrijf onder Planning en notities.
+- **Meldingen** op je telefoon: 's ochtends een overzicht van de acties, afspraken en taken van vandaag, en bij een actie of afspraak met een tijd een melding op het tijdstip of 5 minuten tot een dag ervoor (zie [Meldingen](#meldingen)). Tik op de melding en het bedrijf gaat open.
 - **Belsessie**: de lijst een voor een afbellen. Na elk gesprek staat "Hoe ging het?" open, ook als je vanuit de lijst belt.
 - **Vaste opvolgstappen** na geen gehoor: de volgende werkdag, na twee werkdagen, na drie keer een mail (daarna vanzelf nabellen), na vijf keer voorstel om te archiveren.
 - **Kaart**: al je bedrijven in beeld, met een teller (hoeveel op de kaart, hoeveel zonder adres of met een adres dat niet gevonden is). Kies 2, 5, 10 of 25 km om te zien wat bij jou in de buurt is, met route langs de dichtstbijzijnde. Felle spelden: geel = vandaag te doen, oranje = met actie, paars = zonder actie, rode stip = hoge prioriteit. Adressen worden één keer opgezocht bij de Locatieserver van PDOK (Kadaster) en bij het bedrijf bewaard; de kaart komt ook van PDOK.
@@ -27,7 +28,8 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 - **Vraag het Leadnex** (in de zoekbalk bij Bedrijven): vragen over je eigen klanten, zoals "Welke bedrijven wilden een elektrische heftruck?", "Wie wilde ik dit kwartaal terugbellen?" of "Welke potentiële klanten wachten op een offerte?". De app begrijpt periodes, acties en status en zoekt in je verslagen en notities.
 - Alles werkt in de app zelf: geen AI-dienst, geen extra account en geen kosten.
 - **Weergave**: standaard licht, of donker of zoals je telefoon (Meer → Voorkeuren).
-- **Delen naar de app** vanuit Google Maps, de Google-app of Chrome (naam, adres en telefoon worden zo nodig aangevuld via PDOK of OpenStreetMap; een korte Google-link zoals share.google wordt geopend door de functie `leadnex-meldingen` in Supabase, die ook adres, telefoon, website, e-mail en branche opzoekt via Google Maps en de website van het bedrijf), **visitekaartje scannen**, **in telefooncontacten** zetten, import uit Excel, export naar CSV, back-up.
+- **Delen naar de app** vanuit Google Maps, de Google-app of Chrome (naam, adres en telefoon worden zo nodig aangevuld via PDOK of OpenStreetMap; een korte Google-link zoals share.google wordt geopend door de functie `leadnex-meldingen` in Supabase, die ook adres, telefoon, website, e-mail en branche opzoekt via Google Maps en de website van het bedrijf), **visitekaartje scannen**, **in telefooncontacten** zetten, export naar CSV, back-up.
+- **Klantenlijst importeren** (Meer → Importeren uit Excel): download het voorbeeldbestand (kolommen Klantnummer, Bedrijfsnaam, Contactpersoon, Telefoon, Mobiel, E-mail, Adres, Postcode, Plaats, Website, Branche, Soort relatie, Notitie), vul het in Excel in en lees het in; een eigen Excel met andere kolomnamen kan ook. Kies de soort relatie (met klantnummers standaard Klant) en of bedrijven die al in je lijst staan worden overgeslagen of aangevuld (lege velden invullen, soort relatie alleen omhoog; wat je al had blijft staan). Tot 5000 bedrijven; lange lijsten worden in delen getoond.
 
 ## Bestanden
 
@@ -67,7 +69,7 @@ Aanmelden gebeurt bij Microsoft zelf (code met PKCE, geen wachtwoord in de app).
 
 ## Meldingen
 
-Leadnex stuurt 's ochtends een overzicht van de acties van vandaag (ook die zonder tijd), en bij elke actie met een tijd een melding op het tijdstip zelf of zoveel minuten ervoor. De standaard kies je in de app bij **Meer → Meldingen**; per actie pas je hem aan bij **Gegevens → Melding**.
+Leadnex stuurt 's ochtends een overzicht van de acties, afspraken en taken van vandaag (ook die zonder tijd), en bij elke actie of afspraak met een tijd een melding op het tijdstip zelf of zoveel minuten ervoor. De standaard kies je in de app bij **Meer → Meldingen**; per actie pas je hem aan bij **Gegevens → Melding**.
 
 De meldingen komen van een kleine functie in je eigen Supabase-project, die elke minuut kijkt of er iets te melden is. Zo komen ze ook als de app dicht is. Eenmalig instellen, op de computer (ongeveer 5 minuten):
 

@@ -389,6 +389,7 @@ body.cam-open { overflow: hidden; }
 .row-main:hover { background: var(--sunken); }
 .row.open > .row-main { background: var(--brand-soft); }
 .row.current { box-shadow: inset 4px 0 0 var(--brand); }
+.list-more { display: flex; justify-content: center; padding: 16px; }
 .row-main .sel { flex: none; }
 .bedrijf { flex: 1 1 auto; display: grid; gap: 4px; justify-items: start; min-width: 0; text-align: left; background: none; border: 0; padding: 0; cursor: pointer; border-radius: 4px; }
 .bedrijf .name { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 16.5px; line-height: 1.25; font-weight: 650; letter-spacing: -.012em; overflow-wrap: anywhere; }
@@ -569,6 +570,12 @@ body.sessie .sheet-body { padding-bottom: 150px; }
 .imp-table tr.st-leeg td { color: var(--faint); }
 .imp-opts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 14px 24px; }
 .imp-sum { margin: 0; }
+.imp-tip { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 16px; background: var(--sunken); border: 1px solid var(--line); }
+.imp-tip > .ic { flex: none; width: 22px; height: 22px; color: var(--primary); margin-top: 2px; }
+.imp-tip > div { display: grid; gap: 6px; justify-items: start; min-width: 0; }
+.imp-tip .btn { white-space: normal; max-width: 100%; text-align: left; }
+.imp-tip span { color: var(--muted); font-size: 14px; line-height: 1.45; }
+.imp-table tr.aanvul .st { color: var(--primary); }
 .progress { display: grid; gap: 8px; }
 .bar { height: 10px; border-radius: 999px; background: var(--sunken); border: 1px solid var(--line); overflow: hidden; }
 .bar span { display: block; height: 100%; background: var(--brand); transition: width .2s; }
@@ -751,6 +758,77 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 @media (max-width: 560px) { .dupside + .dupside { padding: 10px 0 0; border-left: 0; border-top: 1px solid var(--line); } }
 
 
+
+/* ---------- Planbord ---------- */
+.plan-add .btn { min-height: 42px; padding: 0 16px; }
+.planbord { display: grid; gap: 12px; }
+.plan-tabs { max-width: 320px; }
+.plan-nav { display: flex; align-items: center; gap: 10px; }
+.plan-nav strong { min-width: 84px; text-align: center; font: 500 18px/1 var(--f-display); letter-spacing: -.01em; }
+.pweek { display: grid; gap: 10px; }
+@media (min-width: 900px) { .pweek { grid-template-columns: repeat(7, minmax(0, 1fr)); align-items: start; } }
+.pday { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; align-content: start; min-width: 0; padding: 12px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+.pday.nu { border-color: color-mix(in srgb, var(--brand) 65%, var(--line)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 22%, transparent), var(--shadow-sm); }
+.pday.voorbij { opacity: .8; }
+.pday.weekend { background: color-mix(in srgb, var(--sunken) 70%, var(--surface)); }
+.pday-h { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 32px; min-width: 0; }
+.pday-d { font-size: 14px; font-weight: 700; white-space: nowrap; }
+.pday-nu { padding: 2px 9px; border-radius: 999px; background: var(--grad-brand); color: var(--brand-ink); font-size: 11.5px; font-weight: 700; }
+.pday-add { flex: none; display: grid; place-items: center; width: 34px; height: 34px; margin-left: auto; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); cursor: pointer; }
+.pday-add:hover { color: var(--ink); border-color: var(--line-strong); }
+.pday-add .ic { width: 16px; height: 16px; }
+.pday-leeg { margin: 0; font-size: 13px; color: var(--faint); }
+@media (max-width: 899.98px) { .pday.leeg { grid-template-columns: minmax(0, 1fr); padding-block: 8px; } .pday.leeg .pday-h { min-height: 34px; } .pday.leeg .pday-leeg { margin-top: -4px; } }
+.pi { display: flex; align-items: flex-start; gap: 10px; width: 100%; min-width: 0; padding: 9px 10px; border: 0; border-radius: 14px; background: var(--sunken); color: inherit; font: inherit; text-align: left; cursor: pointer; box-shadow: inset 3px 0 0 var(--line-strong); }
+.pi:hover { filter: brightness(.98); }
+.pi-afspraak { background: color-mix(in srgb, var(--brand-soft) 60%, var(--surface)); box-shadow: inset 3px 0 0 var(--ok); }
+.pi-lead { box-shadow: inset 3px 0 0 var(--brand); }
+.pi-taak { align-items: center; cursor: default; }
+.pi-taak.klaar strong { color: var(--faint); text-decoration: line-through; }
+.pi-taak.laat { box-shadow: inset 3px 0 0 var(--danger); }
+.pi-laat { background: var(--danger-soft); color: var(--danger); font-size: 13.5px; font-weight: 600; box-shadow: none; }
+.pi-t { flex: none; min-width: 42px; font-size: 13px; font-weight: 700; line-height: 1.35; color: var(--ink); font-variant-numeric: tabular-nums; }
+.pi-t small { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+.pi-m { display: grid; flex: 1; gap: 1px; min-width: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.pi-m strong { font-size: 14px; font-weight: 600; line-height: 1.35; overflow-wrap: break-word; hyphens: auto; }
+.pi-m span { font-size: 12.5px; color: var(--muted); overflow-wrap: break-word; hyphens: auto; }
+@media (min-width: 900px) {
+  .pweek .pday { padding: 10px; }
+  .pweek .pi:not(.pi-taak) { flex-direction: column; gap: 2px; padding: 8px 9px; }
+  .pweek .pi-t { min-width: 0; font-size: 12.5px; }
+  .pweek .pi-t small { display: inline; margin-left: 2px; }
+  .pweek .pi-t small::before { content: "– "; }
+  .pweek .pi-m strong { font-size: 13.5px; }
+  .pweek .pday-add { width: 30px; height: 30px; }
+}
+.plan-zoek { max-width: 520px; }
+.pnotes { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.pnote { position: relative; display: grid; align-content: start; gap: 6px; min-height: 110px; padding: 16px; border-radius: 20px; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow-sm); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.pnote:hover { border-color: var(--line-strong); }
+.pnote.vast { border-color: color-mix(in srgb, var(--brand) 60%, var(--line)); }
+.pnote-pin { position: absolute; top: 14px; right: 14px; color: var(--ok); }
+.pnote-pin .ic { width: 16px; height: 16px; }
+.pnote strong { padding-right: 22px; font-size: 15px; overflow-wrap: anywhere; }
+.pnote-t { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; font-size: 13.5px; color: var(--muted); overflow-wrap: anywhere; }
+.pnote-m { margin-top: auto; font-size: 12px; color: var(--faint); }
+.agvandaag { display: grid; gap: 6px; padding: 14px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.agv-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 4px 4px; }
+.bagenda { gap: 8px; }
+.bag { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border: 0; border-radius: 14px; background: var(--sunken); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.bag > .ic { color: var(--ok); }
+.bag > span { display: grid; min-width: 0; }
+.bag strong { font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.bag span span { font-size: 12.5px; color: var(--muted); }
+.ag-backdrop { z-index: 33; }
+.agsheet { z-index: 34; }
+body.ag-open { overflow: hidden; }
+.agform { gap: 14px; }
+.ag-soort, .ag-kies { max-width: 520px; }
+.ag-soort .tab .ic, .ag-kies .tab .ic, .weergave .tab .ic { width: 16px; height: 16px; }
+@media (max-width: 400px) { .ag-kies .tab { flex-direction: column; gap: 3px; min-height: 52px; padding: 6px 4px; font-size: 13px; } }
+.ag-tijden { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.weergave { width: auto; }
+.weergave .tab { padding: 0 14px; }
 /* ---------- Ronde, 'levende' knoppen en zachte kaarten ---------- */
 .btn, .qd, .chip, .tab, .stab, .qa, .oc, .call, .wa, .iconbtn, .filterbtn, .nav-item .pill, .linkbtn {
   transition: transform .14s cubic-bezier(.2, .8, .2, 1), box-shadow .18s, background-color .18s, border-color .18s, color .18s;
@@ -873,17 +951,27 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     <div><h2 id="greet">Vandaag</h2><p class="sub" id="todayLong"></p></div>
   </div>
   <div class="stats" id="stats" data-show="vandaag"></div>
+  <section class="agvandaag" id="agVandaag" aria-label="Afspraken en taken vandaag" hidden></section>
   <p id="summary">Lijst laden…</p>
+
+  <!-- Planbord -->
+  <div class="page-head" data-show="planbord">
+    <div><h2>Planbord</h2><p class="sub" id="planSub"></p></div>
+    <div class="btns plan-add"><button type="button" class="btn primary" id="planAfspraak" data-ag-nieuw="afspraak"><i data-ic="plus"></i>Afspraak</button><button type="button" class="btn" id="planTaak" data-ag-nieuw="taak"><i data-ic="list-checks"></i>Taak</button><button type="button" class="btn" id="planNotitie" data-ag-nieuw="notitie"><i data-ic="notebook-pen"></i>Notitie</button></div>
+  </div>
+  <section class="planbord" id="planbord" data-show="planbord" aria-label="Planbord"></section>
 
   <!-- Bedrijven -->
   <div class="page-head" data-show="bedrijven">
     <div><h2>Bedrijven</h2><p class="sub" id="bedrijvenSub"></p></div>
-    <button type="button" class="btn" id="mailBtn" hidden>Mail versturen</button>
+    <div class="btns"><div class="tabs weergave" aria-label="Lijst of kaart"><button type="button" class="tab" aria-pressed="true"><i data-ic="list"></i>Lijst</button><button type="button" class="tab" id="naarKaart" data-page="kaart" aria-pressed="false"><i data-ic="map"></i>Kaart</button></div>
+    <button type="button" class="btn" id="mailBtn" hidden>Mail versturen</button></div>
   </div>
   <div class="notice" id="dupNotice" hidden><p><span></span></p><div class="btns"><button type="button" class="btn small" id="dupNoticeGo">Bekijken</button><button type="button" class="btn small ghost" id="dupNoticeHide">Verbergen</button></div></div>
   <!-- Kaart -->
   <div class="page-head" data-show="kaart">
     <div><h2>Kaart</h2><p class="sub">Al je bedrijven op de kaart. Kies een afstand om te zien wat bij jou in de buurt is.</p></div>
+    <div class="tabs weergave" aria-label="Lijst of kaart"><button type="button" class="tab" id="naarLijst" data-page="bedrijven" aria-pressed="false"><i data-ic="list"></i>Lijst</button><button type="button" class="tab" aria-pressed="true"><i data-ic="map"></i>Kaart</button></div>
   </div>
 
   <div class="overview" data-show="bedrijven kaart">
@@ -922,8 +1010,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
 
   <!-- Nieuw bedrijf -->
   <div class="page-head" data-show="nieuw">
-    <div><h2>Nieuw bedrijf</h2><p class="sub">Vul zelf in, scan een visitekaartje of plak gegevens uit Google Maps.</p></div>
+    <div><h2>Nieuw</h2><p class="sub">Een bedrijf toevoegen: vul zelf in, scan een visitekaartje of plak gegevens uit Google Maps.</p></div>
   </div>
+  <div class="tabs ag-kies" data-show="nieuw" aria-label="Wat voeg je toe"><button type="button" class="tab" aria-pressed="true"><i data-ic="building-2"></i>Bedrijf</button><button type="button" class="tab" id="nieuwAfspraak" data-ag-nieuw="afspraak"><i data-ic="calendar"></i>Afspraak</button><button type="button" class="tab" id="nieuwTaak" data-ag-nieuw="taak"><i data-ic="list-checks"></i>Taak</button><button type="button" class="tab" id="nieuwNotitie" data-ag-nieuw="notitie"><i data-ic="notebook-pen"></i>Notitie</button></div>
   <div class="tiles" data-show="nieuw">
     <button type="button" class="tile main" id="scanBtn"><i data-ic="scan-line"></i>Visitekaartje scannen</button>
     <button type="button" class="tile" id="pickBtn"><i data-ic="image"></i>Foto uit galerij</button>
@@ -992,6 +1081,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   <datalist id="actieLijst"></datalist>
   <datalist id="plaatsLijst"></datalist>
   <datalist id="brancheLijst"></datalist>
+  <datalist id="bedrijfLijst"></datalist>
 
   <!-- Meer -->
   <div class="page-head" data-show="meer">
@@ -1038,7 +1128,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       <h3>Gegevens</h3>
       <div class="set-row"><i data-ic="merge"></i><div class="set-text"><strong>Dubbele bedrijven</strong><span id="dupStatus">Zoeken…</span></div>
         <button type="button" class="btn small" id="dupBtn">Bekijken</button></div>
-      <div class="set-row"><i data-ic="file-spreadsheet"></i><div class="set-text"><strong>Importeren uit Excel</strong><span>Een lijst met bedrijven inlezen uit Excel of CSV.</span></div>
+      <div class="set-row"><i data-ic="file-spreadsheet"></i><div class="set-text"><strong>Importeren uit Excel</strong><span>Je klantenlijst of andere bedrijven inlezen uit Excel of CSV.</span></div>
         <button type="button" class="btn small" id="importBtn" hidden>Importeren</button></div>
       <div class="set-row"><i data-ic="download"></i><div class="set-text"><strong>Exporteren</strong><span>Alle bedrijven als CSV-bestand, te openen in Excel.</span></div>
         <button type="button" class="btn small" id="exportBtn">Exporteer naar CSV</button></div>
@@ -1063,6 +1153,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
 </div>
 <div class="sheet-backdrop" id="detailBackdrop" hidden></div>
 <div class="sheet" id="detail" role="dialog" aria-modal="true" aria-labelledby="detailTitle" hidden></div>
+<div class="sheet-backdrop ag-backdrop" id="agBackdrop" hidden></div>
+<div class="sheet agsheet" id="agSheet" role="dialog" aria-modal="true" aria-labelledby="agTitle" hidden></div>
 <div class="selbar" id="selBar" hidden><div class="gutter selbar-inner" id="selInner"></div></div>
 <div class="selbar sessbar" id="sessBar" hidden><div class="gutter selbar-inner" id="sessInner"></div></div>
 </div>
@@ -1101,19 +1193,24 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   let meld = { ...MELD_STANDAARD };
   const BUURT_KM = [2, 5, 10, 25, 50];
   const PLACEHOLDERS = ['{aanhef}', '{voornaam}', '{bedrijf}', '{plaats}'];
-  const MAX_LEADS = 1000;
+  const MAX_LEADS = 5000;
   const FREE_MAIL = new Set(['gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.nl', 'outlook.com', 'outlook.nl', 'live.nl', 'live.com', 'msn.com',
     'icloud.com', 'me.com', 'yahoo.com', 'yahoo.nl', 'ziggo.nl', 'kpnmail.nl', 'kpnplanet.nl', 'planet.nl', 'home.nl', 'xs4all.nl', 'upcmail.nl',
     'chello.nl', 'casema.nl', 'telfort.nl', 'online.nl', 'hetnet.nl', 'zeelandnet.nl', 'quicknet.nl', 'tele2.nl', 'caiway.nl', 'solcon.nl', 'gmx.com', 'gmx.net']);
-  const IMP_FIELDS = [['', 'Niet importeren'], ['bedrijf', 'Bedrijfsnaam'], ['contact', 'Contactpersoon'], ['email', 'E-mailadres'], ['telefoon', 'Telefoonnummer'],
-    ['adres', 'Adres'], ['huisnummer', 'Huisnummer'], ['postcode', 'Postcode'], ['plaats', 'Plaats'], ['branche', 'Branche'], ['website', 'Website'], ['actie', 'Actie'], ['prioriteit', 'Prioriteit'], ['notitie', 'Notitie']];
+  const IMP_FIELDS = [['', 'Niet importeren'], ['bedrijf', 'Bedrijfsnaam'], ['klantnummer', 'Klantnummer'], ['contact', 'Contactpersoon'], ['email', 'E-mailadres'], ['telefoon', 'Telefoonnummer'], ['mobiel', 'Mobiel nummer'],
+    ['adres', 'Adres'], ['huisnummer', 'Huisnummer'], ['postcode', 'Postcode'], ['plaats', 'Plaats'], ['branche', 'Branche'], ['website', 'Website'], ['status', 'Soort relatie'], ['actie', 'Actie'], ['prioriteit', 'Prioriteit'], ['notitie', 'Notitie']];
+  // Kolommen van het voorbeeldbestand voor een klantenlijst; de namen worden bij het inlezen vanzelf herkend.
+  const IMP_VOORBEELD = ['Klantnummer', 'Bedrijfsnaam', 'Contactpersoon', 'Telefoon', 'Mobiel', 'E-mail', 'Adres', 'Postcode', 'Plaats', 'Website', 'Branche', 'Soort relatie', 'Notitie'];
   const IMP_HINTS = [
     ['', /(contactmoment|gearchiveerd|gewijzigd|datum|geen mail|kvk|btw)/, true],
+    ['klantnummer', /^(klantnummer|klantnr\.?|klant ?nr\.?|klantcode|klant-id|debiteur(nummer|nr\.?|code)?|relatie ?(nummer|nr\.?|code))$/, false],
+    ['status', /^(soort relatie|relatiesoort|soort|status|klantstatus|type relatie|relatietype|relatie)$/, false],
     ['website', /^(website|web|url|internet|homepage|site)/, false],
     ['branche', /^(branche|sector|categorie|bedrijfstak|sbi)/, false],
     ['email', /e-?mail|^mail/, false],
     ['bedrijf', /^(bedrijf|bedrijfsnaam|organisatie|onderneming|firma|handelsnaam|company|klant|naam bedrijf|statutaire naam)/, false],
-    ['telefoon', /^(tel|telefoon|phone|mobiel|gsm)/, false],
+    ['mobiel', /^(mobiel|gsm|mobile)/, false],
+    ['telefoon', /^(tel|telefoon|phone)/, false],
     ['huisnummer', /^(huisnummer|huisnr|nr\.?|toevoeging)$/, true],
     ['postcode', /^(postcode|zip)/, false],
     ['adres', /(adres|straat|address)/, false],
@@ -1126,7 +1223,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
 
   const $ = id => document.getElementById(id);
   // Pictogrammen: Lucide (ISC-licentie), alleen de vormen die de app gebruikt.
-  const ICONS = {"phone": "<path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "mail": "<path d=\"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7\" /> <rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" />", "message-circle": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "navigation": "<polygon points=\"3 11 22 2 13 21 11 13 3 11\" />", "calendar-check": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"m9 15 2 2 4-4\" />", "calendar": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "list": "<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "ellipsis": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />", "settings": "<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "camera": "<path d=\"M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z\" /> <circle cx=\"12\" cy=\"13\" r=\"3\" />", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <circle cx=\"9\" cy=\"9\" r=\"2\" /> <path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\" />", "clipboard-paste": "<path d=\"M11 14h10\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v1.344\" /> <path d=\"m17 18 4-4-4-4\" /> <path d=\"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113\" /> <rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" />", "search": "<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "upload": "<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />", "download": "<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />", "archive": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />", "archive-restore": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h2\" /> <path d=\"M20 8v11a2 2 0 0 1-2 2h-2\" /> <path d=\"m9 15 3-3 3 3\" /> <path d=\"M12 12v9\" />", "trash-2": "<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "log-out": "<path d=\"m16 17 5-5-5-5\" /> <path d=\"M21 12H9\" /> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 6v6l4 2\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /> <path d=\"m21.854 2.147-10.94 10.939\" />", "scan-line": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\" /> <path d=\"M17 3h2a2 2 0 0 1 2 2v2\" /> <path d=\"M21 17v2a2 2 0 0 1-2 2h-2\" /> <path d=\"M7 21H5a2 2 0 0 1-2-2v-2\" /> <path d=\"M7 12h10\" />", "contact": "<path d=\"M16 2v2\" /> <path d=\"M7 21v-2a2 2 0 012-2h6a2 2 0 012 2v2\" /> <path d=\"M8 2v2\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />", "house": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "flashlight": "<path d=\"M12 13v1\" /> <path d=\"M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z\" /> <path d=\"M6 6h12\" />", "locate-fixed": "<line x1=\"2\" x2=\"5\" y1=\"12\" y2=\"12\" /> <line x1=\"19\" x2=\"22\" y1=\"12\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"5\" /> <line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\" /> <circle cx=\"12\" cy=\"12\" r=\"7\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "file-spreadsheet": "<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M8 13h2\" /> <path d=\"M14 13h2\" /> <path d=\"M8 17h2\" /> <path d=\"M14 17h2\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "wifi-off": "<path d=\"M12 20h.01\" /> <path d=\"M8.5 16.429a5 5 0 0 1 7 0\" /> <path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\" /> <path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\" /> <path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\" /> <path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\" /> <path d=\"m2 2 20 20\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m16 9-5.5 5.5L8 12\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "layout-list": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" /> <path d=\"M14 4h7\" /> <path d=\"M14 9h7\" /> <path d=\"M14 15h7\" /> <path d=\"M14 20h7\" />", "list-checks": "<path d=\"M13 5h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" />", "mail-plus": "<path d=\"M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8\" /> <path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" /> <path d=\"M19 16v6\" /> <path d=\"M16 19h6\" />", "phone-call": "<path d=\"M13 2a9 9 0 0 1 9 9\" /> <path d=\"M13 6a5 5 0 0 1 5 5\" /> <path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />", "mic": "<path d=\"M12 19v3\" /> <path d=\"M19 10v2a7 7 0 0 1-14 0v-2\" /> <rect x=\"9\" y=\"2\" width=\"6\" height=\"13\" rx=\"3\" />", "square": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" />", "merge": "<path d=\"m8 6 4-4 4 4\" /> <path d=\"M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22\" /> <path d=\"m20 22-5-5\" />", "notebook-pen": "<path d=\"M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4\" /> <path d=\"M2 6h4\" /> <path d=\"M2 10h4\" /> <path d=\"M2 14h4\" /> <path d=\"M2 18h4\" /> <path d=\"M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z\" />", "message-circle-question": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" /> <path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\" /> <path d=\"M12 17h.01\" />", "alarm-clock": "<circle cx=\"12\" cy=\"13\" r=\"8\" /> <path d=\"M12 9v4l2 2\" /> <path d=\"M5 3 2 6\" /> <path d=\"m22 6-3-3\" /> <path d=\"M6.38 18.7 4 21\" /> <path d=\"M17.64 18.67 20 21\" />", "navigation-2": "<polygon points=\"12 2 19 21 12 17 5 21 12 2\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />", "sliders-horizontal": "<path d=\"M10 5H3\" /> <path d=\"M12 19H3\" /> <path d=\"M14 3v4\" /> <path d=\"M16 17v4\" /> <path d=\"M21 12h-9\" /> <path d=\"M21 19h-5\" /> <path d=\"M21 5h-7\" /> <path d=\"M8 10v4\" /> <path d=\"M8 12H3\" />", "pencil-line": "<path d=\"M13 21h8\" /> <path d=\"m15 5 4 4\" /> <path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" />"};
+  const ICONS = {"phone": "<path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "mail": "<path d=\"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7\" /> <rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" />", "message-circle": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "navigation": "<polygon points=\"3 11 22 2 13 21 11 13 3 11\" />", "calendar-check": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"m9 15 2 2 4-4\" />", "calendar": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "list": "<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "ellipsis": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />", "settings": "<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "camera": "<path d=\"M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z\" /> <circle cx=\"12\" cy=\"13\" r=\"3\" />", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <circle cx=\"9\" cy=\"9\" r=\"2\" /> <path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\" />", "clipboard-paste": "<path d=\"M11 14h10\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v1.344\" /> <path d=\"m17 18 4-4-4-4\" /> <path d=\"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113\" /> <rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" />", "search": "<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "chevron-left": "<path d=\"m15 18-6-6 6-6\" />", "upload": "<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />", "download": "<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />", "archive": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />", "archive-restore": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h2\" /> <path d=\"M20 8v11a2 2 0 0 1-2 2h-2\" /> <path d=\"m9 15 3-3 3 3\" /> <path d=\"M12 12v9\" />", "trash-2": "<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "log-out": "<path d=\"m16 17 5-5-5-5\" /> <path d=\"M21 12H9\" /> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 6v6l4 2\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /> <path d=\"m21.854 2.147-10.94 10.939\" />", "scan-line": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\" /> <path d=\"M17 3h2a2 2 0 0 1 2 2v2\" /> <path d=\"M21 17v2a2 2 0 0 1-2 2h-2\" /> <path d=\"M7 21H5a2 2 0 0 1-2-2v-2\" /> <path d=\"M7 12h10\" />", "contact": "<path d=\"M16 2v2\" /> <path d=\"M7 21v-2a2 2 0 012-2h6a2 2 0 012 2v2\" /> <path d=\"M8 2v2\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />", "house": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "flashlight": "<path d=\"M12 13v1\" /> <path d=\"M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z\" /> <path d=\"M6 6h12\" />", "locate-fixed": "<line x1=\"2\" x2=\"5\" y1=\"12\" y2=\"12\" /> <line x1=\"19\" x2=\"22\" y1=\"12\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"5\" /> <line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\" /> <circle cx=\"12\" cy=\"12\" r=\"7\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "file-spreadsheet": "<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M8 13h2\" /> <path d=\"M14 13h2\" /> <path d=\"M8 17h2\" /> <path d=\"M14 17h2\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "wifi-off": "<path d=\"M12 20h.01\" /> <path d=\"M8.5 16.429a5 5 0 0 1 7 0\" /> <path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\" /> <path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\" /> <path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\" /> <path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\" /> <path d=\"m2 2 20 20\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m16 9-5.5 5.5L8 12\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "layout-list": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" /> <path d=\"M14 4h7\" /> <path d=\"M14 9h7\" /> <path d=\"M14 15h7\" /> <path d=\"M14 20h7\" />", "list-checks": "<path d=\"M13 5h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" />", "mail-plus": "<path d=\"M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8\" /> <path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" /> <path d=\"M19 16v6\" /> <path d=\"M16 19h6\" />", "phone-call": "<path d=\"M13 2a9 9 0 0 1 9 9\" /> <path d=\"M13 6a5 5 0 0 1 5 5\" /> <path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />", "mic": "<path d=\"M12 19v3\" /> <path d=\"M19 10v2a7 7 0 0 1-14 0v-2\" /> <rect x=\"9\" y=\"2\" width=\"6\" height=\"13\" rx=\"3\" />", "square": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" />", "merge": "<path d=\"m8 6 4-4 4 4\" /> <path d=\"M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22\" /> <path d=\"m20 22-5-5\" />", "notebook-pen": "<path d=\"M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4\" /> <path d=\"M2 6h4\" /> <path d=\"M2 10h4\" /> <path d=\"M2 14h4\" /> <path d=\"M2 18h4\" /> <path d=\"M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z\" />", "message-circle-question": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" /> <path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\" /> <path d=\"M12 17h.01\" />", "alarm-clock": "<circle cx=\"12\" cy=\"13\" r=\"8\" /> <path d=\"M12 9v4l2 2\" /> <path d=\"M5 3 2 6\" /> <path d=\"m22 6-3-3\" /> <path d=\"M6.38 18.7 4 21\" /> <path d=\"M17.64 18.67 20 21\" />", "navigation-2": "<polygon points=\"12 2 19 21 12 17 5 21 12 2\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />", "sliders-horizontal": "<path d=\"M10 5H3\" /> <path d=\"M12 19H3\" /> <path d=\"M14 3v4\" /> <path d=\"M16 17v4\" /> <path d=\"M21 12h-9\" /> <path d=\"M21 19h-5\" /> <path d=\"M21 5h-7\" /> <path d=\"M8 10v4\" /> <path d=\"M8 12H3\" />", "pencil-line": "<path d=\"M13 21h8\" /> <path d=\"m15 5 4 4\" /> <path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" />"};
   const ic = (n, cls = '') => `<svg class="ic${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
   document.querySelectorAll('i[data-ic]').forEach(el => { el.outerHTML = ic(el.dataset.ic); });
   const PIN = '<svg viewBox="0 0 30 40" aria-hidden="true"><path class="b" d="M15 38.5C15 38.5 3 25.6 3 15a12 12 0 0 1 24 0c0 10.6-12 23.5-12 23.5z"/><circle class="c" cx="15" cy="15" r="5"/></svg>';
@@ -1157,7 +1254,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   try { groupPrefs = JSON.parse(pref.get('groep') || '{}') || {}; } catch { groupPrefs = {}; }
 
   const state = {
-    leads: [], acties: [], sjablonen: [], loaded: false, problem: null, readOnly: false,
+    leads: [], acties: [], sjablonen: [], agenda: [], loaded: false, problem: null, readOnly: false,
     view: VIEWS.has(pref.get('view')) ? pref.get('view') : 'alles',
     actie: pref.get('actie') || '', branche: pref.get('branche') || '',
     search: '', open: null, mode: 'edit', selecting: false, selected: new Set(), pendingMail: null, local: false,
@@ -1165,7 +1262,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   };
   const drafts = {}, finishes = {};
   const mail = { open: false, ids: [], mode: 'bcc', tplId: '', onderwerp: '', tekst: '', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false, sending: null };
-  const imp = { open: false, rows: null, header: true, map: [], include: new Map(), actie: '', datum: '', busy: false, loading: false, done: 0, total: 0, error: '' };
+  const imp = { open: false, rows: null, header: true, map: [], include: new Map(), actie: '', datum: '', status: '', bestaand: 'overslaan', busy: false, loading: false, done: 0, total: 0, error: '' };
   let col = null, sjCol = null, actiesDoc = null, appStore = null, actiesChain = Promise.resolve();
   let armedDelete = null, armedTimer = 0, armedExamples = false, armedExamplesTimer = 0, dupSig = '', dupAcked = false;
 
@@ -1305,19 +1402,19 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     .replace(/\b(b ?v|v ?o ?f|n ?v|c ?v|holding|en zn|zn|zonen|ltd|gmbh)\b/g, ' ').replace(/\s+/g, ' ').trim();
   const phoneKey = s => { const d = String(s || '').replace(/\D/g, ''); return d.length >= 9 ? d.slice(-9) : ''; };
   const domainKey = s => { const m = /@([^@\s]+)$/.exec(key(s)); return m && !FREE_MAIL.has(m[1]) ? m[1] : ''; };
-  const leadKeys = l => ({ n: normName(l.bedrijf), p: phoneKey(l.telefoon), e: /@/.test(l.email || '') ? key(l.email) : '', d: [...new Set([domainKey(l.email), siteKey(l.website)].filter(Boolean))] });
+  const leadKeys = l => ({ n: normName(l.bedrijf), p: phoneKey(l.telefoon), e: /@/.test(l.email || '') ? key(l.email) : '', d: [...new Set([domainKey(l.email), siteKey(l.website)].filter(Boolean))], k: key(l.klantnummer).replace(/\s+/g, '') });
   function buildIndex(list) {
-    const idx = { n: new Map(), p: new Map(), e: new Map(), d: new Map() };
+    const idx = { n: new Map(), p: new Map(), e: new Map(), d: new Map(), k: new Map() };
     list.forEach(l => addToIndex(idx, l));
     return idx;
   }
   function addToIndex(idx, l) {
     const k = leadKeys(l);
-    for (const f of ['n', 'p', 'e', 'd']) for (const v of [].concat(k[f])) if (v && !idx[f].has(v)) idx[f].set(v, l);
+    for (const f of ['n', 'p', 'e', 'd', 'k']) for (const v of [].concat(k[f])) if (v && !idx[f].has(v)) idx[f].set(v, l);
   }
   function lookup(idx, c) {
     const k = leadKeys(c), hits = new Set();
-    for (const f of ['n', 'p', 'e', 'd']) for (const v of [].concat(k[f])) if (v && idx[f].has(v)) hits.add(idx[f].get(v));
+    for (const f of ['n', 'p', 'e', 'd', 'k']) for (const v of [].concat(k[f])) if (v && idx[f].has(v)) hits.add(idx[f].get(v));
     return [...hits];
   }
 
@@ -1413,6 +1510,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       aangemaakt: str(d.aangemaakt), gewijzigd: str(d.gewijzigd), voorbeeld: d.voorbeeld === true, outlookId: str(d.outlookId),
       website: str(d.website).trim(), branche: str(d.branche).trim(), geo: validGeo(d.geo),
       status: validStatus(d.status), verslagen: normalizeVerslagen(d.verslagen), herinnering: validHerinnering(d.herinnering),
+      klantnummer: str(d.klantnummer).trim().slice(0, 40),
     };
   }
   // Klantverslagen: nieuwste eerst.
@@ -1444,12 +1542,13 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     };
     if (l.verslagen && l.verslagen.length) b.verslagen = l.verslagen.map(verslagBody);
     if (validHerinnering(l.herinnering) !== null) b.herinnering = l.herinnering;
+    if (l.klantnummer) b.klantnummer = l.klantnummer;
     if (l.voorbeeld) b.voorbeeld = true;
     if (l.outlookId) b.outlookId = l.outlookId;
     if (validGeo(l.geo)) b.geo = validGeo(l.geo);
     return b;
   }
-  const draftFrom = l => ({ bedrijf: l.bedrijf, contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, website: l.website, branche: l.branche, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail, status: l.status, herinnering: l.herinnering === null || l.herinnering === undefined ? '' : String(l.herinnering) });
+  const draftFrom = l => ({ bedrijf: l.bedrijf, klantnummer: l.klantnummer || '', contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, website: l.website, branche: l.branche, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail, status: l.status, herinnering: l.herinnering === null || l.herinnering === undefined ? '' : String(l.herinnering) });
 
   let toastTimer = 0;
   function toast(msg, ms = 3600) {
@@ -1573,7 +1672,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       website: cleanWebsite(d.website), branche: canonBranche(d.branche),
       actie, datum: actie && parseISO(d.datum) ? d.datum : '', notitie: d.notitie.trim(), geenMail: !!d.geenMail, gewijzigd: nowISO(),
       tijd: actie && parseISO(d.datum) && /^\d{2}:\d{2}$/.test(d.tijd || '') ? d.tijd : '', prioriteit: validPrio(d.prioriteit),
-      status: validStatus(d.status), herinnering: parseHerinnering(d.herinnering),
+      status: validStatus(d.status), herinnering: parseHerinnering(d.herinnering), klantnummer: (d.klantnummer || '').trim().slice(0, 40),
     };
     const ok = await write(() => col.doc(id).set(toBody(next)));
     if (!ok) return false;
@@ -1699,7 +1798,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   }
   async function exportCsv() {
     if (!state.leads.length) return;
-    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Branche', 'Website', 'Actie', 'Datum', 'Tijd', 'Prioriteit', 'Status', 'Notitie', 'Geen mail', 'Contactmomenten', 'Klantverslagen', 'Gearchiveerd', 'Laatst gewijzigd'];
+    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Branche', 'Website', 'Actie', 'Datum', 'Tijd', 'Prioriteit', 'Status', 'Notitie', 'Geen mail', 'Contactmomenten', 'Klantverslagen', 'Gearchiveerd', 'Laatst gewijzigd', 'Klantnummer'];
     const cell = v => {
       let s = String(v ?? '');
       if (/^[=@]/.test(s) || /^[+\-](?![\d\s(])/.test(s)) s = "'" + s;
@@ -1709,7 +1808,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       l.bedrijf, l.contact, l.email, l.telefoon, l.adres, l.plaats, l.branche, l.website, l.actie, l.datum, l.tijd, l.prioriteit, statusLabel(l.status), l.notitie, l.geenMail ? 'ja' : '',
       l.log.map(x => `${x.d} ${x.a}${x.u ? ': ' + x.u : ''}${x.t ? ' (' + x.t + ')' : ''}`).join(' | '),
       l.verslagen.map(v => `${v.datum} ${v.soort}: ${v.tekst.replace(/\s+/g, ' ')}${v.machines.length ? ' [' + v.machines.join(', ') + ']' : ''}`).join(' | '),
-      l.gearchiveerd ? `ja (${l.gearchiveerdOp})` : '', l.gewijzigd.slice(0, 10),
+      l.gearchiveerd ? `ja (${l.gearchiveerdOp})` : '', l.gewijzigd.slice(0, 10), l.klantnummer,
     ])].map(r => r.map(cell).join(';'));
     saveFile(`leadnex-${todayISO()}.csv`, '\ufeff' + lines.join('\r\n'), 'text/csv;charset=utf-8');
     toast('Export opgeslagen in je downloads.');
@@ -2311,7 +2410,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
 
   /* ---------- weergave ---------- */
   // Tabbladen: Vandaag, Bedrijven (Alle / Met actie / Archief), Kaart, Nieuw en Meer.
-  const PAGES = ['vandaag', 'bedrijven', 'kaart', 'nieuw', 'meer'];
+  const PAGES = ['vandaag', 'planbord', 'bedrijven', 'kaart', 'nieuw', 'meer'];
   const pageOfView = v => v === 'vandaag' || v === 'kaart' ? v : 'bedrijven';
   function setView(v) {
     state.view = v; pref.set('view', v);
@@ -2331,13 +2430,14 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (p === 'nieuw' && !('ontouchstart' in window)) $('addBedrijf').focus({ preventScroll: true });
     if (p === 'meer') { renderPush(); checkServer(); }
   }
-  const NAV = [['vandaag', 'calendar-check', 'Vandaag'], ['bedrijven', 'building-2', 'Bedrijven'], ['kaart', 'map', 'Kaart'], ['nieuw', 'plus', 'Nieuw'], ['meer', 'ellipsis', 'Meer']];
+  // Op de computer alle tabbladen bovenin; op de telefoon vijf onderin, met de kaart bij Bedrijven.
+  const NAV = { vandaag: ['calendar-check', 'Vandaag'], planbord: ['calendar', 'Planbord'], bedrijven: ['building-2', 'Bedrijven'], kaart: ['map', 'Kaart'], nieuw: ['plus', 'Nieuw'], meer: ['ellipsis', 'Meer'] };
   function renderNav() {
     const due = state.leads.filter(l => isDue(l, todayISO())).length;
-    const html = NAV.map(([p, icon, label]) => `<a href="#" class="nav-item${p === 'nieuw' ? ' new' : ''}" data-page="${p}"${state.page === p ? ' aria-current="page"' : ''}>
-      <span class="pill">${ic(icon)}</span><span>${label}</span>${p === 'vandaag' && due ? `<span class="badge">${due > 99 ? '99+' : due}</span>` : ''}</a>`).join('');
-    $('topNav').innerHTML = html;
-    $('bottomNav').innerHTML = html;
+    const item = (p, actief) => `<a href="#" class="nav-item${p === 'nieuw' ? ' new' : ''}" data-page="${p}"${actief ? ' aria-current="page"' : ''}>
+      <span class="pill">${ic(NAV[p][0])}</span><span>${NAV[p][1]}</span>${p === 'vandaag' && due ? `<span class="badge">${due > 99 ? '99+' : due}</span>` : ''}</a>`;
+    $('topNav').innerHTML = ['vandaag', 'planbord', 'bedrijven', 'kaart', 'nieuw', 'meer'].map(p => item(p, state.page === p)).join('');
+    $('bottomNav').innerHTML = ['vandaag', 'planbord', 'nieuw', 'bedrijven', 'meer'].map(p => item(p, state.page === p || (p === 'bedrijven' && state.page === 'kaart'))).join('');
   }
   function renderPage() {
     document.querySelectorAll('[data-show]').forEach(el => { el.hidden = !el.dataset.show.split(' ').includes(state.page); });
@@ -2366,7 +2466,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   function inView(l) {
     const q = isQuestion(state.search) ? '' : key(state.search);   // een vraag is geen zoekterm (het antwoord staat bij Bedrijven)
     const filtered = state.view !== 'vandaag';   // Vandaag toont altijd alles wat moet gebeuren
-    if (filtered && q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie, l.website, l.branche].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
+    if (filtered && q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie, l.website, l.branche, l.klantnummer].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
     if (filtered && state.branche && key(l.branche) !== key(state.branche)) return false;
     if (filtered && state.status && l.status !== state.status) return false;
     if (state.view === 'archief') return !!l.gearchiveerd;
@@ -2437,7 +2537,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
         ${input('branche', 'Branche', 'span2', 'text', 60, ' list="brancheLijst"')}
         ${input('website', 'Website', 'span2', 'url', 120, ' inputmode="url" placeholder="www.bedrijf.nl"')}
         ${sel('status', 'Status', statusOptions(d.status))}
-        ${sel('prioriteit', 'Prioriteit', prioOptions(d.prioriteit))}
+        ${input('klantnummer', 'Klantnummer<span class="opt">optioneel</span>', 'span2', 'text', 40)}
       </div>
       <h3 class="slabel">Volgende stap</h3>
       <div class="pgrid">
@@ -2445,6 +2545,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
         <div class="field span2"><label for="p-${id}-tijd">Tijd<span class="opt">optioneel</span></label><input class="input" type="time" id="p-${id}-tijd" data-field="tijd" value="${esc(d.tijd || '')}"${ro}></div>
         <div class="field span4"><label for="p-${id}-datum">Wanneer</label>${whenHtml(`p-${id}-datum`, d.datum, ` data-field="datum"${ro}`, state.readOnly)}</div>
         ${sel('herinnering', 'Melding', herinneringOpties(d.herinnering), '<span class="opt">bij een tijd</span>')}
+        ${sel('prioriteit', 'Prioriteit', prioOptions(d.prioriteit))}
       </div>
       <h3 class="slabel">Notitie</h3>
       <div class="field">
@@ -2473,6 +2574,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const pick = (val, label, mono) => `<span class="pick${mono ? ' mono' : ''}" role="button" tabindex="0" data-act="copy" data-copy="${esc(val)}" data-label="${label}" title="Tik om te kopiëren">${esc(val)}</span>`;
     const q = placeQuery(l);
     const rows = [
+      ['Klantnummer', l.klantnummer && pick(l.klantnummer, 'Klantnummer', true)],
       ['Contactpersoon', l.contact && esc(l.contact)],
       ['Telefoon', l.telefoon && pick(l.telefoon, 'Telefoonnummer', true)],
       ['E-mail', l.email && pick(l.email, 'E-mailadres') + (l.geenMail ? ' <span class="faint">(wil geen mail)</span>' : '')],
@@ -2521,7 +2623,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       : tab === 'gegevens' ? formHtml(l)
       : tab === 'historie' ? historyHtml(l)
       : (prepHtml(l) || (state.readOnly ? '' : `<section class="scard intro"><h3 class="slabel">Nog geen contact</h3><p class="hint">Bel of bezoek dit bedrijf en spreek daarna een verslag in. Leadnex onthoudt wat er besproken is en bereidt je volgende gesprek voor.</p>
-          <div class="pactions"><button type="button" class="btn" id="vmicnew2-${id}" data-act="v-new" data-mic="1">${ic('mic')}Verslag inspreken</button></div></section>`)) + infoHtml(l);
+          <div class="pactions"><button type="button" class="btn" id="vmicnew2-${id}" data-act="v-new" data-mic="1">${ic('mic')}Verslag inspreken</button></div></section>`)) + bedrijfAgendaHtml(l) + infoHtml(l);
     return `${head}<div class="sheet-body">
       ${quick.length ? `<div class="quick">${quick.join('')}</div>` : ''}
       ${next}
@@ -2597,6 +2699,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
 
   // Eén regel per bedrijf: naam, volgende stap en wat je moet weten. Tikken opent het bedrijf.
   function rowHtml(l, reden = '') {
+    if (rowBudget <= 0) { rowCut++; return ''; }
+    rowBudget--;
     const id = esc(l.id);
     const dist = state.view === 'kaart' ? kaart.dist.get(l.id) : buurtActive() ? distTo(l) : null;
     let when;
@@ -2629,7 +2733,10 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   const sessStartHtml = n => !sess.on && !state.selecting && !state.readOnly && n
     ? `<div class="sess-start"><button type="button" class="btn primary" id="sessStart" data-act="sess-start">${ic('phone-call')}Belsessie starten</button><span class="hint">${n} ${plural(n, 'bedrijf', 'bedrijven')} met telefoonnummer een voor een bellen en vastleggen.</span></div>` : '';
   const emptyHtml = (title, text, extra = '') => `<div class="empty"><strong>${esc(title)}</strong><p>${esc(text)}</p>${extra}</div>`;
-  const groupHead = (label, n, extra = '', quiet = false) => `<div class="group-head${quiet ? ' quiet' : ''}"><span>${esc(label)}</span><span class="n">${n}</span>${extra}</div>`;
+  // Lange lijsten (zoals een klantenlijst van duizenden bedrijven) in delen tonen: eerst 250, de rest vanzelf tijdens het scrollen.
+  const LIJST_STAP = 250;
+  let rowBudget = Infinity, rowCut = 0, listSig = '', listMax = LIJST_STAP, meerObs = null;
+  const groupHead = (label, n, extra = '', quiet = false) => rowBudget <= 0 ? '' : `<div class="group-head${quiet ? ' quiet' : ''}"><span>${esc(label)}</span><span class="n">${n}</span>${extra}</div>`;
   function grouped(list, keyOf, labelOf, order, sorter, extraOf) {
     const groups = new Map();
     list.forEach(l => { const k = keyOf(l); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(l); });
@@ -2640,6 +2747,15 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   }
 
   function listHtml() {
+    const sig = [state.page, state.view, state.search, state.actie, state.branche, state.status, buurtActive()].join('|');
+    if (sig !== listSig) { listSig = sig; listMax = LIJST_STAP; }
+    rowBudget = listMax; rowCut = 0;
+    try {
+      const html = listAll();
+      return rowCut ? html + `<div class="list-more"><button type="button" class="btn" id="meerRijen" data-act="meer-rijen">Toon meer bedrijven <span class="n">${rowCut}</span></button></div>` : html;
+    } finally { rowBudget = Infinity; }
+  }
+  function listAll() {
     if (state.problem) return emptyHtml(state.problem.title, state.problem.text);
     if (!state.loaded) return `<div class="empty"><p>Lijst laden…</p></div>`;
     if (!state.leads.length) return emptyHtml('Nog geen bedrijven op je lijst',
@@ -2701,8 +2817,15 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   function renderRows() {
     if (state.open && !byId(state.open)) closeRow(true);
     withFocus(rowsEl, () => { rowsEl.innerHTML = listHtml(); });
+    const meer = $('meerRijen');
+    if (meer && 'IntersectionObserver' in window) {
+      meerObs = meerObs || new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) meerRijen(); }, { rootMargin: '0px 0px 900px 0px' });
+      meerObs.disconnect();
+      meerObs.observe(meer);
+    }
     renderDetail();
   }
+  function meerRijen() { if (meerObs) meerObs.disconnect(); listMax += 500; renderRows(); }
 
   function renderMeta() {
     todayEl.textContent = cap(fmtToday.format(new Date()));
@@ -2827,7 +2950,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     });
   }
 
-  function renderAll() { renderMeta(); renderNav(); renderPage(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderDup(); renderFilters(); if (mail.open) renderMailOut(); }
+  function renderAll() { renderMeta(); renderNav(); renderPage(); renderPlanbord(); renderAgVandaag(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderDup(); renderFilters(); if (mail.open) renderMailOut(); }
   let renderQueued = false;
   function scheduleRender() {
     if (renderQueued) return;
@@ -3147,6 +3270,272 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     gotoLead(id);
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopLocating(); else if (state.view === 'kaart') startLocating(); });
+
+  /* ---------- planbord: afspraken, taken en notities ---------- */
+  // Eigen afspraken, taken en notities staan in de collectie 'agenda'. De acties van bedrijven (Bellen, Bezoek...)
+  // komen er vanzelf bij, zodat je één overzicht van je week hebt.
+  const AG_SOORTEN = [['afspraak', 'Afspraak', 'calendar'], ['taak', 'Taak', 'list-checks'], ['notitie', 'Notitie', 'notebook-pen']];
+  const agNaam = s => (AG_SOORTEN.find(x => x[0] === s) || AG_SOORTEN[0])[1];
+  let agCol = null;
+  const ag = { open: null, draft: null, armed: false, hist: false };
+  const plan = { week: '', view: pref.get('planView') === 'notities' ? 'notities' : 'week', zoek: '' };
+  const tijdOk = t => /^\d{2}:\d{2}$/.test(t || '') ? t : '';
+  function normalizeAgenda(snap) {
+    const d = snap.data() || {};
+    return {
+      id: snap.id, soort: AG_SOORTEN.some(s => s[0] === d.soort) ? d.soort : 'afspraak',
+      titel: str(d.titel).trim().slice(0, 160), tekst: str(d.tekst).slice(0, 8000), datum: parseISO(d.datum) ? str(d.datum).slice(0, 10) : '',
+      tijd: tijdOk(d.tijd), eind: tijdOk(d.eind), locatie: str(d.locatie).trim().slice(0, 160),
+      bedrijfId: str(d.bedrijfId), bedrijfNaam: str(d.bedrijfNaam).trim().slice(0, 120), herinnering: validHerinnering(d.herinnering),
+      klaar: d.klaar === true, vast: d.vast === true, aangemaakt: str(d.aangemaakt), gewijzigd: str(d.gewijzigd),
+    };
+  }
+  function agendaBody(x) {
+    const b = { soort: x.soort, titel: x.titel || '', tekst: x.tekst || '', datum: x.datum || '', tijd: x.tijd || '', eind: x.eind || '', locatie: x.locatie || '',
+      bedrijfId: x.bedrijfId || '', bedrijfNaam: x.bedrijfNaam || '', klaar: !!x.klaar, vast: !!x.vast, aangemaakt: x.aangemaakt || nowISO(), gewijzigd: nowISO() };
+    if (validHerinnering(x.herinnering) !== null) b.herinnering = x.herinnering;
+    return b;
+  }
+  const agWie = x => { const l = x.bedrijfId ? byId(x.bedrijfId) : null; return l ? l.bedrijf : x.bedrijfNaam || ''; };
+  const bedrijfVanNaam = n => { const k = key(n); if (!k) return null; return state.leads.find(l => !l.gearchiveerd && key(l.bedrijf) === k) || state.leads.find(l => key(l.bedrijf) === k) || null; };
+  const mondayOf = iso => { const d = parseISO(iso); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return isoOf(d); };
+  function isoWeek(iso) {
+    const d = parseISO(iso), t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+    return Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / 86400000 + 1) / 7);
+  }
+  const dagKop = iso => cap(fmtShort.format(parseISO(iso)).replace(/\./g, ''));
+  const tijdSort = (a, b) => (a.t || '99').localeCompare(b.t || '99');
+  // Alles op één dag: eigen afspraken en taken, en de acties van bedrijven. Vandaag ook de taken die te laat zijn.
+  function dagItems(iso, today) {
+    const items = [];
+    for (const x of state.agenda) {
+      if (x.soort === 'notitie') continue;
+      if (x.datum === iso) items.push({ k: 'ag', x, t: x.tijd });
+      else if (iso === today && x.soort === 'taak' && !x.klaar && x.datum && x.datum < today) items.push({ k: 'ag', x, t: '', laat: true });
+    }
+    for (const l of state.leads) if (!l.gearchiveerd && l.actie && l.datum === iso) items.push({ k: 'lead', l, t: l.tijd });
+    return items.sort((a, b) => tijdSort(a, b) || (a.k === 'ag' ? 0 : 1) - (b.k === 'ag' ? 0 : 1));
+  }
+  function agItemHtml(it) {
+    if (it.k === 'lead') {
+      const l = it.l;
+      return `<button type="button" class="pi pi-lead" data-pl-lead="${esc(l.id)}"><span class="pi-t">${l.tijd ? esc(l.tijd) : 'Dag'}</span>` +
+        `<span class="pi-m"><strong>${esc(l.actie)}</strong><span>${esc(l.bedrijf)}${l.plaats ? ' · ' + esc(l.plaats) : ''}</span></span></button>`;
+    }
+    const x = it.x, wie = agWie(x);
+    if (x.soort === 'taak') {
+      const sub = [it.laat && `te laat (${shortDate(x.datum)})`, wie].filter(Boolean);
+      return `<div class="pi pi-taak${x.klaar ? ' klaar' : ''}${it.laat ? ' laat' : ''}"><input type="checkbox" class="sel" data-pl-klaar="${esc(x.id)}"${x.klaar ? ' checked' : ''} aria-label="Klaar: ${esc(x.titel || 'taak')}"${state.readOnly ? ' disabled' : ''}>` +
+        `<button type="button" class="pi-m" data-pl-ag="${esc(x.id)}"><strong>${esc(x.titel || 'Taak')}</strong>${sub.length ? `<span>${sub.map(esc).join(' · ')}</span>` : ''}</button></div>`;
+    }
+    const sub = [wie, x.locatie].filter(Boolean);
+    return `<button type="button" class="pi pi-afspraak" data-pl-ag="${esc(x.id)}"><span class="pi-t">${x.tijd ? esc(x.tijd) + (x.eind ? `<small>${esc(x.eind)}</small>` : '') : 'Dag'}</span>` +
+      `<span class="pi-m"><strong>${esc(x.titel || 'Afspraak')}</strong>${sub.length ? `<span>${sub.map(esc).join(' · ')}</span>` : ''}</span></button>`;
+  }
+  const notities = () => state.agenda.filter(x => x.soort === 'notitie');
+  function notitiesHtml() {
+    const q = key(plan.zoek);
+    const list = notities().filter(x => !q || key([x.titel, x.tekst, agWie(x)].join(' ')).includes(q))
+      .sort((a, b) => (b.vast - a.vast) || (b.gewijzigd || '').localeCompare(a.gewijzigd || ''));
+    const kaart = x => {
+      const titel = x.titel || x.tekst.split('\n')[0] || 'Notitie', rest = x.titel ? x.tekst : x.tekst.split('\n').slice(1).join(' ');
+      const meta = [shortDate(x.datum || (x.gewijzigd || '').slice(0, 10)), agWie(x)].filter(Boolean);
+      return `<button type="button" class="pnote${x.vast ? ' vast' : ''}" data-pl-ag="${esc(x.id)}">${x.vast ? `<span class="pnote-pin">${ic('flag')}</span>` : ''}<strong>${esc(clip(titel, 90))}</strong>` +
+        `${rest.trim() ? `<span class="pnote-t">${esc(clip(rest.replace(/\s+/g, ' '), 220))}</span>` : ''}<span class="pnote-m">${meta.map(esc).join(' · ')}</span></button>`;
+    };
+    return `<label class="searchbox plan-zoek"><span class="sr">Zoek in notities</span>${ic('search')}<input class="input search" id="planZoek" type="search" placeholder="Zoek in je notities" value="${esc(plan.zoek)}" autocomplete="off"></label>` +
+      (list.length ? `<div class="pnotes">${list.map(kaart).join('')}</div>`
+        : emptyHtml(q ? 'Niets gevonden' : 'Nog geen notities', q ? 'Probeer een ander woord.' : 'Tik op Notitie om iets op te schrijven: een idee, iets wat een klant vertelde of een geheugensteuntje.'));
+  }
+  function renderPlanbord() {
+    const el = $('planbord');
+    if (state.page !== 'planbord') { el.innerHTML = ''; return; }
+    const today = todayISO();
+    if (!plan.week) plan.week = mondayOf(today);
+    const dagen = Array.from({ length: 7 }, (_, i) => addDays(plan.week, i));
+    $('planSub').textContent = `Week ${isoWeek(plan.week)} · ${shortDate(plan.week)} – ${shortDate(dagen[6])}`;
+    const n = notities().length;
+    const seg = `<div class="tabs plan-tabs" aria-label="Weergave">${[['week', 'Week'], ['notities', 'Notities']].map(([v, t]) =>
+      `<button type="button" class="tab" id="planView-${v}" data-pl-view="${v}" aria-pressed="${plan.view === v}">${t}${v === 'notities' && n ? ` <span class="n">${n}</span>` : ''}</button>`).join('')}</div>`;
+    if (plan.view === 'notities') { withFocus(el, () => { el.innerHTML = seg + notitiesHtml(); }); return; }
+    const nav = `<div class="plan-nav"><button type="button" class="iconbtn" id="planVorige" data-pl-week="-1" aria-label="Vorige week">${ic('chevron-left')}</button>` +
+      `<strong>Week ${isoWeek(plan.week)}</strong><button type="button" class="iconbtn" id="planVolgende" data-pl-week="1" aria-label="Volgende week">${ic('chevron-right')}</button>` +
+      `${plan.week !== mondayOf(today) ? `<button type="button" class="btn small" id="planNu" data-pl-week="0">Deze week</button>` : ''}</div>`;
+    const laat = state.leads.filter(l => isDue(l, today) && l.datum < today).length;
+    const cols = dagen.map((iso, i) => {
+      const items = dagItems(iso, today);
+      return `<section class="pday${iso === today ? ' nu' : ''}${iso < today ? ' voorbij' : ''}${i > 4 ? ' weekend' : ''}${items.length ? '' : ' leeg'}" aria-label="${esc(longDate(iso))}">
+        <header class="pday-h"><span class="pday-d">${esc(dagKop(iso))}</span>${iso === today ? '<span class="pday-nu">Vandaag</span>' : ''}${state.readOnly ? '' : `<button type="button" class="pday-add" data-pl-add="${iso}" aria-label="Afspraak op ${esc(longDate(iso))}">${ic('plus')}</button>`}</header>
+        ${iso === today && laat ? `<button type="button" class="pi pi-laat" data-page="vandaag">${laat} ${plural(laat, 'actie', 'acties')} te laat</button>` : ''}
+        ${items.length ? items.map(agItemHtml).join('') : '<p class="pday-leeg">Niets gepland</p>'}
+      </section>`;
+    }).join('');
+    const los = state.agenda.filter(x => x.soort === 'taak' && !x.datum && !x.klaar).sort((a, b) => (a.aangemaakt || '').localeCompare(b.aangemaakt || ''));
+    const klaar = state.agenda.filter(x => x.soort === 'taak' && !x.datum && x.klaar).length;
+    const takenlijst = los.length || klaar ? `<section class="pday plos" aria-label="Taken zonder datum"><header class="pday-h"><span class="pday-d">Taken zonder datum</span>${state.readOnly ? '' : `<button type="button" class="pday-add" data-ag-nieuw="taak" aria-label="Taak toevoegen">${ic('plus')}</button>`}</header>
+      ${los.map(x => agItemHtml({ k: 'ag', x })).join('') || '<p class="pday-leeg">Alles afgevinkt.</p>'}</section>` : '';
+    el.innerHTML = seg + nav + `<div class="pweek">${cols}</div>` + takenlijst;
+  }
+  // Op Vandaag: de eigen afspraken en taken van vandaag, boven de acties.
+  function renderAgVandaag() {
+    const el = $('agVandaag'), today = todayISO();
+    const items = state.page !== 'vandaag' ? [] : state.agenda.filter(x => x.soort !== 'notitie' && (x.soort === 'taak' ? !x.klaar && x.datum && x.datum <= today : x.datum === today))
+      .map(x => ({ k: 'ag', x, t: x.tijd, laat: x.datum < today })).sort(tijdSort);
+    el.hidden = !items.length;
+    el.innerHTML = items.length ? `<div class="agv-head"><span class="slabel">Afspraken en taken vandaag</span><button type="button" class="linkbtn" data-page="planbord">Planbord</button></div>${items.map(agItemHtml).join('')}` : '';
+  }
+  // Bij een bedrijf: wat er gepland staat en de notities.
+  function bedrijfAgendaHtml(l) {
+    const today = todayISO();
+    const items = state.agenda.filter(x => x.bedrijfId === l.id && (x.soort === 'notitie' || (x.soort === 'taak' ? !x.klaar : x.datum >= today)))
+      .sort((a, b) => (a.soort === 'notitie') - (b.soort === 'notitie') || (a.datum || '9').localeCompare(b.datum || '9') || (a.tijd || '99').localeCompare(b.tijd || '99')).slice(0, 8);
+    const regel = x => `<button type="button" class="bag" data-pl-ag="${esc(x.id)}">${ic(AG_SOORTEN.find(s => s[0] === x.soort)[2])}<span><strong>${esc(x.titel || clip(x.tekst.split('\n')[0], 70) || agNaam(x.soort))}</strong>` +
+      `<span>${esc([agNaam(x.soort), x.soort !== 'notitie' && x.datum ? shortDate(x.datum) + (x.tijd ? ' ' + x.tijd : '') : ''].filter(Boolean).join(' · '))}</span></span></button>`;
+    return `<section class="scard bagenda"><h3 class="slabel">Planning en notities</h3>${items.length ? items.map(regel).join('') : '<p class="hint">Nog niets gepland of genoteerd bij dit bedrijf.</p>'}
+      ${state.readOnly ? '' : `<div class="pactions"><button type="button" class="btn small" data-ag-nieuw="afspraak" data-ag-lead="${esc(l.id)}">${ic('calendar')}Afspraak</button><button type="button" class="btn small" data-ag-nieuw="taak" data-ag-lead="${esc(l.id)}">${ic('list-checks')}Taak</button><button type="button" class="btn small" data-ag-nieuw="notitie" data-ag-lead="${esc(l.id)}">${ic('notebook-pen')}Notitie</button></div>`}</section>`;
+  }
+
+  /* invoerscherm voor een afspraak, taak of notitie */
+  const agSheet = $('agSheet');
+  function openAg(x) {
+    if (state.readOnly) return;
+    const bestaand = x.id ? state.agenda.find(a => a.id === x.id) : null;
+    if (x.id && !bestaand) return;
+    const soort = bestaand ? bestaand.soort : x.soort || 'afspraak';
+    const b = bestaand || { soort, titel: '', tekst: '', datum: x.datum !== undefined ? x.datum : soort === 'afspraak' ? todayISO() : '', tijd: '', eind: '', locatie: '',
+      bedrijfId: x.bedrijfId || '', bedrijfNaam: '', herinnering: null, klaar: false, vast: false };
+    ag.open = bestaand ? bestaand.id : 'nieuw';
+    ag.armed = false;
+    ag.draft = { ...b, wie: agWie(b), herinnering: b.herinnering === null ? '' : String(b.herinnering) };
+    renderAg();
+    if (!bestaand) setTimeout(() => (ag.draft && ag.draft.soort === 'notitie' ? $('ag-tekst') : $('ag-titel'))?.focus({ preventScroll: true }), 60);
+  }
+  function closeAg() { ag.open = null; ag.draft = null; ag.armed = false; renderAg(); }
+  function agSheetHtml() {
+    const d = ag.draft, nieuw = ag.open === 'nieuw', naam = agNaam(d.soort);
+    const f = (k, label, html, cls = '') => `<div class="field${cls ? ' ' + cls : ''}"><label for="ag-${k}">${label}</label>${html}</div>`;
+    const inp = (k, label, extra = '', cls = '') => f(k, label, `<input class="input" id="ag-${k}" data-agf="${k}" value="${esc(d[k] || '')}"${extra}>`, cls);
+    const opt = '<span class="opt">optioneel</span>';
+    const wie = inp('wie', 'Bedrijf' + opt, ' list="bedrijfLijst" maxlength="120" autocomplete="off" placeholder="Kies of typ een bedrijf"');
+    let velden;
+    if (d.soort === 'notitie') {
+      velden = [inp('titel', 'Titel' + opt, ' maxlength="160" placeholder="Bijv. Idee voor de beurs"'),
+        f('tekst', 'Notitie', `<textarea class="input" id="ag-tekst" data-agf="tekst" rows="8" placeholder="Typ, of spreek in met de microfoon van je toetsenbord">${esc(d.tekst)}</textarea>`),
+        wie, `<label class="check" for="ag-vast"><input type="checkbox" id="ag-vast" data-agf="vast"${d.vast ? ' checked' : ''}>Bovenaan vastzetten</label>`];
+    } else {
+      velden = [inp('titel', d.soort === 'taak' ? 'Wat moet er gebeuren' : 'Wat', ` maxlength="160" placeholder="${d.soort === 'taak' ? 'Bijv. Offerte nakijken' : 'Bijv. Bezoek showroom'}"`),
+        f('datum', d.soort === 'taak' ? 'Wanneer' + opt : 'Datum', whenHtml('ag-datum', d.datum, ' data-agf="datum"')),
+        d.soort === 'afspraak' ? `<div class="ag-tijden">${inp('tijd', 'Van' + opt, ' type="time"')}${inp('eind', 'Tot' + opt, ' type="time"')}</div>` : '',
+        wie,
+        d.soort === 'afspraak' ? inp('locatie', 'Waar' + opt, ' maxlength="160" placeholder="Adres of plaats"') : '',
+        d.soort === 'afspraak' && tijdOk(d.tijd) ? f('herinnering', 'Melding', `<select class="input" id="ag-herinnering" data-agf="herinnering">${herinneringOpties(d.herinnering)}</select>`) : '',
+        f('tekst', 'Notitie' + opt, `<textarea class="input" id="ag-tekst" data-agf="tekst" rows="3">${esc(d.tekst)}</textarea>`),
+        d.soort === 'taak' && !nieuw ? `<label class="check" for="ag-klaar"><input type="checkbox" id="ag-klaar" data-agf="klaar"${d.klaar ? ' checked' : ''}>Klaar</label>` : ''];
+    }
+    const lead = d.bedrijfId ? byId(d.bedrijfId) : null;
+    return `<header class="sheet-head"><button type="button" class="iconbtn" id="agSluit" data-ag="sluit" aria-label="Sluiten">${ic('arrow-left')}</button>
+        <div class="sh-title"><h2 id="agTitle">${nieuw ? `${naam} toevoegen` : esc(d.titel || naam)}</h2><p>${nieuw ? 'Komt op je planbord' : esc(naam)}</p></div></header>
+      <div class="sheet-body"><section class="scard agform">
+        ${nieuw ? `<div class="tabs ag-soort" aria-label="Soort">${AG_SOORTEN.map(([v, t, icn]) => `<button type="button" class="tab" id="agSoort-${v}" data-ag-soort="${v}" aria-pressed="${d.soort === v}">${ic(icn)}${t}</button>`).join('')}</div>` : ''}
+        ${velden.join('')}
+        <div class="pactions"><button type="button" class="btn primary" id="agBewaar" data-ag="bewaar">${ic('check')}Opslaan</button>
+          ${lead ? `<button type="button" class="btn" data-ag="bedrijf">${ic('building-2')}${esc(clip(lead.bedrijf, 28))}</button>` : ''}
+          ${nieuw ? '' : `<button type="button" class="btn danger${ag.armed ? ' armed' : ''}" id="agWeg" data-ag="weg">${ag.armed ? 'Nogmaals tikken om te verwijderen' : `${ic('trash-2')}Verwijderen`}</button>`}</div>
+      </section></div>`;
+  }
+  let bedrijfLijstVoor = -1;
+  function renderAg() {
+    const open = !!ag.open && !!ag.draft;
+    agSheet.hidden = !open;
+    $('agBackdrop').hidden = !open;
+    document.body.classList.toggle('ag-open', open);
+    // Terugknop van Android sluit het invoerscherm in plaats van de app.
+    if (open && !ag.hist) { history.pushState({ ag: true }, ''); ag.hist = true; }
+    else if (!open && ag.hist) { ag.hist = false; if (history.state && history.state.ag) { ignorePop = true; history.back(); } }
+    if (!open) { agSheet.innerHTML = ''; return; }
+    if (bedrijfLijstVoor !== state.leads.length) {
+      bedrijfLijstVoor = state.leads.length;
+      $('bedrijfLijst').innerHTML = [...new Set(state.leads.filter(l => !l.gearchiveerd).map(l => l.bedrijf))].sort(cmp).map(n => `<option value="${esc(n)}">`).join('');
+    }
+    withFocus(agSheet, () => { agSheet.innerHTML = agSheetHtml(); });
+  }
+  window.addEventListener('popstate', () => { if (ag.hist && !(history.state && history.state.ag)) { ag.hist = false; ag.open = null; ag.draft = null; renderAg(); } });
+  async function saveAg() {
+    const d = ag.draft;
+    if (!d || !agCol) return;
+    const titel = d.titel.trim(), tekst = d.tekst.trim();
+    if (d.soort !== 'notitie' && !titel) { toast(d.soort === 'taak' ? 'Vul in wat er moet gebeuren.' : 'Vul in wat de afspraak is.'); $('ag-titel')?.focus(); return; }
+    if (d.soort === 'notitie' && !titel && !tekst) { toast('Schrijf eerst iets op.'); $('ag-tekst')?.focus(); return; }
+    if (d.soort === 'afspraak' && !parseISO(d.datum)) { toast('Kies een datum voor de afspraak.'); $('ag-datum')?.focus(); return; }
+    const lead = bedrijfVanNaam(d.wie);
+    const tijd = d.soort === 'afspraak' ? tijdOk(d.tijd) : '';
+    const x = { ...d, titel, tekst, datum: parseISO(d.datum) ? d.datum : d.soort === 'notitie' ? todayISO() : '', tijd, eind: tijd && tijdOk(d.eind) > tijd ? tijdOk(d.eind) : '',
+      locatie: d.soort === 'afspraak' ? (d.locatie || '').trim() : '', bedrijfId: lead ? lead.id : '', bedrijfNaam: lead ? lead.bedrijf : (d.wie || '').trim(),
+      herinnering: tijd ? parseHerinnering(d.herinnering) : null, klaar: d.soort === 'taak' && !!d.klaar, vast: d.soort === 'notitie' && !!d.vast };
+    const ref = ag.open === 'nieuw' ? agCol.doc() : agCol.doc(ag.open);
+    if (!await write(() => ref.set(agendaBody(x)))) return;
+    const nieuw = ag.open === 'nieuw';
+    closeAg();
+    if (x.soort !== 'notitie' && x.datum) plan.week = mondayOf(x.datum);
+    renderAll();
+    toast(nieuw ? (x.soort === 'notitie' ? 'Notitie opgeslagen.' : `${agNaam(x.soort)} staat op je planbord${x.datum ? ` op ${shortDate(x.datum)}${x.tijd ? ' om ' + x.tijd : ''}` : ''}.`) : 'Opgeslagen.');
+  }
+  async function agKlaar(id, klaar) {
+    const x = state.agenda.find(a => a.id === id);
+    if (!x || !agCol) return;
+    if (await write(() => agCol.doc(id).set(agendaBody({ ...x, klaar })))) toast(klaar ? 'Taak afgevinkt.' : 'Taak staat weer open.');
+  }
+  agSheet.addEventListener('input', e => {
+    const k = e.target.dataset.agf;
+    if (!k || !ag.draft) return;
+    ag.draft[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    if (k === 'tijd' && !!tijdOk(e.target.value) !== !!agSheet.querySelector('#ag-herinnering')) renderAg();
+  });
+  agSheet.addEventListener('change', e => { const k = e.target.dataset.agf; if (k && ag.draft) ag.draft[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value; });
+  agSheet.addEventListener('click', async e => {
+    const s = e.target.closest('[data-ag-soort]');
+    if (s && ag.draft) {
+      const soort = s.dataset.agSoort;
+      if (soort !== ag.draft.soort) {
+        ag.draft.soort = soort;
+        if (soort === 'afspraak' && !ag.draft.datum) ag.draft.datum = todayISO();
+        renderAg();
+      }
+      return;
+    }
+    const b = e.target.closest('[data-ag]');
+    if (!b) return;
+    const a = b.dataset.ag;
+    if (a === 'sluit') closeAg();
+    else if (a === 'bewaar') saveAg();
+    else if (a === 'bedrijf') { const id = ag.draft && ag.draft.bedrijfId; closeAg(); if (id) gotoLead(id); }
+    else if (a === 'weg') {
+      if (!ag.armed) { ag.armed = true; renderAg(); return; }
+      const id = ag.open;
+      if (await write(() => agCol.doc(id).delete())) { closeAg(); renderAll(); toast('Verwijderd.'); }
+    }
+  });
+  $('agBackdrop').addEventListener('click', closeAg);
+  // Overal: openen, afvinken, toevoegen en bladeren.
+  document.addEventListener('click', e => {
+    const t = e.target;
+    const kl = t.closest('[data-pl-klaar]');
+    if (kl) { agKlaar(kl.dataset.plKlaar, kl.checked); return; }
+    const o = t.closest('[data-pl-ag]');
+    if (o) { openAg({ id: o.dataset.plAg }); return; }
+    const ld = t.closest('[data-pl-lead]');
+    if (ld) { gotoLead(ld.dataset.plLead); return; }
+    const add = t.closest('[data-pl-add]');
+    if (add) { openAg({ soort: 'afspraak', datum: add.dataset.plAdd }); return; }
+    const nw = t.closest('[data-ag-nieuw]');
+    if (nw) { openAg({ soort: nw.dataset.agNieuw, bedrijfId: nw.dataset.agLead || '' }); return; }
+    const wk = t.closest('[data-pl-week]');
+    if (wk) { const n = +wk.dataset.plWeek; plan.week = n ? addDays(plan.week || mondayOf(todayISO()), 7 * n) : mondayOf(todayISO()); renderPlanbord(); return; }
+    const vw = t.closest('[data-pl-view]');
+    if (vw) { plan.view = vw.dataset.plView; pref.set('planView', plan.view); renderPlanbord(); }
+  });
+  $('planbord').addEventListener('input', e => { if (e.target.id === 'planZoek') { plan.zoek = e.target.value; renderPlanbord(); } });
 
   /* ---------- belsessie: de lijst een voor een afbellen ---------- */
   const sess = { on: false, ids: [], i: 0, done: 0, skipped: 0 };
@@ -3576,30 +3965,57 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     return map;
   }
   const normPhone = s => { const t = String(s || '').trim(); return /^[1-9]\d{8}$/.test(t) ? '0' + t : t; };
+  // Soort relatie uit het bestand: Klant, Potentiële klant (prospect) of Lead. Iets anders telt niet; dan geldt de keuze bij het importeren.
+  function mapStatus(v) {
+    const k = key(v);
+    if (!k || /\b(ex|oud|voormalig|geen)\b/.test(k)) return '';
+    if (/prospect|potenti/.test(k)) return 'prospect';
+    if (/klant|customer|client|debiteur/.test(k)) return 'klant';
+    return /^(lead|nieuw|koud)/.test(k) ? 'lead' : '';
+  }
   function mapRow(row, map) {
-    const o = { bedrijf: [], contact: [], email: [], telefoon: [], adres: [], huisnummer: [], postcode: [], plaats: [], branche: [], website: [], actie: [], prioriteit: [], notitie: [] };
+    const o = { bedrijf: [], klantnummer: [], contact: [], email: [], telefoon: [], mobiel: [], adres: [], huisnummer: [], postcode: [], plaats: [], branche: [], website: [], status: [], actie: [], prioriteit: [], notitie: [] };
     map.forEach((f, i) => { const v = String(row[i] ?? '').trim(); if (f && v && o[f]) o[f].push(v); });
     let adres = [o.adres.join(' '), o.huisnummer.join(' ')].filter(Boolean).join(' ');
     if (o.postcode.length) adres = [adres, o.postcode.join(' ')].filter(Boolean).join(', ');
+    // Eén telefoonveld: het vaste nummer, of anders het mobiele. Een tweede, ander nummer komt in de notitie.
+    const tel = normPhone(o.telefoon[0]), mob = normPhone(o.mobiel[0]);
+    const extra = tel && mob && phoneKey(tel) !== phoneKey(mob) ? [`Mobiel: ${mob}`] : [];
     return {
-      bedrijf: o.bedrijf.join(' ').slice(0, 120), contact: o.contact.join(' ').replace(/\s+/g, ' ').slice(0, 120),
-      email: (o.email[0] || '').split(/[;,\s]+/)[0].slice(0, 120), telefoon: normPhone(o.telefoon[0]).slice(0, 40),
-      adres: adres.slice(0, 120), plaats: o.plaats.join(' ').slice(0, 60), branche: o.branche[0] || '', website: cleanWebsite(o.website[0]), actie: o.actie[0] || '', prioriteit: mapPrio(o.prioriteit[0]), notitie: o.notitie.join(' · ').slice(0, 2000),
+      bedrijf: o.bedrijf.join(' ').slice(0, 120), klantnummer: (o.klantnummer[0] || '').slice(0, 40), contact: o.contact.join(' ').replace(/\s+/g, ' ').slice(0, 120),
+      email: (o.email[0] || '').split(/[;,\s]+/)[0].slice(0, 120), telefoon: (tel || mob).slice(0, 40),
+      adres: adres.slice(0, 120), plaats: o.plaats.join(' ').slice(0, 60), branche: o.branche[0] || '', website: cleanWebsite(o.website[0]), status: mapStatus(o.status[0]),
+      actie: o.actie[0] || '', prioriteit: mapPrio(o.prioriteit[0]), notitie: [...extra, ...o.notitie].join(' · ').slice(0, 2000),
     };
+  }
+  // Soort relatie voor rijen zonder eigen soort. Staat er een klantnummer in het bestand, dan is het waarschijnlijk een klantenlijst.
+  const impStatus = () => validStatus(imp.status || (imp.map.includes('klantnummer') ? 'klant' : 'lead'));
+  // Bestaand bedrijf aanvullen: lege velden invullen en de notitie erbij. De soort relatie gaat alleen omhoog (Lead → Klant), nooit omlaag.
+  function aanvulLead(l, c, status) {
+    const fill = (k, v) => l[k] || v || '';
+    const notitie = c.notitie && !key(l.notitie).includes(key(c.notitie)) ? [l.notitie, c.notitie].filter(Boolean).join('\n\n').slice(0, 2000) : l.notitie;
+    return { ...l, klantnummer: fill('klantnummer', c.klantnummer), contact: fill('contact', c.contact), email: fill('email', c.email), telefoon: fill('telefoon', c.telefoon),
+      adres: fill('adres', c.adres), plaats: fill('plaats', canonPlaats(c.plaats)), website: fill('website', c.website), branche: fill('branche', canonBranche(c.branche)),
+      notitie, status: rankStatus(status) > rankStatus(l.status) ? status : l.status };
+  }
+  function voorbeeldBestand() {
+    saveFile('leadnex-klantenlijst.csv', '\ufeff' + IMP_VOORBEELD.join(';') + '\r\n', 'text/csv;charset=utf-8');
+    toast('Voorbeeldbestand opgeslagen in je downloads. Open het in Excel, vul per rij een bedrijf in en sla het op.', 6000);
   }
   function importRows() {
     if (!imp.rows) return [];
     const data = imp.header ? imp.rows.slice(1) : imp.rows;
-    const existing = buildIndex(state.leads), inFile = buildIndex([]);
+    const existing = buildIndex(state.leads), inFile = buildIndex([]), aanvullen = imp.bestaand === 'aanvullen', gezien = new Set();
     return data.map((row, i) => {
       const c = mapRow(row, imp.map);
-      let status = 'nieuw';
+      let status = 'nieuw', match = null;
       if (!c.bedrijf) status = 'leeg';
-      else if (lookup(existing, c).length) status = 'bestaat';
+      else if ((match = lookup(existing, c)[0] || null)) status = gezien.has(match.id) ? 'dubbel' : 'bestaat';
       else if (lookup(inFile, c).length) status = 'dubbel';
+      if (match) gezien.add(match.id);
       if (c.bedrijf) addToIndex(inFile, c);
-      const include = status === 'leeg' ? false : (imp.include.has(i) ? imp.include.get(i) : status === 'nieuw');
-      return { i, row, c, status, include };
+      const include = status === 'leeg' ? false : (imp.include.has(i) ? imp.include.get(i) : status === 'nieuw' || (aanvullen && status === 'bestaat'));
+      return { i, row, c, status, match, include, aanvullen: aanvullen && !!match };
     });
   }
   function setImportRows(rows) {
@@ -3609,6 +4025,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     imp.map = guessMap(imp.rows, imp.header);
     imp.include = new Map();
     imp.error = '';
+    imp.status = '';
     renderImport();
   }
   async function readImportFile(file) {
@@ -3651,36 +4068,50 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
         </div>
         ${imp.loading ? '<p class="hint">Bestand lezen…</p>' : ''}
         ${imp.error ? `<p class="warn">${esc(imp.error)}</p>` : ''}
-        <p class="hint">Na het inlezen kies je per kolom welk veld het is en zie je welke bedrijven al in je lijst staan.</p>`;
+        <p class="hint">Na het inlezen kies je per kolom welk veld het is en zie je welke bedrijven al in je lijst staan.</p>
+        <div class="imp-tip">${ic('file-spreadsheet')}<div><strong>Klantenlijst invoeren?</strong>
+          <span>Download het voorbeeldbestand, vul in Excel per rij één klant in (klantnummer, naam, telefoon, adres…) en kies het bestand hierboven. Je eigen Excel met andere kolomnamen kan ook.</span>
+          <button type="button" class="btn small" id="impVoorbeeld" data-i="voorbeeld">${ic('download')}Voorbeeldbestand downloaden</button></div></div>`;
     }
     const rows = importRows();
     const counts = { nieuw: 0, bestaat: 0, dubbel: 0, leeg: 0 };
     rows.forEach(r => counts[r.status]++);
-    const chosen = rows.filter(r => r.include).length;
-    const over = state.leads.length + chosen > MAX_LEADS;
-    const statusTxt = { nieuw: 'Nieuw', bestaat: 'Staat al in je lijst', dubbel: 'Dubbel in bestand', leeg: 'Geen bedrijfsnaam' };
+    const chosen = rows.filter(r => r.include).length, nAanvul = rows.filter(r => r.include && r.aanvullen).length, nNieuw = chosen - nAanvul;
+    const over = state.leads.length + nNieuw > MAX_LEADS;
+    const statusTxt = { nieuw: 'Nieuw', bestaat: imp.bestaand === 'aanvullen' ? 'Wordt aangevuld' : 'Staat al in je lijst', dubbel: 'Dubbel in bestand', leeg: 'Geen bedrijfsnaam' };
     const width = imp.map.length;
     const table = `<div class="imp-wrap"><table class="imp-table">
       <thead><tr><th><span class="sr">Importeren</span></th><th>Status</th>${imp.map.map((f, i) =>
         `<th><select id="impMap-${i}" data-col="${i}" aria-label="Veld voor kolom ${i + 1}">${IMP_FIELDS.map(([v, lab]) => `<option value="${v}"${v === f ? ' selected' : ''}>${lab}</option>`).join('')}</select>` +
         `${imp.header ? `<div class="colname">${esc(imp.rows[0][i] || '')}</div>` : ''}</th>`).join('')}</tr></thead>
-      <tbody>${rows.slice(0, 200).map(r => `<tr class="st-${r.status}"><td><input type="checkbox" class="sel" id="impRow-${r.i}" data-row="${r.i}"${r.include ? ' checked' : ''}${r.status === 'leeg' ? ' disabled' : ''} aria-label="Rij ${r.i + 1} importeren"></td><td class="st">${statusTxt[r.status]}</td>` +
+      <tbody>${rows.slice(0, 200).map(r => `<tr class="st-${r.status}${r.aanvullen && r.status === 'bestaat' ? ' aanvul' : ''}"><td><input type="checkbox" class="sel" id="impRow-${r.i}" data-row="${r.i}"${r.include ? ' checked' : ''}${r.status === 'leeg' ? ' disabled' : ''} aria-label="Rij ${r.i + 1} importeren"></td><td class="st">${statusTxt[r.status]}</td>` +
         Array.from({ length: width }, (_, i) => `<td title="${esc(r.row[i] || '')}">${esc(r.row[i] || '')}</td>`).join('') + '</tr>').join('')}</tbody>
     </table></div>`;
     return head + `
       <label class="check" for="impHeader"><input type="checkbox" id="impHeader"${imp.header ? ' checked' : ''}>Eerste rij bevat kolomnamen</label>
       ${imp.map.includes('bedrijf') ? '' : '<p class="warn">Kies bij één kolom <strong>Bedrijfsnaam</strong>. Zonder bedrijfsnaam kan een rij niet worden geïmporteerd.</p>'}
-      <p class="hint">Kies bovenaan elke kolom welk veld het is. Bedrijven die al in je lijst of archief staan, zijn niet aangevinkt.</p>
+      <p class="hint">Kies bovenaan elke kolom welk veld het is. ${imp.bestaand === 'aanvullen'
+        ? 'Bedrijven die al in je lijst of archief staan, worden aangevuld: lege velden worden ingevuld en de soort relatie gaat omhoog (bijv. van Lead naar Klant). Wat je al had ingevuld, blijft staan.'
+        : 'Bedrijven die al in je lijst of archief staan, zijn niet aangevinkt.'}</p>
       ${table}
       ${rows.length > 200 ? `<p class="hint">De eerste 200 van ${rows.length} rijen worden getoond. De rest wordt ook geïmporteerd, behalve dubbele rijen.</p>` : ''}
-      <p class="imp-sum"><strong>${chosen}</strong> ${plural(chosen, 'bedrijf wordt', 'bedrijven worden')} geïmporteerd · ${counts.bestaat} ${plural(counts.bestaat, 'staat', 'staan')} al in je lijst · ${counts.dubbel} dubbel in bestand${counts.leeg ? ` · ${counts.leeg} zonder bedrijfsnaam` : ''}</p>
+      <p class="imp-sum">${imp.bestaand === 'aanvullen'
+        ? `<strong>${nNieuw}</strong> ${plural(nNieuw, 'nieuw bedrijf', 'nieuwe bedrijven')} · <strong>${nAanvul}</strong> ${plural(nAanvul, 'bestaand bedrijf wordt', 'bestaande bedrijven worden')} aangevuld`
+        : `<strong>${chosen}</strong> ${plural(chosen, 'bedrijf wordt', 'bedrijven worden')} geïmporteerd · ${counts.bestaat} ${plural(counts.bestaat, 'staat', 'staan')} al in je lijst`} · ${counts.dubbel} dubbel in bestand${counts.leeg ? ` · ${counts.leeg} zonder bedrijfsnaam` : ''}</p>
       <div class="imp-opts">
-        <div class="field"><label for="impActie">Actie voor deze bedrijven<span class="opt">optioneel</span></label><input class="input" id="impActie" list="actieLijst" maxlength="40" value="${esc(imp.actie)}" placeholder="Bijv. Bellen"></div>
+        <div class="field"><label for="impStatus">Soort relatie</label><select class="input" id="impStatus">${STATUSES.map(([v, t]) => `<option value="${v}"${v === impStatus() ? ' selected' : ''}>${t}</option>`).join('')}</select>
+          <p class="hint">${imp.map.includes('status') ? 'Voor rijen zonder Klant, Potentiële klant of Lead in de kolom Soort relatie.' : 'Voor alle bedrijven uit dit bestand. Kies Klant voor je klantenlijst.'}</p></div>
+        <div class="field"><label for="impBestaand">Staat een bedrijf al in je lijst?</label><select class="input" id="impBestaand">
+          <option value="overslaan"${imp.bestaand === 'aanvullen' ? '' : ' selected'}>Overslaan</option><option value="aanvullen"${imp.bestaand === 'aanvullen' ? ' selected' : ''}>Aanvullen (lege velden invullen)</option></select>
+          <p class="hint">Herkend aan klantnummer, naam, telefoon, e-mail of website. Aanvullen overschrijft niets wat je al had.</p></div>
+        <div class="field"><label for="impActie">Actie voor de nieuwe bedrijven<span class="opt">optioneel</span></label><input class="input" id="impActie" list="actieLijst" maxlength="40" value="${esc(imp.actie)}" placeholder="Bijv. Bellen"></div>
         <div class="field"><label for="impDatum">Wanneer<span class="opt">optioneel</span></label>${whenHtml('impDatum', imp.datum)}</div>
       </div>
       ${over ? `<p class="warn">De lijst kan maximaal ${MAX_LEADS} bedrijven bevatten. Er staan er nu ${state.leads.length}. Vink er minder aan of verwijder eerst oude bedrijven.</p>` : ''}
       <div class="pactions">
-        <button type="button" class="btn primary" id="impGo" data-i="go"${chosen && !over ? '' : ' disabled'}>Importeer ${chosen} ${plural(chosen, 'bedrijf', 'bedrijven')}</button>
+        <button type="button" class="btn primary" id="impGo" data-i="go"${chosen && !over ? '' : ' disabled'}>${nAanvul
+          ? `${nNieuw ? `Importeer ${nNieuw} en vul` : 'Vul'} ${nAanvul} ${plural(nAanvul, 'bedrijf', 'bedrijven')} aan`
+          : `Importeer ${chosen} ${plural(chosen, 'bedrijf', 'bedrijven')}`}</button>
         <button type="button" class="btn" id="impReset" data-i="reset">Ander bestand kiezen</button>
       </div>`;
   }
@@ -3700,15 +4131,26 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   async function runImport() {
     const chosen = importRows().filter(r => r.include);
     if (!chosen.length || imp.busy) return;
-    if (state.leads.length + chosen.length > MAX_LEADS) return;
-    const now = nowISO(), globalActie = canonAction(imp.actie), datum = parseISO(imp.datum) ? imp.datum : '';
-    const bodies = chosen.map(r => {
+    const nieuw = chosen.filter(r => !r.aanvullen);
+    if (state.leads.length + nieuw.length > MAX_LEADS) return;
+    const now = nowISO(), globalActie = canonAction(imp.actie), datum = parseISO(imp.datum) ? imp.datum : '', status = impStatus();
+    const bodies = nieuw.map(r => {
       const actie = canonAction(r.c.actie) || globalActie;
-      return toBody({ bedrijf: r.c.bedrijf, prioriteit: r.c.prioriteit, contact: r.c.contact, email: r.c.email, telefoon: r.c.telefoon, adres: r.c.adres, plaats: canonPlaats(r.c.plaats),
-        branche: canonBranche(r.c.branche), website: r.c.website,
-        actie, datum: actie ? datum : '', notitie: r.c.notitie, geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now });
+      return { body: toBody({ bedrijf: r.c.bedrijf, klantnummer: r.c.klantnummer, prioriteit: r.c.prioriteit, contact: r.c.contact, email: r.c.email, telefoon: r.c.telefoon, adres: r.c.adres, plaats: canonPlaats(r.c.plaats),
+        branche: canonBranche(r.c.branche), website: r.c.website, status: r.c.status || status,
+        actie, datum: actie ? datum : '', notitie: r.c.notitie, geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now }) };
     });
-    const acties = [...new Set(bodies.map(b => b.actie).filter(Boolean))];
+    // Aanvullen: alle rijen van hetzelfde bedrijf eerst samenvoegen, dan één keer opslaan. Niets veranderd: niet opslaan.
+    const aanvul = new Map();
+    chosen.filter(r => r.aanvullen).forEach(r => { const l = aanvul.get(r.match.id) || r.match; aanvul.set(r.match.id, aanvulLead(l, r.c, r.c.status || status)); });
+    let ongewijzigd = 0;
+    aanvul.forEach((l, id) => {
+      if (JSON.stringify(toBody(l)) === JSON.stringify(toBody(byId(id) || {}))) { ongewijzigd++; return; }
+      bodies.push({ id, body: toBody({ ...l, gewijzigd: now }) });
+    });
+    const nNieuw = nieuw.length, nAanvul = bodies.length - nNieuw;
+    const acties = [...new Set(bodies.map(b => b.body.actie).filter(Boolean))];
+    if (!bodies.length) { imp.open = false; renderImport(); toast(`Niets te doen: ${ongewijzigd} ${plural(ongewijzigd, 'bedrijf had', 'bedrijven hadden')} al alle gegevens.`); return; }
     Object.assign(imp, { busy: true, done: 0, total: bodies.length });
     renderImport();
     const queue = bodies.slice();
@@ -3720,7 +4162,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     };
     const worker = async () => {
       while (queue.length && !stop) {
-        const body = queue.shift(), ref = col.doc();
+        const { id, body } = queue.shift(), ref = id ? col.doc(id) : col.doc();
         let ok = false;
         for (let a = 0; a < 4 && !ok && !stop; a++) {
           try { await ref.set(body); ok = true; }
@@ -3742,6 +4184,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     renderImport();
     renderAll();
     if (stop || failed) { writeError(lastErr); if (done) toast(`${done} bedrijven geïmporteerd. Daarna ging het mis: ${queue.length + failed} niet geïmporteerd.`); }
+    else if (nAanvul) toast([nNieuw && `${nNieuw} ${plural(nNieuw, 'bedrijf', 'bedrijven')} geïmporteerd`, `${nAanvul} ${plural(nAanvul, 'bedrijf', 'bedrijven')} aangevuld`,
+      ongewijzigd && `${ongewijzigd} al compleet`].filter(Boolean).join(', ') + '.', 6000);
     else toast(`${done} ${plural(done, 'bedrijf', 'bedrijven')} geïmporteerd.`);
   }
 
@@ -4295,6 +4739,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   }
   function dupReasons(a, b) {
     const ka = leadKeys(a), kb = leadKeys(b), r = [];
+    if (ka.k && ka.k === kb.k) r.push('zelfde klantnummer');
     if (ka.p && ka.p === kb.p) r.push('zelfde telefoonnummer');
     if (ka.e && ka.e === kb.e) r.push('zelfde e-mailadres');
     if (ka.d.some(x => kb.d.includes(x))) r.push('zelfde website of maildomein');
@@ -4313,7 +4758,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const buckets = new Map(), put = (k, l) => { if (!k) return; if (!buckets.has(k)) buckets.set(k, []); buckets.get(k).push(l); };
     state.leads.forEach(l => {
       const k = leadKeys(l);
-      put(k.n && 'n:' + k.n, l); put(k.p && 'p:' + k.p, l); put(k.e && 'e:' + k.e, l); k.d.forEach(d => put('d:' + d, l));
+      put(k.n && 'n:' + k.n, l); put(k.k && 'k:' + k.k, l); put(k.p && 'p:' + k.p, l); put(k.e && 'e:' + k.e, l); k.d.forEach(d => put('d:' + d, l));
       const first = k.n.split(' ').find(w => w.length >= 3);
       if (first && l.plaats) put('f:' + first + '|' + key(l.plaats), l);
     });
@@ -4338,7 +4783,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const log = [...a.log, ...b.log].sort((x, y) => y.d.localeCompare(x.d)).filter(x => { const k = JSON.stringify(x); return !seen.has(k) && seen.add(k); });
     const verslagen = [...a.verslagen, ...b.verslagen.filter(v => !a.verslagen.some(w => w.id === v.id))].sort(byVerslag).slice(0, 200);
     const act = a.actie ? a : b.actie ? b : a;
-    return { ...a, contact: pick('contact'), email: pick('email'), telefoon: pick('telefoon'), adres: pick('adres'), plaats: pick('plaats'), website: pick('website'), branche: pick('branche'),
+    return { ...a, klantnummer: pick('klantnummer'), contact: pick('contact'), email: pick('email'), telefoon: pick('telefoon'), adres: pick('adres'), plaats: pick('plaats'), website: pick('website'), branche: pick('branche'),
       notitie: [...new Set([a.notitie, b.notitie].map(x => x.trim()).filter(Boolean))].join('\n\n').slice(0, 2000),
       actie: act.actie, datum: act.datum, tijd: act.tijd, herinnering: act.herinnering, outlookId: act.outlookId,
       prioriteit: prioRank(a) <= prioRank(b) ? a.prioriteit : b.prioriteit, status: rankStatus(a.status) >= rankStatus(b.status) ? a.status : b.status,
@@ -4547,6 +4992,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (act === 'call') return;
     if (act === 'reset') { setView('alles'); state.search = ''; searchEl.value = ''; renderAll(); return; }
     if (act === 'allacties') { setActie(''); renderAll(); return; }
+    if (act === 'meer-rijen') { meerRijen(); return; }
     if (act === 'sess-start') { startSession(); return; }
     if (act === 'copy') { copyText(el.dataset.copy, el.dataset.label); return; }
     if (act === 'filter') { setView('acties'); setActie(el.dataset.actie); renderAll(); filtersEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return; }
@@ -4686,6 +5132,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   rowsEl.addEventListener('keydown', onRowsKey);
   detailEl.addEventListener('keydown', onRowsKey);
   document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && ag.open) { e.preventDefault(); closeAg(); return; }
     if (e.key === 'Escape' && state.open && !detailEl.hidden && $('cam').hidden) { e.preventDefault(); const id = state.open; closeRow(); $('t-' + id)?.focus({ preventScroll: true }); }
   });
 
@@ -4819,6 +5266,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const a = b.dataset.i;
     if (a === 'close') { if (!imp.busy) { imp.open = false; renderImport(); } }
     else if (a === 'reset') { imp.rows = null; imp.error = ''; renderImport(); }
+    else if (a === 'voorbeeld') voorbeeldBestand();
     else if (a === 'go') runImport();
   });
   importPanel.addEventListener('change', e => {
@@ -4826,6 +5274,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (t.id === 'impFile' && t.files && t.files[0]) readImportFile(t.files[0]);
     else if (t.id === 'impPaste' && t.value.trim()) setImportRows(parseDelimited(t.value));
     else if (t.id === 'impHeader') { imp.header = t.checked; imp.map = guessMap(imp.rows, imp.header); imp.include = new Map(); renderImport(); }
+    else if (t.id === 'impStatus') { imp.status = t.value; renderImport(); }
+    else if (t.id === 'impBestaand') { imp.bestaand = t.value; imp.include = new Map(); renderImport(); }
     else if (t.dataset.col !== undefined) { imp.map[+t.dataset.col] = t.value; imp.include = new Map(); renderImport(); }
     else if (t.dataset.row !== undefined) { imp.include.set(+t.dataset.row, t.checked); renderImport(); }
   });
@@ -4932,9 +5382,15 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const newId = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)).replace(/-/g, '').slice(0, 20);
 
     async function fetchCol(c) {
-      const { data, error } = await sb.from('docs').select('id,data').eq('collection', c).limit(5000);
-      if (error) throw storeError(error);
-      cache.set(c, new Map((data || []).map(r => [r.id, r.data])));
+      // Supabase geeft per keer hoogstens 1000 rijen: grotere lijsten (zoals een klantenlijst) in delen ophalen.
+      const data = [];
+      for (let from = 0; from < 20000; from += 1000) {
+        const { data: deel, error } = await sb.from('docs').select('id,data').eq('collection', c).order('id').range(from, from + 999);
+        if (error) throw storeError(error);
+        data.push(...(deel || []));
+        if (!deel || deel.length < 1000) break;
+      }
+      cache.set(c, new Map(data.map(r => [r.id, r.data])));
       // Wat nog in de wachtrij staat, gaat voor op wat online staat.
       queue.filter(q => q.c === c).forEach(q => { if (q.op === 'del') colMap(c).delete(q.id); else colMap(c).set(q.id, q.data); });
       loaded.add(c);
@@ -5131,6 +5587,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       leads: state.leads.map(l => ({ id: l.id, ...toBody(l) })),
       sjablonen: state.sjablonen.map(t => ({ id: t.id, naam: t.naam, onderwerp: t.onderwerp, tekst: t.tekst })),
       acties: state.acties,
+      agenda: state.agenda.map(x => ({ id: x.id, ...agendaBody(x), gewijzigd: x.gewijzigd || nowISO() })),
     };
     saveFile(`leadnex-backup-${todayISO()}.json`, JSON.stringify(data, null, 2), 'application/json');
     pref.set('laatsteBackup', nowISO());
@@ -5148,8 +5605,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       const leads = Array.isArray(data.leads) ? data.leads.filter(x => x && typeof x.bedrijf === 'string' && x.bedrijf.trim()) : [];
       const sjablonen = Array.isArray(data.sjablonen) ? data.sjablonen.filter(x => x && (x.onderwerp || x.tekst)) : [];
       const acties = Array.isArray(data.acties) ? data.acties.filter(x => typeof x === 'string' && x.trim()) : [];
-      if (!leads.length && !sjablonen.length) throw new Error('leeg');
-      restoreData = { leads, sjablonen, acties };
+      const agenda = Array.isArray(data.agenda) ? data.agenda.filter(x => x && typeof x === 'object' && (x.titel || x.tekst)) : [];
+      if (!leads.length && !sjablonen.length && !agenda.length) throw new Error('leeg');
+      restoreData = { leads, sjablonen, acties, agenda };
       renderRestore();
     } catch {
       restoreData = null;
@@ -5166,11 +5624,12 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   async function runRestore() {
     if (!restoreData || restoreBusy || !col) return;
     restoreBusy = true;
-    const { leads, sjablonen, acties, move } = restoreData;
+    const { leads, sjablonen, acties, move, agenda = [] } = restoreData;
     const idOk = v => typeof v === 'string' && /^[A-Za-z0-9_\-.~:@+]{1,200}$/.test(v);
     const jobs = [
       ...leads.map(x => () => col.doc(idOk(x.id) ? x.id : undefined).set(toBody(normalize({ id: '', data: () => x })))),
       ...sjablonen.map(x => () => sjCol.doc(idOk(x.id) ? x.id : undefined).set({ naam: str(x.naam).trim() || 'Naamloos', onderwerp: str(x.onderwerp), tekst: str(x.tekst), gewijzigd: nowISO() })),
+      ...agenda.map(x => () => agCol.doc(idOk(x.id) ? x.id : undefined).set(agendaBody(normalizeAgenda({ id: '', data: () => x })))),
     ];
     let done = 0, failed = 0;
     renderRestore(`Bezig met terugzetten: 0 van ${jobs.length}…`);
@@ -5798,6 +6257,14 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   function openWachtend() {
     if (!openNaLaden || !state.loaded) return;
     const id = openNaLaden;
+    if (id.startsWith('agenda:')) {
+      const x = state.agenda.find(a => a.id === id.slice(7));
+      if (!x) return;   // nog niet geladen: bij de volgende keer
+      openNaLaden = '';
+      if (x.datum) plan.week = mondayOf(x.datum);
+      setTimeout(() => openAg({ id: x.id }), 0);
+      return;
+    }
     openNaLaden = '';
     if (byId(id)) setTimeout(() => gotoLead(id), 0);
   }
@@ -5864,6 +6331,12 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       scheduleRender();
       maybeSeed();
     });
+    agCol = store.collection('agenda');
+    agCol.limit(5000).onSnapshot(snap => {
+      state.agenda = snap.docs.filter(d => d.exists).map(normalizeAgenda);
+      openWachtend();
+      scheduleRender();
+    });
     meldDoc = store.doc('instellingen/meldingen');
     meldDoc.onSnapshot(snap => {
       const d = snap.exists ? snap.data() || {} : {};
@@ -5898,6 +6371,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       const h = location.hash;
       if (h === '#vandaag') setView('vandaag');
       else if (h.startsWith('#bedrijf=')) { openNaLaden = decodeURIComponent(h.slice(9)); setView('vandaag'); }
+      else if (h.startsWith('#agenda=')) { openNaLaden = 'agenda:' + decodeURIComponent(h.slice(8)); setPage('planbord'); }
       else return;
       history.replaceState(null, '', location.pathname);
       openWachtend();

@@ -2,7 +2,7 @@
 //
 // Supabase roept deze functie elke minuut aan (zie supabase/meldingen.sql). De functie stuurt:
 //  - 's ochtends een overzicht van de acties van vandaag, op de tijd die je in de app instelt;
-//  - bij een actie met een tijd een herinnering op het tijdstip zelf of zoveel minuten ervoor.
+//  - bij een actie of eigen afspraak met een tijd een herinnering op het tijdstip zelf of zoveel minuten ervoor.
 // Vanuit de app (Meer → Meldingen) wordt hij aangeroepen met {"status": true} om te zien of alles werkt,
 // en met {"test": true} voor een testmelding op jouw telefoons.
 // Daarnaast opent hij voor de app een korte Google-link ({"link": "https://share.google/..."}): bij delen vanuit
@@ -28,6 +28,8 @@ const CORS = {
 type Sub = { user_id: string; id: string; data: { endpoint: string; keys: { p256dh: string; auth: string }; verlopen?: string } };
 type Lead = { user_id: string; id: string; bedrijf: string | null; actie: string | null; datum: string | null; tijd: string | null;
   herinnering: number | null; gearchiveerd: boolean | null; plaats: string | null; contact: string | null; telefoon: string | null; prioriteit: string | null };
+type Agendapunt = { user_id: string; id: string; soort: string | null; titel: string | null; datum: string | null; tijd: string | null; eind: string | null;
+  locatie: string | null; herinnering: number | null; klaar: boolean | null; bedrijfNaam: string | null };
 type Bericht = { sleutel: string; title: string; body: string; tag: string; url: string; ttl: number };
 
 /* ---------- hulpjes ---------- */
@@ -160,17 +162,34 @@ async function verstuur(subs: Sub[], b: Bericht) {
 
 /* ---------- wat er in de meldingen staat ---------- */
 const rang = (l: Lead) => l.prioriteit === 'hoog' ? 0 : l.prioriteit === 'laag' ? 2 : 1;
-function ochtendBericht(uid: string, leads: Lead[], vandaag: string, weekend: boolean): Bericht | null {
+// Overzicht van de dag: eigen afspraken (op tijd), taken en de acties bij bedrijven.
+function ochtendBericht(uid: string, leads: Lead[], agenda: Agendapunt[], vandaag: string, weekend: boolean): Bericht | null {
   const due = leads.filter(l => l.datum! <= vandaag)
     .sort((a, b) => rang(a) - rang(b) || a.datum!.localeCompare(b.datum!) || (a.tijd || '99').localeCompare(b.tijd || '99') || (a.plaats || '').localeCompare(b.plaats || ''));
+  const afspraken = agenda.filter(a => a.soort === 'afspraak' && a.datum === vandaag).sort((a, b) => (a.tijd || '99').localeCompare(b.tijd || '99'));
+  const taken = agenda.filter(a => a.soort === 'taak' && a.klaar !== true && a.datum! <= vandaag);
   const vandaagZelf = due.filter(l => l.datum === vandaag);
-  if (!due.length || (weekend && !vandaagZelf.length)) return null;   // in het weekend alleen als er die dag echt iets staat
-  const lijst = weekend ? vandaagZelf : due;
+  // In het weekend alleen als er die dag echt iets staat.
+  const lijst = weekend ? vandaagZelf : due, takenNu = weekend ? taken.filter(a => a.datum === vandaag) : taken;
+  if (!lijst.length && !afspraken.length && !takenNu.length) return null;
   const laat = lijst.filter(l => l.datum! < vandaag).length;
-  const regels = lijst.slice(0, 6).map(l => `${l.tijd && l.datum === vandaag ? l.tijd + ' ' : ''}${l.actie} · ${l.bedrijf}${l.plaats ? ` (${l.plaats})` : ''}${l.datum! < vandaag ? ' – te laat' : ''}${l.prioriteit === 'hoog' ? ' – hoog' : ''}`);
-  if (lijst.length > 6) regels.push(`en nog ${lijst.length - 6}`);
-  const n = lijst.length;
-  return { sleutel: `ochtend|${uid}|${vandaag}`, title: `Vandaag: ${n} ${n === 1 ? 'actie' : 'acties'}${laat ? `, ${laat} te laat` : ''}`, body: regels.join('\n'), tag: 'dagtaken', url: './#vandaag', ttl: 4 * 3600 };
+  const regels = [
+    ...afspraken.map(a => `${a.tijd ? a.tijd + ' ' : ''}${a.titel || 'Afspraak'}${a.locatie ? ` (${a.locatie})` : a.bedrijfNaam ? ` (${a.bedrijfNaam})` : ''}`),
+    ...takenNu.map(a => `Taak: ${a.titel || 'taak'}${a.datum! < vandaag ? ' – te laat' : ''}`),
+    ...lijst.map(l => `${l.tijd && l.datum === vandaag ? l.tijd + ' ' : ''}${l.actie} · ${l.bedrijf}${l.plaats ? ` (${l.plaats})` : ''}${l.datum! < vandaag ? ' – te laat' : ''}${l.prioriteit === 'hoog' ? ' – hoog' : ''}`),
+  ];
+  const tonen = regels.slice(0, 7);
+  if (regels.length > 7) tonen.push(`en nog ${regels.length - 7}`);
+  const tel = (n: number, een: string, meer: string) => n ? `${n} ${n === 1 ? een : meer}` : '';
+  const kop = [tel(lijst.length, 'actie', 'acties') + (laat ? ` (${laat} te laat)` : ''), tel(afspraken.length, 'afspraak', 'afspraken'), tel(takenNu.length, 'taak', 'taken')].filter(x => x.trim());
+  return { sleutel: `ochtend|${uid}|${vandaag}`, title: `Vandaag: ${kop.join(', ')}`, body: tonen.join('\n'), tag: 'dagtaken', url: './#vandaag', ttl: 4 * 3600 };
+}
+function afspraakBericht(uid: string, a: Agendapunt, vooraf: number, vandaag: string): Bericht {
+  const wanneer = a.datum === vandaag ? `om ${a.tijd}` : a.datum === plusDagen(vandaag, 1) ? `morgen om ${a.tijd}` : `${kortDatum(a.datum!)} om ${a.tijd}`;
+  const titel = a.titel || 'Afspraak';
+  const nu = vooraf === 0 ? `Gepland om ${a.tijd}${a.eind ? `–${a.eind}` : ''}.` : vooraf < 60 ? `Over ${vooraf} minuten.` : vooraf === 60 ? 'Over een uur.' : '';
+  return { sleutel: `agenda|${uid}|${a.id}|${a.datum}T${a.tijd}|${vooraf}`, title: vooraf === 0 ? `Nu: ${titel}` : `${titel} ${wanneer}`,
+    body: [nu, [a.locatie, a.bedrijfNaam].filter(Boolean).join(' · ')].filter(Boolean).join('\n'), tag: `agenda-${a.id}`, url: `./#agenda=${encodeURIComponent(a.id)}`, ttl: 1800 };
 }
 function herinnerBericht(uid: string, l: Lead, vooraf: number, vandaag: string): Bericht {
   const wanneer = l.datum === vandaag ? `om ${l.tijd}` : l.datum === plusDagen(vandaag, 1) ? `morgen om ${l.tijd}` : `${kortDatum(l.datum!)} om ${l.tijd}`;
@@ -191,13 +210,15 @@ async function ronde(nu: number) {
   const morgen = plusDagen(vandaag, 1);
   const velden = 'user_id,id,bedrijf:data->>bedrijf,actie:data->>actie,datum:data->>datum,tijd:data->>tijd,herinnering:data->herinnering,gearchiveerd:data->gearchiveerd,plaats:data->>plaats,contact:data->>contact,telefoon:data->>telefoon,prioriteit:data->>prioriteit';
   const leads: Lead[] = await db(`docs?collection=eq.leads&user_id=${inLijst(users)}&data->>datum=lte.${morgen}&data->>datum=gte.2000-01-01&select=${velden}`);
+  const agVelden = 'user_id,id,soort:data->>soort,titel:data->>titel,datum:data->>datum,tijd:data->>tijd,eind:data->>eind,locatie:data->>locatie,herinnering:data->herinnering,klaar:data->klaar,bedrijfNaam:data->>bedrijfNaam';
+  const agenda: Agendapunt[] = await db(`docs?collection=eq.agenda&user_id=${inLijst(users)}&data->>datum=lte.${morgen}&data->>datum=gte.2000-01-01&select=${agVelden}`).catch(() => []);
   const totaal = { telefoons: subs.length, verstuurd: 0, verlopen: 0, fouten: [] as string[] };
   for (const uid of users) {
     const cfg = cfgVan(uid);
     const mijn = leads.filter(l => l.user_id === uid && l.actie && l.bedrijf && /^\d{4}-\d\d-\d\d$/.test(l.datum || '') && l.gearchiveerd !== true);
     const berichten: Bericht[] = [];
     if (cfg.ochtend && minuten(tijd) >= minuten(cfg.ochtend) && minuten(tijd) < minuten(cfg.ochtend) + OCHTEND_VENSTER) {
-      const b = ochtendBericht(uid, mijn, vandaag, weekend);
+      const b = ochtendBericht(uid, mijn, agenda.filter(a => a.user_id === uid), vandaag, weekend);
       if (b) berichten.push(b);
     }
     for (const l of mijn) {
@@ -207,6 +228,15 @@ async function ronde(nu: number) {
       const vooraf = h === 1 ? 0 : h;   // 1 = op het tijdstip zelf
       const om = tijdstip(l.datum!, l.tijd!) - vooraf * 60000;
       if (om <= nu && om > nu - HERINNER_VENSTER * 60000) berichten.push(herinnerBericht(uid, l, vooraf, vandaag));
+    }
+    // Eigen afspraken met een tijd
+    for (const a of agenda) {
+      if (a.user_id !== uid || a.soort !== 'afspraak' || !/^\d{4}-\d\d-\d\d$/.test(a.datum || '') || !/^\d\d:\d\d$/.test(a.tijd || '')) continue;
+      const h = Number.isInteger(a.herinnering) ? a.herinnering! : cfg.herinnering;
+      if (h <= 0) continue;
+      const vooraf = h === 1 ? 0 : h;
+      const om = tijdstip(a.datum!, a.tijd!) - vooraf * 60000;
+      if (om <= nu && om > nu - HERINNER_VENSTER * 60000) berichten.push(afspraakBericht(uid, a, vooraf, vandaag));
     }
     const mijnSubs = subs.filter(s => s.user_id === uid);
     for (const b of berichten) {
