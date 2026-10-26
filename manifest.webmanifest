@@ -36,5 +36,11 @@
       "text": "deel_tekst",
       "url": "deel_url"
     }
+  },
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
   }
 }

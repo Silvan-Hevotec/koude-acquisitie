@@ -2069,7 +2069,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   function renderScanLines() {
     const el = $('scanLines');
     // Wat er via delen binnenkwam, letterlijk: handig om te zien waarom iets niet werd herkend.
-    const raw = scan.raw ? `<details class="raw"><summary>Wat er binnenkwam</summary><pre>${esc([scan.raw.title && 'Titel: ' + scan.raw.title, scan.raw.text && 'Tekst: ' + scan.raw.text, scan.raw.url && 'Link: ' + scan.raw.url].filter(Boolean).join('\n'))}</pre></details>` : '';
+    const raw = scan.raw ? `<details class="raw"${scan.lines.length ? '' : ' open'}><summary>Wat er binnenkwam</summary><pre>${esc([scan.raw.title && 'Titel: ' + scan.raw.title, scan.raw.text && 'Tekst: ' + scan.raw.text, scan.raw.url && 'Link: ' + scan.raw.url, scan.raw.open && 'Geopend: ' + scan.raw.open].filter(Boolean).join('\n'))}</pre></details>` : '';
     el.hidden = !scan.lines.length && !raw;
     if (!scan.lines.length) { el.innerHTML = raw; return; }
     el.innerHTML = `<p class="hint">${scan.src === 'deel' ? 'Dit kwam mee met delen.' : 'Dit las de app op het kaartje.'} Staat iets niet goed? Kies bij de regel in welk veld hij hoort.</p>
@@ -2137,6 +2137,14 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     clearScanLines();
     scan.raw = sh; scan.src = 'deel';
     const urls = [...new Set(`${sh.text}\n${sh.url}`.match(/(?:https?:\/\/|geo:)[^\s<>"]+/g) || [])];
+    // Google stuurt vaak alleen een korte link (share.google/...). Die opent de meldingsdienst in Supabase voor ons,
+    // want de app zelf mag hem niet volgen; het adres daarachter bevat de naam en soms de plek.
+    const kort = urls.find(isShortGoogle);
+    if (kort && sb && !state.local) {
+      msg.textContent = 'De link van Google openen…';
+      const r = await meldServer({ link: kort });
+      if (r && r.ok && r.url) { urls.push(r.url); scan.raw = { ...sh, open: r.url }; }
+    }
     const hints = shareHints(urls);
     // Tekstregels zonder links en zonder Google-reclameteksten ("Bekijk ... op Google Maps").
     let lines = String(sh.text || '').split(/\r?\n/).map(t => t.replace(/(?:https?:\/\/|geo:)[^\s<>"]+/g, '').replace(/\s+/g, ' ').trim())
@@ -2150,8 +2158,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (!lines.length && !site && !hints.coords) {
       renderScanLines();
       msg.textContent = urls.some(isShortGoogle)
-        ? 'Google stuurde alleen een korte link mee (zonder naam of adres). Zet in de Google-app bij Instellingen het inkorten van links uit, of tik in Google op het adres, kopieer het en gebruik Plakken.'
+        ? 'Google stuurde alleen een korte link mee, zonder naam of adres, en die kon de app niet openen. Kopieer in Google de naam van het bedrijf en tik hier op Plakken.'
         : 'Er kwam niets bruikbaars mee. Vul de gegevens zelf in.';
+      toast(msg.textContent, 8000);
       return;
     }
     const res = parseCard(lines.map(t => ({ t: cleanCardLine(t), h: 0 })));
@@ -5266,14 +5275,15 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     finally { push.busy = false; if (push.again) setTimeout(() => ensurePush().then(renderPush), 0); }
   }
   async function meldServer(body) {
-    const c = window.KA_CONFIG || {};
+    const c = getConfig();
+    if (!c) return { ok: false, fout: 'geen-verbinding' };
     let token = '';
     try { const { data } = await sb.auth.getSession(); token = data && data.session ? data.session.access_token : ''; } catch {}
     if (!token) return { ok: false, fout: 'niet-ingelogd' };
     let res;
     try {
-      res = await fetch(`${String(c.supabaseUrl).replace(/\/$/, '')}/functions/v1/leadnex-meldingen`, { method: 'POST',
-        headers: { 'Content-Type': 'application/json', apikey: c.supabaseKey, Authorization: 'Bearer ' + token }, body: JSON.stringify(body) });
+      res = await fetch(`${c.url}/functions/v1/leadnex-meldingen`, { method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: c.key, Authorization: 'Bearer ' + token }, body: JSON.stringify(body) });
     } catch { return { ok: false, fout: 'geen-verbinding' }; }
     if (res.status === 404) return { ok: false, fout: 'geen-functie' };
     const j = await res.json().catch(() => ({}));
@@ -5759,7 +5769,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   // Link uit de mail "wachtwoord vergeten" of "uitnodiging": eerst een (nieuw) wachtwoord kiezen.
   const viaInvite = /type=invite/.test(location.hash);
   // Een melding over een actie opent dat bedrijf, zodra de lijst geladen is.
-  let openNaLaden = '';
+  let openNaLaden = '', shareBezig = false;
   function openWachtend() {
     if (!openNaLaden || !state.loaded) return;
     const id = openNaLaden;
@@ -5803,6 +5813,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     sjCol = store.collection('sjablonen');
     actiesDoc = store.doc('instellingen/acties');
 
+    // Gedeeld vanuit Google of Chrome: meteen naar Nieuw, ook als de lijst nog laadt.
+    if (shareIn && !shareBezig) { shareBezig = true; setTimeout(() => handleShare(shareIn).catch(e => console.error(e)), 0); }
     col.limit(MAX_LEADS).onSnapshot(snap => {
       const first = !state.loaded;
       state.leads = snap.docs.filter(d => d.exists).map(normalize);
@@ -5810,7 +5822,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       if (pref.get('kaart') === '1') scheduleGeocode();
       openWachtend();
       setTimeout(maybeOfferMove, 0);
-      if (first) setTimeout(() => { if (shareIn) handleShare(shareIn).catch(e => console.error(e)); else afterCall(); }, 0);
+      if (first) setTimeout(() => { if (shareIn) checkAddDupes(); else afterCall(); }, 0);
       state.problem = null;
       saveAgenda();
       scheduleRender();

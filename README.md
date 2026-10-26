@@ -27,7 +27,7 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 - **Vraag het Leadnex** (in de zoekbalk bij Bedrijven): vragen over je eigen klanten, zoals "Welke bedrijven wilden een elektrische heftruck?", "Wie wilde ik dit kwartaal terugbellen?" of "Welke potentiële klanten wachten op een offerte?". De app begrijpt periodes, acties en status en zoekt in je verslagen en notities.
 - Alles werkt in de app zelf: geen AI-dienst, geen extra account en geen kosten.
 - **Weergave**: standaard licht, of donker of zoals je telefoon (Meer → Voorkeuren).
-- **Delen naar de app** vanuit Google Maps, de Google-app of Chrome (naam, adres en telefoon worden zo nodig aangevuld via PDOK of OpenStreetMap), **visitekaartje scannen**, **in telefooncontacten** zetten, import uit Excel, export naar CSV, back-up.
+- **Delen naar de app** vanuit Google Maps, de Google-app of Chrome (naam, adres en telefoon worden zo nodig aangevuld via PDOK of OpenStreetMap; een korte Google-link zoals share.google wordt geopend door de functie `leadnex-meldingen` in Supabase), **visitekaartje scannen**, **in telefooncontacten** zetten, import uit Excel, export naar CSV, back-up.
 
 ## Bestanden
 

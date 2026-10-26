@@ -5,6 +5,8 @@
 //  - bij een actie met een tijd een herinnering op het tijdstip zelf of zoveel minuten ervoor.
 // Vanuit de app (Meer → Meldingen) wordt hij aangeroepen met {"status": true} om te zien of alles werkt,
 // en met {"test": true} voor een testmelding op jouw telefoons.
+// Daarnaast opent hij voor de app een korte Google-link ({"link": "https://share.google/..."}): bij delen vanuit
+// Google komt vaak alleen zo'n link mee, en de app kan die zelf niet volgen.
 //
 // Instellen in Supabase: Edge Functions → nieuwe functie "leadnex-meldingen" met deze code,
 // "Verify JWT" uit, en bij Edge Functions → Secrets het geheim VAPID_PRIVATE_KEY.
@@ -217,12 +219,41 @@ async function ronde(nu: number) {
   return totaal;
 }
 
+/* ---------- korte Google-link openen (delen naar de app) ---------- */
+const KORTE_LINK = /^https:\/\/(share\.google|maps\.app\.goo\.gl|goo\.gl|g\.co|search\.app)\//i;
+const BROWSER = 'Mozilla/5.0 (Linux; Android 14; SM-S918B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
+// Volgt de doorverwijzingen tot een Google-zoek- of kaartadres (met de naam en soms de plek erin). Ook de
+// toestemmingspagina van Google (continue=...) en een pagina die pas in de browser doorstuurt.
+async function linkOpenen(start: string) {
+  let url = start;
+  for (let i = 0; i < 8; i++) {
+    const u = new URL(url);
+    if (/^consent\.google\./.test(u.hostname) && u.searchParams.get('continue')) { url = u.searchParams.get('continue')!; continue; }
+    if (/(^|\.)google\.[a-z.]+$/.test(u.hostname) && (/^\/maps\//.test(u.pathname) || (u.pathname === '/maps' && u.search) || (u.pathname === '/search' && (u.searchParams.get('q') || u.searchParams.get('kgmid'))))) return url;
+    const res = await fetch(url, { redirect: 'manual', headers: { 'User-Agent': BROWSER, 'Accept-Language': 'nl-NL,nl;q=0.9', Accept: 'text/html,application/xhtml+xml' } });
+    const loc = res.headers.get('location');
+    if (res.status >= 300 && res.status < 400 && loc) { await res.body?.cancel(); url = new URL(loc, url).href; continue; }
+    if (!res.ok) { await res.body?.cancel(); break; }
+    const html = (await res.text()).slice(0, 500000)
+      .replace(/\\x3d/gi, '=').replace(/\\x26/gi, '&').replace(/\\u003d/gi, '=').replace(/\\u0026/gi, '&').replace(/\\\//g, '/').replace(/&amp;/g, '&');
+    const m = html.match(/https:\/\/www\.google\.[a-z.]+\/(?:search|maps)[^"'<>\s\\]+/) || html.match(/["'=](\/(?:search|maps)(?:\/|\?)[^"'<>\s\\]+)/);
+    if (!m) break;
+    url = new URL(m[1] || m[0], url).href;
+  }
+  return url === start ? '' : url;
+}
+
 /* ---------- vanuit de app: status of testmelding ---------- */
-async function vanApp(req: Request, body: { test?: boolean; status?: boolean }) {
-  if (!(Deno.env.get('VAPID_PRIVATE_KEY') || '').trim()) return json({ ok: false, fout: 'geen-sleutel', uitleg: 'Het geheim VAPID_PRIVATE_KEY ontbreekt in Supabase (Edge Functions → Secrets).' });
+async function vanApp(req: Request, body: { test?: boolean; status?: boolean; link?: string }) {
+  if (!body.link && !(Deno.env.get('VAPID_PRIVATE_KEY') || '').trim()) return json({ ok: false, fout: 'geen-sleutel', uitleg: 'Het geheim VAPID_PRIVATE_KEY ontbreekt in Supabase (Edge Functions → Secrets).' });
   const res = await fetch(`${Deno.env.get('SUPABASE_URL')}/auth/v1/user`, { headers: { apikey: req.headers.get('apikey') || geheimeSleutel(), Authorization: req.headers.get('Authorization') || '' } });
   if (!res.ok) return json({ ok: false, fout: 'niet-ingelogd', uitleg: 'Log opnieuw in en probeer het nog eens.' }, 401);
   const user = await res.json();
+  if (body.link) {
+    if (!KORTE_LINK.test(body.link)) return json({ ok: false, fout: 'geen-korte-link' }, 400);
+    const url = await linkOpenen(body.link).catch(() => '');
+    return json(url ? { ok: true, url } : { ok: false, fout: 'link-niet-geopend' });
+  }
   const subs = await abonnementen(user.id);
   const hartslag = ((await db('meldlog?sleutel=eq.hartslag&select=verstuurd')) || [])[0]?.verstuurd || null;
   if (body.status) return json({ ok: true, telefoons: subs.length, hartslag });
@@ -237,7 +268,7 @@ Deno.serve(async req => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   try {
     const body = await req.json().catch(() => ({}));
-    if (body && (body.test || body.status)) return await vanApp(req, body);
+    if (body && (body.test || body.status || body.link)) return await vanApp(req, body);
     return json(await ronde(Date.now()));
   } catch (e) {
     console.error(e);
