@@ -13,7 +13,7 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 - **Vandaag**: wat er vandaag (of eerder) moet gebeuren, met elke ochtend om 08:05 een melding.
 - **Belsessie**: de lijst een voor een afbellen. Na elk gesprek staat "Hoe ging het?" open, ook als je vanuit de lijst belt.
 - **Vaste opvolgstappen** na geen gehoor: de volgende werkdag, na twee werkdagen, na drie keer een mail (daarna vanzelf nabellen), na vijf keer voorstel om te archiveren.
-- **Kaart**: bedrijven bij jou in de buurt (2, 5, 10 of 25 km), met route langs de dichtstbijzijnde. Adressen worden één keer opgezocht bij de Locatieserver van PDOK (Kadaster) en bij het bedrijf bewaard; de kaart komt ook van PDOK.
+- **Kaart**: al je bedrijven in beeld, met een teller (hoeveel op de kaart, hoeveel zonder adres of met een adres dat niet gevonden is). Kies 2, 5, 10 of 25 km om te zien wat bij jou in de buurt is, met route langs de dichtstbijzijnde. Felle spelden: geel = vandaag te doen, oranje = met actie, paars = zonder actie, rode stip = hoge prioriteit. Adressen worden één keer opgezocht bij de Locatieserver van PDOK (Kadaster) en bij het bedrijf bewaard; de kaart komt ook van PDOK.
 - **Mailen**: per bedrijf of aan iedereen in de lijst (filter op branche of actie), in BCC in mails van hooguit 50 adressen, met mailteksten.
 - **WhatsApp** per bedrijf (06- en Belgische 04-nummers), met een begroeting en de voornaam alvast ingevuld.
 - **Werken zonder bereik**: wijzigingen blijven op de telefoon in een wachtrij en gaan vanzelf online zodra er weer verbinding is.

@@ -478,37 +478,40 @@ body.sessie .sheet-body { padding-bottom: 150px; }
 
 /* Kaart */
 .kaart { display: grid; gap: 10px; padding: 10px; }
-.kaart-map { height: min(52vh, 440px); min-height: 260px; border-radius: 10px; overflow: hidden; background: var(--sunken); z-index: 0; }
+.kaart-map { height: min(62vh, 560px); min-height: 300px; border-radius: 12px; overflow: hidden; background: #8E9A91; z-index: 0; }
+.kaart-count { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 0; padding: 2px 4px 0; font-size: 14px; color: var(--muted); }
+.kaart-count strong { color: var(--ink); font-size: 17px; }
+.kaart-count .dot { color: var(--faint); }
 .kaart-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
 .kaart .hint { margin: 0; padding: 0 4px; }
 .kaart-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 13px; }
 .kaart-legend .lg { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
-.kaart-legend .kpin svg, .kaart-legend .kpin.pin-due svg { width: 15px; height: 20px; }
-/* De PDOK-kaart is van zichzelf erg licht: wat meer kleur en contrast, en in de donkere stand een donkere kaart. */
-.kaart-map .leaflet-tile-pane { filter: saturate(1.4) contrast(1.15) brightness(.96); }
-.kaart-map .kring { stroke: var(--ink); stroke-opacity: .75; }
-/* Spelden: kleur = status, stip in het midden rood bij hoge prioriteit, gestippeld als alleen de plaats bekend is. */
-:root { --pin-due: #FFD400; --pin-due-line: #111315; --pin-due-ink: #111315; --pin-act: #16191B; --pin-act-ink: #FFFFFF; --pin-none: #6E777E; --pin-none-ink: #FFFFFF; --pin-line: #FFFFFF; --pin-hoog: #E5383B; }
+.kaart-legend .kpin svg, .kaart-legend .kpin.pin-due svg { width: 17px; height: 23px; }
+/* De PDOK-kaart is van zichzelf erg licht. Iets donkerder en rustiger, zodat de felle spelden eruit springen;
+   in de donkere stand een donkere kaart. */
+.kaart-map .leaflet-tile-pane { filter: brightness(.8) contrast(1.1) saturate(.85); }
+.kaart-map .kring { stroke: #FFFFFF; stroke-opacity: .95; }
+/* Spelden: felle kleur = wat er moet gebeuren, rode stip bij hoge prioriteit, gestippelde rand als alleen de plaats bekend is.
+   Overal een witte rand en een schaduw, zodat ze op elke ondergrond goed te zien zijn. */
+:root { --pin-due: #FFD400; --pin-due-ink: #111315; --pin-act: #FF5A00; --pin-act-ink: #FFFFFF; --pin-none: #A24BFF; --pin-none-ink: #FFFFFF; --pin-line: #FFFFFF; --pin-hoog: #E0102F; }
 .kpin { background: none; border: 0; }
-.kpin svg { display: block; width: 30px; height: 40px; overflow: visible; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .4)); }
-.kpin .b { stroke: var(--pin-line); stroke-width: 2.4; stroke-linejoin: round; }
-.kpin .c { stroke: none; }
-.kpin.pin-due svg { width: 34px; height: 45px; }
-.kpin.pin-due .b { fill: var(--pin-due); stroke: var(--pin-due-line); } .kpin.pin-due .c { fill: var(--pin-due-ink); }
+.kpin svg { display: block; width: 34px; height: 45px; overflow: visible; filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, .55)) drop-shadow(0 3px 4px rgba(0, 0, 0, .45)); }
+.kpin .b { stroke: var(--pin-line); stroke-width: 2.6; stroke-linejoin: round; }
+.kpin .c { stroke: #FFFFFF; stroke-width: 0; }
+.kpin.pin-due svg { width: 40px; height: 53px; }
+.kpin.pin-due .b { fill: var(--pin-due); } .kpin.pin-due .c { fill: var(--pin-due-ink); }
 .kpin.pin-act .b { fill: var(--pin-act); } .kpin.pin-act .c { fill: var(--pin-act-ink); }
 .kpin.pin-none .b { fill: var(--pin-none); } .kpin.pin-none .c { fill: var(--pin-none-ink); }
-.kpin.pin-hoog .c { fill: var(--pin-hoog); }
-.kpin.pin-approx .b { stroke-dasharray: 3.2 2.4; } .kpin.pin-approx svg { opacity: .85; }
+.kpin.pin-hoog .c { fill: var(--pin-hoog); stroke-width: 2.2; }
+.kpin.pin-approx .b { stroke-dasharray: 3.4 2.2; }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .kaart-map .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.95) contrast(.9) saturate(.75); }
-  :root:not([data-theme="light"]) { --pin-act: #F2F4F5; --pin-act-ink: #111315; --pin-none: #9AA3AA; --pin-none-ink: #111315; --pin-line: #111315; }
+  :root:not([data-theme="light"]) .kaart-map .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.72) contrast(.95) saturate(.7); }
 }
 .kaart-map .leaflet-bar a { background: var(--surface); color: var(--ink); border-bottom-color: var(--line); }
 .kaart-map .leaflet-bar { border-color: var(--line-strong); }
 .kaart-map.leaflet-container .leaflet-control-attribution { background: color-mix(in srgb, var(--surface) 85%, transparent); color: var(--muted); }
 .kaart-map .leaflet-control-attribution a { color: var(--ink); }
-:root[data-theme="dark"] .kaart-map .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.95) contrast(.9) saturate(.75); }
-:root[data-theme="dark"] { --pin-act: #F2F4F5; --pin-act-ink: #111315; --pin-none: #9AA3AA; --pin-none-ink: #111315; --pin-line: #111315; }
+:root[data-theme="dark"] .kaart-map .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(.72) contrast(.95) saturate(.7); }
 .kpop { display: grid; gap: 4px; font: 14px/1.35 var(--f-body); color: #1C2126; }
 .kpop strong { font-size: 15px; }
 .kpop-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
@@ -779,7 +782,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   <div class="notice" id="dupNotice" hidden><p><span></span></p><div class="btns"><button type="button" class="btn small" id="dupNoticeGo">Bekijken</button><button type="button" class="btn small ghost" id="dupNoticeHide">Verbergen</button></div></div>
   <!-- Kaart -->
   <div class="page-head" data-show="kaart">
-    <div><h2>In de buurt</h2><p class="sub">Bedrijven rond je huidige plek, de dichtstbijzijnde eerst.</p></div>
+    <div><h2>Kaart</h2><p class="sub">Al je bedrijven op de kaart. Kies een afstand om te zien wat bij jou in de buurt is.</p></div>
   </div>
 
   <div class="overview" data-show="bedrijven kaart">
@@ -804,6 +807,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   </div>
 
   <section class="card kaart" id="kaartPanel" aria-label="Kaart" hidden>
+    <p class="kaart-count" id="kaartCount" role="status"></p>
     <div class="kaart-map" id="kaartMap"></div>
     <div class="kaart-bar"><div class="chips" id="kaartChips"></div><button type="button" class="btn small" id="kaartMe"><i data-ic="locate-fixed"></i>Mijn locatie</button></div>
     <p class="hint" id="kaartStatus" role="status" hidden></p>
@@ -1314,7 +1318,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   // Plek op de kaart: coördinaten, of onthouden dat het adres niet gevonden is. q is het adres waarvoor gezocht is.
   function validGeo(g) {
     if (!g || typeof g !== 'object' || typeof g.q !== 'string') return null;
-    if (g.none === true) return { q: g.q, none: true };
+    if (g.none === true) return g.v ? { q: g.q, none: true, v: g.v } : { q: g.q, none: true };
     return Number.isFinite(g.lat) && Number.isFinite(g.lon) && Math.abs(g.lat) <= 90 && Math.abs(g.lon) <= 180
       ? { q: g.q, lat: g.lat, lon: g.lon, p: g.p === 'plaats' ? 'plaats' : 'adres' } : null;
   }
@@ -2174,6 +2178,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     else if (p === 'bedrijven') { const v = pref.get('bedrijvenView'); setView(['alles', 'acties', 'archief'].includes(v) ? v : 'alles'); }
     else { state.page = p; pref.set('page', p); }
     if (state.selecting && !['bedrijven', 'kaart', 'vandaag'].includes(state.page)) setSelecting(false);
+    if (p === 'kaart' && isQuestion(state.search)) { state.search = ''; searchEl.value = ''; }   // het antwoord op een vraag hoort bij Bedrijven
     closeRow(true);
     renderAll();
     window.scrollTo({ top: 0 });
@@ -2212,7 +2217,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   // Een zoekterm die als vraag begint of op een vraagteken eindigt, beantwoordt Leadnex (zie askLocal).
   const isQuestion = s => /\?\s*$/.test(s) || /^\s*(wie|welke|welk|wat|wanneer|waar|hoeveel)\b/i.test(s);
   function inView(l) {
-    const q = state.page === 'bedrijven' && isQuestion(state.search) ? '' : key(state.search);
+    const q = isQuestion(state.search) ? '' : key(state.search);   // een vraag is geen zoekterm (het antwoord staat bij Bedrijven)
     const filtered = state.view !== 'vandaag';   // Vandaag toont altijd alles wat moet gebeuren
     if (filtered && q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie, l.website, l.branche].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
     if (filtered && state.branche && key(l.branche) !== key(state.branche)) return false;
@@ -2718,15 +2723,16 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   // De gevonden plek wordt bij het bedrijf bewaard, zodat elk adres maar één keer wordt opgezocht.
   const PDOK_ZOEK = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1/free';
   const PDOK_KAART = 'https://service.pdok.nl/brt/achtergrondkaart/wmts/v2_0/standaard/EPSG:3857/{z}/{x}/{y}.png';
-  const RADII = [2, 5, 10, 25, 0];
+  const RADII = [0, 2, 5, 10, 25];
+  const GEO_V = 2;   // versie van het opzoeken: adressen die eerder niet gevonden werden, worden één keer opnieuw geprobeerd
   const kaart = {
-    map: null, layer: null, mine: null, ring: null, here: null, watch: null, fitted: false, centerOnMe: false,
-    radius: pref.get('kaartStraal') !== null && RADII.includes(Number(pref.get('kaartStraal'))) ? Number(pref.get('kaartStraal')) : 10, alleenActie: pref.get('kaartActie') === '1',
+    map: null, layer: null, mine: null, ring: null, here: null, watch: null, refit: true, fitCount: 0, userMoved: false, fitting: false,
+    radius: 0, alleenActie: pref.get('kaartActie') === '1',
     geoBusy: false, geoDone: 0, geoTotal: 0, geoError: '', locError: '', loadError: '', dist: new Map(),
   };
   const geoKey = l => key([l.adres, l.plaats].join('|'));
   const onMap = l => !!(l.geo && !l.geo.none);
-  const needsGeo = l => !l.gearchiveerd && !!(l.adres || l.plaats) && (!l.geo || l.geo.q !== geoKey(l));
+  const needsGeo = l => !l.gearchiveerd && !!(l.adres || l.plaats) && (!l.geo || l.geo.q !== geoKey(l) || (l.geo.none && l.geo.v !== GEO_V));
   function distKm(a, b) {
     const r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLon = (b.lon - a.lon) * r;
     const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLon / 2) ** 2;
@@ -2761,14 +2767,17 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     return m ? { lon: Number(m[1]), lat: Number(m[2]) } : null;
   }
   async function geocodeLead(l) {
-    const q = geoKey(l), pc = String(l.adres || '').match(/\b(\d{4}) ?([A-Z]{2})\b/);
+    const q = geoKey(l), adres = String(l.adres || ''), pc = adres.toUpperCase().match(/\b(\d{4}) ?([A-Z]{2})\b/);
+    const straat = adres.split(',')[0].replace(/\s+\d.*$/, '').trim();
     let hit = null, p = 'adres';
-    if (l.adres) {
-      hit = await pdokFind(`${l.adres} ${l.plaats}`.trim(), 'adres');
+    if (adres) {
+      hit = await pdokFind(`${adres} ${l.plaats}`.trim(), 'adres');
       if (!hit && pc) hit = await pdokFind(pc[1] + pc[2], 'postcode');
+      if (!hit && straat && l.plaats) hit = await pdokFind(`${straat} ${l.plaats}`, 'weg');
     }
     if (!hit && l.plaats) { hit = await pdokFind(l.plaats, 'woonplaats'); p = 'plaats'; }
-    return hit ? { q, lat: hit.lat, lon: hit.lon, p } : { q, none: true };
+    if (!hit && !l.plaats && adres) { hit = await pdokFind(adres, 'woonplaats'); p = 'plaats'; }   // alleen een plaatsnaam in het adresveld
+    return hit ? { q, lat: hit.lat, lon: hit.lon, p } : { q, none: true, v: GEO_V };
   }
   let geoTimer = 0;
   function scheduleGeocode() { clearTimeout(geoTimer); geoTimer = setTimeout(geocodeAll, 1500); }
@@ -2778,23 +2787,28 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (!todo.length) return;
     Object.assign(kaart, { geoBusy: true, geoDone: 0, geoTotal: todo.length, geoError: '' });
     renderKaartStatus();
-    for (const l0 of todo) {
-      const l = byId(l0.id);
-      if (l && needsGeo(l)) {
-        try {
-          const geo = await geocodeLead(l), cur = byId(l.id);
-          if (cur && geoKey(cur) === geo.q) await write(() => col.doc(l.id).update({ geo }));   // adres intussen veranderd: later opnieuw
-        } catch {
-          kaart.geoError = 'Adressen opzoeken lukte niet. Controleer je internet; de app probeert het later opnieuw.';
-          break;
+    let next = 0;
+    const worker = async () => {
+      while (next < todo.length && !kaart.geoError) {
+        const l = byId(todo[next++].id);
+        if (l && needsGeo(l)) {
+          try {
+            const geo = await geocodeLead(l), cur = byId(l.id);
+            if (cur && geoKey(cur) === geo.q) await write(() => col.doc(l.id).update({ geo }));   // adres intussen veranderd: later opnieuw
+          } catch {
+            kaart.geoError = 'Adressen opzoeken lukte niet. Controleer je internet; de app probeert het later opnieuw.';
+            break;
+          }
+          await sleep(60);
         }
-        await sleep(120);
+        kaart.geoDone++;
+        renderKaartStatus();
       }
-      kaart.geoDone++;
-      renderKaartStatus();
-    }
+    };
+    await Promise.all([worker(), worker(), worker()]);
     kaart.geoBusy = false;
     renderKaartStatus();
+    if (kaart.geoError) { clearTimeout(geoTimer); geoTimer = setTimeout(() => { kaart.geoError = ''; geocodeAll(); }, 60000); }
   }
 
   function startLocating() {
@@ -2804,7 +2818,7 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
       const prev = kaart.here;
       kaart.here = { lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy };
       kaart.locError = '';
-      if (!prev) kaart.centerOnMe = true;
+      if (!prev && !kaart.userMoved) kaart.refit = true;   // eerste keer: jouw plek mee in beeld nemen
       if (!prev || distKm(prev, kaart.here) > 0.1) scheduleRender(); else drawMe();
     }, err => {
       kaart.locError = err.code === 1
@@ -2824,15 +2838,27 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     if (!document.hidden) startLocating();
     scheduleGeocode();
     const chip = (v, label) => `<button type="button" class="chip" data-straal="${v}" aria-pressed="${kaart.radius === v}">${label}</button>`;
-    $('kaartChips').innerHTML = RADII.map(v => chip(v, v ? `${v} km` : 'Alles')).join('') +
+    $('kaartChips').innerHTML = RADII.map(v => chip(v, v ? `${v} km` : 'Alle bedrijven')).join('') +
       `<span class="sep" aria-hidden="true"></span><button type="button" class="chip toggle" data-kaartactie aria-pressed="${kaart.alleenActie}">Alleen met actie</button>`;
     renderKaartStatus();
     if (!kaart.map) { initMap(); return; }
     drawMarkers();
   }
+  // Hoeveel bedrijven er op de kaart staan, en waarom de rest er (nog) niet op staat.
+  function renderKaartCount() {
+    const list = state.leads.filter(inView);
+    const placed = list.filter(onMap).length, pending = list.filter(needsGeo).length;
+    const noAddr = list.filter(l => !l.adres && !l.plaats).length, notFound = list.filter(l => l.geo && l.geo.none && !needsGeo(l)).length;
+    const parts = [`<strong>${placed}</strong> ${plural(placed, 'bedrijf', 'bedrijven')} op de kaart`];
+    if (pending) parts.push(`${pending} nog opzoeken`);
+    if (noAddr) parts.push(`${noAddr} zonder adres`);
+    if (notFound) parts.push(`${notFound} adres niet gevonden`);
+    $('kaartCount').innerHTML = parts.join('<span class="dot" aria-hidden="true">·</span>');
+  }
   function renderKaartStatus() {
     const el = $('kaartStatus');
     if (!el || state.view !== 'kaart') return;
+    renderKaartCount();
     const parts = [];
     if (kaart.loadError) parts.push(kaart.loadError);
     if (kaart.locError) parts.push(kaart.locError);
@@ -2848,10 +2874,12 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     catch { kaart.loadError = 'De kaart kon niet laden. Controleer je internetverbinding.'; renderKaartStatus(); return; }
     kaart.loadError = '';
     if (kaart.map || state.view !== 'kaart') { if (kaart.map) drawMarkers(); return; }
-    kaart.map = L.map('kaartMap', { zoomControl: true, attributionControl: true }).setView([52.25, 5.6], 7);
+    kaart.map = L.map('kaartMap', { zoomControl: true, attributionControl: true, zoomSnap: 0.25 }).setView([52.25, 5.6], 7);
     kaart.map.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
     L.tileLayer(PDOK_KAART, { maxZoom: 19, updateWhenIdle: false, keepBuffer: 3, attribution: 'Kaart: <a href="https://www.pdok.nl" target="_blank" rel="noopener">PDOK</a> / Kadaster' }).addTo(kaart.map);
     kaart.layer = L.layerGroup().addTo(kaart.map);
+    // Zelf schuiven of zoomen: dan blijft de kaart staan waar jij hem neerzet.
+    kaart.map.on('dragstart zoomstart', () => { if (!kaart.fitting) kaart.userMoved = true; });
     drawMarkers();
   }
   function kaartPopup(l) {
@@ -2885,20 +2913,24 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
     state.leads.filter(l => inView(l) && onMap(l)).forEach(l => {
       const due = isDue(l, today);
       const cls = ['kpin', due ? 'pin-due' : l.actie ? 'pin-act' : 'pin-none', l.prioriteit === 'hoog' ? 'pin-hoog' : '', l.geo.p === 'plaats' ? 'pin-approx' : ''].filter(Boolean).join(' ');
-      const icon = L.divIcon({ className: cls, html: PIN, iconSize: due ? [34, 45] : [30, 40], iconAnchor: due ? [17, 44] : [15, 39], popupAnchor: [0, due ? -40 : -35] });
+      const icon = L.divIcon({ className: cls, html: PIN, iconSize: due ? [40, 53] : [34, 45], iconAnchor: due ? [20, 52] : [17, 44], popupAnchor: [0, due ? -47 : -40] });
       L.marker([l.geo.lat, l.geo.lon], { icon, title: l.bedrijf, zIndexOffset: due ? 1000 : l.actie ? 500 : 0, riseOnHover: true })
         .bindPopup(() => kaartPopup(l), { maxWidth: 260 }).addTo(kaart.layer);
       pts.push([l.geo.lat, l.geo.lon]);
     });
     drawMe();
-    // Alleen de eerste keer (en na Mijn locatie of een andere afstand) de kaart verplaatsen; anders blijft hij waar jij hem neerzet.
-    if (kaart.here && (kaart.centerOnMe || !kaart.fitted)) {
-      const at = L.latLng(kaart.here.lat, kaart.here.lon);
-      kaart.map.fitBounds(at.toBounds((kaart.radius || 25) * 2000));
-      kaart.centerOnMe = false; kaart.fitted = true;
-    } else if (!kaart.fitted && pts.length) {
-      kaart.map.fitBounds(pts, { padding: [24, 24], maxZoom: 13 });
-      kaart.fitted = true;
+    // Alle bedrijven in beeld (of de gekozen afstand rond jou). Komen er nog bedrijven bij terwijl de adressen worden
+    // opgezocht, dan schuift de kaart mee, tot je hem zelf verschuift of inzoomt.
+    if (kaart.refit || (!kaart.userMoved && pts.length !== kaart.fitCount)) {
+      kaart.refit = false; kaart.fitCount = pts.length; kaart.fitting = true;
+      const here = kaart.here && L.latLng(kaart.here.lat, kaart.here.lon);
+      if (kaart.radius && here) kaart.map.fitBounds(here.toBounds(kaart.radius * 2000), { animate: false });
+      else if (pts.length) {
+        const b = L.latLngBounds(pts);
+        if (here && distKm(kaart.here, { lat: b.getCenter().lat, lon: b.getCenter().lng }) < 100) b.extend(here);
+        kaart.map.fitBounds(b, { padding: [28, 28], maxZoom: 13, animate: false });
+      } else if (here) kaart.map.setView(here, 11, { animate: false });
+      kaart.fitting = false;
     }
   }
   // De dichtstbijzijnde eerst, dan steeds de dichtstbijzijnde vanaf de vorige: een logische route.
@@ -2935,12 +2967,12 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
   }
   $('kaartChips').addEventListener('click', e => {
     const r = e.target.closest('[data-straal]');
-    if (r) { kaart.radius = Number(r.dataset.straal); pref.set('kaartStraal', String(kaart.radius)); kaart.centerOnMe = !!kaart.here; renderAll(); return; }
+    if (r) { kaart.radius = Number(r.dataset.straal); kaart.refit = true; kaart.userMoved = false; renderAll(); return; }
     if (e.target.closest('[data-kaartactie]')) { kaart.alleenActie = !kaart.alleenActie; pref.set('kaartActie', kaart.alleenActie ? '1' : ''); renderAll(); }
   });
   $('kaartMe').addEventListener('click', () => {
     kaart.locError = '';
-    if (kaart.here) { kaart.centerOnMe = true; drawMarkers(); }
+    if (kaart.here && kaart.map) kaart.map.setView([kaart.here.lat, kaart.here.lon], Math.max(kaart.map.getZoom(), 12));
     else { stopLocating(); startLocating(); renderKaartStatus(); }
   });
   document.addEventListener('click', e => {
