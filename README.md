@@ -26,7 +26,7 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 - **In de buurt**: filter bij Bedrijven op afstand van je huidige plek (afstand instelbaar in Meer).
 - **Vraag het Leadnex** (in de zoekbalk bij Bedrijven): vragen over je eigen klanten, zoals "Welke bedrijven wilden een elektrische heftruck?", "Wie wilde ik dit kwartaal terugbellen?" of "Welke potentiële klanten wachten op een offerte?". De app begrijpt periodes, acties en status en zoekt in je verslagen en notities.
 - Alles werkt in de app zelf: geen AI-dienst, geen extra account en geen kosten.
-- **Weergave**: licht, donker of zoals je telefoon (Meer → Voorkeuren).
+- **Weergave**: standaard licht, of donker of zoals je telefoon (Meer → Voorkeuren).
 - **Delen naar de app** vanuit Google Maps, de Google-app of Chrome (naam, adres en telefoon worden zo nodig aangevuld via PDOK of OpenStreetMap), **visitekaartje scannen**, **in telefooncontacten** zetten, import uit Excel, export naar CSV, back-up.
 
 ## Bestanden

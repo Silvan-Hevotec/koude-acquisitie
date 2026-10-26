@@ -1,8 +1,8 @@
 // Service worker: maakt de app installeerbaar, laat hem openen zonder bereik
 // en toont de ochtendmelding met de acties van vandaag.
-const CACHE = 'koude-acquisitie-v22';
+const CACHE = 'koude-acquisitie-v23';
 const DATA_CACHE = 'koude-acq-data';   // hierin zet de app de actielijst voor de ochtendmelding
-const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest', './vendor/supabase.js', './icons/icon-192.png', './icons/icon-512.png', './icons/badge-96.png', './icons/logo-mark.png', './icons/logo-wordmark.png'];
+const SHELL = ['./', './index.html', './config.js', './manifest.webmanifest', './vendor/supabase.js', './icons/leadnex-192.png', './icons/leadnex-512.png', './icons/badge-96.png', './icons/logo-mark.png', './icons/logo-wordmark.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -71,7 +71,7 @@ self.addEventListener('push', event => {
   // Melding met inhoud van de meldingsdienst in Supabase: dagoverzicht, herinnering bij een actie of testmelding.
   if (msg.type === 'melding' && msg.title) {
     event.waitUntil(self.registration.showNotification(String(msg.title).slice(0, 120), {
-      body: String(msg.body || '').slice(0, 600), icon: 'icons/icon-192.png', badge: 'icons/badge-96.png',
+      body: String(msg.body || '').slice(0, 600), icon: 'icons/leadnex-192.png', badge: 'icons/badge-96.png',
       tag: String(msg.tag || 'leadnex'), renotify: true, vibrate: [200, 100, 200], data: { url: msg.url || './#vandaag' },
     }));
     return;
@@ -81,7 +81,7 @@ self.addEventListener('push', event => {
     const agenda = await readAgenda();
     const m = buildMessage(agenda && agenda.items, todayISO());
     const tip = backupReminder(agenda);
-    const opts = { icon: 'icons/icon-192.png', badge: 'icons/badge-96.png', tag: 'dagtaken', renotify: true, data: { url: './#vandaag' } };
+    const opts = { icon: 'icons/leadnex-192.png', badge: 'icons/badge-96.png', tag: 'dagtaken', renotify: true, data: { url: './#vandaag' } };
     if (m) return self.registration.showNotification(m.title, { ...opts, body: tip ? m.body + '\n' + tip : m.body });
     if (tip) return self.registration.showNotification('Back-up maken', { ...opts, body: tip + ' Open de app en tik onderaan op Back-up maken.' });
     if (msg.test) return self.registration.showNotification('Leadnex', { ...opts, body: 'Meldingen werken. Er staan vandaag geen acties op je lijst.' });
