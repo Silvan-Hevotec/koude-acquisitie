@@ -8,6 +8,8 @@
 // Daarnaast opent hij voor de app een korte Google-link ({"link": "https://share.google/..."}): bij delen vanuit
 // Google komt vaak alleen zo'n link mee, en de app kan die zelf niet volgen. En met {"verrijk": {...}} zoekt hij
 // bij een gedeeld bedrijf het adres, de telefoon, de website en het e-mailadres erbij.
+// Tot slot geeft hij op een geheime link (…/leadnex-meldingen/agenda/<sleutel>.ics) je afspraken, taken en acties
+// als agenda, zodat je die in Outlook kunt toevoegen (Agenda toevoegen → Abonneren vanaf het web).
 //
 // Instellen in Supabase: Edge Functions → nieuwe functie "leadnex-meldingen" met deze code,
 // "Verify JWT" uit, en bij Edge Functions → Secrets het geheim VAPID_PRIVATE_KEY.
@@ -22,7 +24,7 @@ const HERINNER_VENSTER = 10;    // minuten
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
 
 type Sub = { user_id: string; id: string; data: { endpoint: string; keys: { p256dh: string; auth: string }; verlopen?: string } };
@@ -445,9 +447,76 @@ async function vanApp(req: Request, body: { test?: boolean; status?: boolean; li
   return json({ ok: r.verstuurd > 0, telefoons: subs.length, hartslag, ...r });
 }
 
+/* ---------- agenda voor Outlook ---------- */
+// Outlook haalt deze link om de paar uur op. De sleutel maakt de app (Meer → Agenda in Outlook) en staat in
+// instellingen/agendalink; met een nieuwe sleutel werkt de oude link niet meer. Notities en afgevinkte taken staan er niet in.
+const AGENDA_PAD = /\/agenda\/([A-Za-z0-9_-]{24,64})\.ics$/;
+const icsTekst = (t: string) => t.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+// Regels van hooguit 75 bytes; het vervolg begint met een spatie.
+function vouw(regel: string) {
+  const delen: string[] = [];
+  let huidig = '', bytes = 0;
+  for (const teken of regel) {
+    const n = te.encode(teken).length;
+    if (bytes + n > 75) { delen.push(huidig); huidig = ' '; bytes = 1; }
+    huidig += teken; bytes += n;
+  }
+  delen.push(huidig);
+  return delen.join('\r\n');
+}
+const utc = (t: number) => new Date(t).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+const heleDag = (datum: string) => datum.replace(/-/g, '');
+const geldigeTijd = (t: string | null) => !!t && /^\d\d:\d\d$/.test(t);
+type Moment = { uid: string; datum: string; tijd?: string | null; eind?: number; titel: string; plek?: string; info?: string; url?: string; bezet?: boolean };
+function vevent(m: Moment, stempel: string) {
+  const regels = ['BEGIN:VEVENT', `UID:${m.uid}@leadnex`, `DTSTAMP:${stempel}`];
+  if (geldigeTijd(m.tijd ?? null)) {
+    const start = tijdstip(m.datum, m.tijd!);
+    regels.push(`DTSTART:${utc(start)}`, `DTEND:${utc(start + (m.eind || 30) * 60000)}`);
+  } else regels.push(`DTSTART;VALUE=DATE:${heleDag(m.datum)}`, `DTEND;VALUE=DATE:${heleDag(plusDagen(m.datum, 1))}`);
+  regels.push(`SUMMARY:${icsTekst(m.titel)}`);
+  if (m.plek) regels.push(`LOCATION:${icsTekst(m.plek)}`);
+  if (m.info) regels.push(`DESCRIPTION:${icsTekst(m.info)}`);
+  if (m.url) regels.push(`URL:${m.url}`);
+  regels.push(`TRANSP:${m.bezet ? 'OPAQUE' : 'TRANSPARENT'}`, 'END:VEVENT');
+  return regels.map(vouw).join('\r\n');
+}
+async function agendaFeed(sleutel: string, alleenKop: boolean) {
+  const kop = { ...CORS, 'Cache-Control': 'no-cache' };
+  const eigenaar: { user_id: string }[] = await db(`docs?collection=eq.instellingen&id=eq.agendalink&data->>sleutel=eq.${encodeURIComponent(sleutel)}&select=user_id`);
+  if (!eigenaar.length) return new Response('Deze agendalink werkt niet meer. Maak in Leadnex een nieuwe bij Meer → Agenda in Outlook.', { status: 404, headers: { ...kop, 'Content-Type': 'text/plain; charset=utf-8' } });
+  const uid = encodeURIComponent(eigenaar[0].user_id);
+  const vandaag = nl(Date.now()).datum, van = plusDagen(vandaag, -60), tot = plusDagen(vandaag, 400);
+  const bereik = `&data->>datum=gte.${van}&data->>datum=lte.${tot}`;
+  const leads: (Lead & { adres: string | null })[] = await db(`docs?collection=eq.leads&user_id=eq.${uid}${bereik}&select=id,bedrijf:data->>bedrijf,actie:data->>actie,datum:data->>datum,tijd:data->>tijd,gearchiveerd:data->gearchiveerd,adres:data->>adres,plaats:data->>plaats,contact:data->>contact,telefoon:data->>telefoon`);
+  const agenda: (Agendapunt & { tekst: string | null })[] = await db(`docs?collection=eq.agenda&user_id=eq.${uid}${bereik}&select=id,soort:data->>soort,titel:data->>titel,tekst:data->>tekst,datum:data->>datum,tijd:data->>tijd,eind:data->>eind,locatie:data->>locatie,klaar:data->klaar,bedrijfNaam:data->>bedrijfNaam`).catch(() => []);
+  const stempel = utc(Date.now());
+  const momenten: Moment[] = [];
+  for (const l of leads) {
+    if (!l.actie || !l.datum || l.gearchiveerd === true) continue;
+    momenten.push({ uid: `bedrijf-${l.id}`, datum: l.datum, tijd: l.tijd, titel: `${l.actie} ${l.bedrijf || ''}`.trim(), plek: [l.adres, l.plaats].filter(Boolean).join(', '),
+      info: [[l.contact, l.telefoon].filter(Boolean).join(' · '), `Openen in Leadnex: ${APP_URL}#bedrijf=${encodeURIComponent(l.id)}`].filter(Boolean).join('\n'),
+      url: `${APP_URL}#bedrijf=${encodeURIComponent(l.id)}` });
+  }
+  for (const a of agenda) {
+    if (!a.datum || a.soort === 'notitie' || (a.soort === 'taak' && a.klaar === true)) continue;
+    const titel = a.soort === 'taak' ? `Taak: ${a.titel || ''}` : `${a.titel || 'Afspraak'}${a.bedrijfNaam ? ` – ${a.bedrijfNaam}` : ''}`;
+    const duur = geldigeTijd(a.tijd) && geldigeTijd(a.eind) && minuten(a.eind!) > minuten(a.tijd!) ? minuten(a.eind!) - minuten(a.tijd!) : 60;
+    momenten.push({ uid: `agenda-${a.id}`, datum: a.datum, tijd: a.tijd, eind: a.soort === 'afspraak' ? duur : 30, titel, plek: a.locatie || '',
+      info: [(a.tekst || '').slice(0, 1000), `Openen in Leadnex: ${APP_URL}#agenda=${encodeURIComponent(a.id)}`].filter(Boolean).join('\n\n'),
+      url: `${APP_URL}#agenda=${encodeURIComponent(a.id)}`, bezet: a.soort === 'afspraak' && geldigeTijd(a.tijd) });
+  }
+  const tekst = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Leadnex//Agenda//NL', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    'X-WR-CALNAME:Leadnex', 'X-WR-TIMEZONE:Europe/Amsterdam', 'REFRESH-INTERVAL;VALUE=DURATION:PT1H', 'X-PUBLISHED-TTL:PT1H',
+    ...momenten.map(m => vevent(m, stempel)), 'END:VCALENDAR'].join('\r\n') + '\r\n';
+  return new Response(alleenKop ? null : tekst, { headers: { ...kop, 'Content-Type': 'text/calendar; charset=utf-8', 'Content-Disposition': 'inline; filename="leadnex.ics"' } });
+}
+
 Deno.serve(async req => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   try {
+    const agendaPad = new URL(req.url).pathname.match(AGENDA_PAD);
+    if (agendaPad) return await agendaFeed(agendaPad[1], req.method === 'HEAD');
     const body = await req.json().catch(() => ({}));
     if (body && (body.test || body.status || body.link || body.verrijk)) return await vanApp(req, body);
     return json(await ronde(Date.now()));

@@ -17,6 +17,8 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 - **Vaste opvolgstappen** na geen gehoor: de volgende werkdag, na twee werkdagen, na drie keer een mail (daarna vanzelf nabellen), na vijf keer voorstel om te archiveren.
 - **Kaart**: al je bedrijven in beeld, met een teller (hoeveel op de kaart, hoeveel zonder adres of met een adres dat niet gevonden is). Kies 2, 5, 10 of 25 km om te zien wat bij jou in de buurt is, met route langs de dichtstbijzijnde. Felle spelden: geel = vandaag te doen, oranje = met actie, paars = zonder actie, rode stip = hoge prioriteit. Adressen worden één keer opgezocht bij de Locatieserver van PDOK (Kadaster) en bij het bedrijf bewaard; de kaart komt ook van PDOK.
 - **Mailen**: per bedrijf of aan iedereen in de lijst (filter op branche of actie), in BCC in mails van hooguit 50 adressen, met mailteksten.
+- **Mailronde** (zonder Outlook-koppeling): per bedrijf een persoonlijke mail in je eigen mail-app, met aanhef en naam ingevuld. Na het versturen tik je op "Verstuurd, open de volgende": de mail komt in de contactmomenten en de volgende mail gaat meteen open.
+- **Agenda in Outlook** (zonder koppeling of beheerder): Meer → Agenda in Outlook maakt een geheime agendalink. Voeg die in Outlook toe via Agenda toevoegen → Abonneren vanaf het web; je afspraken, open taken en acties staan dan in je Outlook-agenda (Outlook ververst om de paar uur). De link komt van de functie `leadnex-meldingen`.
 - **WhatsApp** per bedrijf (06- en Belgische 04-nummers), met een begroeting en de voornaam alvast ingevuld.
 - **Werken zonder bereik**: wijzigingen blijven op de telefoon in een wachtrij en gaan vanzelf online zodra er weer verbinding is.
 - **Status** per bedrijf: lead, potentiële klant of klant, met een filter bij Bedrijven. Bij "Interesse" wordt een lead vanzelf potentiële klant.
@@ -57,7 +59,7 @@ Zet de bestanden in een openbare GitHub-repository en zet **Settings → Pages**
 De app staat dan op `https://<gebruikersnaam>.github.io/<repository>/`.
 
 ### 3. Outlook (optioneel, mailen en agenda via Microsoft 365)
-Met een koppeling verstuurt de app mails vanuit je eigen mailbox (ook persoonlijk per bedrijf, in één keer) en zet hij afspraken direct in je Outlook-agenda. Zonder koppeling opent de app je mail-app en downloadt hij een agenda-bestand (.ics).
+Met een koppeling verstuurt de app mails vanuit je eigen mailbox (ook persoonlijk per bedrijf, in één keer) en zet hij afspraken direct in je Outlook-agenda. Zonder koppeling opent de app je mail-app (ook als mailronde, persoonlijk per bedrijf), downloadt hij een agenda-bestand (.ics) en kun je de agendalink gebruiken (Meer → Agenda in Outlook). De koppeling vraagt eenmalig toestemming van een Microsoft 365-beheerder; zonder die toestemming toont Microsoft "Beheerdersgoedkeuring vereist".
 
 1. Ga naar [entra.microsoft.com](https://entra.microsoft.com) → **App-registraties** → **Nieuwe registratie**.
 2. Naam: `Leadnex`. Accounttype: **Alleen één tenant** (je eigen organisatie).
@@ -80,6 +82,8 @@ De meldingen komen van een kleine functie in je eigen Supabase-project, die elke
 5. Op je telefoon: **Meer → Meldingen op deze telefoon → Aanzetten** en tik op **Toestaan**. Je krijgt meteen een testmelding, en onder de knop staat of de meldingsdienst werkt.
 
 Kosten: geen. Elke minuut één aanroep is zo'n 45.000 per maand; het gratis Supabase-abonnement heeft er 500.000.
+
+**Functie bijwerken** na een nieuwe versie van Leadnex (bijvoorbeeld voor de agendalink): Supabase → **Edge Functions** → `leadnex-meldingen` → tabblad **Code** → alles selecteren en vervangen door de nieuwste [`index.ts`](supabase/functions/leadnex-meldingen/index.ts) → **Deploy**. Geheimen en de SQL hoeven niet opnieuw.
 
 ## Op de telefoon installeren
 Open het adres in **Chrome**, log in en tik op **App installeren** (of menu ⋮ → **App installeren**).

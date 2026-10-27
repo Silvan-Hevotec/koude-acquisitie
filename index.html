@@ -570,6 +570,8 @@ body.sessie .sheet-body { padding-bottom: 150px; }
 .imp-table tr.st-leeg td { color: var(--faint); }
 .imp-opts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 14px 24px; }
 .imp-sum { margin: 0; }
+.ronde-vraag { display: grid; gap: 10px; padding: 14px 16px; border-radius: 16px; background: var(--brand-soft); border: 1px solid var(--line); }
+.btn.big { min-height: 52px; font-size: 16px; padding: 0 22px; }
 .imp-tip { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 16px; background: var(--sunken); border: 1px solid var(--line); }
 .imp-tip > .ic { flex: none; width: 22px; height: 22px; color: var(--primary); margin-top: 2px; }
 .imp-tip > div { display: grid; gap: 6px; justify-items: start; min-width: 0; }
@@ -624,6 +626,12 @@ details.alt > :not(summary) { margin-top: 10px; margin-bottom: 0; }
 .set-row > .push-line { flex: 1 1 220px; min-width: 0; margin: 0; }
 .set-row > .push-server { flex-basis: 100%; margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--sunken); color: var(--ink); font-size: 13.5px; }
 .set-row > .push-server.ok { background: var(--ok-soft); color: var(--ok); }
+#agLinkRow { border-top: 1px solid var(--line); }
+.aglink { flex-basis: 100%; display: grid; gap: 10px; min-width: 0; }
+.aglink .input { font: 400 12.5px/1.4 var(--f-mono); }
+.aglink ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; }
+.aglink .check-line { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--sunken); font-size: 13.5px; }
+.aglink .check-line.ok { background: var(--ok-soft); color: var(--ok); }
 .set-row > .push-server a { color: inherit; }
 .push-line .linkbtn { font-size: 14px; }
 .push-line .input { flex-basis: 100%; font: 12px/1.4 var(--f-mono); }
@@ -1114,6 +1122,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
           <button type="button" class="linkbtn" id="outlookOff" hidden>Ontkoppelen</button>
         </p></div>
       <section class="outlook-panel" id="outlookPanel" aria-label="Outlook" hidden></section>
+      <div class="set-row" id="agLinkRow"><i data-ic="calendar"></i><div class="set-text"><strong>Agenda in Outlook</strong><span id="agLinkStatus">Je afspraken, taken en acties ook in je Outlook-agenda, zonder koppeling.</span></div>
+        <button type="button" class="btn small" id="agLinkMaak" hidden>Link maken</button>
+        <div class="aglink" id="agLinkBox" hidden></div></div>
     </section>
     <section class="card set-group" aria-label="Voorkeuren">
       <h3>Voorkeuren</h3>
@@ -3665,7 +3676,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     list.sort((a, b) => byName(byId(a), byId(b)));
     if (mail.sending) { toast('Wacht even tot de mails zijn verstuurd.'); return; }
     if (!['vandaag', 'bedrijven', 'kaart'].includes(state.page)) setPage('bedrijven');
-    Object.assign(mail, { open: true, ids: list, mode: list.length === 1 ? 'pers' : 'bcc', index: 0, done: new Set(), skipped: new Set(), opened: new Set(), newName: null, armedDel: false, busy: false, sending: null });
+    Object.assign(mail, { open: true, ids: list, mode: list.length === 1 ? 'pers' : 'bcc', index: 0, done: new Set(), skipped: new Set(), opened: new Set(), openedId: '', newName: null, armedDel: false, busy: false, sending: null });
     const ggTpl = state.sjablonen.find(t => /geen gehoor/i.test(t.naam));
     if (ggTpl && list.every(i => { const l = byId(i); return /^mail/i.test(l.actie || '') && noAnswerStreak(l) >= 2; })) applyTemplate(ggTpl.id);
     else if (!mail.onderwerp && !mail.tekst && state.sjablonen.length) applyTemplate(state.sjablonen[0].id);
@@ -3684,7 +3695,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   function mailOutHtml() {
     const recips = mailRecipients(), n = recips.length, viaMs = outlookOn(), acc = msAccount();
     const legal = '<p class="hint">Let op: voor ongevraagde reclamemail gelden in Nederland regels, ook richting bedrijven. Bedrijven met "Wil geen mail ontvangen" worden overgeslagen.</p>';
-    const tabs = n > 1 ? `<div class="tabs" aria-label="Manier van versturen"><button type="button" class="tab" id="mModeBcc" data-m="mode-bcc" aria-pressed="${mail.mode === 'bcc'}">Eén mail aan iedereen</button><button type="button" class="tab" id="mModePers" data-m="mode-pers" aria-pressed="${mail.mode === 'pers'}">Persoonlijk per bedrijf</button></div>` : '';
+    const tabs = n > 1 ? `<div class="tabs" aria-label="Manier van versturen"><button type="button" class="tab" id="mModeBcc" data-m="mode-bcc" aria-pressed="${mail.mode === 'bcc'}">Eén mail aan iedereen</button><button type="button" class="tab" id="mModePers" data-m="mode-pers" aria-pressed="${mail.mode === 'pers'}">${viaMs ? 'Persoonlijk per bedrijf' : 'Mailronde'}</button></div>` : '';
     const off = mail.busy ? ' disabled' : '';
     // Zonder koppeling (of als je liever zelf verstuurt): de mail-app openen en daarna vastleggen.
     const own = (html, open) => viaMs ? `<details class="alt"${open ? ' open' : ''}><summary>Liever zelf versturen met je mail-app</summary>${html}</details>` : html;
@@ -3730,6 +3741,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const l = recips[mail.index];
     const subj = fillTemplate(mail.onderwerp, l), body = fillTemplate(mail.tekst, l);
     const owa = mailtoUrl(l.email, '', subj, body);
+    if (!viaMs && n > 1) return tabs + mailRondeHtml(recips, l, subj, body, owa) + previewHtml(subj, body) + legal;
     const rest = recips.slice(mail.index).filter(x => !mail.done.has(x.id)).length;
     const nav = `${n > 1 ? '<button type="button" class="btn" id="mSkip" data-m="skip">Overslaan</button>' : ''}${mail.index > 0 ? '<button type="button" class="btn" id="mPrev" data-m="prev">Vorige</button>' : ''}`;
     const manual = `
@@ -3762,6 +3774,42 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
         ${nav}
       </div>`}
       ${legal}`;
+  }
+
+  // Mailronde zonder Outlook-koppeling: per bedrijf een persoonlijke mail in je eigen mail-app.
+  // Na het versturen kom je terug en tik je op "Verstuurd": dat legt het contactmoment vast en opent meteen de volgende mail.
+  function mailRondeHtml(recips, l, subj, body, owa) {
+    const n = recips.length, next = recips[mail.index + 1] || null, off = mail.busy ? ' disabled' : '';
+    const geopend = mail.openedId === l.id;
+    const nextUrl = next ? mailtoUrl(next.email, '', fillTemplate(mail.onderwerp, next), fillTemplate(mail.tekst, next)) : '';
+    const nav = `<button type="button" class="btn small" id="mSkip" data-m="skip">Overslaan</button>${mail.index > 0 ? '<button type="button" class="btn small" id="mPrev" data-m="prev">Vorige</button>' : ''}`;
+    const actie = geopend
+      ? `<div class="ronde-vraag"><strong>Is de mail aan ${esc(l.bedrijf)} verstuurd?</strong>
+          <div class="btns">${next
+            ? `<a class="btn primary" id="mSentNext" href="${esc(nextUrl)}" data-handoff="mail" data-volgende="${esc(next.id)}">${ic('check')}Verstuurd, open de volgende</a>
+               <button type="button" class="btn" id="mSent" data-m="sent"${off}>Verstuurd</button>`
+            : `<button type="button" class="btn primary" id="mSent" data-m="sent"${off}>${ic('check')}Verstuurd, klaar</button>`}
+            <a class="btn" id="mReopen" href="${esc(owa)}" data-handoff="mail" data-pers="${esc(l.id)}">Opnieuw openen</a></div>
+          ${next ? `<p class="hint">"Verstuurd, open de volgende" legt deze mail vast en opent meteen de mail aan ${esc(next.bedrijf)}.</p>` : ''}</div>`
+      : `<div class="btns"><a class="btn primary big" id="mOpen" href="${esc(owa)}" data-handoff="mail" data-pers="${esc(l.id)}">${ic('mail')}Open mail aan ${esc(l.bedrijf)}</a></div>
+        <p class="hint">Je mail-app (Outlook) opent met adres, onderwerp en tekst ingevuld. Verstuur de mail en kom terug naar Leadnex.</p>`;
+    return `
+      <div class="pers-head"><span class="meta">Mailronde · ${mail.index + 1} van ${n}${mail.done.size ? ` · ${mail.done.size} verstuurd` : ''}${mail.done.has(l.id) ? ' · deze al vastgelegd' : ''}</span><strong>${esc(l.bedrijf)}</strong><span>${l.contact ? esc(l.contact) + ' · ' : ''}<span class="pick">${esc(l.email)}</span></span></div>
+      ${actie}
+      <div class="btns">${nav}</div>
+      <details class="alt"><summary>Opent je mail-app niet?</summary>
+        <p class="hint">Kopieer adres, onderwerp en tekst naar een nieuwe mail in Outlook en tik daarna op Verstuurd.</p>
+        <div class="btns"><button type="button" class="btn small" id="mCopyTo" data-m="copy-to">Kopieer adres</button><button type="button" class="btn small" id="mCopySubj" data-m="copy-subj">Kopieer onderwerp</button><button type="button" class="btn small" id="mCopyBody" data-m="copy-body">Kopieer tekst</button>
+          ${geopend ? '' : `<button type="button" class="btn small" id="mSent" data-m="sent"${off}>Verstuurd</button>`}</div>
+      </details>`;
+  }
+  // Mailronde: deze mail vastleggen als verstuurd en de volgende staat al open in de mail-app.
+  async function sentNext(nextId) {
+    const l = mailRecipients()[mail.index];
+    if (!l) return;
+    mail.index++; mail.openedId = nextId;
+    setTimeout(renderMailOut, 0);
+    if (await logMail([l.id], fillTemplate(mail.onderwerp, l) || 'Mail')) { mail.done.add(l.id); mail.skipped.delete(l.id); renderMailOut(); }
   }
 
   function mailHtml() {
@@ -5213,6 +5261,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const handoff = e.target.closest('a[data-handoff]');
     if (handoff) {
       if (handoff.dataset.batch !== undefined) { (mail.opened = mail.opened || new Set()).add(+handoff.dataset.batch); setTimeout(renderMailOut, 0); }
+      else if (handoff.dataset.volgende) sentNext(handoff.dataset.volgende);
+      else if (handoff.dataset.pers) { mail.openedId = handoff.dataset.pers; setTimeout(renderMailOut, 0); }
       return;
     }
     const ph = e.target.closest('[data-ph]');
@@ -5821,6 +5871,87 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     renderPush(); renderRows();
     if (meldDoc && !state.local) await write(() => meldDoc.set({ ...meld, gewijzigd: nowISO() }));
   }
+  /* ---------- agenda in Outlook: een geheime link die Outlook om de paar uur ophaalt (geen koppeling of beheerder nodig) ---------- */
+  let agLinkDoc = null;
+  const agLink = { sleutel: '', geladen: false, armed: '', check: null, checkVoor: '', nr: 0, bezig: false };
+  const agLinkUrl = () => { const c = getConfig(); return c && agLink.sleutel ? `${c.url}/functions/v1/leadnex-meldingen/agenda/${agLink.sleutel}.ics` : ''; };
+  function nieuweSleutel() {
+    const b = new Uint8Array(24);
+    crypto.getRandomValues(b);
+    return btoa(String.fromCharCode(...b)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function renderAgLink() {
+    const status = $('agLinkStatus'), maak = $('agLinkMaak'), box = $('agLinkBox');
+    const kan = !state.local && !!getConfig() && agLink.geladen;
+    if (state.local || !getConfig()) status.textContent = 'Werkt alleen met online opslag.';
+    else if (!agLink.sleutel) status.textContent = 'Je afspraken, taken en acties ook in je Outlook-agenda, zonder koppeling of beheerder.';
+    else status.textContent = 'Aan. Outlook haalt je Leadnex-agenda om de paar uur op.';
+    maak.hidden = !kan || !!agLink.sleutel || state.readOnly;
+    box.hidden = !kan || !agLink.sleutel;
+    if (box.hidden) { box.innerHTML = ''; return; }
+    const c = agLink.check;
+    const regel = !c ? '<p class="check-line">Link controleren…</p>'
+      : c.ok ? `<p class="check-line ok">De link werkt: nu ${c.n} ${plural(c.n, 'item', 'items')} in de agenda.</p>`
+      : c.fout === 'functie' ? '<p class="check-line">De functie in Supabase moet nog worden bijgewerkt. Plak daar de nieuwste code (zie de uitleg in de README, kopje Meldingen) en kom hier terug.</p>'
+      : c.fout === 'nog-niet' ? '<p class="check-line">De link staat nog niet online. Controleer je verbinding en probeer het zo opnieuw.</p>'
+      : '<p class="check-line">Controleren lukte niet. Probeer het later opnieuw.</p>';
+    withFocus(box, () => {
+      box.innerHTML = `
+        <label class="sr" for="agLinkUrl">Agendalink</label>
+        <input class="input" id="agLinkUrl" readonly value="${esc(agLinkUrl())}">
+        <div class="btns"><button type="button" class="btn small primary" id="agLinkKopieer">${ic('link')}Kopieer link</button><button type="button" class="btn small" id="agLinkTest">Opnieuw controleren</button></div>
+        ${regel}
+        <ol>
+          <li>Tik op <strong>Kopieer link</strong>.</li>
+          <li>Open Outlook op de computer (outlook.office.com) en ga naar <strong>Agenda</strong>.</li>
+          <li>Kies <strong>Agenda toevoegen</strong> → <strong>Abonneren vanaf het web</strong>.</li>
+          <li>Plak de link, noem hem <strong>Leadnex</strong> en klik op <strong>Importeren</strong>.</li>
+        </ol>
+        <p class="hint">Outlook ververst de agenda om de paar uur; daarna staat hij ook in de Outlook-app op je telefoon. Notities en afgevinkte taken staan er niet in. Iedereen met deze link kan je agenda zien: deel hem niet. Met een nieuwe link werkt de oude niet meer.</p>
+        ${state.readOnly ? '' : `<div class="btns"><button type="button" class="btn small${agLink.armed === 'nieuw' ? ' armed' : ''}" id="agLinkNieuw">${agLink.armed === 'nieuw' ? 'Tik nogmaals: de oude link werkt dan niet meer' : 'Nieuwe link'}</button>
+          <button type="button" class="btn small danger${agLink.armed === 'uit' ? ' armed' : ''}" id="agLinkUit">${agLink.armed === 'uit' ? 'Tik nogmaals om uit te zetten' : 'Uitzetten'}</button></div>`}`;
+    });
+    if (agLink.checkVoor !== agLink.sleutel && !agLink.bezig) controleerAgLink();
+  }
+  // Haalt de agenda zelf één keer op: zo zie je meteen of de functie in Supabase al bijgewerkt is.
+  async function controleerAgLink() {
+    const sleutel = agLink.sleutel, url = agLinkUrl(), nr = ++agLink.nr;
+    agLink.checkVoor = sleutel; agLink.check = null;
+    if (!url) return;
+    let check;
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      const tekst = await res.text();
+      check = /^BEGIN:VCALENDAR/.test(tekst) ? { ok: true, n: (tekst.match(/^BEGIN:VEVENT/gm) || []).length }
+        : res.status === 404 && /werkt niet meer/.test(tekst) ? { fout: 'nog-niet' } : { fout: 'functie' };
+    } catch { check = { fout: 'netwerk' }; }
+    if (nr !== agLink.nr) return;   // intussen opnieuw gecontroleerd of een nieuwe link gemaakt
+    agLink.check = check;
+    renderAgLink();
+  }
+  async function zetAgLink(aan) {
+    if (!agLinkDoc || state.readOnly) return;
+    agLink.armed = '';
+    const sleutel = aan ? nieuweSleutel() : '';
+    agLink.bezig = true;   // pas controleren als de link echt online staat
+    const ok = await write(() => aan ? agLinkDoc.set({ sleutel, aangemaakt: nowISO() }) : agLinkDoc.delete());
+    agLink.bezig = false;
+    if (!ok) { renderAgLink(); return; }
+    agLink.sleutel = sleutel; agLink.checkVoor = '';
+    renderAgLink();
+    toast(aan ? 'Agendalink klaar. Kopieer hem en voeg hem toe in Outlook.' : 'Agendalink uitgezet. Outlook krijgt geen nieuwe afspraken meer; verwijder de agenda Leadnex daar zelf.', 5000);
+  }
+  $('agLinkMaak').addEventListener('click', () => zetAgLink(true));
+  $('agLinkRow').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.id === 'agLinkKopieer') copyText(agLinkUrl(), 'Agendalink', false);
+    else if (b.id === 'agLinkTest') { agLink.checkVoor = ''; renderAgLink(); }
+    else if (b.id === 'agLinkNieuw') { if (agLink.armed === 'nieuw') zetAgLink(true); else { agLink.armed = 'nieuw'; renderAgLink(); } }
+    else if (b.id === 'agLinkUit') { if (agLink.armed === 'uit') zetAgLink(false); else { agLink.armed = 'uit'; renderAgLink(); } }
+  });
+  $('agLinkRow').addEventListener('focusin', e => { if (e.target.id === 'agLinkUrl') e.target.select(); });
+
   $('meldOchtend').addEventListener('change', e => saveMeld({ ochtend: e.target.value }));
   $('meldHerinnering').addEventListener('change', e => saveMeld({ herinnering: validHerinnering(+e.target.value) ?? MELD_STANDAARD.herinnering }));
   async function testMelding() {
@@ -6346,6 +6477,13 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       };
       renderPush();
       scheduleRender();
+    });
+    agLinkDoc = store.doc('instellingen/agendalink');
+    agLinkDoc.onSnapshot(snap => {
+      const d = snap.exists ? snap.data() || {} : {};
+      agLink.sleutel = typeof d.sleutel === 'string' && /^[A-Za-z0-9_-]{24,64}$/.test(d.sleutel) ? d.sleutel : '';
+      agLink.geladen = true;
+      renderAgLink();
     });
     pushCol = store.collection('push');
     pushCol.limit(50).onSnapshot(snap => {
