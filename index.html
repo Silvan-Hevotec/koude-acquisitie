@@ -138,13 +138,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 @media (max-width: 899.98px) {
   .topnav { display: none; }
   .bottomnav {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 14; display: grid; grid-template-columns: repeat(5, 1fr);
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 14; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
     background: color-mix(in srgb, var(--surface) 88%, transparent); -webkit-backdrop-filter: saturate(1.4) blur(16px); backdrop-filter: saturate(1.4) blur(16px);
     border-top: 1px solid var(--line);
     padding: 6px max(6px, env(safe-area-inset-left, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-right, 0px));
   }
-  .bottomnav .nav-item { flex-direction: column; justify-content: center; gap: 3px; min-height: 54px; color: var(--muted); font-size: 11.5px; font-weight: 600; letter-spacing: .01em; }
-  .bottomnav .nav-item .pill { display: grid; place-items: center; width: 52px; height: 30px; border-radius: 999px; transition: background-color .15s; }
+  .bottomnav .nav-item { flex-direction: column; justify-content: center; gap: 3px; min-height: 54px; min-width: 0; color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0; white-space: nowrap; }
+  .bottomnav .nav-item .pill { display: grid; place-items: center; width: 46px; height: 30px; border-radius: 999px; transition: background-color .15s; }
   .bottomnav .nav-item .ic { width: 22px; height: 22px; }
   .bottomnav .nav-item[aria-current="page"] { color: var(--ink); }
   .bottomnav .nav-item[aria-current="page"] .pill { background: var(--brand-soft); color: var(--brand-soft-ink); }
@@ -570,6 +570,40 @@ body.sessie .sheet-body { padding-bottom: 150px; }
 .imp-table tr.st-leeg td { color: var(--faint); }
 .imp-opts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 14px 24px; }
 .imp-sum { margin: 0; }
+.kansvandaag { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border-radius: 24px; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.kansvandaag > .ic:first-child { width: 22px; height: 22px; color: var(--primary); flex: none; }
+.kansvandaag > span { display: grid; gap: 2px; flex: 1; min-width: 0; }
+.kansvandaag > span span { font-size: 13px; color: var(--muted); }
+.kansvandaag > .ic:last-child { color: var(--muted); flex: none; }
+.kanshint { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 14px; border-radius: 14px; background: var(--brand-soft); color: var(--ink); font-size: 14px; }
+.kanshint > .ic { color: var(--primary); }
+.kanshint > span { flex: 1 1 220px; }
+.kansen { display: grid; gap: 14px; }
+.kansprofiel { display: grid; gap: 14px; padding: 18px; }
+.kansprofiel h3 { margin: 0; font-size: 17px; }
+.kansprofiel .hint { margin: 0; }
+.kansprofiel .field { display: grid; gap: 8px; }
+.kansprofiel .chip .n { margin-left: 2px; }
+.kansnav { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.kansnav strong { font-size: 17px; }
+.kansnav .faint { flex: 1; }
+.kansgebied { display: flex; gap: 6px; align-items: flex-start; margin: 0; }
+.kansgebied .ic { flex: none; width: 16px; height: 16px; margin-top: 2px; }
+.kbronnen { display: flex; flex-wrap: wrap; gap: 6px; }
+.kbron { padding: 3px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: var(--ok-soft); color: var(--ok); }
+.kbron.fout { background: var(--danger-soft); color: var(--danger); }
+.kanssectie { display: grid; gap: 8px; }
+.kanssectie .slabel { display: flex; align-items: center; gap: 8px; margin: 6px 0 0; }
+.kanssectie .slabel .ic { width: 16px; height: 16px; }
+.kans { display: grid; gap: 10px; padding: 14px 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); }
+.kans.weg { opacity: .6; }
+.kans-tekst { display: grid; gap: 3px; min-width: 0; overflow-wrap: anywhere; }
+.kans-tekst strong { font-size: 15px; font-weight: 600; line-height: 1.35; }
+.kans-tekst span { font-size: 13.5px; color: var(--muted); }
+.kans-tekst .meta { color: var(--faint); font-size: 12.5px; }
+.kansvoet { margin: 4px 0 0; }
+@media (min-width: 900px) { .kans { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } .kans .btns { justify-content: flex-end; } }
+.ok-line { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--ok-soft); color: var(--ok); font-size: 14px; }
 .ronde-vraag { display: grid; gap: 10px; padding: 14px 16px; border-radius: 16px; background: var(--brand-soft); border: 1px solid var(--line); }
 .btn.big { min-height: 52px; font-size: 16px; padding: 0 22px; }
 .imp-tip { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 16px; background: var(--sunken); border: 1px solid var(--line); }
@@ -992,6 +1026,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   <div class="stats" id="stats" data-show="vandaag"></div>
   <section class="agvandaag" id="agVandaag" aria-label="Afspraken en taken vandaag" hidden></section>
   <section class="agvandaag stilvandaag" id="stilVandaag" aria-label="Klanten die je lang niet sprak" hidden></section>
+  <button type="button" class="kansvandaag" id="kansVandaag" data-page="kansen" hidden></button>
   <p id="summary">Lijst laden…</p>
 
   <!-- Planbord -->
@@ -1000,6 +1035,13 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     <div class="btns plan-add"><button type="button" class="btn primary" id="planAfspraak" data-ag-nieuw="afspraak"><i data-ic="plus"></i>Afspraak</button><button type="button" class="btn" id="planTaak" data-ag-nieuw="taak"><i data-ic="list-checks"></i>Taak</button><button type="button" class="btn" id="planNotitie" data-ag-nieuw="notitie"><i data-ic="notebook-pen"></i>Notitie</button></div>
   </div>
   <section class="planbord" id="planbord" data-show="planbord" aria-label="Planbord"></section>
+
+  <!-- Kansen -->
+  <div class="page-head" data-show="kansen">
+    <div><h2>Kansen</h2><p class="sub" id="kansSub">Nieuwbouw, nieuws en bedrijven die passen bij jouw klanten. Elke maandag nieuw.</p></div>
+    <div class="btns" id="kansKnoppen"><button type="button" class="btn primary" id="kansNu"><i data-ic="search"></i>Nu zoeken</button><button type="button" class="btn" id="kansInstel" aria-expanded="false"><i data-ic="sliders-horizontal"></i>Instellen</button></div>
+  </div>
+  <section class="kansen" id="kansenPage" data-show="kansen" aria-label="Kansen"></section>
 
   <!-- Bedrijven -->
   <div class="page-head" data-show="bedrijven">
@@ -1121,6 +1163,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       <div id="addWhen"></div>
     </div>
     <div class="dupwarn" id="dupWarn" hidden></div>
+    <div class="kanshint" id="kansHint" hidden></div>
     <div class="submit">
       <button type="submit" class="btn primary" id="addBtn"><i data-ic="plus"></i>Toevoegen</button>
     </div>
@@ -1318,7 +1361,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   try { groupPrefs = JSON.parse(pref.get('groep') || '{}') || {}; } catch { groupPrefs = {}; }
 
   const state = {
-    leads: [], acties: [], sjablonen: [], agenda: [], loaded: false, problem: null, readOnly: false,
+    leads: [], acties: [], sjablonen: [], agenda: [], kansen: [], loaded: false, problem: null, readOnly: false,
     view: VIEWS.has(pref.get('view')) ? pref.get('view') : 'alles',
     actie: pref.get('actie') || '', branche: pref.get('branche') || '',
     search: '', open: null, mode: 'edit', selecting: false, selected: new Set(), pendingMail: null, local: false,
@@ -1477,11 +1520,13 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const k = leadKeys(l);
     for (const f of ['n', 'p', 'e', 'd', 'k']) for (const v of [].concat(k[f])) if (v && !idx[f].has(v)) idx[f].set(v, l);
   }
-  function lookup(idx, c) {
+  function lookup(idx, c, velden = ['n', 'p', 'e', 'd', 'k']) {
     const k = leadKeys(c), hits = new Set();
-    for (const f of ['n', 'p', 'e', 'd', 'k']) for (const v of [].concat(k[f])) if (v && idx[f].has(v)) hits.add(idx[f].get(v));
+    for (const f of velden) for (const v of [].concat(k[f])) if (v && idx[f].has(v)) hits.add(idx[f].get(v));
     return [...hits];
   }
+  // Bij importeren alleen op naam of klantnummer: bedrijven uit dezelfde groep delen vaak website, mailadres of telefoon.
+  const lookupImport = (idx, c) => lookup(idx, c, ['k', 'n']);
 
   /* Mailteksten invullen per bedrijf. */
   function contactParts(contact) {
@@ -1748,7 +1793,10 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       status: validStatus($('addStatus').value), labels: parseLabels($('addLabels').value),
     };
     addBtn.disabled = true;
-    const ok = await write(() => col.doc().set(toBody(lead)));
+    if (kans.pending) { lead.notitie = kans.pending.notitie; lead.labels = validLabels([...lead.labels, 'Kans']); }
+    const ref = col.doc();
+    const ok = await write(() => ref.set(toBody(lead)));
+    if (ok && kans.pending) { const p = kans.pending; kans.pending = null; renderKansHint(); kansZet(p.w, p.id, { status: 'toegevoegd', leadId: ref.id }); }
     addBtn.disabled = false;
     if (!ok) return;
     rememberAction(actie);
@@ -2515,7 +2563,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
 
   /* ---------- weergave ---------- */
   // Tabbladen: Vandaag, Bedrijven (Alle / Met actie / Archief), Kaart, Nieuw en Meer.
-  const PAGES = ['vandaag', 'planbord', 'bedrijven', 'kaart', 'nieuw', 'meer'];
+  const PAGES = ['vandaag', 'planbord', 'bedrijven', 'kaart', 'kansen', 'nieuw', 'meer'];
   const pageOfView = v => v === 'vandaag' || v === 'kaart' ? v : 'bedrijven';
   function setView(v) {
     state.view = v; pref.set('view', v);
@@ -2536,13 +2584,13 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (p === 'meer') { renderPush(); checkServer(); checkAutoBackup(); }
   }
   // Op de computer alle tabbladen bovenin; op de telefoon vijf onderin, met de kaart bij Bedrijven.
-  const NAV = { vandaag: ['calendar-check', 'Vandaag'], planbord: ['calendar', 'Planbord'], bedrijven: ['building-2', 'Bedrijven'], kaart: ['map', 'Kaart'], nieuw: ['plus', 'Nieuw'], meer: ['ellipsis', 'Meer'] };
+  const NAV = { vandaag: ['calendar-check', 'Vandaag'], planbord: ['calendar', 'Planbord'], bedrijven: ['building-2', 'Bedrijven'], kaart: ['map', 'Kaart'], nieuw: ['plus', 'Nieuw'], kansen: ['sparkles', 'Kansen'], meer: ['ellipsis', 'Meer'] };
   function renderNav() {
     const due = state.leads.filter(l => isDue(l, todayISO())).length;
     const item = (p, actief) => `<a href="#" class="nav-item${p === 'nieuw' ? ' new' : ''}" data-page="${p}"${actief ? ' aria-current="page"' : ''}>
       <span class="pill">${ic(NAV[p][0])}</span><span>${NAV[p][1]}</span>${p === 'vandaag' && due ? `<span class="badge">${due > 99 ? '99+' : due}</span>` : ''}</a>`;
-    $('topNav').innerHTML = ['vandaag', 'planbord', 'bedrijven', 'kaart', 'nieuw', 'meer'].map(p => item(p, state.page === p)).join('');
-    $('bottomNav').innerHTML = ['vandaag', 'planbord', 'nieuw', 'bedrijven', 'meer'].map(p => item(p, state.page === p || (p === 'bedrijven' && state.page === 'kaart'))).join('');
+    $('topNav').innerHTML = ['vandaag', 'planbord', 'bedrijven', 'kaart', 'kansen', 'nieuw', 'meer'].map(p => item(p, state.page === p)).join('');
+    $('bottomNav').innerHTML = ['vandaag', 'planbord', 'nieuw', 'bedrijven', 'kansen', 'meer'].map(p => item(p, state.page === p || (p === 'bedrijven' && state.page === 'kaart'))).join('');
   }
   function renderPage() {
     document.querySelectorAll('[data-show]').forEach(el => { el.hidden = !el.dataset.show.split(' ').includes(state.page); });
@@ -3090,7 +3138,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     });
   }
 
-  function renderAll() { renderMeta(); renderNav(); renderPage(); renderPlanbord(); renderAgVandaag(); renderStil(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderDup(); renderFilters(); if (mail.open) renderMailOut(); }
+  function renderAll() { renderMeta(); renderNav(); renderPage(); renderPlanbord(); renderAgVandaag(); renderStil(); renderKansen(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderDup(); renderFilters(); if (mail.open) renderMailOut(); }
   let renderQueued = false;
   function scheduleRender() {
     if (renderQueued) return;
@@ -3518,6 +3566,188 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     el.innerHTML = seg + nav + `<div class="pweek">${cols}</div>` + takenlijst;
   }
   // Op Vandaag: de eigen afspraken en taken van vandaag, boven de acties.
+  /* ---------- kansen uit de markt ---------- */
+  // De functie leadnex-meldingen zoekt elke maandag (of meteen met Nu zoeken) kansen in de gemeenten waar jouw klanten zitten:
+  // nieuwbouw en vergunningen (officiële bekendmakingen), nieuws (Google Nieuws) en bedrijven in jouw branches (OpenStreetMap).
+  // Iedereen kiest zelf zijn branches en provincies (instellingen/kansen); per week één document in de collectie kansen.
+  const KANS_BRANCHES = [
+    ['transport', 'Transport en logistiek', /transport|logisti|expeditie|koerier|distributie|verhuis|cargo|freight/],
+    ['bouw', 'Bouw en aannemerij', /bouw(?!maat)|aannem|beton|infra|grondverzet|sloop|fundering|bestrating|straatwerk/],
+    ['afbouw', 'Afbouw (schilder, timmer, isolatie)', /schilder|timmer|isolatie|stukadoor|tegel|vloer|dakdek|glas|keuken|interieur|klussen|afbouw|gevel/],
+    ['installatie', 'Installatietechniek', /install|elektro|loodgiet|klimaat|warmte|zonne|solar|koeltechniek/],
+    ['metaal', 'Metaal en machinebouw', /metaal|staal|lasbedrijf|lastechniek|machine|constructie|cnc|plaatwerk|rvs|steel/],
+    ['hout', 'Hout en meubel', /hout|meubel|zagerij|kozijn|trappen/],
+    ['handel', 'Groothandel en handel', /handel|groothandel|trading|import|export|wholesale|supplies/],
+    ['agrarisch', 'Agrarisch en loonwerk', /agrar|loonbedrijf|loonwerk|veehouderij|melkvee|akkerbouw|boerderij|maatschap|mechanisatie|tuinbouw|veevoer/],
+    ['groen', 'Hoveniers en groen', /hovenier|groen|boomverzorging|tuin|kwekerij/],
+    ['auto', 'Auto, truck en aanhanger', /auto|garage|truck|bedrijfswagen|aanhangwagen|carrosserie|banden/],
+    ['productie', 'Productie en food', /food|voeding|bakkerij|vlees|zuivel|productie|fabriek|industrie|kunststof|verpakking|products|manufactur/],
+    ['recycling', 'Recycling en afval', /recycl|afval|container|milieu/],
+    ['verhuur', 'Verhuur', /verhuur|rental/],
+  ];
+  const KANS_SOORTEN = [['vergunning', 'Nieuwbouw en vergunningen', 'house'], ['nieuws', 'In het nieuws', 'globe'], ['bedrijf', 'Bedrijven die bij je klanten passen', 'building-2']];
+  const PROVINCIES = ['Drenthe', 'Flevoland', 'Friesland', 'Gelderland', 'Groningen', 'Limburg', 'Noord-Brabant', 'Noord-Holland', 'Overijssel', 'Utrecht', 'Zeeland', 'Zuid-Holland'];
+  let kansCol = null, kansProfielDoc = null;
+  const kans = { profiel: null, geladen: false, week: '', instellen: false, bezig: false, draft: null, toon: false, pending: null };
+  const weekId = iso => { const d = parseISO(mondayOf(iso)); d.setDate(d.getDate() + 3); return `${d.getFullYear()}-W${pad(isoWeek(iso))}`; };
+  const weekMaandag = id => { const m = /^(\d{4})-W(\d{2})$/.exec(id); return m ? isoOf(weekMonday(+m[1], +m[2])) : todayISO(); };
+  // Aantal klanten per branche, op naam en branche (voor de standaardkeuze en als hulp bij het kiezen).
+  function brancheTelling() {
+    const klanten = state.leads.filter(l => !l.gearchiveerd && l.status === 'klant');
+    const basis = klanten.length >= 20 ? klanten : state.leads.filter(l => !l.gearchiveerd);
+    const n = Object.fromEntries(KANS_BRANCHES.map(([k]) => [k, 0]));
+    basis.forEach(l => { const t = key(`${l.bedrijf} ${l.branche}`); KANS_BRANCHES.forEach(([k, , re]) => { if (re.test(t)) n[k]++; }); });
+    return n;
+  }
+  function standaardProfiel() {
+    const n = brancheTelling();
+    const branches = KANS_BRANCHES.map(([k]) => k).filter(k => n[k] > 0).sort((a, b) => n[b] - n[a]).slice(0, 5);
+    return { branches, provincies: ['Overijssel', 'Gelderland', 'Drenthe'], soorten: ['vergunning', 'nieuws', 'bedrijf'], woorden: '' };
+  }
+  function kansProfielHtml() {
+    const d = kans.draft, n = brancheTelling();
+    const chip = (attr, v, label, aan, extra = '') => `<button type="button" class="chip small" ${attr}="${esc(v)}" aria-pressed="${aan}">${esc(label)}${extra}</button>`;
+    return `<section class="card kansprofiel" aria-label="Kansen instellen">
+      <h3>Waar zoek je kansen?</h3>
+      <p class="hint">Kies de branches waarin jij werkt. Leadnex zoekt in de gemeenten waar de meeste van jouw klanten zitten, binnen de provincies die je kiest. Iedereen stelt dit voor zichzelf in.</p>
+      <div class="field"><span class="flabel">Branches</span><div class="chips">${KANS_BRANCHES.map(([k, label]) => chip('data-kb', k, label, d.branches.includes(k), n[k] ? ` <span class="n">${n[k]}</span>` : '')).join('')}</div>
+        <p class="hint">Het getal is het aantal van jouw klanten in die branche (herkend aan naam of branche).</p></div>
+      <div class="field"><span class="flabel">Provincies</span><div class="chips">${PROVINCIES.map(p => chip('data-kp', p, p, d.provincies.includes(p))).join('')}</div></div>
+      <div class="field"><span class="flabel">Soort kansen</span><div class="chips">${KANS_SOORTEN.map(([k, label]) => chip('data-ks', k, label, d.soorten.includes(k))).join('')}</div></div>
+      <div class="field"><label for="kansWoorden">Eigen zoekwoorden<span class="opt">optioneel, scheid met komma's</span></label><input class="input" id="kansWoorden" maxlength="200" value="${esc(d.woorden)}" placeholder="Bijv. magazijn, stellingen, heftruck"></div>
+      <div class="pactions"><button type="button" class="btn primary" id="kansBewaar"${d.provincies.length && d.soorten.length ? '' : ' disabled'}>${kans.profiel ? 'Opslaan' : 'Opslaan en kansen zoeken'}</button>${kans.profiel ? '<button type="button" class="btn" id="kansAnnuleer">Annuleren</button>' : ''}</div>
+    </section>`;
+  }
+  const kansMeta = it => [it.plaats || it.gemeente, it.soort === 'bedrijf' ? '' : it.bron, it.datum ? shortDate(it.datum) : ''].filter(Boolean).join(' · ');
+  function kansItemHtml(w, it) {
+    const id = esc(it.id), weg = it.status === 'verborgen';
+    return `<article class="kans${weg ? ' weg' : ''}" data-kans="${id}">
+      <div class="kans-tekst"><strong>${esc(it.titel)}</strong><span class="meta">${esc(kansMeta(it))}</span>${it.tekst && it.tekst !== it.bron ? `<span>${esc(it.tekst)}</span>` : ''}</div>
+      <div class="btns">${it.status === 'toegevoegd' ? `<span class="stag klant">In je lijst</span>`
+        : state.readOnly ? '' : `<button type="button" class="btn small primary" id="kansAdd-${id}" data-kans-add="${id}" data-kans-week="${esc(w)}">${ic('plus')}${it.soort === 'bedrijf' ? 'Toevoegen' : 'Als lead'}</button>`}
+        ${it.url ? `<a class="btn small" href="${esc(it.url)}" target="_blank" rel="noopener">${ic('link')}Bron</a>` : ''}
+        ${state.readOnly || it.status === 'toegevoegd' ? '' : `<button type="button" class="btn small ghost" id="kansWeg-${id}" data-kans-weg="${id}" data-kans-week="${esc(w)}">${weg ? 'Toch tonen' : 'Niet interessant'}</button>`}</div>
+    </article>`;
+  }
+  function kansWeekHtml() {
+    const huidig = weekId(todayISO()), id = kans.week || huidig, d = state.kansen.find(x => x.id === id);
+    const weken = [...new Set([huidig, ...state.kansen.map(x => x.id)])].sort().reverse(), i = weken.indexOf(id);
+    const ma = weekMaandag(id), zo = isoOf(new Date(parseISO(ma).getTime() + 6 * 86400000));
+    const nav = `<div class="kansnav"><button type="button" class="iconbtn" id="kansVorige" data-kans-naar="${esc(weken[i + 1] || '')}"${weken[i + 1] ? '' : ' disabled'} aria-label="Vorige week">${ic('chevron-left')}</button>
+      <strong>Week ${+id.slice(6)}${id === huidig ? ' (deze week)' : ''}</strong><span class="faint">${esc(dagKop(ma))} – ${esc(dagKop(zo))}</span>
+      <button type="button" class="iconbtn" id="kansVolgende" data-kans-naar="${esc(weken[i - 1] || '')}"${i > 0 ? '' : ' disabled'} aria-label="Volgende week">${ic('chevron-right')}</button></div>`;
+    if (!d) return nav + emptyHtml('Nog geen kansen voor deze week', id === huidig ? 'Ze komen maandagochtend vanzelf. Tik op Nu zoeken om nu al te kijken.' : 'Voor deze week zijn geen kansen gezocht.');
+    const gebied = (d.gebied || []).map(g => `${g.naam} (${g.n})`).join(' · ');
+    const bron = (k, label) => { const b = (d.bronnen || {})[k]; return !b ? '' : b.fout === 'uit' ? '' : `<span class="kbron${b.ok ? '' : ' fout'}" title="${esc(b.fout || '')}">${esc(label)}: ${b.ok ? b.n : 'niet gelukt'}</span>`; };
+    const bronnen = [bron('vergunning', 'Bekendmakingen'), bron('nieuws', 'Nieuws'), bron('bedrijf', 'Bedrijven')].filter(Boolean).join('');
+    const bronNaam = { gebied: 'Gebied', vergunning: 'Bekendmakingen', nieuws: 'Nieuws', bedrijf: 'Bedrijven' };
+    const fouten = Object.entries(d.bronnen || {}).filter(([, b]) => !b.ok && b.fout && b.fout !== 'uit').map(([k, b]) => `${bronNaam[k] || k}: ${b.fout}`);
+    const items = d.items || [], verborgen = items.filter(x => x.status === 'verborgen').length;
+    const secties = KANS_SOORTEN.filter(([k]) => !kans.profiel || kans.profiel.soorten.includes(k)).map(([k, label, icn]) => {
+      const lijst = items.filter(x => x.soort === k && (kans.toon || x.status !== 'verborgen')).sort((a, b) => (a.status === 'toegevoegd') - (b.status === 'toegevoegd') || b.score - a.score);
+      return `<section class="kanssectie" aria-label="${esc(label)}"><h3 class="slabel">${ic(icn)}${esc(label)} <span class="n">${lijst.length}</span></h3>
+        ${lijst.length ? lijst.map(it => kansItemHtml(id, it)).join('') : '<p class="hint">Deze week niets gevonden.</p>'}</section>`;
+    }).join('');
+    return nav + `${gebied ? `<p class="hint kansgebied">${ic('map-pin')}Gebied: ${esc(gebied)}</p>` : ''}
+      ${bronnen ? `<div class="kbronnen">${bronnen}</div>` : ''}
+      ${fouten.length ? `<p class="warn">Niet alles lukte: ${esc(fouten.join(' · '))}</p>` : ''}
+      ${secties}
+      ${verborgen ? `<button type="button" class="linkbtn" id="kansToon">${kans.toon ? 'Verborgen kansen verbergen' : `${verborgen} verborgen ${plural(verborgen, 'kans', 'kansen')} tonen`}</button>` : ''}
+      <p class="hint kansvoet">Bronnen: officiële bekendmakingen van gemeenten (overheid.nl), Google Nieuws en © OpenStreetMap-bijdragers. Controleer een kans altijd even in de bron.</p>`;
+  }
+  function renderKansen() {
+    const el = $('kansenPage'), knoppen = $('kansKnoppen');
+    const vk = $('kansVandaag'), d = state.kansen.find(x => x.id === weekId(todayISO()));
+    const open = d ? (d.items || []).filter(x => !x.status).length : 0;
+    vk.hidden = state.page !== 'vandaag' || !open;
+    vk.innerHTML = open ? `${ic('sparkles')}<span><strong>${open} ${plural(open, 'kans', 'kansen')} deze week</strong><span>Nieuwbouw, nieuws en bedrijven die bij je klanten passen</span></span>${ic('chevron-right')}` : '';
+    if (state.page !== 'kansen') return;
+    const online = !state.local && !!getConfig();
+    knoppen.hidden = !online || !kans.profiel || state.readOnly;
+    $('kansNu').disabled = kans.bezig;
+    $('kansNu').innerHTML = kans.bezig ? `${ic('search')}Zoeken…` : `${ic('search')}Nu zoeken`;
+    $('kansInstel').setAttribute('aria-expanded', String(kans.instellen));
+    if (!online) { el.innerHTML = emptyHtml('Kansen werken met online opslag', 'Koppel de online opslag (Supabase) om kansen uit de markt te krijgen.'); return; }
+    if (!kans.geladen) { el.innerHTML = '<div class="empty"><p>Laden…</p></div>'; return; }
+    if ((!kans.profiel || kans.instellen) && !kans.draft) kans.draft = kans.profiel ? { ...kans.profiel, woorden: kans.profiel.woorden.join(', ') } : standaardProfiel();
+    withFocus(el, () => {
+      el.innerHTML = (!kans.profiel || kans.instellen ? kansProfielHtml() : '') + (kans.profiel ? kansWeekHtml() : '') +
+        (kans.bezig ? '<p class="hint" role="status">Kansen zoeken in de bekendmakingen, het nieuws en OpenStreetMap… dit duurt een halve minuut.</p>' : '');
+    });
+  }
+  async function kansZoeken() {
+    if (kans.bezig) return;
+    kans.bezig = true; renderKansen();
+    const r = await meldServer({ kansen: true });
+    kans.bezig = false;
+    if (r.ok) { kans.week = r.week; toast(`${r.kansen} ${plural(r.kansen, 'kans', 'kansen')} voor week ${+String(r.week).slice(6)}.`); if (appStore && appStore.ververs) await appStore.ververs('kansen').catch(() => {}); }
+    else if (r.fout === 'geen-functie' || (!r.fout && r.telefoons !== undefined)) toast('Werk eerst de functie leadnex-meldingen bij in Supabase (zie de uitleg).', 6000);
+    else if (r.fout === 'niet-ingelogd') toast('Log opnieuw in en probeer het nog eens.');
+    else toast('Zoeken lukte niet. Probeer het later opnieuw.');
+    renderKansen();
+  }
+  async function kansZet(w, itemId, patch) {
+    const d = state.kansen.find(x => x.id === w);
+    if (!d || !kansCol) return false;
+    return write(() => kansCol.doc(w).update({ items: (d.items || []).map(x => x.id === itemId ? { ...x, ...patch } : x) }));
+  }
+  async function kansToevoegen(w, itemId) {
+    const d = state.kansen.find(x => x.id === w), it = d && (d.items || []).find(x => x.id === itemId);
+    if (!it || state.readOnly) return;
+    const notitie = `Kans uit ${it.bron} (week ${+w.slice(6)}): ${it.titel}${it.url ? '\n' + it.url : ''}`;
+    if (it.soort !== 'bedrijf') {
+      // Bij een bekendmaking of nieuwsbericht staat de bedrijfsnaam er vaak niet netjes in: invullen op Nieuw.
+      kans.pending = { w, id: itemId, notitie, titel: it.titel, url: it.url };
+      setPage('nieuw');
+      $('addPlaats').value = it.plaats && it.plaats !== it.gemeente ? it.plaats : it.gemeente || it.plaats || '';
+      $('addAdres').value = it.adres || '';
+      $('addLabels').value = 'Kans';
+      renderKansHint();
+      $('addBedrijf').focus();
+      return;
+    }
+    const now = nowISO(), ref = col.doc(), branche = (KANS_BRANCHES.find(b => b[0] === it.branche) || [])[1] || '';
+    const lead = { bedrijf: it.titel, contact: '', email: '', telefoon: it.telefoon || '', adres: it.adres || '', plaats: canonPlaats(it.plaats || it.gemeente || ''), website: cleanWebsite(it.website || ''),
+      branche: canonBranche(branche), actie: canonAction('Bellen'), datum: '', tijd: '', prioriteit: 'normaal', notitie, geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '',
+      aangemaakt: now, gewijzigd: now, status: 'lead', labels: ['Kans'] };
+    if (!(await write(() => ref.set(toBody(lead))))) return;
+    await kansZet(w, itemId, { status: 'toegevoegd', leadId: ref.id });
+    toast(`${it.titel} staat in je lijst, met label Kans en actie Bellen.`);
+  }
+  function renderKansHint() {
+    const el = $('kansHint'), p = kans.pending;
+    el.hidden = !p;
+    el.innerHTML = p ? `${ic('sparkles')}<span><strong>Kans:</strong> ${esc(p.titel)}. Vul de bedrijfsnaam in${p.url ? ` (zie de <a href="${esc(p.url)}" target="_blank" rel="noopener">bron</a>)` : ''}.</span><button type="button" class="linkbtn" id="kansHintWeg">Annuleren</button>` : '';
+  }
+  $('kansHint').addEventListener('click', e => { if (e.target.closest('#kansHintWeg')) { kans.pending = null; renderKansHint(); } });
+  $('kansNu').addEventListener('click', kansZoeken);
+  $('kansInstel').addEventListener('click', () => { kans.instellen = !kans.instellen; kans.draft = null; renderKansen(); });
+  $('kansenPage').addEventListener('input', e => { if (e.target.id === 'kansWoorden' && kans.draft) kans.draft.woorden = e.target.value; });
+  $('kansenPage').addEventListener('click', async e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const d = kans.draft, wissel = (lijst, v) => lijst.includes(v) ? lijst.filter(x => x !== v) : [...lijst, v];
+    if (d && b.dataset.kb) { d.branches = wissel(d.branches, b.dataset.kb); renderKansen(); }
+    else if (d && b.dataset.kp) { d.provincies = wissel(d.provincies, b.dataset.kp); renderKansen(); }
+    else if (d && b.dataset.ks) { d.soorten = wissel(d.soorten, b.dataset.ks); renderKansen(); }
+    else if (b.id === 'kansBewaar' && d) {
+      const eerste = !kans.profiel;
+      const profiel = { branches: d.branches, provincies: d.provincies, soorten: d.soorten, woorden: String(d.woorden || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 8), gewijzigd: nowISO() };
+      if (!(await write(() => kansProfielDoc.set(profiel)))) return;
+      kans.profiel = profiel; kans.instellen = false; kans.draft = null;
+      renderKansen();
+      if (eerste) kansZoeken(); else toast('Opgeslagen. Je nieuwe keuzes gelden vanaf de volgende zoekronde; tik op Nu zoeken om het meteen te zien.', 6000);
+    }
+    else if (b.id === 'kansAnnuleer') { kans.instellen = false; kans.draft = null; renderKansen(); }
+    else if (b.dataset.kansNaar !== undefined && b.dataset.kansNaar) { kans.week = b.dataset.kansNaar; renderKansen(); }
+    else if (b.id === 'kansToon') { kans.toon = !kans.toon; renderKansen(); }
+    else if (b.dataset.kansAdd) kansToevoegen(b.dataset.kansWeek, b.dataset.kansAdd);
+    else if (b.dataset.kansWeg) {
+      const dd = state.kansen.find(x => x.id === b.dataset.kansWeek), it = dd && dd.items.find(x => x.id === b.dataset.kansWeg);
+      if (it) kansZet(b.dataset.kansWeek, it.id, { status: it.status === 'verborgen' ? '' : 'verborgen' });
+    }
+  });
+
   /* ---------- klanten die je lang niet sprak ---------- */
   // Laatste contact: het nieuwste contactmoment (bellen, mail, WhatsApp, verslag). Zonder contactmoment telt de dag
   // waarop het bedrijf in Leadnex kwam, zodat een net geïmporteerde klantenlijst niet meteen helemaal "vergeten" is.
@@ -4337,22 +4567,45 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       const c = mapRow(row, imp.map);
       let status = 'nieuw', match = null;
       if (!c.bedrijf) status = 'leeg';
-      else if ((match = lookup(existing, c)[0] || null)) status = gezien.has(match.id) ? 'dubbel' : 'bestaat';
-      else if (lookup(inFile, c).length) status = 'dubbel';
+      else if ((match = lookupImport(existing, c)[0] || null)) status = gezien.has(match.id) ? 'dubbel' : 'bestaat';
+      else if (lookupImport(inFile, c).length) status = 'dubbel';
       if (match) gezien.add(match.id);
       if (c.bedrijf) addToIndex(inFile, c);
       const include = status === 'leeg' ? false : (imp.include.has(i) ? imp.include.get(i) : status === 'nieuw' || (aanvullen && status === 'bestaat'));
       return { i, row, c, status, match, include, aanvullen: aanvullen && !!match };
     });
   }
+  // Overzicht met twee regels per relatie, zoals "Overzicht relaties" uit Powerall: regel 1 nummer, bedrijf, adres, postcode,
+  // plaats, telefoon; regel 2 contactpersoon, e-mail, website, mobiel. Wordt één rij per relatie, met kolomnamen.
+  const TWEE_REGELS_KOP = ['Nummer', 'Bedrijfsnaam', 'Adres', 'Postcode', '', 'Plaats', 'Telefoon', '', 'Contactpersoon', 'E-mail', '', 'Website', '', 'Mobiel'];
+  function tweeRegels(rows) {
+    const proef = rows.slice(0, 60), kop = r => /^\d+$/.test(String(r[0] || '').trim()) && String(r[1] || '').trim(), vervolg = r => r && !String(r[0] || '').trim();
+    if (proef.length < 4 || looksLikeHeader(rows[0])) return null;
+    let paren = 0;
+    for (let i = 0; i + 1 < proef.length; i += 2) if (kop(proef[i]) && vervolg(proef[i + 1])) paren++;
+    if (paren < Math.floor(proef.length / 2) * 0.8) return null;
+    const breed = Math.max(...proef.map(r => r.length)), vul = r => Array.from({ length: breed }, (_, i) => String(r[i] ?? '').trim());
+    const uit = [];
+    for (let i = 0; i < rows.length; i++) {
+      if (!kop(rows[i])) continue;
+      const r = rows[i], v = vervolg(rows[i + 1]) && !kop(rows[i + 1]) ? rows[++i] : [];
+      uit.push([...vul(r), ...vul(v)]);
+    }
+    const kopRij = breed === 7 ? TWEE_REGELS_KOP : [...Array.from({ length: breed }, (_, i) => `Kolom ${i + 1}`), ...Array.from({ length: breed }, (_, i) => `Regel 2, kolom ${i + 1}`)];
+    const houd = kopRij.map((_, c) => uit.some(r => r[c]));   // lege kolommen weglaten
+    return { rows: [kopRij.filter((_, c) => houd[c]), ...uit.map(r => r.filter((_, c) => houd[c]))], n: uit.length };
+  }
   function setImportRows(rows) {
     if (!rows.length) { imp.error = 'Er staan geen rijen in. Controleer het bestand of plak de rijen opnieuw.'; renderImport(); return; }
+    const twee = tweeRegels(rows);
+    if (twee) rows = twee.rows;
     imp.rows = rows.slice(0, 5001);
-    imp.header = looksLikeHeader(rows[0]);
+    imp.header = twee ? true : looksLikeHeader(rows[0]);
     imp.map = guessMap(imp.rows, imp.header);
     imp.include = new Map();
     imp.error = '';
-    imp.status = '';
+    imp.status = twee ? 'klant' : '';
+    imp.melding = twee ? `Overzicht met twee regels per relatie herkend (zoals uit Powerall): samengevoegd tot ${twee.n} ${plural(twee.n, 'relatie', 'relaties')}, één per rij.` : '';
     renderImport();
   }
   async function readImportFile(file) {
@@ -4416,6 +4669,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     </table></div>`;
     return head + `
       <label class="check" for="impHeader"><input type="checkbox" id="impHeader"${imp.header ? ' checked' : ''}>Eerste rij bevat kolomnamen</label>
+      ${imp.melding ? `<p class="ok-line">${esc(imp.melding)}</p>` : ''}
       ${imp.map.includes('bedrijf') ? '' : '<p class="warn">Kies bij één kolom <strong>Bedrijfsnaam</strong>. Zonder bedrijfsnaam kan een rij niet worden geïmporteerd.</p>'}
       <p class="hint">Kies bovenaan elke kolom welk veld het is. ${imp.bestaand === 'aanvullen'
         ? 'Bedrijven die al in je lijst of archief staan, worden aangevuld: lege velden worden ingevuld en de soort relatie gaat omhoog (bijv. van Lead naar Klant). Wat je al had ingevuld, blijft staan.'
@@ -4430,7 +4684,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
           <p class="hint">${imp.map.includes('status') ? 'Voor rijen zonder Klant, Potentiële klant of Lead in de kolom Soort relatie.' : 'Voor alle bedrijven uit dit bestand. Kies Klant voor je klantenlijst.'}</p></div>
         <div class="field"><label for="impBestaand">Staat een bedrijf al in je lijst?</label><select class="input" id="impBestaand">
           <option value="overslaan"${imp.bestaand === 'aanvullen' ? '' : ' selected'}>Overslaan</option><option value="aanvullen"${imp.bestaand === 'aanvullen' ? ' selected' : ''}>Aanvullen (lege velden invullen)</option></select>
-          <p class="hint">Herkend aan klantnummer, naam, telefoon, e-mail of website. Aanvullen overschrijft niets wat je al had.</p></div>
+          <p class="hint">Herkend aan klantnummer of bedrijfsnaam. Aanvullen overschrijft niets wat je al had.</p></div>
         <div class="field"><label for="impLabel">Label voor alle bedrijven uit dit bestand<span class="opt">optioneel</span></label><input class="input" id="impLabel" maxlength="40" value="${esc(imp.label)}" placeholder="Bijv. Klantenlijst 2026"></div>
         <div class="field"><label for="impActie">Actie voor de nieuwe bedrijven<span class="opt">optioneel</span></label><input class="input" id="impActie" list="actieLijst" maxlength="40" value="${esc(imp.actie)}" placeholder="Bijv. Bellen"></div>
         <div class="field"><label for="impDatum">Wanneer<span class="opt">optioneel</span></label>${whenHtml('impDatum', imp.datum)}</div>
@@ -4482,37 +4736,24 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (!bodies.length) { imp.open = false; renderImport(); toast(`Niets te doen: ${ongewijzigd} ${plural(ongewijzigd, 'bedrijf had', 'bedrijven hadden')} al alle gegevens.`); return; }
     Object.assign(imp, { busy: true, done: 0, total: bodies.length });
     renderImport();
-    const queue = bodies.slice();
-    let failed = 0, stop = false, lastErr = null;
+    let failed = 0, lastErr = null;
     const progress = () => {
       const bar = $('impBar'), p = $('impProg');
       if (bar) bar.style.width = Math.round(imp.done / imp.total * 100) + '%';
       if (p) p.textContent = `${imp.done} van ${imp.total} bedrijven geïmporteerd…`;
     };
-    const worker = async () => {
-      while (queue.length && !stop) {
-        const { id, body } = queue.shift(), ref = id ? col.doc(id) : col.doc();
-        let ok = false;
-        for (let a = 0; a < 4 && !ok && !stop; a++) {
-          try { await ref.set(body); ok = true; }
-          catch (e) {
-            lastErr = e;
-            if (e && (e.code === 'resource_exhausted' || e.code === 'unavailable')) await sleep(1000 * (a + 1));
-            else stop = true;
-          }
-        }
-        if (ok) imp.done++; else failed++;
-        progress();
-      }
-    };
-    await Promise.all([worker(), worker(), worker()]);
+    // In delen opslaan: duizenden bedrijven in een paar seconden in plaats van één voor één.
+    const items = bodies.map(b => ({ id: b.id || col.nieuwId(), data: b.body }));
+    try { await col.zetVeel(items, n => { imp.done = n; progress(); }); imp.done = items.length; }
+    catch (e) { lastErr = e; imp.done = e.gedaan || 0; failed = items.length - imp.done; }
+    const stop = failed > 0;
     acties.forEach(rememberAction);
     imp.busy = false;
     const done = imp.done;
     if (done) { imp.open = false; setView('alles'); state.search = ''; searchEl.value = ''; }
     renderImport();
     renderAll();
-    if (stop || failed) { writeError(lastErr); if (done) toast(`${done} bedrijven geïmporteerd. Daarna ging het mis: ${queue.length + failed} niet geïmporteerd.`); }
+    if (stop) { writeError(lastErr); if (done) toast(`${done} bedrijven geïmporteerd. Daarna ging het mis: ${failed} niet geïmporteerd.`); }
     else if (nAanvul) toast([nNieuw && `${nNieuw} ${plural(nNieuw, 'bedrijf', 'bedrijven')} geïmporteerd`, `${nAanvul} ${plural(nAanvul, 'bedrijf', 'bedrijven')} aangevuld`,
       ongewijzigd && `${ongewijzigd} al compleet`].filter(Boolean).join(', ') + '.', 6000);
     else toast(`${done} ${plural(done, 'bedrijf', 'bedrijven')} geïmporteerd.`);
@@ -5790,6 +6031,31 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       if (error && isNetErr(error)) { enqueue('put', c, id, data); return; }
       if (error) { if (prev === undefined) m.delete(id); else m.set(id, prev); emit(c); saveLocal(); throw storeError(error); }
     }
+    // Veel tegelijk opslaan (importeren): één keer bijwerken en in delen van 250 naar de online lijst.
+    async function putMany(c, items, voortgang) {
+      const m = colMap(c), prev = new Map(items.map(x => [x.id, m.get(x.id)]));
+      items.forEach(x => m.set(x.id, x.data));
+      emit(c);
+      saveLocal();
+      let gedaan = 0;
+      for (let i = 0; i < items.length; i += 250) {
+        const deel = items.slice(i, i + 250);
+        let error = null;
+        if (!queue.length) {
+          try { ({ error } = await sb.from('docs').upsert(deel.map(x => ({ user_id: uid, collection: c, id: x.id, data: x.data, updated_at: new Date().toISOString() })), { onConflict: 'user_id,collection,id' })); }
+          catch (e) { error = e; }
+        }
+        if (queue.length || (error && isNetErr(error))) deel.forEach(x => enqueue('put', c, x.id, x.data));   // geen verbinding: later
+        else if (error) {
+          items.slice(i).forEach(x => { const v = prev.get(x.id); if (v === undefined) m.delete(x.id); else m.set(x.id, v); });
+          emit(c); saveLocal();
+          const e = storeError(error); e.gedaan = gedaan; throw e;
+        }
+        gedaan += deel.length;
+        if (voortgang) voortgang(gedaan);
+      }
+      if (queue.length) flush();
+    }
     async function remove(c, id) {
       const m = colMap(c), prev = m.get(id);
       m.delete(id);
@@ -5825,22 +6091,26 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       }, onError),
     });
     const colRef = c => {
-      const q = { limit: () => q, onSnapshot: (next, onError) => subscribe(c, next, onError), doc: id => docRef(c, id || newId()), get: async () => snap(c) };
+      const q = { limit: () => q, onSnapshot: (next, onError) => subscribe(c, next, onError), doc: id => docRef(c, id || newId()), get: async () => snap(c),
+        zetVeel: (items, voortgang) => putMany(c, items, voortgang), nieuwId: newId };
       return q;
     };
     const refreshAll = () => { flush(); [...subs.keys()].forEach(c => fetchCol(c).catch(offlineNotice)); };
 
     // Live bijwerken als je op een ander apparaat iets wijzigt.
+    const liveTimers = {};
     try {
       sb.channel('docs-' + uid)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'docs', filter: 'user_id=eq.' + uid }, p => {
           const row = p.eventType === 'DELETE' ? p.old : p.new;
           if (!row || !row.collection || (row.user_id && row.user_id !== uid)) { refreshAll(); return; }
           if (queue.some(q => q.c === row.collection && q.id === row.id)) return;   // eigen wijziging wacht nog: die gaat voor
-          if (p.eventType === 'DELETE') colMap(row.collection).delete(row.id);
-          else colMap(row.collection).set(row.id, row.data);
+          const m = colMap(row.collection);
+          if (p.eventType === 'DELETE') { if (!m.has(row.id)) return; m.delete(row.id); }
+          else { if (m.has(row.id) && JSON.stringify(m.get(row.id)) === JSON.stringify(row.data)) return; m.set(row.id, row.data); }   // eigen wijziging: staat er al
           saveLocal();
-          emit(row.collection);
+          clearTimeout(liveTimers[row.collection]);
+          liveTimers[row.collection] = setTimeout(() => emit(row.collection), 120);   // bij veel wijzigingen tegelijk één keer bijwerken
         })
         .subscribe();
     } catch {}
@@ -5849,6 +6119,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       collection: colRef,
       doc: path => { const [c, id] = path.split('/'); return docRef(c, id); },
       refreshAll,
+      ververs: c => fetchCol(c),
       isLoaded: c => loaded.has(c),
       clearLocal: () => { try { localStorage.removeItem(LS); } catch {} },
     };
@@ -5884,6 +6155,16 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       emit(c);
     }
     async function remove(c, id) { colMap(c).delete(id); persist(); emit(c); }
+    async function putMany(c, items, voortgang) {
+      const m = colMap(c), prev = new Map(items.map(x => [x.id, m.get(x.id)]));
+      items.forEach(x => m.set(x.id, x.data));
+      if (!persist()) {
+        prev.forEach((v, id) => { if (v === undefined) m.delete(id); else m.set(id, v); });
+        const e = new Error('Opslag vol'); e.code = 'quota_exceeded'; e.gedaan = 0; throw e;
+      }
+      emit(c);
+      if (voortgang) voortgang(items.length);
+    }
     function subscribe(c, fn) {
       if (!subs.has(c)) subs.set(c, new Set());
       subs.get(c).add(fn);
@@ -5906,7 +6187,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       }),
     });
     const colRef = c => {
-      const q = { limit: () => q, onSnapshot: next => subscribe(c, next), doc: id => docRef(c, id || newId()), get: async () => snap(c) };
+      const q = { limit: () => q, onSnapshot: next => subscribe(c, next), doc: id => docRef(c, id || newId()), get: async () => snap(c),
+        zetVeel: (items, voortgang) => putMany(c, items, voortgang), nieuwId: newId };
       return q;
     };
     // Is de app in een tweede venster open, dan loopt die mee.
@@ -5916,6 +6198,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       collection: colRef,
       doc: path => { const [c, id] = path.split('/'); return docRef(c, id); },
       refreshAll: () => {},
+      ververs: async () => {},
       isLoaded: () => true,
       clearLocal: () => {},
     };
@@ -6874,6 +7157,18 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
         herinnering: validHerinnering(d.herinnering) ?? MELD_STANDAARD.herinnering,
       };
       renderPush();
+      scheduleRender();
+    });
+    kansCol = store.collection('kansen');
+    kansCol.limit(60).onSnapshot(snap => {
+      state.kansen = snap.docs.filter(d => d.exists).map(d => ({ id: d.id, ...(d.data() || {}) })).filter(d => /^\d{4}-W\d{2}$/.test(d.id)).sort((a, b) => b.id.localeCompare(a.id));
+      scheduleRender();
+    });
+    kansProfielDoc = store.doc('instellingen/kansen');
+    kansProfielDoc.onSnapshot(snap => {
+      const d = snap.exists ? snap.data() || {} : null;
+      kans.profiel = d ? { branches: Array.isArray(d.branches) ? d.branches : [], provincies: Array.isArray(d.provincies) ? d.provincies : [], soorten: Array.isArray(d.soorten) ? d.soorten : [], woorden: Array.isArray(d.woorden) ? d.woorden : [] } : null;
+      kans.geladen = true;
       scheduleRender();
     });
     agLinkDoc = store.doc('instellingen/agendalink');

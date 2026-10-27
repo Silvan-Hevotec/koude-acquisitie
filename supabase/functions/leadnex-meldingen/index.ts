@@ -9,7 +9,8 @@
 // Google komt vaak alleen zo'n link mee, en de app kan die zelf niet volgen. En met {"verrijk": {...}} zoekt hij
 // bij een gedeeld bedrijf het adres, de telefoon, de website en het e-mailadres erbij.
 // Elke nacht tussen 3 en 4 uur maakt hij per gebruiker een back-up in Supabase Storage (backups/<gebruiker>/<datum>.json),
-// en met {"backup": true} vanuit de app meteen. Tot slot geeft hij op een geheime link (…/leadnex-meldingen/agenda/<sleutel>.ics) je afspraken, taken en acties
+// en met {"backup": true} vanuit de app meteen. Op maandagochtend zoekt hij kansen uit de markt (zie kansen hieronder),
+// en met {"kansen": true} meteen voor jou. Tot slot geeft hij op een geheime link (…/leadnex-meldingen/agenda/<sleutel>.ics) je afspraken, taken en acties
 // als agenda, zodat je die in Outlook kunt toevoegen (Agenda toevoegen → Abonneren vanaf het web).
 //
 // Instellen in Supabase: Edge Functions → nieuwe functie "leadnex-meldingen" met deze code,
@@ -216,8 +217,13 @@ function herinnerBericht(uid: string, l: Lead, vooraf: number, vandaag: string):
 async function ronde(nu: number) {
   await db('meldlog?on_conflict=sleutel', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify([{ sleutel: 'hartslag', verstuurd: new Date(nu).toISOString() }]) });
   const backups = await nachtBackups(nu).catch(e => { console.error(e); return 0; });
+  const r = await meldRonde(nu);
+  const kansen = await kansenRonde(nu).catch(e => { console.error('kansen', e); return 0; });   // na de meldingen, zodat die niet wachten
+  return { ...r, backups, kansen };
+}
+async function meldRonde(nu: number) {
   const subs = await abonnementen();
-  if (!subs.length) return { telefoons: 0, verstuurd: 0, backups };
+  if (!subs.length) return { telefoons: 0, verstuurd: 0 };
   const users = [...new Set(subs.map(s => s.user_id))];
   const cfgVan = await instellingen(users);
   const { datum: vandaag, tijd, weekend } = nl(nu);
@@ -226,7 +232,7 @@ async function ronde(nu: number) {
   const leads: Lead[] = await db(`docs?collection=eq.leads&user_id=${inLijst(users)}&data->>datum=lte.${morgen}&data->>datum=gte.2000-01-01&select=${velden}`);
   const agVelden = 'user_id,id,soort:data->>soort,titel:data->>titel,datum:data->>datum,tijd:data->>tijd,eind:data->>eind,locatie:data->>locatie,herinnering:data->herinnering,klaar:data->klaar,bedrijfNaam:data->>bedrijfNaam';
   const agenda: Agendapunt[] = await db(`docs?collection=eq.agenda&user_id=${inLijst(users)}&data->>datum=lte.${morgen}&data->>datum=gte.2000-01-01&select=${agVelden}`).catch(() => []);
-  const totaal = { telefoons: subs.length, verstuurd: 0, verlopen: 0, fouten: [] as string[], backups };
+  const totaal = { telefoons: subs.length, verstuurd: 0, verlopen: 0, fouten: [] as string[] };
   for (const uid of users) {
     const cfg = cfgVan(uid);
     const mijn = leads.filter(l => l.user_id === uid && l.actie && l.bedrijf && /^\d{4}-\d\d-\d\d$/.test(l.datum || '') && l.gearchiveerd !== true);
@@ -438,8 +444,8 @@ async function verrijk(v: { naam?: string; plaats?: string; url?: string; websit
 }
 
 /* ---------- vanuit de app: status of testmelding ---------- */
-async function vanApp(req: Request, body: { test?: boolean; status?: boolean; link?: string; backup?: boolean; verrijk?: { naam?: string; plaats?: string; url?: string; website?: string } }) {
-  if (!body.link && !body.verrijk && !body.backup && !(Deno.env.get('VAPID_PRIVATE_KEY') || '').trim()) return json({ ok: false, fout: 'geen-sleutel', uitleg: 'Het geheim VAPID_PRIVATE_KEY ontbreekt in Supabase (Edge Functions → Secrets).' });
+async function vanApp(req: Request, body: { test?: boolean; status?: boolean; link?: string; backup?: boolean; kansen?: boolean; verrijk?: { naam?: string; plaats?: string; url?: string; website?: string } }) {
+  if (!body.link && !body.verrijk && !body.backup && !body.kansen && !(Deno.env.get('VAPID_PRIVATE_KEY') || '').trim()) return json({ ok: false, fout: 'geen-sleutel', uitleg: 'Het geheim VAPID_PRIVATE_KEY ontbreekt in Supabase (Edge Functions → Secrets).' });
   const res = await fetch(`${Deno.env.get('SUPABASE_URL')}/auth/v1/user`, { headers: { apikey: req.headers.get('apikey') || geheimeSleutel(), Authorization: req.headers.get('Authorization') || '' } });
   if (!res.ok) return json({ ok: false, fout: 'niet-ingelogd', uitleg: 'Log opnieuw in en probeer het nog eens.' }, 401);
   const user = await res.json();
@@ -449,6 +455,10 @@ async function vanApp(req: Request, body: { test?: boolean; status?: boolean; li
     return json(url ? { ok: true, url } : { ok: false, fout: 'link-niet-geopend' });
   }
   if (body.verrijk) return json({ ok: true, ...(await verrijk(body.verrijk)) });
+  if (body.kansen) {
+    try { return json({ ok: true, ...(await kansenNu(user.id)) }); }
+    catch (e) { return json({ ok: false, fout: 'mislukt', uitleg: String((e as Error).message || e).slice(0, 200) }); }
+  }
   if (body.backup) {
     try { return json({ ok: true, ...(await maakBackup(user.id, nl(Date.now()).datum)) }); }
     catch (e) { return json({ ok: false, fout: /bucket|not found|404/i.test(String(e)) ? 'geen-opslag' : 'mislukt', uitleg: String((e as Error).message || e).slice(0, 200) }); }
@@ -504,6 +514,262 @@ async function nachtBackups(nu: number) {
     catch (e) { console.error('back-up mislukt', user_id, e); await vrijgeven(sleutel).catch(() => {}); }
   }
   return n;
+}
+
+/* ---------- kansen uit de markt ---------- */
+// Elke maandagochtend per gebruiker (en meteen met "Nu zoeken" in de app) kansen in het gebied waar je klanten zitten:
+//  - gebied:     plaatsen van je klanten → gemeente en provincie (PDOK Locatieserver); de gemeenten met de meeste klanten
+//  - vergunning: nieuwbouw en uitbreiding van bedrijfspanden (officiële bekendmakingen van gemeenten)
+//  - nieuws:     regionaal nieuws over nieuwbouw, uitbreiding en verhuizing (Google Nieuws)
+//  - bedrijf:    bedrijven in jouw branches die nog niet in je lijst staan (OpenStreetMap)
+// Per week één document (docs, collection 'kansen', id bijv. 2026-W44). Wat je in de app afhandelt, blijft staan.
+type KansProfiel = { branches: string[]; provincies: string[]; soorten: string[]; woorden: string[] };
+type Kans = { id: string; soort: 'vergunning' | 'nieuws' | 'bedrijf'; titel: string; tekst?: string; plaats?: string; gemeente?: string; datum?: string;
+  url?: string; bron: string; adres?: string; telefoon?: string; website?: string; branche?: string; score: number; status?: string; leadId?: string };
+type BronStatus = { ok: boolean; n: number; fout?: string };
+type Gemeente = { naam: string; provincie: string; n: number; plaatsen: string[] };
+type KansDoc = { week: string; gemaakt?: string; gebied?: Gemeente[]; bronnen: Record<string, BronStatus>; stappen: string[]; items: Kans[] };
+const KANS_STAPPEN = ['gebied', 'vergunning', 'nieuws', 'bedrijf'] as const;
+const PROVINCIES = ['Drenthe', 'Flevoland', 'Friesland', 'Gelderland', 'Groningen', 'Limburg', 'Noord-Brabant', 'Noord-Holland', 'Overijssel', 'Utrecht', 'Zeeland', 'Zuid-Holland'];
+// Branches: zoekwoorden voor het nieuws en kenmerken in OpenStreetMap. Zelfde sleutels als in de app.
+const KANS_BRANCHES: Record<string, { label: string; nieuws: string; osm: string[] }> = {
+  transport: { label: 'Transport en logistiek', nieuws: 'transportbedrijf OR logistiek OR distributiecentrum', osm: ['["office"="logistics"]', '["industrial"~"^(warehouse|logistics|distribution)$"]', '["building"="warehouse"]'] },
+  bouw: { label: 'Bouw en aannemerij', nieuws: 'bouwbedrijf OR aannemer', osm: ['["craft"~"^(builder|roofer|scaffolder)$"]', '["office"="construction_company"]'] },
+  afbouw: { label: 'Afbouw (schilder, timmer, isolatie)', nieuws: 'schildersbedrijf OR timmerbedrijf', osm: ['["craft"~"^(painter|carpenter|plasterer|tiler|floorer|insulation|glaziery)$"]'] },
+  installatie: { label: 'Installatietechniek', nieuws: 'installatiebedrijf OR installateur', osm: ['["craft"~"^(electrician|plumber|hvac|heating_engineer|solar_installer)$"]'] },
+  metaal: { label: 'Metaal en machinebouw', nieuws: 'metaalbedrijf OR staalbouw OR machinebouw', osm: ['["craft"~"^(metal_construction|welder|blacksmith|machinist)$"]', '["industrial"~"^(metal|metal_processing|machinery|steel)"]'] },
+  hout: { label: 'Hout en meubel', nieuws: 'houtbedrijf OR meubelfabriek', osm: ['["craft"~"^(sawmill|cabinet_maker|joiner)$"]', '["industrial"="sawmill"]'] },
+  handel: { label: 'Groothandel en handel', nieuws: 'groothandel', osm: ['["shop"~"^(wholesale|trade)$"]'] },
+  agrarisch: { label: 'Agrarisch en loonwerk', nieuws: 'loonbedrijf OR mechanisatiebedrijf OR agrarisch bedrijf', osm: ['["craft"="agricultural_engines"]', '["shop"="agrarian"]'] },
+  groen: { label: 'Hoveniers en groen', nieuws: 'hoveniersbedrijf OR groenvoorziening', osm: ['["craft"="gardener"]', '["shop"="garden_centre"]'] },
+  auto: { label: 'Auto, truck en aanhanger', nieuws: 'autobedrijf OR truckdealer', osm: ['["shop"~"^(car_repair|car|truck|trailer|tyres)$"]'] },
+  productie: { label: 'Productie en food', nieuws: 'fabriek OR productiebedrijf OR voedingsmiddelenbedrijf', osm: ['["man_made"="works"]', '["industrial"~"^(factory|food_industry|brewery|bakery|plastic|chemical|printing)"]'] },
+  recycling: { label: 'Recycling en afval', nieuws: 'recyclingbedrijf OR afvalverwerker', osm: ['["industrial"~"^(scrap_yard|recycling|waste_handling)$"]'] },
+  verhuur: { label: 'Verhuur', nieuws: 'verhuurbedrijf OR machineverhuur', osm: ['["shop"~"^(rental|tool_hire)$"]'] },
+};
+// Nieuwbouw en uitbreiding van bedrijfspanden: daar komen heftrucks, stellingen en intern transport bij kijken.
+const BOUW_WOORDEN: [string, number][] = [['distributiecentrum', 5], ['bedrijfshal', 4], ['productiehal', 4], ['opslaghal', 4], ['bedrijfspand', 3], ['bedrijfsgebouw', 3], ['magazijn', 3], ['bedrijfsruimte', 2], ['loods', 2], ['werkplaats', 2]];
+const NIEUWS_WOORDEN = /nieuwbouw|bouwt|bouw van|nieuw pand|nieuwe hal|bedrijfspand|bedrijfshal|distributiecentrum|magazijn|uitbrei|verhuis|vestiging|fabriek|opent|overname|neemt .* over|investeert|groeit|bedrijventerrein|loods|eerste paal|productie/i;
+const NIEUWS_NIET = /ongeluk|aanrijding|brand |brandweer|politie|overleden|rechtbank|rechter|voetbal|wedstrijd|concert|festival|woningen|appartement|huurwoning|school|zorg/i;
+const KANS_UA = 'Leadnex/1.0 (kansen voor eigen relaties)';
+const kansKey = (t: string) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\b(b\.?\s?v\.?|v\.?o\.?f\.?|holding|groep|group|gmbh|bv|vof)\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+const ontsnapXml = (t: string) => t.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&amp;/g, '&');
+const xmlVeld = (xml: string, naam: string) => { const m = new RegExp(`<(?:[\\w-]+:)?${naam}\\b[^>]*>([\\s\\S]*?)</(?:[\\w-]+:)?${naam}>`).exec(xml); return m ? ontsnapXml(m[1]).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : ''; };
+function hash(t: string) { let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) >>> 0; return h.toString(36); }
+function isoWeek(datum: string) {
+  const d = new Date(datum + 'T12:00:00Z'), dag = (d.getUTCDay() + 6) % 7;
+  d.setUTCDate(d.getUTCDate() - dag + 3);
+  const jaar = d.getUTCFullYear(), eerste = new Date(Date.UTC(jaar, 0, 4));
+  const week = 1 + Math.round(((d.getTime() - eerste.getTime()) / 86400000 - 3 + ((eerste.getUTCDay() + 6) % 7)) / 7);
+  return `${jaar}-W${String(week).padStart(2, '0')}`;
+}
+const haalKans = (url: string, init: RequestInit = {}) => fetch(url, { ...init, headers: { 'User-Agent': KANS_UA, ...(init.headers as Record<string, string> || {}) }, signal: AbortSignal.timeout(25000) });
+function validProfiel(d: Record<string, unknown> | undefined): KansProfiel {
+  const lijst = (v: unknown, ok: (x: string) => boolean) => Array.isArray(v) ? v.filter(x => typeof x === 'string' && ok(x)) as string[] : [];
+  const soorten = lijst(d?.soorten, x => ['vergunning', 'nieuws', 'bedrijf'].includes(x));
+  const provincies = lijst(d?.provincies, x => PROVINCIES.includes(x));
+  return { branches: lijst(d?.branches, x => x in KANS_BRANCHES), provincies: provincies.length ? provincies : ['Overijssel', 'Gelderland', 'Drenthe'],
+    soorten: Array.isArray(d?.soorten) ? soorten : ['vergunning', 'nieuws', 'bedrijf'], woorden: lijst(d?.woorden, x => x.trim().length > 1).map(x => x.trim().slice(0, 40)).slice(0, 8) };
+}
+type KansLead = { bedrijf: string | null; plaats: string | null; adres: string | null; status: string | null; telefoon: string | null; website: string | null };
+async function kansLeads(uid: string): Promise<KansLead[]> {
+  const uit: KansLead[] = [];
+  for (let van = 0; van < 20000; van += 1000) {
+    const deel: KansLead[] = await db(`docs?user_id=eq.${encodeURIComponent(uid)}&collection=eq.leads&select=bedrijf:data->>bedrijf,plaats:data->>plaats,adres:data->>adres,status:data->>status,telefoon:data->>telefoon,website:data->>website&order=id.asc&limit=1000&offset=${van}`);
+    uit.push(...deel);
+    if (deel.length < 1000) break;
+  }
+  return uit;
+}
+
+// 1. Gebied: per plaats (met een postcode uit het adres) de gemeente en provincie opzoeken; onthouden in instellingen/kansgebied.
+async function kansGebied(uid: string, profiel: KansProfiel, leads: KansLead[]) {
+  const klanten = leads.filter(l => l.status === 'klant' && l.plaats);
+  const basis = klanten.length >= 20 ? klanten : leads.filter(l => l.plaats);
+  const perPlaats = new Map<string, { naam: string; n: number; pc: string }>();
+  for (const l of basis) {
+    const k = kansKey(l.plaats!), pc = (/\b(\d{4}) ?([A-Z]{2})\b/.exec(l.adres || '') || []).slice(1).join('');
+    const x = perPlaats.get(k) || { naam: l.plaats!.trim(), n: 0, pc: '' };
+    x.n++; if (!x.pc && pc) x.pc = pc;
+    perPlaats.set(k, x);
+  }
+  const cacheRij = ((await db(`docs?user_id=eq.${encodeURIComponent(uid)}&collection=eq.instellingen&id=eq.kansgebied&select=data`)) || [])[0];
+  const cache: Record<string, { g: string; p: string; w: string }> = cacheRij?.data?.plaatsen || {};
+  const top = [...perPlaats.entries()].sort((a, b) => b[1].n - a[1].n).slice(0, 80);
+  const open = top.filter(([k]) => !cache[k]);
+  for (let i = 0; i < open.length; i += 10) {
+    await Promise.all(open.slice(i, i + 10).map(async ([k, x]) => {
+      const q = x.pc ? `q=${x.pc}&fq=type:postcode` : `q=${encodeURIComponent(x.naam)}&fq=type:woonplaats`;
+      try {
+        const r = await haalKans(`https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?${q}&fl=woonplaatsnaam,gemeentenaam,provincienaam&rows=1`);
+        const d = (await r.json())?.response?.docs?.[0];
+        if (d && d.gemeentenaam) cache[k] = { g: d.gemeentenaam, p: d.provincienaam || '', w: d.woonplaatsnaam || x.naam };
+      } catch { /* volgende keer opnieuw */ }
+    }));
+  }
+  await db('docs?on_conflict=user_id,collection,id', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' },
+    body: JSON.stringify([{ user_id: uid, collection: 'instellingen', id: 'kansgebied', data: { plaatsen: cache, gewijzigd: new Date(Date.now()).toISOString() } }]) });
+  const perGemeente = new Map<string, Gemeente>();
+  for (const [k, x] of top) {
+    const c = cache[k];
+    if (!c || !profiel.provincies.includes(c.p)) continue;
+    const g = perGemeente.get(c.g) || { naam: c.g, provincie: c.p, n: 0, plaatsen: [] };
+    g.n += x.n; if (g.plaatsen.length < 6) g.plaatsen.push(c.w);
+    perGemeente.set(c.g, g);
+  }
+  const gebied = [...perGemeente.values()].sort((a, b) => b.n - a.n || a.naam.localeCompare(b.naam)).slice(0, 12);
+  return { gebied, status: { ok: gebied.length > 0, n: gebied.length, ...(gebied.length ? {} : { fout: basis.length ? 'Geen plaatsen gevonden in de gekozen provincies.' : 'Nog geen klanten met een plaats. Importeer eerst je relaties.' }) } as BronStatus };
+}
+const dichtheid = (gebied: Gemeente[], gemeente: string) => { const i = gebied.findIndex(g => g.naam === gemeente); return i < 0 ? 0 : i < 3 ? 2 : 1; };
+const profielWoorden = (p: KansProfiel) => new RegExp(`\\b(${[...p.woorden, ...p.branches.flatMap(b => KANS_BRANCHES[b].nieuws.split(' OR '))].map(w => w.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') || '$^'})`, 'i');
+
+// 2. Nieuwbouw en uitbreiding: bekendmakingen van de gemeenten in je gebied, van de afgelopen 14 dagen.
+async function kansVergunningen(gebied: Gemeente[], profiel: KansProfiel, vandaag: string): Promise<{ items: Kans[]; status: BronStatus }> {
+  if (!gebied.length) return { items: [], status: { ok: false, n: 0, fout: 'Geen gebied' } };
+  const van = plusDagen(vandaag, -14);
+  const query = `c.product-area==officielepublicaties and dt.modified>=${van} and (${gebied.map(g => `dt.creator=="${g.naam}"`).join(' or ')}) and (${BOUW_WOORDEN.map(([w]) => `cql.textAndIndexes="${w}"`).join(' or ')})`;
+  const r = await haalKans(`https://repository.overheid.nl/sru?query=${encodeURIComponent(query)}&maximumRecords=100&startRecord=1`);
+  const xml = await r.text();
+  if (!r.ok || /<(?:\w+:)?diagnostic\b/.test(xml)) return { items: [], status: { ok: false, n: 0, fout: `bekendmakingen ${r.status}: ${xmlVeld(xml, 'message') || xmlVeld(xml, 'details') || 'onbekende fout'}`.slice(0, 160) } };
+  const extra = profielWoorden(profiel), items: Kans[] = [];
+  for (const rec of xml.split(/<(?:[\w-]+:)?recordData\b/).slice(1)) {
+    const titel = xmlVeld(rec, 'title'), gemeente = xmlVeld(rec, 'creator'), datum = (xmlVeld(rec, 'modified') || xmlVeld(rec, 'available') || xmlVeld(rec, 'date')).slice(0, 10);
+    const id = xmlVeld(rec, 'identifier'), url = xmlVeld(rec, 'preferredUrl') || (id ? `https://zoek.officielebekendmakingen.nl/${id}.html` : '');
+    const tekst = `${titel} ${xmlVeld(rec, 'abstract')}`.toLowerCase();
+    if (!titel || /intrekking|verkeersbesluit|kapvergunning|woning|evenement|alcohol|drank/i.test(titel)) continue;
+    const woord = BOUW_WOORDEN.find(([w]) => tekst.includes(w));
+    if (!woord) continue;
+    const soortTekst = /verleend|besluit|vergunning verleend/i.test(titel) ? 'Vergunning verleend' : /aanvraag|ontvangen|ingediend/i.test(titel) ? 'Aanvraag ingediend' : 'Bekendmaking';
+    const adres = (/([A-Z][\p{L}'.-]+(?:\s[\p{L}'.-]+){0,3}\s\d{1,5}[a-zA-Z]?)/u.exec(titel) || [])[1] || '';
+    items.push({ id: 'v-' + (id || hash(titel + datum)), soort: 'vergunning', titel, tekst: `${soortTekst} · ${woord[0]}`, gemeente, plaats: gemeente, datum, url, bron: 'Officiële bekendmakingen', adres,
+      score: woord[1] + (/nieuwbouw|bouwen|oprichten|uitbrei/i.test(tekst) ? 1 : 0) + dichtheid(gebied, gemeente) + (extra.test(tekst) ? 2 : 0) });
+  }
+  return { items: items.sort((a, b) => b.score - a.score || (b.datum || '').localeCompare(a.datum || '')).slice(0, 15), status: { ok: true, n: items.length } };
+}
+
+// 3. Nieuws uit de regio: nieuwbouw, uitbreiding en verhuizing van bedrijven in de plaatsen waar je klanten zitten.
+async function kansNieuws(gebied: Gemeente[], profiel: KansProfiel): Promise<{ items: Kans[]; status: BronStatus }> {
+  const plaatsen = [...new Set(gebied.flatMap(g => g.plaatsen.slice(0, 2)))].slice(0, 10);
+  if (!plaatsen.length) return { items: [], status: { ok: false, n: 0, fout: 'Geen gebied' } };
+  const waar = `(${plaatsen.map(p => `"${p}"`).join(' OR ')})`;
+  const vragen = [`(nieuwbouw OR distributiecentrum OR bedrijfspand OR bedrijfshal OR uitbreiding OR verhuist OR "nieuwe vestiging") ${waar} when:7d`,
+    ...profiel.branches.slice(0, 3).map(b => `(${KANS_BRANCHES[b].nieuws}) ${waar} when:7d`), ...(profiel.woorden.length ? [`(${profiel.woorden.map(w => `"${w}"`).join(' OR ')}) ${waar} when:7d`] : [])];
+  const extra = profielWoorden(profiel), gezien = new Set<string>(), items: Kans[] = [];
+  let fouten = 0;
+  for (const q of vragen) {
+    let xml = '';
+    try { const r = await haalKans(`https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=nl&gl=NL&ceid=NL:nl`); if (!r.ok) throw new Error(String(r.status)); xml = await r.text(); }
+    catch { fouten++; continue; }
+    for (const it of xml.split(/<item>/).slice(1)) {
+      const ruw = xmlVeld(it, 'title'), bron = xmlVeld(it, 'source'), link = xmlVeld(it, 'link'), oms = xmlVeld(it, 'description');
+      const titel = bron && ruw.endsWith(` - ${bron}`) ? ruw.slice(0, -(bron.length + 3)) : ruw;
+      const tekst = `${titel} ${oms}`;
+      const plaats = plaatsen.find(p => new RegExp(`\\b${p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(tekst));
+      if (!titel || !plaats || !NIEUWS_WOORDEN.test(titel) || NIEUWS_NIET.test(titel) || gezien.has(kansKey(titel))) continue;
+      gezien.add(kansKey(titel));
+      const pub = Date.parse(xmlVeld(it, 'pubDate')), gemeente = gebied.find(g => g.plaatsen.includes(plaats))?.naam || '';
+      items.push({ id: 'n-' + hash(link || titel), soort: 'nieuws', titel, tekst: bron, plaats, gemeente, datum: isNaN(pub) ? '' : new Date(pub).toISOString().slice(0, 10), url: link, bron: bron || 'Nieuws',
+        score: 2 + (/nieuwbouw|distributiecentrum|bedrijfshal|bedrijfspand|magazijn|uitbrei/i.test(titel) ? 2 : 0) + dichtheid(gebied, gemeente) + (extra.test(tekst) ? 2 : 0) });
+    }
+  }
+  const ok = fouten < vragen.length;
+  return { items: items.sort((a, b) => b.score - a.score || (b.datum || '').localeCompare(a.datum || '')).slice(0, 12), status: { ok, n: items.length, ...(ok ? {} : { fout: 'Google Nieuws gaf geen antwoord' }) } };
+}
+
+// 4. Bedrijven in jouw branches in de gemeenten waar je klanten zitten, die nog niet in je lijst staan. Elke week andere.
+async function kansBedrijven(gebied: Gemeente[], profiel: KansProfiel, leads: KansLead[], eerder: Set<string>, week: string): Promise<{ items: Kans[]; status: BronStatus }> {
+  if (!gebied.length) return { items: [], status: { ok: false, n: 0, fout: 'Geen gebied' } };
+  if (!profiel.branches.length) return { items: [], status: { ok: false, n: 0, fout: 'Kies eerst je branches' } };
+  const namen = gebied.map(g => g.naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const sel = profiel.branches.flatMap(b => KANS_BRANCHES[b].osm.map(o => `nwr(area.g)["name"]${o};`)).join('');
+  const ql = `[out:json][timeout:25];area["boundary"="administrative"]["admin_level"="8"]["ref:gemeentecode"]["name"~"^(${namen})$"]->.g;(${sel});out tags center 600;`;
+  const r = await haalKans('https://overpass-api.de/api/interpreter', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(ql) });
+  if (!r.ok) return { items: [], status: { ok: false, n: 0, fout: `OpenStreetMap ${r.status}` } };
+  const els: { type: string; id: number; tags?: Record<string, string> }[] = (await r.json())?.elements || [];
+  const bekend = new Set(leads.map(l => kansKey(l.bedrijf || '')).filter(Boolean));
+  const bekendTel = new Set(leads.map(l => String(l.telefoon || '').replace(/\D/g, '').slice(-9)).filter(t => t.length === 9));
+  const site = (w: string) => w.toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+  const bekendWeb = new Set(leads.map(l => site(l.website || '')).filter(Boolean));
+  const items: Kans[] = [];
+  for (const e of els) {
+    const t = e.tags || {}, naam = (t.name || '').trim(), k = kansKey(naam);
+    if (!naam || !k || bekend.has(k) || eerder.has(`b-${e.type}${e.id}`)) continue;
+    const tel = t.phone || t['contact:phone'] || '', web = t.website || t['contact:website'] || '';
+    if ((tel && bekendTel.has(tel.replace(/\D/g, '').slice(-9))) || (web && bekendWeb.has(site(web)))) continue;
+    const branche = profiel.branches.find(b => KANS_BRANCHES[b].osm.some(o => { const m = /\["([^"]+)"(=|~)"([^"]+)"\]/.exec(o); return m && t[m[1]] !== undefined && (m[2] === '=' ? t[m[1]] === m[3] : new RegExp(m[3]).test(t[m[1]])); })) || profiel.branches[0];
+    const plaats = t['addr:city'] || '', gemeente = gebied.find(g => g.plaatsen.some(p => kansKey(p) === kansKey(plaats)))?.naam || '';
+    const adres = [[t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' '), t['addr:postcode']].filter(Boolean).join(', ');
+    items.push({ id: `b-${e.type}${e.id}`, soort: 'bedrijf', titel: naam, tekst: [KANS_BRANCHES[branche].label, adres && plaats ? `${adres}, ${plaats}` : plaats].filter(Boolean).join(' · '),
+      plaats, gemeente, url: web || `https://www.openstreetmap.org/${e.type}/${e.id}`, bron: 'OpenStreetMap', adres, telefoon: tel, website: web, branche,
+      score: 1 + (tel ? 1 : 0) + (web ? 1 : 0) + (adres ? 1 : 0) + dichtheid(gebied, gemeente) });
+  }
+  // Elke week een andere greep uit de beste: op score, daarbinnen per week anders gesorteerd.
+  items.sort((a, b) => b.score - a.score || hash(week + a.id).localeCompare(hash(week + b.id)));
+  return { items: items.slice(0, 12), status: { ok: true, n: items.length } };
+}
+
+async function kansDoc(uid: string, week: string): Promise<KansDoc | null> {
+  const rij = ((await db(`docs?user_id=eq.${encodeURIComponent(uid)}&collection=eq.kansen&id=eq.${encodeURIComponent(week)}&select=data`)) || [])[0];
+  return rij ? rij.data as KansDoc : null;
+}
+async function bewaarKansDoc(uid: string, d: KansDoc) {
+  await db('docs?on_conflict=user_id,collection,id', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify([{ user_id: uid, collection: 'kansen', id: d.week, data: d }]) });
+}
+// Nieuwe kansen erbij; wat je al had afgehandeld (toegevoegd, niet interessant) blijft zoals het was.
+function voegKansenToe(d: KansDoc, nieuw: Kans[]) {
+  const bestaand = new Map(d.items.map(x => [x.id, x]));
+  for (const x of nieuw) bestaand.set(x.id, bestaand.has(x.id) ? { ...x, status: bestaand.get(x.id)!.status, leadId: bestaand.get(x.id)!.leadId } : x);
+  d.items = [...bestaand.values()].slice(-80);
+}
+// Eén stap voor één gebruiker. 's Nachts per minuut één stap, met "Nu zoeken" alle stappen achter elkaar.
+async function kansStap(uid: string, week: string, stap: typeof KANS_STAPPEN[number], vandaag: string, cache: { profiel?: KansProfiel; leads?: KansLead[] } = {}) {
+  const d: KansDoc = (await kansDoc(uid, week)) || { week, bronnen: {}, stappen: [], items: [] };
+  const profiel = cache.profiel || validProfiel(((await db(`docs?user_id=eq.${encodeURIComponent(uid)}&collection=eq.instellingen&id=eq.kansen&select=data`)) || [])[0]?.data);
+  const leads = cache.leads || await kansLeads(uid);
+  Object.assign(cache, { profiel, leads });
+  try {
+    if (stap === 'gebied') { const g = await kansGebied(uid, profiel, leads); d.gebied = g.gebied; d.bronnen.gebied = g.status; }
+    else if (!profiel.soorten.includes(stap)) d.bronnen[stap] = { ok: true, n: 0, fout: 'uit' };
+    else {
+      const gebied = d.gebied || [];
+      let r: { items: Kans[]; status: BronStatus };
+      if (stap === 'vergunning') r = await kansVergunningen(gebied, profiel, vandaag);
+      else if (stap === 'nieuws') r = await kansNieuws(gebied, profiel);
+      else {
+        const eerder = new Set<string>();
+        const oud: { data: KansDoc }[] = await db(`docs?user_id=eq.${encodeURIComponent(uid)}&collection=eq.kansen&id=neq.${encodeURIComponent(week)}&select=data&order=id.desc&limit=26`).catch(() => []);
+        oud.forEach(o => (o.data?.items || []).forEach(x => { if (x.soort === 'bedrijf') eerder.add(x.id); }));
+        r = await kansBedrijven(gebied, profiel, leads, eerder, week);
+      }
+      voegKansenToe(d, r.items); d.bronnen[stap] = r.status;
+    }
+  } catch (e) { d.bronnen[stap] = { ok: false, n: 0, fout: String((e as Error).message || e).slice(0, 160) }; }
+  if (!d.stappen.includes(stap)) d.stappen.push(stap);
+  d.gemaakt = new Date(Date.now()).toISOString();
+  await bewaarKansDoc(uid, d);
+  return d;
+}
+// Maandag tussen 5 en 8 uur: per minuut één stap voor één gebruiker met een kansenprofiel.
+async function kansenRonde(nu: number) {
+  const { datum, tijd } = nl(nu), dag = new Date(datum + 'T12:00:00Z').getUTCDay();
+  if (dag !== 1 || tijd < '05:00' || tijd >= '08:00') return 0;
+  const week = isoWeek(datum);
+  const profielen: { user_id: string }[] = await db('docs?collection=eq.instellingen&id=eq.kansen&select=user_id');
+  for (const { user_id } of profielen) {
+    const d = await kansDoc(user_id, week);
+    const stap = KANS_STAPPEN.find(s => !(d?.stappen || []).includes(s));
+    if (!stap) continue;
+    if (!(await claim(`kans|${user_id}|${week}|${stap}`, user_id))) continue;
+    await kansStap(user_id, week, stap, datum);
+    return 1;
+  }
+  return 0;
+}
+async function kansenNu(uid: string) {
+  const vandaag = nl(Date.now()).datum, week = isoWeek(vandaag), cache = {};
+  let d: KansDoc | null = null;
+  for (const stap of KANS_STAPPEN) d = await kansStap(uid, week, stap, vandaag, cache);
+  return { week, kansen: d!.items.length, bronnen: d!.bronnen };
 }
 
 /* ---------- agenda voor Outlook ---------- */
@@ -577,7 +843,7 @@ Deno.serve(async req => {
     const agendaPad = new URL(req.url).pathname.match(AGENDA_PAD);
     if (agendaPad) return await agendaFeed(agendaPad[1], req.method === 'HEAD');
     const body = await req.json().catch(() => ({}));
-    if (body && (body.test || body.status || body.link || body.verrijk || body.backup)) return await vanApp(req, body);
+    if (body && (body.test || body.status || body.link || body.verrijk || body.backup || body.kansen)) return await vanApp(req, body);
     return json(await ronde(Date.now()));
   } catch (e) {
     console.error(e);

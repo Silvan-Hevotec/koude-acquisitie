@@ -37,6 +37,8 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 - **Klanten die je lang niet sprak**: op Vandaag de klanten zonder contact en zonder geplande actie (na 3, 6 of 12 maanden, instelbaar in Meer → Voorkeuren), met "Vandaag bellen" of "Over een maand". Bij Bedrijven → Filters → Laatste contact.
 - **Foto's en bestanden** bij een bedrijf (foto maken of bestand kiezen; foto's worden verkleind). Ze staan afgeschermd in Supabase Storage; zie [Opslag voor foto's en back-ups](#4-opslag-voor-fotos-en-back-ups).
 - **Automatische back-up**: elke nacht om 3 uur een back-up in Supabase Storage, de nieuwste 30 blijven bewaard. In Meer terugzetten of downloaden, of meteen een maken.
+- **Kansen** (eigen tabblad): elke maandagochtend kansen uit de markt in de gemeenten waar jouw klanten zitten, per week: **nieuwbouw en vergunningen** voor bedrijfspanden, loodsen, magazijnen en distributiecentra (officiële bekendmakingen van gemeenten), **regionaal nieuws** over nieuwbouw, uitbreiding en verhuizing (Google Nieuws) en **bedrijven in jouw branches** die nog niet in je lijst staan (OpenStreetMap). Iedereen kiest zelf zijn branches, provincies, soort kansen en eigen zoekwoorden. Met één tik voeg je een kans toe als lead (label Kans, actie Bellen) of verberg je hem. Nu zoeken zoekt meteen. Het gebied volgt uit de plaatsen van je klanten (gemeente en provincie via PDOK).
+- **Relatie-overzicht uit Powerall importeren**: een overzicht met twee regels per relatie (nummer, bedrijf, adres, postcode, plaats, telefoon; daaronder contactpersoon, e-mail, website, mobiel) wordt herkend en samengevoegd. Bij importeren tellen alleen dezelfde naam of hetzelfde klantnummer als dubbel; bedrijven uit dezelfde groep met dezelfde website of hetzelfde telefoonnummer worden gewoon apart geïmporteerd. Importeren gaat in delen van 250, dus duizenden relaties in een paar seconden.
 - **Snelkoppelingen**: houd het app-icoon ingedrukt voor Nieuwe afspraak, Notitie, Belsessie, Nieuw bedrijf of Taak.
 
 ## Bestanden
@@ -46,7 +48,7 @@ Wil je later dat telefoon en computer dezelfde lijst delen, koppel dan een Supab
 | `index.html` | De app |
 | `config.js` | Koppeling met Supabase (Project URL en publishable/anon key) en Outlook (toepassings-ID en map-ID) |
 | `supabase.sql` | Maakt de tabel en de beveiliging aan in Supabase |
-| `supabase/functions/leadnex-meldingen/index.ts`, `supabase/meldingen.sql` | De meldingsdienst in Supabase (zie [Meldingen](#meldingen)); maakt ook de nachtelijke back-up en de agendalink |
+| `supabase/functions/leadnex-meldingen/index.ts`, `supabase/meldingen.sql` | De meldingsdienst in Supabase (zie [Meldingen](#meldingen)); maakt ook de nachtelijke back-up, de agendalink en de wekelijkse kansen |
 | `supabase/opslag.sql` | Opslag voor foto's, bestanden en back-ups (Supabase Storage) |
 | `manifest.webmanifest`, `sw.js`, `icons/` | Maken de app installeerbaar op Android |
 | `vendor/` | Supabase-bibliotheek 2.117.2, SheetJS 0.18.5 (Excel-import), Tesseract.js 5.1.1 (visitekaartjes lezen) en Leaflet 1.9.4 (kaart) |
