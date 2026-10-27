@@ -8,7 +8,8 @@
 // Daarnaast opent hij voor de app een korte Google-link ({"link": "https://share.google/..."}): bij delen vanuit
 // Google komt vaak alleen zo'n link mee, en de app kan die zelf niet volgen. En met {"verrijk": {...}} zoekt hij
 // bij een gedeeld bedrijf het adres, de telefoon, de website en het e-mailadres erbij.
-// Tot slot geeft hij op een geheime link (…/leadnex-meldingen/agenda/<sleutel>.ics) je afspraken, taken en acties
+// Elke nacht tussen 3 en 4 uur maakt hij per gebruiker een back-up in Supabase Storage (backups/<gebruiker>/<datum>.json),
+// en met {"backup": true} vanuit de app meteen. Tot slot geeft hij op een geheime link (…/leadnex-meldingen/agenda/<sleutel>.ics) je afspraken, taken en acties
 // als agenda, zodat je die in Outlook kunt toevoegen (Agenda toevoegen → Abonneren vanaf het web).
 //
 // Instellen in Supabase: Edge Functions → nieuwe functie "leadnex-meldingen" met deze code,
@@ -81,6 +82,16 @@ async function db(pad: string, init: RequestInit = {}) {
   if (!res.ok) throw new Error(`database ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const text = await res.text();
   return text ? JSON.parse(text) : null;
+}
+// Supabase Storage (bestanden en back-ups), met dezelfde geheime sleutel als de database.
+async function opslag(pad: string, init: RequestInit = {}) {
+  const key = geheimeSleutel();
+  const headers: Record<string, string> = { apikey: key, ...(init.headers as Record<string, string> || {}) };
+  if (!key.startsWith('sb_')) headers.Authorization = `Bearer ${key}`;
+  const res = await fetch(`${Deno.env.get('SUPABASE_URL')}/storage/v1/${pad}`, { ...init, headers });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`opslag ${res.status}: ${text.slice(0, 300)}`);
+  try { return text ? JSON.parse(text) : null; } catch { return text; }
 }
 const inLijst = (ids: string[]) => `in.(${ids.map(encodeURIComponent).join(',')})`;
 // Telefoons met meldingen aan. Een verlopen koppeling blijft staan met 'verlopen', zodat de app op die telefoon
@@ -204,8 +215,9 @@ function herinnerBericht(uid: string, l: Lead, vooraf: number, vandaag: string):
 /* ---------- elke minuut ---------- */
 async function ronde(nu: number) {
   await db('meldlog?on_conflict=sleutel', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify([{ sleutel: 'hartslag', verstuurd: new Date(nu).toISOString() }]) });
+  const backups = await nachtBackups(nu).catch(e => { console.error(e); return 0; });
   const subs = await abonnementen();
-  if (!subs.length) return { telefoons: 0, verstuurd: 0 };
+  if (!subs.length) return { telefoons: 0, verstuurd: 0, backups };
   const users = [...new Set(subs.map(s => s.user_id))];
   const cfgVan = await instellingen(users);
   const { datum: vandaag, tijd, weekend } = nl(nu);
@@ -214,7 +226,7 @@ async function ronde(nu: number) {
   const leads: Lead[] = await db(`docs?collection=eq.leads&user_id=${inLijst(users)}&data->>datum=lte.${morgen}&data->>datum=gte.2000-01-01&select=${velden}`);
   const agVelden = 'user_id,id,soort:data->>soort,titel:data->>titel,datum:data->>datum,tijd:data->>tijd,eind:data->>eind,locatie:data->>locatie,herinnering:data->herinnering,klaar:data->klaar,bedrijfNaam:data->>bedrijfNaam';
   const agenda: Agendapunt[] = await db(`docs?collection=eq.agenda&user_id=${inLijst(users)}&data->>datum=lte.${morgen}&data->>datum=gte.2000-01-01&select=${agVelden}`).catch(() => []);
-  const totaal = { telefoons: subs.length, verstuurd: 0, verlopen: 0, fouten: [] as string[] };
+  const totaal = { telefoons: subs.length, verstuurd: 0, verlopen: 0, fouten: [] as string[], backups };
   for (const uid of users) {
     const cfg = cfgVan(uid);
     const mijn = leads.filter(l => l.user_id === uid && l.actie && l.bedrijf && /^\d{4}-\d\d-\d\d$/.test(l.datum || '') && l.gearchiveerd !== true);
@@ -426,8 +438,8 @@ async function verrijk(v: { naam?: string; plaats?: string; url?: string; websit
 }
 
 /* ---------- vanuit de app: status of testmelding ---------- */
-async function vanApp(req: Request, body: { test?: boolean; status?: boolean; link?: string; verrijk?: { naam?: string; plaats?: string; url?: string; website?: string } }) {
-  if (!body.link && !body.verrijk && !(Deno.env.get('VAPID_PRIVATE_KEY') || '').trim()) return json({ ok: false, fout: 'geen-sleutel', uitleg: 'Het geheim VAPID_PRIVATE_KEY ontbreekt in Supabase (Edge Functions → Secrets).' });
+async function vanApp(req: Request, body: { test?: boolean; status?: boolean; link?: string; backup?: boolean; verrijk?: { naam?: string; plaats?: string; url?: string; website?: string } }) {
+  if (!body.link && !body.verrijk && !body.backup && !(Deno.env.get('VAPID_PRIVATE_KEY') || '').trim()) return json({ ok: false, fout: 'geen-sleutel', uitleg: 'Het geheim VAPID_PRIVATE_KEY ontbreekt in Supabase (Edge Functions → Secrets).' });
   const res = await fetch(`${Deno.env.get('SUPABASE_URL')}/auth/v1/user`, { headers: { apikey: req.headers.get('apikey') || geheimeSleutel(), Authorization: req.headers.get('Authorization') || '' } });
   if (!res.ok) return json({ ok: false, fout: 'niet-ingelogd', uitleg: 'Log opnieuw in en probeer het nog eens.' }, 401);
   const user = await res.json();
@@ -437,6 +449,10 @@ async function vanApp(req: Request, body: { test?: boolean; status?: boolean; li
     return json(url ? { ok: true, url } : { ok: false, fout: 'link-niet-geopend' });
   }
   if (body.verrijk) return json({ ok: true, ...(await verrijk(body.verrijk)) });
+  if (body.backup) {
+    try { return json({ ok: true, ...(await maakBackup(user.id, nl(Date.now()).datum)) }); }
+    catch (e) { return json({ ok: false, fout: /bucket|not found|404/i.test(String(e)) ? 'geen-opslag' : 'mislukt', uitleg: String((e as Error).message || e).slice(0, 200) }); }
+  }
   const subs = await abonnementen(user.id);
   const hartslag = ((await db('meldlog?sleutel=eq.hartslag&select=verstuurd')) || [])[0]?.verstuurd || null;
   if (body.status) return json({ ok: true, telefoons: subs.length, hartslag });
@@ -445,6 +461,49 @@ async function vanApp(req: Request, body: { test?: boolean; status?: boolean; li
   const h = cfg.herinnering, wanneer = h <= 0 ? 'geen herinnering bij acties met een tijd' : h === 1 ? 'een herinnering op het tijdstip van een actie' : h === 1440 ? 'een herinnering een dag voor een actie met een tijd' : `een herinnering ${h} minuten voor een actie met een tijd`;
   const r = await verstuur(subs, { sleutel: '', title: 'Meldingen werken', body: `${cfg.ochtend ? `Om ${cfg.ochtend} krijg je het overzicht van de dag, en ` : 'Je krijgt '}${wanneer}.`, tag: 'test', url: './#vandaag', ttl: 600 });
   return json({ ok: r.verstuurd > 0, telefoons: subs.length, hartslag, ...r });
+}
+
+/* ---------- automatische back-up ---------- */
+// Zelfde opbouw als Back-up maken in de app, zodat Terugzetten hem gewoon kan lezen. De nieuwste 30 blijven bewaard.
+const BACKUP_UUR = '03', BACKUP_BEWAAR = 30;
+type DocRij = { collection: string; id: string; data: Record<string, unknown> };
+async function alleDocs(uid: string) {
+  const rijen: DocRij[] = [];
+  for (let van = 0; van < 50000; van += 1000) {
+    const deel: DocRij[] = await db(`docs?user_id=eq.${encodeURIComponent(uid)}&select=collection,id,data&order=collection.asc,id.asc&limit=1000&offset=${van}`);
+    rijen.push(...deel);
+    if (deel.length < 1000) break;
+  }
+  return rijen;
+}
+async function maakBackup(uid: string, datum: string) {
+  const rijen = await alleDocs(uid);
+  const van = (c: string) => rijen.filter(r => r.collection === c).map(r => ({ id: r.id, ...r.data }));
+  const namen = rijen.find(r => r.collection === 'instellingen' && r.id === 'acties')?.data?.namen;
+  const backup = { app: 'koude-acquisitie', versie: 1, gemaakt: new Date(Date.now()).toISOString(), automatisch: true,
+    leads: van('leads'), sjablonen: van('sjablonen'), acties: Array.isArray(namen) ? namen : [], agenda: van('agenda') };
+  const naam = `${datum}.json`;
+  await opslag(`object/backups/${encodeURIComponent(uid)}/${naam}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-upsert': 'true' }, body: JSON.stringify(backup) });
+  const lijst: { name: string }[] = await opslag('object/list/backups', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prefix: uid, limit: 1000, offset: 0, sortBy: { column: 'name', order: 'desc' } }) }) || [];
+  const weg = lijst.map(x => x.name).filter(n => /^\d{4}-\d\d-\d\d\.json$/.test(n)).sort().reverse().slice(BACKUP_BEWAAR);
+  if (weg.length) await opslag('object/backups', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prefixes: weg.map(n => `${uid}/${n}`) }) });
+  return { naam, bedrijven: backup.leads.length, opgeruimd: weg.length };
+}
+// 's Nachts: per gebruiker één keer per dag, hooguit drie per minuut (de rest volgt in de minuten erna).
+async function nachtBackups(nu: number) {
+  const { datum, tijd } = nl(nu);
+  if (tijd.slice(0, 2) !== BACKUP_UUR) return 0;
+  const gebruikers: { user_id: string }[] = await db('docs?collection=eq.instellingen&id=eq.app&select=user_id');
+  let n = 0;
+  for (const { user_id } of gebruikers) {
+    if (n >= 3) break;
+    const sleutel = `backup|${user_id}|${datum}`;
+    if (!(await claim(sleutel, user_id))) continue;
+    try { await maakBackup(user_id, datum); n++; }
+    catch (e) { console.error('back-up mislukt', user_id, e); await vrijgeven(sleutel).catch(() => {}); }
+  }
+  return n;
 }
 
 /* ---------- agenda voor Outlook ---------- */
@@ -518,7 +577,7 @@ Deno.serve(async req => {
     const agendaPad = new URL(req.url).pathname.match(AGENDA_PAD);
     if (agendaPad) return await agendaFeed(agendaPad[1], req.method === 'HEAD');
     const body = await req.json().catch(() => ({}));
-    if (body && (body.test || body.status || body.link || body.verrijk)) return await vanApp(req, body);
+    if (body && (body.test || body.status || body.link || body.verrijk || body.backup)) return await vanApp(req, body);
     return json(await ronde(Date.now()));
   } catch (e) {
     console.error(e);

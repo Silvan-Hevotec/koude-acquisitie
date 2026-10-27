@@ -42,5 +42,67 @@
       "navigate-existing",
       "auto"
     ]
-  }
+  },
+  "shortcuts": [
+    {
+      "name": "Nieuwe afspraak",
+      "short_name": "Afspraak",
+      "url": "./?snel=afspraak",
+      "icons": [
+        {
+          "src": "icons/snel-afspraak.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Nieuwe notitie",
+      "short_name": "Notitie",
+      "url": "./?snel=notitie",
+      "icons": [
+        {
+          "src": "icons/snel-notitie.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Belsessie starten",
+      "short_name": "Belsessie",
+      "url": "./?snel=belsessie",
+      "icons": [
+        {
+          "src": "icons/snel-belsessie.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Nieuw bedrijf",
+      "short_name": "Bedrijf",
+      "url": "./?snel=bedrijf",
+      "icons": [
+        {
+          "src": "icons/snel-bedrijf.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Nieuwe taak",
+      "short_name": "Taak",
+      "url": "./?snel=taak",
+      "icons": [
+        {
+          "src": "icons/snel-taak.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
 }

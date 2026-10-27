@@ -689,6 +689,21 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .stag { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; line-height: 1.5; vertical-align: 2px; }
 .stag.prospect { background: var(--brand-soft); color: var(--brand-soft-ink); }
 .stag.klant { background: var(--ok-soft); color: var(--ok); }
+.ltag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; line-height: 1.5; vertical-align: 2px; background: var(--sunken); color: var(--ink); border: 1px solid var(--line); }
+.ltag.more { color: var(--muted); }
+.ltags { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.ltags .ltag { margin-left: 0; }
+.labelsug { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.labelsug:empty { display: none; }
+.pcard { display: grid; gap: 10px; padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--sunken); }
+.pcard + .pcard { margin-top: 8px; }
+.personen { display: grid; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.personen ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.personen li { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.personen .pn { display: grid; gap: 1px; min-width: 0; overflow-wrap: anywhere; }
+.personen .pn span { font-size: 13.5px; color: var(--muted); }
+.personen .pacts { display: flex; gap: 6px; flex: none; }
+.labelsug .chip { min-height: 32px; padding: 0 12px; font-size: 13px; }
 .buurtbtn[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
 .buurt-status { margin-top: -4px; }
 .set-sel { width: auto; min-width: 140px; min-height: 40px; }
@@ -822,6 +837,22 @@ body.sessie .toast, body.selecting .toast { bottom: calc(var(--nav-h) + 90px + e
 .agvandaag { display: grid; gap: 6px; padding: 14px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
 .agv-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 4px 4px; }
 .bagenda { gap: 8px; }
+.stil-item { display: grid; gap: 6px; }
+.bestanden { gap: 10px; }
+.bst-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
+.bst { position: relative; min-width: 0; }
+.bst-open { display: grid; gap: 3px; color: inherit; text-decoration: none; min-width: 0; }
+.bst-open img, .bst-ic { width: 100%; aspect-ratio: 1; border-radius: 14px; object-fit: cover; background: var(--sunken); border: 1px solid var(--line); }
+.bst-ic { display: grid; place-items: center; color: var(--muted); }
+.bst-ic .ic { width: 30px; height: 30px; }
+.bst-naam { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bst-meta { font-size: 11.5px; color: var(--muted); }
+.bst-weg { position: absolute; top: 6px; right: 6px; min-width: 30px; height: 30px; display: grid; place-items: center; padding: 0 8px; border-radius: 999px; border: 0; background: rgba(12, 41, 37, .78); color: #fff; font: 600 12px/1 var(--f-body, inherit); cursor: pointer; }
+.bst-weg .ic { width: 16px; height: 16px; }
+.bst-weg.armed { background: var(--danger); }
+.bestanden label.btn { cursor: pointer; }
+.stil-item + .stil-item { padding-top: 6px; border-top: 1px solid var(--line); }
+.stil-item .btns { padding-left: 4px; }
 .bag { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border: 0; border-radius: 14px; background: var(--sunken); color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .bag > .ic { color: var(--ok); }
 .bag > span { display: grid; min-width: 0; }
@@ -960,6 +991,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   </div>
   <div class="stats" id="stats" data-show="vandaag"></div>
   <section class="agvandaag" id="agVandaag" aria-label="Afspraken en taken vandaag" hidden></section>
+  <section class="agvandaag stilvandaag" id="stilVandaag" aria-label="Klanten die je lang niet sprak" hidden></section>
   <p id="summary">Lijst laden…</p>
 
   <!-- Planbord -->
@@ -991,6 +1023,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     <section class="filterpanel" id="filterPanel" aria-label="Filters" hidden>
       <div class="field" id="brancheField"><label for="brancheSel">Branche</label><select class="input" id="brancheSel"></select></div>
       <div class="field"><label for="statusSel">Soort relatie</label><select class="input" id="statusSel"></select></div>
+      <div class="field" id="labelField" hidden><label for="labelSel">Label</label><select class="input" id="labelSel"></select></div>
+      <div class="field"><label for="stilSel">Laatste contact</label><select class="input" id="stilSel"></select></div>
       <div class="field" id="buurtField"><span class="flabel">Afstand</span><button type="button" class="btn buurtbtn" id="buurtBtn" aria-pressed="false">In de buurt</button></div>
       <div class="pactions"><button type="button" class="btn primary" id="filterDone">Klaar</button><button type="button" class="btn ghost" id="filterClear">Filters wissen</button></div>
     </section>
@@ -1064,6 +1098,11 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       <label for="addWebsite">Website</label>
       <input class="input" id="addWebsite" type="url" inputmode="url" maxlength="120" placeholder="www.bedrijf.nl">
     </div>
+    <div class="field wide">
+      <label for="addLabels">Labels <span class="opt">optioneel, scheid met komma's</span></label>
+      <input class="input" id="addLabels" maxlength="300" placeholder="Bijv. Linde-vloot, Beurs 2026">
+      <div id="addLabelSug"></div>
+    </div>
     <p class="fsec">Volgende stap</p>
     <div class="field">
       <label for="addActie">Actie</label>
@@ -1134,6 +1173,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
         <select class="input set-sel" id="bouwvakSel" aria-label="Bouwvak-regio"></select></div>
       <div class="set-row"><i data-ic="navigation-2"></i><div class="set-text"><strong>In de buurt</strong><span>Afstand voor het filter In de buurt bij Bedrijven.</span></div>
         <select class="input set-sel" id="buurtSel" aria-label="Afstand voor In de buurt"></select></div>
+      <div class="set-row"><i data-ic="users"></i><div class="set-text"><strong>Klanten die je lang niet sprak</strong><span>Op Vandaag een seintje over klanten zonder contact en zonder geplande actie.</span></div>
+        <select class="input set-sel" id="stilMaandenSel" aria-label="Seintje over klanten die je lang niet sprak"></select></div>
     </section>
     <section class="card set-group" aria-label="Gegevens">
       <h3>Gegevens</h3>
@@ -1146,6 +1187,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       <div class="set-row"><i data-ic="save"></i><div class="set-text"><strong>Back-up</strong><span>Een kopie van je lijst en mailteksten, om terug te zetten op elk apparaat.</span></div>
         <div class="btns"><button type="button" class="btn small" id="backupBtn">Back-up maken</button><button type="button" class="btn small" id="restoreBtn">Back-up terugzetten</button></div>
         <input type="file" id="restoreFile" accept=".json,application/json" hidden></div>
+      <div class="set-row" id="autoBackupRow" hidden><i data-ic="rotate-ccw"></i><div class="set-text"><strong>Automatische back-up</strong><span id="autoBackupStatus">Kijken…</span></div>
+        <button type="button" class="btn small" id="autoBackupNu" hidden>Nu maken</button>
+        <div class="aglink" id="autoBackupBox" hidden></div></div>
     </section>
     <p class="copyright">© 2026 Silvan H. Alle rechten voorbehouden.</p>
   </div>
@@ -1192,6 +1236,13 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     history.replaceState(null, '', location.pathname + location.hash);
     return { title: q.get('deel_titel') || '', text: q.get('deel_tekst') || '', url: q.get('deel_url') || '' };
   })();
+  // Snelkoppeling op het app-icoon (lang indrukken): ?snel=afspraak, taak, notitie, bedrijf of belsessie.
+  const snelIn = (() => {
+    const s = new URLSearchParams(location.search).get('snel');
+    if (!s) return '';
+    history.replaceState(null, '', location.pathname + location.hash);
+    return ['afspraak', 'taak', 'notitie', 'bedrijf', 'belsessie'].includes(s) ? s : '';
+  })();
   const VIEWS = new Set(['alles', 'acties', 'vandaag', 'kaart', 'archief']);
   const OUTCOMES = ['Geen gehoor', 'Terugbellen', 'Interesse', 'Geen interesse'];
   const STATUSES = [['lead', 'Lead'], ['prospect', 'Potentiële klant'], ['klant', 'Klant']];
@@ -1208,14 +1259,16 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   const FREE_MAIL = new Set(['gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.nl', 'outlook.com', 'outlook.nl', 'live.nl', 'live.com', 'msn.com',
     'icloud.com', 'me.com', 'yahoo.com', 'yahoo.nl', 'ziggo.nl', 'kpnmail.nl', 'kpnplanet.nl', 'planet.nl', 'home.nl', 'xs4all.nl', 'upcmail.nl',
     'chello.nl', 'casema.nl', 'telfort.nl', 'online.nl', 'hetnet.nl', 'zeelandnet.nl', 'quicknet.nl', 'tele2.nl', 'caiway.nl', 'solcon.nl', 'gmx.com', 'gmx.net']);
-  const IMP_FIELDS = [['', 'Niet importeren'], ['bedrijf', 'Bedrijfsnaam'], ['klantnummer', 'Klantnummer'], ['contact', 'Contactpersoon'], ['email', 'E-mailadres'], ['telefoon', 'Telefoonnummer'], ['mobiel', 'Mobiel nummer'],
-    ['adres', 'Adres'], ['huisnummer', 'Huisnummer'], ['postcode', 'Postcode'], ['plaats', 'Plaats'], ['branche', 'Branche'], ['website', 'Website'], ['status', 'Soort relatie'], ['actie', 'Actie'], ['prioriteit', 'Prioriteit'], ['notitie', 'Notitie']];
+  const IMP_FIELDS = [['', 'Niet importeren'], ['bedrijf', 'Bedrijfsnaam'], ['klantnummer', 'Klantnummer'], ['contact', 'Contactpersoon'], ['functie', 'Functie'], ['email', 'E-mailadres'], ['telefoon', 'Telefoonnummer'], ['mobiel', 'Mobiel nummer'],
+    ['adres', 'Adres'], ['huisnummer', 'Huisnummer'], ['postcode', 'Postcode'], ['plaats', 'Plaats'], ['branche', 'Branche'], ['website', 'Website'], ['status', 'Soort relatie'], ['labels', 'Labels'], ['actie', 'Actie'], ['prioriteit', 'Prioriteit'], ['notitie', 'Notitie']];
   // Kolommen van het voorbeeldbestand voor een klantenlijst; de namen worden bij het inlezen vanzelf herkend.
   const IMP_VOORBEELD = ['Klantnummer', 'Bedrijfsnaam', 'Contactpersoon', 'Telefoon', 'Mobiel', 'E-mail', 'Adres', 'Postcode', 'Plaats', 'Website', 'Branche', 'Soort relatie', 'Notitie'];
   const IMP_HINTS = [
     ['', /(contactmoment|gearchiveerd|gewijzigd|datum|geen mail|kvk|btw)/, true],
     ['klantnummer', /^(klantnummer|klantnr\.?|klant ?nr\.?|klantcode|klant-id|debiteur(nummer|nr\.?|code)?|relatie ?(nummer|nr\.?|code))$/, false],
     ['status', /^(soort relatie|relatiesoort|soort|status|klantstatus|type relatie|relatietype|relatie)$/, false],
+    ['functie', /^(functie|functie contactpersoon|rol|positie|function|job ?title)$/, false],
+    ['labels', /^(labels?|tags?|kenmerk(en)?|groep(en)?|segment(en)?|categorie(en)?)$/, true],
     ['website', /^(website|web|url|internet|homepage|site)/, false],
     ['branche', /^(branche|sector|categorie|bedrijfstak|sbi)/, false],
     ['email', /e-?mail|^mail/, false],
@@ -1234,7 +1287,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
 
   const $ = id => document.getElementById(id);
   // Pictogrammen: Lucide (ISC-licentie), alleen de vormen die de app gebruikt.
-  const ICONS = {"phone": "<path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "mail": "<path d=\"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7\" /> <rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" />", "message-circle": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "navigation": "<polygon points=\"3 11 22 2 13 21 11 13 3 11\" />", "calendar-check": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"m9 15 2 2 4-4\" />", "calendar": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "list": "<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "ellipsis": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />", "settings": "<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "camera": "<path d=\"M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z\" /> <circle cx=\"12\" cy=\"13\" r=\"3\" />", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <circle cx=\"9\" cy=\"9\" r=\"2\" /> <path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\" />", "clipboard-paste": "<path d=\"M11 14h10\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v1.344\" /> <path d=\"m17 18 4-4-4-4\" /> <path d=\"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113\" /> <rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" />", "search": "<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "chevron-left": "<path d=\"m15 18-6-6 6-6\" />", "upload": "<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />", "download": "<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />", "archive": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />", "archive-restore": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h2\" /> <path d=\"M20 8v11a2 2 0 0 1-2 2h-2\" /> <path d=\"m9 15 3-3 3 3\" /> <path d=\"M12 12v9\" />", "trash-2": "<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "log-out": "<path d=\"m16 17 5-5-5-5\" /> <path d=\"M21 12H9\" /> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 6v6l4 2\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /> <path d=\"m21.854 2.147-10.94 10.939\" />", "scan-line": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\" /> <path d=\"M17 3h2a2 2 0 0 1 2 2v2\" /> <path d=\"M21 17v2a2 2 0 0 1-2 2h-2\" /> <path d=\"M7 21H5a2 2 0 0 1-2-2v-2\" /> <path d=\"M7 12h10\" />", "contact": "<path d=\"M16 2v2\" /> <path d=\"M7 21v-2a2 2 0 012-2h6a2 2 0 012 2v2\" /> <path d=\"M8 2v2\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />", "house": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "flashlight": "<path d=\"M12 13v1\" /> <path d=\"M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z\" /> <path d=\"M6 6h12\" />", "locate-fixed": "<line x1=\"2\" x2=\"5\" y1=\"12\" y2=\"12\" /> <line x1=\"19\" x2=\"22\" y1=\"12\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"5\" /> <line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\" /> <circle cx=\"12\" cy=\"12\" r=\"7\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "file-spreadsheet": "<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M8 13h2\" /> <path d=\"M14 13h2\" /> <path d=\"M8 17h2\" /> <path d=\"M14 17h2\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "wifi-off": "<path d=\"M12 20h.01\" /> <path d=\"M8.5 16.429a5 5 0 0 1 7 0\" /> <path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\" /> <path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\" /> <path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\" /> <path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\" /> <path d=\"m2 2 20 20\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m16 9-5.5 5.5L8 12\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "layout-list": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" /> <path d=\"M14 4h7\" /> <path d=\"M14 9h7\" /> <path d=\"M14 15h7\" /> <path d=\"M14 20h7\" />", "list-checks": "<path d=\"M13 5h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" />", "mail-plus": "<path d=\"M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8\" /> <path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" /> <path d=\"M19 16v6\" /> <path d=\"M16 19h6\" />", "phone-call": "<path d=\"M13 2a9 9 0 0 1 9 9\" /> <path d=\"M13 6a5 5 0 0 1 5 5\" /> <path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />", "mic": "<path d=\"M12 19v3\" /> <path d=\"M19 10v2a7 7 0 0 1-14 0v-2\" /> <rect x=\"9\" y=\"2\" width=\"6\" height=\"13\" rx=\"3\" />", "square": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" />", "merge": "<path d=\"m8 6 4-4 4 4\" /> <path d=\"M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22\" /> <path d=\"m20 22-5-5\" />", "notebook-pen": "<path d=\"M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4\" /> <path d=\"M2 6h4\" /> <path d=\"M2 10h4\" /> <path d=\"M2 14h4\" /> <path d=\"M2 18h4\" /> <path d=\"M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z\" />", "message-circle-question": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" /> <path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\" /> <path d=\"M12 17h.01\" />", "alarm-clock": "<circle cx=\"12\" cy=\"13\" r=\"8\" /> <path d=\"M12 9v4l2 2\" /> <path d=\"M5 3 2 6\" /> <path d=\"m22 6-3-3\" /> <path d=\"M6.38 18.7 4 21\" /> <path d=\"M17.64 18.67 20 21\" />", "navigation-2": "<polygon points=\"12 2 19 21 12 17 5 21 12 2\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />", "sliders-horizontal": "<path d=\"M10 5H3\" /> <path d=\"M12 19H3\" /> <path d=\"M14 3v4\" /> <path d=\"M16 17v4\" /> <path d=\"M21 12h-9\" /> <path d=\"M21 19h-5\" /> <path d=\"M21 5h-7\" /> <path d=\"M8 10v4\" /> <path d=\"M8 12H3\" />", "pencil-line": "<path d=\"M13 21h8\" /> <path d=\"m15 5 4 4\" /> <path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" />"};
+  const ICONS = {"phone": "<path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "mail": "<path d=\"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7\" /> <rect x=\"2\" y=\"4\" width=\"20\" height=\"16\" rx=\"2\" />", "message-circle": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" />", "map-pin": "<path d=\"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "navigation": "<polygon points=\"3 11 22 2 13 21 11 13 3 11\" />", "calendar-check": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"m9 15 2 2 4-4\" />", "calendar": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "list": "<path d=\"M3 5h.01\" /> <path d=\"M3 12h.01\" /> <path d=\"M3 19h.01\" /> <path d=\"M8 5h13\" /> <path d=\"M8 12h13\" /> <path d=\"M8 19h13\" />", "plus": "<path d=\"M5 12h14\" /> <path d=\"M12 5v14\" />", "ellipsis": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <circle cx=\"19\" cy=\"12\" r=\"1\" /> <circle cx=\"5\" cy=\"12\" r=\"1\" />", "settings": "<path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "camera": "<path d=\"M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z\" /> <circle cx=\"12\" cy=\"13\" r=\"3\" />", "image": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <circle cx=\"9\" cy=\"9\" r=\"2\" /> <path d=\"m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21\" />", "clipboard-paste": "<path d=\"M11 14h10\" /> <path d=\"M16 4h2a2 2 0 0 1 2 2v1.344\" /> <path d=\"m17 18 4-4-4-4\" /> <path d=\"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113\" /> <rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\" />", "search": "<path d=\"m21 21-4.34-4.34\" /> <circle cx=\"11\" cy=\"11\" r=\"8\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "chevron-down": "<path d=\"m6 9 6 6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "chevron-left": "<path d=\"m15 18-6-6 6-6\" />", "upload": "<path d=\"M12 3v12\" /> <path d=\"m17 8-5-5-5 5\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" />", "download": "<path d=\"M12 15V3\" /> <path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\" /> <path d=\"m7 10 5 5 5-5\" />", "archive": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8\" /> <path d=\"M10 12h4\" />", "archive-restore": "<rect width=\"20\" height=\"5\" x=\"2\" y=\"3\" rx=\"1\" /> <path d=\"M4 8v11a2 2 0 0 0 2 2h2\" /> <path d=\"M20 8v11a2 2 0 0 1-2 2h-2\" /> <path d=\"m9 15 3-3 3 3\" /> <path d=\"M12 12v9\" />", "trash-2": "<path d=\"M10 11v6\" /> <path d=\"M14 11v6\" /> <path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6\" /> <path d=\"M3 6h18\" /> <path d=\"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\" />", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\" /> <circle cx=\"12\" cy=\"7\" r=\"4\" />", "log-out": "<path d=\"m16 17 5-5-5-5\" /> <path d=\"M21 12H9\" /> <path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\" />", "bell": "<path d=\"M10.268 21a2 2 0 0 0 3.464 0\" /> <path d=\"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "clock": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 6v6l4 2\" />", "send": "<path d=\"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z\" /> <path d=\"m21.854 2.147-10.94 10.939\" />", "scan-line": "<path d=\"M3 7V5a2 2 0 0 1 2-2h2\" /> <path d=\"M17 3h2a2 2 0 0 1 2 2v2\" /> <path d=\"M21 17v2a2 2 0 0 1-2 2h-2\" /> <path d=\"M7 21H5a2 2 0 0 1-2-2v-2\" /> <path d=\"M7 12h10\" />", "contact": "<path d=\"M16 2v2\" /> <path d=\"M7 21v-2a2 2 0 012-2h6a2 2 0 012 2v2\" /> <path d=\"M8 2v2\" /> <circle cx=\"12\" cy=\"10\" r=\"3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />", "house": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\" /> <path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "flashlight": "<path d=\"M12 13v1\" /> <path d=\"M17 2a1 1 0 0 1 1 1v4a3 3 0 0 1-.6 1.8l-.6.8A4 4 0 0 0 16 12v8a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2v-8a4 4 0 0 0-.8-2.4l-.6-.8A3 3 0 0 1 6 7V3a1 1 0 0 1 1-1z\" /> <path d=\"M6 6h12\" />", "locate-fixed": "<line x1=\"2\" x2=\"5\" y1=\"12\" y2=\"12\" /> <line x1=\"19\" x2=\"22\" y1=\"12\" y2=\"12\" /> <line x1=\"12\" x2=\"12\" y1=\"2\" y2=\"5\" /> <line x1=\"12\" x2=\"12\" y1=\"19\" y2=\"22\" /> <circle cx=\"12\" cy=\"12\" r=\"7\" /> <circle cx=\"12\" cy=\"12\" r=\"3\" />", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\" /> <path d=\"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15\" /> <circle cx=\"18\" cy=\"5\" r=\"3\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "file-spreadsheet": "<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M8 13h2\" /> <path d=\"M14 13h2\" /> <path d=\"M8 17h2\" /> <path d=\"M14 17h2\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "rotate-ccw": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" />", "link": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\" /> <path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\" />", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 16v-4\" /> <path d=\"M12 8h.01\" />", "wifi-off": "<path d=\"M12 20h.01\" /> <path d=\"M8.5 16.429a5 5 0 0 1 7 0\" /> <path d=\"M5 12.859a10 10 0 0 1 5.17-2.69\" /> <path d=\"M19 12.859a10 10 0 0 0-2.007-1.523\" /> <path d=\"M2 8.82a15 15 0 0 1 4.177-2.643\" /> <path d=\"M22 8.82a15 15 0 0 0-11.288-3.764\" /> <path d=\"m2 2 20 20\" />", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" /> <path d=\"m15 5 4 4\" />", "circle-check": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"m16 9-5.5 5.5L8 12\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "layout-list": "<rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\" /> <path d=\"M14 4h7\" /> <path d=\"M14 9h7\" /> <path d=\"M14 15h7\" /> <path d=\"M14 20h7\" />", "list-checks": "<path d=\"M13 5h8\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"m3 17 2 2 4-4\" /> <path d=\"m3 7 2 2 4-4\" />", "mail-plus": "<path d=\"M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8\" /> <path d=\"m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7\" /> <path d=\"M19 16v6\" /> <path d=\"M16 19h6\" />", "phone-call": "<path d=\"M13 2a9 9 0 0 1 9 9\" /> <path d=\"M13 6a5 5 0 0 1 5 5\" /> <path d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384\" />", "smartphone": "<rect width=\"14\" height=\"20\" x=\"5\" y=\"2\" rx=\"2\" ry=\"2\" /> <path d=\"M12 18h.01\" />", "mic": "<path d=\"M12 19v3\" /> <path d=\"M19 10v2a7 7 0 0 1-14 0v-2\" /> <rect x=\"9\" y=\"2\" width=\"6\" height=\"13\" rx=\"3\" />", "square": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" />", "merge": "<path d=\"m8 6 4-4 4 4\" /> <path d=\"M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22\" /> <path d=\"m20 22-5-5\" />", "notebook-pen": "<path d=\"M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4\" /> <path d=\"M2 6h4\" /> <path d=\"M2 10h4\" /> <path d=\"M2 14h4\" /> <path d=\"M2 18h4\" /> <path d=\"M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z\" />", "message-circle-question": "<path d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719\" /> <path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\" /> <path d=\"M12 17h.01\" />", "alarm-clock": "<circle cx=\"12\" cy=\"13\" r=\"8\" /> <path d=\"M12 9v4l2 2\" /> <path d=\"M5 3 2 6\" /> <path d=\"m22 6-3-3\" /> <path d=\"M6.38 18.7 4 21\" /> <path d=\"M17.64 18.67 20 21\" />", "navigation-2": "<polygon points=\"12 2 19 21 12 17 5 21 12 2\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />", "sliders-horizontal": "<path d=\"M10 5H3\" /> <path d=\"M12 19H3\" /> <path d=\"M14 3v4\" /> <path d=\"M16 17v4\" /> <path d=\"M21 12h-9\" /> <path d=\"M21 19h-5\" /> <path d=\"M21 5h-7\" /> <path d=\"M8 10v4\" /> <path d=\"M8 12H3\" />", "file-text": "<path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\" /> <path d=\"M14 2v5a1 1 0 0 0 1 1h5\" /> <path d=\"M10 9H8\" /> <path d=\"M16 13H8\" /> <path d=\"M16 17H8\" />", "pencil-line": "<path d=\"M13 21h8\" /> <path d=\"m15 5 4 4\" /> <path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\" />"};
   const ic = (n, cls = '') => `<svg class="ic${cls ? ' ' + cls : ''}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
   document.querySelectorAll('i[data-ic]').forEach(el => { el.outerHTML = ic(el.dataset.ic); });
   const PIN = '<svg viewBox="0 0 30 40" aria-hidden="true"><path class="b" d="M15 38.5C15 38.5 3 25.6 3 15a12 12 0 0 1 24 0c0 10.6-12 23.5-12 23.5z"/><circle class="c" cx="15" cy="15" r="5"/></svg>';
@@ -1270,10 +1323,11 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     actie: pref.get('actie') || '', branche: pref.get('branche') || '',
     search: '', open: null, mode: 'edit', selecting: false, selected: new Set(), pendingMail: null, local: false,
     status: ['lead', 'prospect', 'klant'].includes(pref.get('statusFilter')) ? pref.get('statusFilter') : '', buurt: pref.get('buurt') === '1',
+    label: pref.get('labelFilter') || '', stil: ['3', '6', '12', 'nooit'].includes(pref.get('stilFilter')) ? pref.get('stilFilter') : '',
   };
   const drafts = {}, finishes = {};
   const mail = { open: false, ids: [], mode: 'bcc', tplId: '', onderwerp: '', tekst: '', index: 0, done: new Set(), skipped: new Set(), newName: null, armedDel: false, busy: false, sending: null };
-  const imp = { open: false, rows: null, header: true, map: [], include: new Map(), actie: '', datum: '', status: '', bestaand: 'overslaan', busy: false, loading: false, done: 0, total: 0, error: '' };
+  const imp = { open: false, rows: null, header: true, map: [], include: new Map(), actie: '', datum: '', status: '', label: '', bestaand: 'overslaan', busy: false, loading: false, done: 0, total: 0, error: '' };
   let col = null, sjCol = null, actiesDoc = null, appStore = null, actiesChain = Promise.resolve();
   let armedDelete = null, armedTimer = 0, armedExamples = false, armedExamplesTimer = 0, dupSig = '', dupAcked = false;
 
@@ -1521,8 +1575,41 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       aangemaakt: str(d.aangemaakt), gewijzigd: str(d.gewijzigd), voorbeeld: d.voorbeeld === true, outlookId: str(d.outlookId),
       website: str(d.website).trim(), branche: str(d.branche).trim(), geo: validGeo(d.geo),
       status: validStatus(d.status), verslagen: normalizeVerslagen(d.verslagen), herinnering: validHerinnering(d.herinnering),
-      klantnummer: str(d.klantnummer).trim().slice(0, 40),
+      klantnummer: str(d.klantnummer).trim().slice(0, 40), labels: validLabels(d.labels),
+      functie: str(d.functie).trim().slice(0, 60), personen: validPersonen(d.personen), bestanden: validBestanden(d.bestanden),
     };
+  }
+  // Foto's en bestanden: het bestand zelf staat in Supabase Storage (map bestanden/<gebruiker>/<bedrijf>/), hier alleen de gegevens.
+  function validBestanden(v) {
+    return (Array.isArray(v) ? v : []).filter(x => x && typeof x.pad === 'string' && x.pad && typeof x.naam === 'string').map(x => ({
+      id: str(x.id).slice(0, 24), naam: x.naam.slice(0, 120), type: str(x.type).slice(0, 100), grootte: Number.isFinite(x.grootte) ? x.grootte : 0, pad: x.pad.slice(0, 300), datum: str(x.datum).slice(0, 10),
+    })).slice(0, 60);
+  }
+  // Andere contactpersonen naast het hoofdcontact (inkoper, directeur, werkplaatschef…). Hooguit 20.
+  function validPersonen(v) {
+    return (Array.isArray(v) ? v : []).filter(x => x && typeof x === 'object').map(x => ({
+      id: str(x.id).slice(0, 24) || Math.random().toString(36).slice(2, 10),
+      naam: str(x.naam).trim().slice(0, 120), functie: str(x.functie).trim().slice(0, 60), telefoon: str(x.telefoon).trim().slice(0, 40), email: str(x.email).trim().slice(0, 120),
+    })).filter(x => x.naam || x.telefoon || x.email).slice(0, 20);
+  }
+  const persoonBody = x => { const b = { id: x.id, naam: x.naam }; for (const k of ['functie', 'telefoon', 'email']) if (x[k]) b[k] = x[k]; return b; };
+  // Labels: eigen trefwoorden per bedrijf, zoals "Linde-vloot" of "Beurs 2026". Hooguit 12, zonder dubbele.
+  function validLabels(v) {
+    const seen = new Set();
+    return (Array.isArray(v) ? v : []).map(x => String(x || '').trim().replace(/\s+/g, ' ').slice(0, 40)).filter(x => x && !seen.has(key(x)) && seen.add(key(x))).slice(0, 12);
+  }
+  const labelNames = () => { const m = new Map(); state.leads.forEach(l => l.labels.forEach(x => { if (!m.has(key(x))) m.set(key(x), x); })); return sortNames([...m.values()]); };
+  // Getypte labels (met komma's) → lijst, met de schrijfwijze die al in je lijst voorkomt.
+  function parseLabels(text) {
+    const bekend = new Map(labelNames().map(x => [key(x), x]));
+    return validLabels(String(text || '').split(/[,;|]/).map(x => { const t = x.trim(); return bekend.get(key(t)) || (t ? t.charAt(0).toLocaleUpperCase('nl') + t.slice(1) : ''); }));
+  }
+  const labelTags = (l, max = 3) => l.labels.slice(0, max).map(x => `<span class="ltag">${esc(x)}</span>`).join('') + (l.labels.length > max ? `<span class="ltag more">+${l.labels.length - max}</span>` : '');
+  // Klikbare voorstellen onder een labelveld: tik om toe te voegen of weg te halen.
+  function labelSugHtml(inputId, current) {
+    const cur = new Set(parseLabels(current).map(key)), names = labelNames();
+    if (!names.length) return '';
+    return `<div class="labelsug" data-for="${esc(inputId)}">${names.slice(0, 16).map(x => `<button type="button" class="chip small${cur.has(key(x)) ? ' on' : ''}" data-label="${esc(x)}" aria-pressed="${cur.has(key(x))}">${esc(x)}</button>`).join('')}</div>`;
   }
   // Klantverslagen: nieuwste eerst.
   const strList = (v, n, max) => Array.isArray(v) ? v.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim().slice(0, max)).slice(0, n) : [];
@@ -1554,12 +1641,16 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (l.verslagen && l.verslagen.length) b.verslagen = l.verslagen.map(verslagBody);
     if (validHerinnering(l.herinnering) !== null) b.herinnering = l.herinnering;
     if (l.klantnummer) b.klantnummer = l.klantnummer;
+    if (l.labels && l.labels.length) b.labels = validLabels(l.labels);
+    if (l.functie) b.functie = l.functie;
+    if (l.personen && l.personen.length) b.personen = validPersonen(l.personen).map(persoonBody);
+    if (l.bestanden && l.bestanden.length) b.bestanden = validBestanden(l.bestanden);
     if (l.voorbeeld) b.voorbeeld = true;
     if (l.outlookId) b.outlookId = l.outlookId;
     if (validGeo(l.geo)) b.geo = validGeo(l.geo);
     return b;
   }
-  const draftFrom = l => ({ bedrijf: l.bedrijf, klantnummer: l.klantnummer || '', contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, website: l.website, branche: l.branche, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail, status: l.status, herinnering: l.herinnering === null || l.herinnering === undefined ? '' : String(l.herinnering) });
+  const draftFrom = l => ({ bedrijf: l.bedrijf, klantnummer: l.klantnummer || '', labels: (l.labels || []).join(', '), functie: l.functie || '', personen: (l.personen || []).map(x => ({ ...x })), contact: l.contact, email: l.email, telefoon: l.telefoon, adres: l.adres, plaats: l.plaats, website: l.website, branche: l.branche, actie: l.actie, datum: l.datum, tijd: l.tijd, prioriteit: l.prioriteit, notitie: l.notitie, geenMail: l.geenMail, status: l.status, herinnering: l.herinnering === null || l.herinnering === undefined ? '' : String(l.herinnering) });
 
   let toastTimer = 0;
   function toast(msg, ms = 3600) {
@@ -1654,7 +1745,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       adres: $('addAdres').value.trim(), plaats: canonPlaats($('addPlaats').value),
       website: cleanWebsite($('addWebsite').value), branche: canonBranche($('addBranche').value),
       actie, datum, tijd: '', prioriteit: validPrio($('addPrio').value), notitie: '', geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now,
-      status: validStatus($('addStatus').value),
+      status: validStatus($('addStatus').value), labels: parseLabels($('addLabels').value),
     };
     addBtn.disabled = true;
     const ok = await write(() => col.doc().set(toBody(lead)));
@@ -1684,6 +1775,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       actie, datum: actie && parseISO(d.datum) ? d.datum : '', notitie: d.notitie.trim(), geenMail: !!d.geenMail, gewijzigd: nowISO(),
       tijd: actie && parseISO(d.datum) && /^\d{2}:\d{2}$/.test(d.tijd || '') ? d.tijd : '', prioriteit: validPrio(d.prioriteit),
       status: validStatus(d.status), herinnering: parseHerinnering(d.herinnering), klantnummer: (d.klantnummer || '').trim().slice(0, 40),
+      labels: parseLabels(d.labels), functie: (d.functie || '').trim().slice(0, 60), personen: validPersonen(d.personen),
     };
     const ok = await write(() => col.doc(id).set(toBody(next)));
     if (!ok) return false;
@@ -1771,6 +1863,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const l = byId(id);
     const ok = await write(() => col.doc(id).delete());
     if (!ok) { renderRows(); return; }
+    if (l && l.bestanden.length && sb && !state.local) sb.storage.from('bestanden').remove(l.bestanden.map(b => b.pad)).catch(() => {});
     closeRow(true);
     renderAll();
     toast(`${l ? l.bedrijf : 'Bedrijf'} is verwijderd.`);
@@ -1809,7 +1902,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   }
   async function exportCsv() {
     if (!state.leads.length) return;
-    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Branche', 'Website', 'Actie', 'Datum', 'Tijd', 'Prioriteit', 'Status', 'Notitie', 'Geen mail', 'Contactmomenten', 'Klantverslagen', 'Gearchiveerd', 'Laatst gewijzigd', 'Klantnummer'];
+    const head = ['Bedrijfsnaam', 'Contactpersoon', 'E-mailadres', 'Telefoonnummer', 'Adres', 'Plaats', 'Branche', 'Website', 'Actie', 'Datum', 'Tijd', 'Prioriteit', 'Status', 'Notitie', 'Geen mail', 'Contactmomenten', 'Klantverslagen', 'Gearchiveerd', 'Laatst gewijzigd', 'Klantnummer', 'Labels', 'Functie', 'Andere contactpersonen'];
     const cell = v => {
       let s = String(v ?? '');
       if (/^[=@]/.test(s) || /^[+\-](?![\d\s(])/.test(s)) s = "'" + s;
@@ -1819,7 +1912,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       l.bedrijf, l.contact, l.email, l.telefoon, l.adres, l.plaats, l.branche, l.website, l.actie, l.datum, l.tijd, l.prioriteit, statusLabel(l.status), l.notitie, l.geenMail ? 'ja' : '',
       l.log.map(x => `${x.d} ${x.a}${x.u ? ': ' + x.u : ''}${x.t ? ' (' + x.t + ')' : ''}`).join(' | '),
       l.verslagen.map(v => `${v.datum} ${v.soort}: ${v.tekst.replace(/\s+/g, ' ')}${v.machines.length ? ' [' + v.machines.join(', ') + ']' : ''}`).join(' | '),
-      l.gearchiveerd ? `ja (${l.gearchiveerdOp})` : '', l.gewijzigd.slice(0, 10), l.klantnummer,
+      l.gearchiveerd ? `ja (${l.gearchiveerdOp})` : '', l.gewijzigd.slice(0, 10), l.klantnummer, l.labels.join(', '), l.functie,
+      l.personen.map(x => [x.naam + (x.functie ? ` (${x.functie})` : ''), x.telefoon, x.email].filter(Boolean).join(' ')).join(' | '),
     ])].map(r => r.map(cell).join(';'));
     saveFile(`leadnex-${todayISO()}.csv`, '\ufeff' + lines.join('\r\n'), 'text/csv;charset=utf-8');
     toast('Export opgeslagen in je downloads.');
@@ -2439,7 +2533,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     renderAll();
     window.scrollTo({ top: 0 });
     if (p === 'nieuw' && !('ontouchstart' in window)) $('addBedrijf').focus({ preventScroll: true });
-    if (p === 'meer') { renderPush(); checkServer(); }
+    if (p === 'meer') { renderPush(); checkServer(); checkAutoBackup(); }
   }
   // Op de computer alle tabbladen bovenin; op de telefoon vijf onderin, met de kaart bij Bedrijven.
   const NAV = { vandaag: ['calendar-check', 'Vandaag'], planbord: ['calendar', 'Planbord'], bedrijven: ['building-2', 'Bedrijven'], kaart: ['map', 'Kaart'], nieuw: ['plus', 'Nieuw'], meer: ['ellipsis', 'Meer'] };
@@ -2477,9 +2571,11 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   function inView(l) {
     const q = isQuestion(state.search) ? '' : key(state.search);   // een vraag is geen zoekterm (het antwoord staat bij Bedrijven)
     const filtered = state.view !== 'vandaag';   // Vandaag toont altijd alles wat moet gebeuren
-    if (filtered && q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie, l.website, l.branche, l.klantnummer].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
+    if (filtered && q && ![l.bedrijf, l.contact, l.plaats, l.adres, l.email, l.telefoon, l.actie, l.notitie, l.website, l.branche, l.klantnummer, ...l.labels, l.functie, ...l.personen.flatMap(x => [x.naam, x.functie, x.telefoon, x.email])].some(v => String(v || '').toLocaleLowerCase('nl').includes(q))) return false;
     if (filtered && state.branche && key(l.branche) !== key(state.branche)) return false;
     if (filtered && state.status && l.status !== state.status) return false;
+    if (filtered && state.label && !l.labels.some(x => key(x) === key(state.label))) return false;
+    if (filtered && state.stil && (state.stil === 'nooit' ? l.log.length > 0 : !stilSinds(l, +state.stil))) return false;
     if (state.view === 'archief') return !!l.gearchiveerd;
     if (l.gearchiveerd) return false;
     if (state.view === 'vandaag') return isDue(l, todayISO());
@@ -2539,17 +2635,28 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     return `<section class="scard pform" aria-label="Gegevens">
       <h3 class="slabel">Bedrijf en contact</h3>
       <div class="pgrid">
-        ${input('bedrijf', 'Bedrijfsnaam', 'span2')}
+        ${input('bedrijf', 'Bedrijfsnaam', 'span4')}
+        ${input('klantnummer', 'Klantnummer<span class="opt">optioneel</span>', 'span2', 'text', 40)}
+        ${sel('status', 'Status', statusOptions(d.status))}
         ${input('contact', 'Contactpersoon', 'span2')}
+        ${input('functie', 'Functie<span class="opt">optioneel</span>', 'span2', 'text', 60, ' placeholder="Bijv. Inkoper"')}
         ${input('telefoon', 'Telefoonnummer', 'span2', 'tel', 40)}
         ${input('email', 'E-mailadres', 'span2', 'email')}
         ${input('adres', 'Adres', 'span2', 'text', 120, ' placeholder="Straat en huisnummer"')}
         ${input('plaats', 'Plaats', 'span2', 'text', 60, ' list="plaatsLijst"')}
         ${input('branche', 'Branche', 'span2', 'text', 60, ' list="brancheLijst"')}
         ${input('website', 'Website', 'span2', 'url', 120, ' inputmode="url" placeholder="www.bedrijf.nl"')}
-        ${sel('status', 'Status', statusOptions(d.status))}
-        ${input('klantnummer', 'Klantnummer<span class="opt">optioneel</span>', 'span2', 'text', 40)}
+        <div class="field span4"><label for="p-${id}-labels">Labels<span class="opt">scheid met komma's</span></label>
+          <input class="input" id="p-${id}-labels" data-field="labels" maxlength="300" value="${esc(d.labels || '')}" placeholder="Bijv. Linde-vloot, Beurs 2026"${ro}>
+          ${state.readOnly ? '' : labelSugHtml(`p-${id}-labels`, d.labels)}</div>
       </div>
+      <h3 class="slabel">Andere contactpersonen</h3>
+      ${(d.personen || []).map((x, i) => {
+        const pin = (k, label, type = 'text', max = 120) => `<div class="field span2"><label for="p-${id}-p${i}-${k}">${label}</label><input class="input" id="p-${id}-p${i}-${k}" data-persoon="${i}" data-pf="${k}" type="${type}" maxlength="${max}" value="${esc(x[k] || '')}"${ro}></div>`;
+        return `<div class="pcard"><div class="pgrid">${pin('naam', 'Naam')}${pin('functie', 'Functie', 'text', 60)}${pin('telefoon', 'Telefoon', 'tel', 40)}${pin('email', 'E-mail', 'email')}</div>
+          ${state.readOnly ? '' : `<div class="btns"><button type="button" class="btn small" id="phoofd-${id}-${i}" data-act="p-hoofd" data-i="${i}">Maak hoofdcontact</button><button type="button" class="btn small ghost" id="pdel-${id}-${i}" data-act="p-del" data-i="${i}">Weghalen</button></div>`}</div>`;
+      }).join('') || '<p class="hint">Nog geen. Voeg bijvoorbeeld de inkoper of de werkplaatschef toe.</p>'}
+      ${state.readOnly ? '' : `<div class="btns"><button type="button" class="btn small" id="padd-${id}" data-act="p-add">${ic('plus')}Contactpersoon toevoegen</button></div>`}
       <h3 class="slabel">Volgende stap</h3>
       <div class="pgrid">
         ${input('actie', 'Actie', 'span2', 'text', 40, ' list="actieLijst" placeholder="Kies of typ, bijv. Bezoek"')}
@@ -2586,7 +2693,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const q = placeQuery(l);
     const rows = [
       ['Klantnummer', l.klantnummer && pick(l.klantnummer, 'Klantnummer', true)],
-      ['Contactpersoon', l.contact && esc(l.contact)],
+      ['Labels', l.labels.length && `<span class="ltags">${labelTags(l, 12)}</span>`],
+      ['Contactpersoon', l.contact && esc(l.contact) + (l.functie ? ` <span class="faint">· ${esc(l.functie)}</span>` : '')],
       ['Telefoon', l.telefoon && pick(l.telefoon, 'Telefoonnummer', true)],
       ['E-mail', l.email && pick(l.email, 'E-mailadres') + (l.geenMail ? ' <span class="faint">(wil geen mail)</span>' : '')],
       ['Adres', (l.adres || l.plaats) && `<a href="${esc(mapUrl(q))}" target="_blank" rel="noopener">${esc([l.adres, l.plaats].filter(Boolean).join(', '))}</a>`],
@@ -2596,8 +2704,18 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     return `<section class="scard info" aria-label="Gegevens">
       <div class="scard-head"><h3 class="slabel">Gegevens</h3>${state.readOnly ? '' : `<button type="button" class="linkbtn" id="edit-${id}" data-act="tab" data-tab="gegevens">${ic('pencil-line')}Bewerken</button>`}</div>
       ${rows.length ? `<dl class="infolist">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` : '<p class="hint">Nog geen contactgegevens. Tik op Bewerken om ze aan te vullen.</p>'}
+      ${personenHtml(l)}
       ${l.notitie ? `<div class="note"><span class="slabel">Notitie</span><p>${esc(l.notitie)}</p></div>` : ''}
     </section>`;
+  }
+  // Andere contactpersonen met knoppen om te bellen, te appen of te mailen. Bellen vraagt daarna ook "Hoe ging het?".
+  function personenHtml(l) {
+    if (!l.personen.length) return '';
+    return `<div class="personen"><span class="slabel">Andere contactpersonen</span><ul>${l.personen.map(x => {
+      const tel = String(x.telefoon || '').replace(/\D/g, '').length >= 6, wa = waNumber(x.telefoon), naam = x.naam || 'Contactpersoon';
+      return `<li><div class="pn"><strong>${esc(naam)}</strong>${x.functie ? `<span>${esc(x.functie)}</span>` : ''}${x.telefoon ? `<span class="pick mono" role="button" tabindex="0" data-act="copy" data-copy="${esc(x.telefoon)}" data-label="Telefoonnummer">${esc(x.telefoon)}</span>` : ''}${x.email ? `<span class="pick" role="button" tabindex="0" data-act="copy" data-copy="${esc(x.email)}" data-label="E-mailadres">${esc(x.email)}</span>` : ''}</div>
+        <div class="pacts">${tel ? `<a class="iconbtn" href="${esc(telHref(x.telefoon))}" aria-label="Bel ${esc(naam)}">${ic('phone')}</a>` : ''}${wa ? `<a class="iconbtn" href="${esc(waHref({ contact: x.naam, telefoon: x.telefoon }))}" target="_blank" rel="noopener" data-act="wa" aria-label="WhatsApp naar ${esc(naam)}">${ic('message-circle')}</a>` : ''}${/@/.test(x.email || '') ? `<a class="iconbtn" href="${esc(mailtoUrl(x.email))}" data-act="qmail" aria-label="Mail ${esc(naam)}">${ic('mail')}</a>` : ''}</div></li>`;
+    }).join('')}</ul></div>`;
   }
   function historyHtml(l) {
     return `<section class="scard log" aria-label="Contactmomenten">
@@ -2634,7 +2752,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       : tab === 'gegevens' ? formHtml(l)
       : tab === 'historie' ? historyHtml(l)
       : (prepHtml(l) || (state.readOnly ? '' : `<section class="scard intro"><h3 class="slabel">Nog geen contact</h3><p class="hint">Bel of bezoek dit bedrijf en spreek daarna een verslag in. Leadnex onthoudt wat er besproken is en bereidt je volgende gesprek voor.</p>
-          <div class="pactions"><button type="button" class="btn" id="vmicnew2-${id}" data-act="v-new" data-mic="1">${ic('mic')}Verslag inspreken</button></div></section>`)) + bedrijfAgendaHtml(l) + infoHtml(l);
+          <div class="pactions"><button type="button" class="btn" id="vmicnew2-${id}" data-act="v-new" data-mic="1">${ic('mic')}Verslag inspreken</button></div></section>`)) + bedrijfAgendaHtml(l) + bestandenHtml(l) + infoHtml(l);
     return `${head}<div class="sheet-body">
       ${quick.length ? `<div class="quick">${quick.join('')}</div>` : ''}
       ${next}
@@ -2729,7 +2847,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       <div class="row-main" data-act="toggle">
         ${check}
         <button type="button" class="bedrijf" id="t-${id}" data-act="toggle" aria-haspopup="dialog">
-          <span class="name">${esc(l.bedrijf)}${prioBadge(l)}${statusBadge(l)}${l.voorbeeld ? '<span class="tag">Voorbeeld</span>' : ''}</span>
+          <span class="name">${esc(l.bedrijf)}${prioBadge(l)}${statusBadge(l)}${labelTags(l, 2)}${l.voorbeeld ? '<span class="tag">Voorbeeld</span>' : ''}</span>
           <span class="r-when">${when}</span>
           ${meta || dist != null || info ? `<span class="meta">${meta}${dist != null ? ` <span class="dist">${fmtKm(dist)}</span>` : ''}${info ? `${meta || dist != null ? ' · ' : ''}${esc(info)}` : ''}</span>` : ''}
         </button>
@@ -2909,6 +3027,17 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     ssel.innerHTML = `<option value="">Leads en klanten</option>` + [['lead', 'Leads'], ['prospect', 'Potentiële klanten'], ['klant', 'Klanten']]
       .map(([v, t]) => `<option value="${v}"${v === state.status ? ' selected' : ''}>${t} (${scount(v)})</option>`).join('');
     ssel.classList.toggle('on', !!state.status);
+    const labels = labelNames(), lsel = $('labelSel');
+    if (state.loaded && state.label && !labels.some(x => key(x) === key(state.label))) { state.label = ''; pref.set('labelFilter', ''); }
+    $('labelField').hidden = !labels.length;
+    const lcount = x => state.leads.filter(l => !l.gearchiveerd && l.labels.some(y => key(y) === key(x))).length;
+    lsel.innerHTML = `<option value="">Alle labels</option>` + labels.map(x => `<option value="${esc(x)}"${key(x) === key(state.label) ? ' selected' : ''}>${esc(x)} (${lcount(x)})</option>`).join('');
+    lsel.classList.toggle('on', !!state.label);
+    const stsel = $('stilSel');
+    stsel.innerHTML = `<option value="">Maakt niet uit</option>` + STIL_OPTIES.map(([v, t]) => `<option value="${v}"${v === state.stil ? ' selected' : ''}>${t}</option>`).join('');
+    stsel.classList.toggle('on', !!state.stil);
+    const sug = $('addLabelSug');
+    if (sug && document.activeElement !== $('addLabels')) sug.innerHTML = labelSugHtml('addLabels', $('addLabels').value);
     const plaatsen = new Map();
     state.leads.forEach(l => { if (l.plaats && !plaatsen.has(key(l.plaats))) plaatsen.set(key(l.plaats), l.plaats); });
     plaatsListEl.innerHTML = sortNames([...plaatsen.values()]).map(x => `<option value="${esc(x)}"></option>`).join('');
@@ -2961,7 +3090,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     });
   }
 
-  function renderAll() { renderMeta(); renderNav(); renderPage(); renderPlanbord(); renderAgVandaag(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderDup(); renderFilters(); if (mail.open) renderMailOut(); }
+  function renderAll() { renderMeta(); renderNav(); renderPage(); renderPlanbord(); renderAgVandaag(); renderStil(); renderRows(); renderKaart(); renderBuurt(); renderSelBar(); renderSessBar(); renderDup(); renderFilters(); if (mail.open) renderMailOut(); }
   let renderQueued = false;
   function scheduleRender() {
     if (renderQueued) return;
@@ -3389,6 +3518,55 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     el.innerHTML = seg + nav + `<div class="pweek">${cols}</div>` + takenlijst;
   }
   // Op Vandaag: de eigen afspraken en taken van vandaag, boven de acties.
+  /* ---------- klanten die je lang niet sprak ---------- */
+  // Laatste contact: het nieuwste contactmoment (bellen, mail, WhatsApp, verslag). Zonder contactmoment telt de dag
+  // waarop het bedrijf in Leadnex kwam, zodat een net geïmporteerde klantenlijst niet meteen helemaal "vergeten" is.
+  const STIL_OPTIES = [['3', 'Langer dan 3 maanden geleden'], ['6', 'Langer dan 6 maanden geleden'], ['12', 'Langer dan een jaar geleden'], ['nooit', 'Nog nooit (in Leadnex)']];
+  const stilMaanden = () => ['0', '3', '6', '12'].includes(pref.get('stilMaanden')) ? +pref.get('stilMaanden') : 6;
+  const laatsteContact = l => l.log.reduce((m, x) => x.d > m ? x.d : m, '') || String(l.aangemaakt || '').slice(0, 10);
+  function maandenTerug(n) { const d = new Date(); d.setMonth(d.getMonth() - n); return isoOf(d); }
+  const stilSinds = (l, maanden) => laatsteContact(l) < maandenTerug(maanden);
+  function stilLater() { try { const o = JSON.parse(pref.get('stilLater') || '{}'); return o && typeof o === 'object' ? o : {}; } catch { return {}; } }
+  function stilKlanten() {
+    const m = stilMaanden();
+    if (!m) return [];
+    const later = stilLater(), today = todayISO();
+    return state.leads.filter(l => !l.gearchiveerd && l.status === 'klant' && !l.actie && stilSinds(l, m) && !(later[l.id] >= today))
+      .sort((a, b) => laatsteContact(a).localeCompare(laatsteContact(b)) || byName(a, b));
+  }
+  function renderStil() {
+    const el = $('stilVandaag');
+    const lijst = state.page === 'vandaag' && state.loaded ? stilKlanten() : [];
+    el.hidden = !lijst.length;
+    if (!lijst.length) { el.innerHTML = ''; return; }
+    const m = stilMaanden();
+    const wanneer = l => l.log.length ? `Laatst gesproken ${shortDate(laatsteContact(l))}` : `Geen contact vastgelegd sinds ${shortDate(laatsteContact(l))}`;
+    el.innerHTML = `<div class="agv-head"><span class="slabel">Klanten die je ${m === 12 ? 'een jaar' : m + ' maanden'} niet sprak</span><button type="button" class="linkbtn" data-stil-alle>Alle ${lijst.length}</button></div>` +
+      lijst.slice(0, 3).map(l => `<div class="stil-item"><button type="button" class="bag" data-stil-open="${esc(l.id)}">${ic('building-2')}<span><strong>${esc(l.bedrijf)}</strong><span>${esc([l.contact, wanneer(l)].filter(Boolean).join(' · '))}</span></span></button>
+        ${state.readOnly ? '' : `<div class="btns"><button type="button" class="btn small primary" id="stilPlan-${esc(l.id)}" data-stil-plan="${esc(l.id)}">${ic('phone')}Vandaag bellen</button><button type="button" class="btn small ghost" id="stilLater-${esc(l.id)}" data-stil-later="${esc(l.id)}">Over een maand</button></div>`}</div>`).join('');
+  }
+  $('stilVandaag').addEventListener('click', async e => {
+    const b = e.target.closest('[data-stil-open], [data-stil-plan], [data-stil-later], [data-stil-alle]');
+    if (!b) return;
+    if (b.dataset.stilOpen) { openRow(b.dataset.stilOpen); return; }
+    if (b.hasAttribute('data-stil-alle')) {
+      state.status = 'klant'; pref.set('statusFilter', 'klant'); state.stil = String(stilMaanden()); pref.set('stilFilter', state.stil);
+      setPage('bedrijven'); return;
+    }
+    if (b.dataset.stilLater) {
+      const o = stilLater(), d = new Date(); d.setMonth(d.getMonth() + 1);
+      Object.keys(o).forEach(k => { if (o[k] < todayISO()) delete o[k]; });
+      o[b.dataset.stilLater] = isoOf(d); pref.set('stilLater', JSON.stringify(o));
+      renderStil(); return;
+    }
+    const l = byId(b.dataset.stilPlan);
+    if (!l || state.readOnly) return;
+    const actie = canonAction('Bellen');
+    if (await write(() => col.doc(l.id).update({ actie, datum: todayISO(), tijd: '', gewijzigd: nowISO() }))) { rememberAction(actie); toast(`${l.bedrijf} staat bij Bellen voor vandaag.`); }
+  });
+  $('stilMaandenSel').innerHTML = [['0', 'Uit'], ['3', 'Na 3 maanden'], ['6', 'Na 6 maanden'], ['12', 'Na een jaar']].map(([v, t]) => `<option value="${v}"${+v === stilMaanden() ? ' selected' : ''}>${t}</option>`).join('');
+  $('stilMaandenSel').addEventListener('change', e => { pref.set('stilMaanden', e.target.value); renderAll(); });
+
   function renderAgVandaag() {
     const el = $('agVandaag'), today = todayISO();
     const items = state.page !== 'vandaag' ? [] : state.agenda.filter(x => x.soort !== 'notitie' && (x.soort === 'taak' ? !x.klaar && x.datum && x.datum <= today : x.datum === today))
@@ -3396,6 +3574,106 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     el.hidden = !items.length;
     el.innerHTML = items.length ? `<div class="agv-head"><span class="slabel">Afspraken en taken vandaag</span><button type="button" class="linkbtn" data-page="planbord">Planbord</button></div>${items.map(agItemHtml).join('')}` : '';
   }
+  /* ---------- foto's en bestanden bij een bedrijf ---------- */
+  const BESTAND_MAX = 25 * 1024 * 1024;
+  const bst = { urls: new Map(), laden: new Set(), bezig: '', voortgang: '', fout: '', armed: '' };
+  const isFoto = b => /^image\//.test(b.type);
+  const kb = n => n >= 1048576 ? `${(n / 1048576).toFixed(1).replace('.', ',')} MB` : `${Math.max(1, Math.round(n / 1024))} kB`;
+  function bestandenHtml(l) {
+    const online = !state.local && !!sb && !!state.uid;
+    const id = esc(l.id), lijst = l.bestanden;
+    if (!online && !lijst.length) return '';
+    const tegels = lijst.map(b => {
+      const u = bst.urls.get(b.pad), href = u ? ` href="${esc(u)}" target="_blank" rel="noopener"` : '';
+      const binnen = isFoto(b) && u ? `<img src="${esc(u)}" alt="" loading="lazy">` : `<span class="bst-ic">${ic(isFoto(b) ? 'image' : /sheet|excel|csv/.test(b.type) ? 'file-spreadsheet' : 'file-text')}</span>`;
+      return `<div class="bst"><a class="bst-open"${href} title="${esc(b.naam)}">${binnen}<span class="bst-naam">${esc(b.naam)}</span><span class="bst-meta">${esc([shortDate(b.datum), b.grootte ? kb(b.grootte) : ''].filter(Boolean).join(' · '))}</span></a>` +
+        (state.readOnly ? '' : `<button type="button" class="bst-weg${bst.armed === b.id ? ' armed' : ''}" data-bst-weg="${esc(b.id)}" aria-label="${bst.armed === b.id ? 'Tik nogmaals om te verwijderen' : 'Verwijderen'}: ${esc(b.naam)}">${bst.armed === b.id ? 'Verwijderen?' : ic('x')}</button>`) + '</div>';
+    }).join('');
+    if (online && lijst.some(b => !bst.urls.has(b.pad) && !bst.laden.has(b.pad))) setTimeout(() => laadBestandUrls(l), 0);
+    return `<section class="scard bestanden" aria-label="Foto's en bestanden"><h3 class="slabel">Foto's en bestanden</h3>
+      ${lijst.length ? `<div class="bst-grid">${tegels}</div>` : '<p class="hint">Nog niets. Maak een foto van de situatie of een machine, of voeg een offerte of tekening toe.</p>'}
+      ${bst.bezig === l.id ? `<p class="hint" role="status">${esc(bst.voortgang)}</p>` : ''}
+      ${bst.fout ? `<p class="warn">${bst.fout}</p>` : ''}
+      ${online && !state.readOnly ? `<div class="pactions">
+        <label class="btn small" for="bstFoto-${id}">${ic('camera')}Foto maken</label><input type="file" class="sr" id="bstFoto-${id}" data-bst-lead="${id}" accept="image/*" capture="environment">
+        <label class="btn small" for="bstFile-${id}">${ic('upload')}Bestand toevoegen</label><input type="file" class="sr" id="bstFile-${id}" data-bst-lead="${id}" multiple>
+      </div>` : online ? '' : '<p class="hint">Bestanden toevoegen kan alleen met online opslag.</p>'}
+    </section>`;
+  }
+  // Tijdelijke links (een uur geldig) om foto's te tonen en bestanden te openen.
+  async function laadBestandUrls(l) {
+    const paden = l.bestanden.map(b => b.pad).filter(p => !bst.urls.has(p) && !bst.laden.has(p));
+    if (!paden.length || !sb) return;
+    paden.forEach(p => bst.laden.add(p));
+    try {
+      const { data } = await sb.storage.from('bestanden').createSignedUrls(paden, 3600);
+      (data || []).forEach(x => { if (x && x.signedUrl && x.path) bst.urls.set(x.path, x.signedUrl); });
+    } catch { /* geen verbinding: dan zonder voorbeeld */ }
+    setTimeout(() => paden.forEach(p => bst.laden.delete(p)), 60000);
+    if (state.open === l.id) renderDetail();
+  }
+  // Foto's van de telefoon zijn groot: verkleinen tot hooguit 1600 pixels, als JPEG.
+  async function verklein(file) {
+    if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type) || typeof createImageBitmap !== 'function') return file;
+    try {
+      const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+      const f = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * f); c.height = Math.round(bmp.height * f);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.82));
+      return blob && blob.size < file.size ? new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' }) : file;
+    } catch { return file; }
+  }
+  const veiligeNaam = n => String(n || 'bestand').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(-80) || 'bestand';
+  const opslagFout = e => /bucket not found|not found|404|row-level security|unauthorized|403/i.test(String((e && (e.message || e.error || e.statusCode)) || ''))
+    ? 'Foto\'s en bestanden zijn nog niet ingesteld in Supabase. Voer eenmalig <strong>supabase/opslag.sql</strong> uit (zie de uitleg).'
+    : navigator.onLine ? 'Uploaden lukte niet. Probeer het nog eens.' : 'Geen verbinding. Probeer het opnieuw als je weer bereik hebt.';
+  async function voegBestandenToe(id, files) {
+    const l = byId(id);
+    if (!l || !files.length || bst.bezig || !sb || state.readOnly) return;
+    bst.bezig = id; bst.fout = '';
+    const nieuw = [];
+    for (let i = 0; i < files.length; i++) {
+      bst.voortgang = `Uploaden: ${i + 1} van ${files.length}…`; renderDetail();
+      const f = await verklein(files[i]);
+      if (f.size > BESTAND_MAX) { bst.fout = `${esc(f.name)} is groter dan 25 MB en is overgeslagen.`; continue; }
+      const bid = Math.random().toString(36).slice(2, 10), pad = `${state.uid}/${id}/${bid}-${veiligeNaam(f.name)}`;
+      try {
+        const { error } = await sb.storage.from('bestanden').upload(pad, f, { contentType: f.type || 'application/octet-stream', upsert: false, cacheControl: '3600' });
+        if (error) throw error;
+        nieuw.push({ id: bid, naam: f.name.slice(0, 120), type: f.type || '', grootte: f.size, pad, datum: todayISO() });
+      } catch (e) { bst.fout = opslagFout(e); break; }
+    }
+    if (nieuw.length) {
+      const cur = byId(id);
+      const ok = cur && await write(() => col.doc(id).update({ bestanden: validBestanden([...nieuw, ...cur.bestanden]), gewijzigd: nowISO() }));
+      if (ok) toast(nieuw.length === 1 ? `${nieuw[0].naam} toegevoegd.` : `${nieuw.length} bestanden toegevoegd.`);
+    }
+    bst.bezig = ''; bst.voortgang = '';
+    renderDetail();
+  }
+  async function verwijderBestand(id, bid) {
+    const l = byId(id), b = l && l.bestanden.find(x => x.id === bid);
+    if (!b || state.readOnly) return;
+    if (bst.armed !== bid) { bst.armed = bid; renderDetail(); setTimeout(() => { if (bst.armed === bid) { bst.armed = ''; renderDetail(); } }, 4000); return; }
+    bst.armed = '';
+    try { const { error } = await sb.storage.from('bestanden').remove([b.pad]); if (error && !/not found/i.test(error.message || '')) throw error; }
+    catch (e) { bst.fout = opslagFout(e); renderDetail(); return; }
+    const cur = byId(id);
+    if (cur && await write(() => col.doc(id).update({ bestanden: cur.bestanden.filter(x => x.id !== bid), gewijzigd: nowISO() }))) toast(`${b.naam} verwijderd.`);
+    bst.urls.delete(b.pad);
+    renderDetail();
+  }
+  detailEl.addEventListener('change', e => {
+    const t = e.target;
+    if (t.dataset && t.dataset.bstLead && t.files && t.files.length) { const files = [...t.files]; t.value = ''; voegBestandenToe(t.dataset.bstLead, files); }
+  });
+  detailEl.addEventListener('click', e => {
+    const b = e.target.closest('[data-bst-weg]');
+    if (b) { e.preventDefault(); verwijderBestand(detailEl.dataset.id, b.dataset.bstWeg); }
+  });
+
   // Bij een bedrijf: wat er gepland staat en de notities.
   function bedrijfAgendaHtml(l) {
     const today = todayISO();
@@ -3638,6 +3916,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const tel = String(l.telefoon || '').trim(), mobile = /^(?:\+31|0031|0)[\s\-.()]*6/.test(tel);
     const lines = ['BEGIN:VCARD', 'VERSION:3.0', `N:;${e(fn)};;;`, `FN:${e(fn)}`, `ORG:${e(l.bedrijf)}`];
     if (tel) lines.push(`TEL;TYPE=${mobile ? 'CELL' : 'WORK,VOICE'}:${tel}`);
+    if (l.functie) lines.push(`TITLE:${e(l.functie)}`);
     addrList(l.email).forEach(a => lines.push(`EMAIL;TYPE=INTERNET,WORK:${a}`));
     if (street || pc || l.plaats) lines.push(`ADR;TYPE=WORK:;;${e(street)};${e(l.plaats)};;${e(pc)};Nederland`);
     if (l.website) lines.push(`URL:${e(webHref(l.website))}`);
@@ -4022,7 +4301,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     return /^(lead|nieuw|koud)/.test(k) ? 'lead' : '';
   }
   function mapRow(row, map) {
-    const o = { bedrijf: [], klantnummer: [], contact: [], email: [], telefoon: [], mobiel: [], adres: [], huisnummer: [], postcode: [], plaats: [], branche: [], website: [], status: [], actie: [], prioriteit: [], notitie: [] };
+    const o = { bedrijf: [], klantnummer: [], contact: [], functie: [], email: [], telefoon: [], mobiel: [], adres: [], huisnummer: [], postcode: [], plaats: [], branche: [], website: [], status: [], labels: [], actie: [], prioriteit: [], notitie: [] };
     map.forEach((f, i) => { const v = String(row[i] ?? '').trim(); if (f && v && o[f]) o[f].push(v); });
     let adres = [o.adres.join(' '), o.huisnummer.join(' ')].filter(Boolean).join(' ');
     if (o.postcode.length) adres = [adres, o.postcode.join(' ')].filter(Boolean).join(', ');
@@ -4030,9 +4309,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const tel = normPhone(o.telefoon[0]), mob = normPhone(o.mobiel[0]);
     const extra = tel && mob && phoneKey(tel) !== phoneKey(mob) ? [`Mobiel: ${mob}`] : [];
     return {
-      bedrijf: o.bedrijf.join(' ').slice(0, 120), klantnummer: (o.klantnummer[0] || '').slice(0, 40), contact: o.contact.join(' ').replace(/\s+/g, ' ').slice(0, 120),
+      bedrijf: o.bedrijf.join(' ').slice(0, 120), klantnummer: (o.klantnummer[0] || '').slice(0, 40), contact: o.contact.join(' ').replace(/\s+/g, ' ').slice(0, 120), functie: (o.functie[0] || '').slice(0, 60),
       email: (o.email[0] || '').split(/[;,\s]+/)[0].slice(0, 120), telefoon: (tel || mob).slice(0, 40),
-      adres: adres.slice(0, 120), plaats: o.plaats.join(' ').slice(0, 60), branche: o.branche[0] || '', website: cleanWebsite(o.website[0]), status: mapStatus(o.status[0]),
+      adres: adres.slice(0, 120), plaats: o.plaats.join(' ').slice(0, 60), branche: o.branche[0] || '', website: cleanWebsite(o.website[0]), status: mapStatus(o.status[0]), labels: validLabels(o.labels.flatMap(x => x.split(/[,;|]/))),
       actie: o.actie[0] || '', prioriteit: mapPrio(o.prioriteit[0]), notitie: [...extra, ...o.notitie].join(' · ').slice(0, 2000),
     };
   }
@@ -4042,9 +4321,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   function aanvulLead(l, c, status) {
     const fill = (k, v) => l[k] || v || '';
     const notitie = c.notitie && !key(l.notitie).includes(key(c.notitie)) ? [l.notitie, c.notitie].filter(Boolean).join('\n\n').slice(0, 2000) : l.notitie;
-    return { ...l, klantnummer: fill('klantnummer', c.klantnummer), contact: fill('contact', c.contact), email: fill('email', c.email), telefoon: fill('telefoon', c.telefoon),
+    return { ...l, klantnummer: fill('klantnummer', c.klantnummer), contact: fill('contact', c.contact), functie: l.contact ? l.functie : fill('functie', c.functie), email: fill('email', c.email), telefoon: fill('telefoon', c.telefoon),
       adres: fill('adres', c.adres), plaats: fill('plaats', canonPlaats(c.plaats)), website: fill('website', c.website), branche: fill('branche', canonBranche(c.branche)),
-      notitie, status: rankStatus(status) > rankStatus(l.status) ? status : l.status };
+      notitie, status: rankStatus(status) > rankStatus(l.status) ? status : l.status, labels: validLabels([...l.labels, ...c.labels]) };
   }
   function voorbeeldBestand() {
     saveFile('leadnex-klantenlijst.csv', '\ufeff' + IMP_VOORBEELD.join(';') + '\r\n', 'text/csv;charset=utf-8');
@@ -4152,6 +4431,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
         <div class="field"><label for="impBestaand">Staat een bedrijf al in je lijst?</label><select class="input" id="impBestaand">
           <option value="overslaan"${imp.bestaand === 'aanvullen' ? '' : ' selected'}>Overslaan</option><option value="aanvullen"${imp.bestaand === 'aanvullen' ? ' selected' : ''}>Aanvullen (lege velden invullen)</option></select>
           <p class="hint">Herkend aan klantnummer, naam, telefoon, e-mail of website. Aanvullen overschrijft niets wat je al had.</p></div>
+        <div class="field"><label for="impLabel">Label voor alle bedrijven uit dit bestand<span class="opt">optioneel</span></label><input class="input" id="impLabel" maxlength="40" value="${esc(imp.label)}" placeholder="Bijv. Klantenlijst 2026"></div>
         <div class="field"><label for="impActie">Actie voor de nieuwe bedrijven<span class="opt">optioneel</span></label><input class="input" id="impActie" list="actieLijst" maxlength="40" value="${esc(imp.actie)}" placeholder="Bijv. Bellen"></div>
         <div class="field"><label for="impDatum">Wanneer<span class="opt">optioneel</span></label>${whenHtml('impDatum', imp.datum)}</div>
       </div>
@@ -4181,11 +4461,12 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (!chosen.length || imp.busy) return;
     const nieuw = chosen.filter(r => !r.aanvullen);
     if (state.leads.length + nieuw.length > MAX_LEADS) return;
-    const now = nowISO(), globalActie = canonAction(imp.actie), datum = parseISO(imp.datum) ? imp.datum : '', status = impStatus();
+    const now = nowISO(), globalActie = canonAction(imp.actie), datum = parseISO(imp.datum) ? imp.datum : '', status = impStatus(), impLabels = parseLabels(imp.label);
+    chosen.forEach(r => { r.c = { ...r.c, labels: parseLabels([...r.c.labels, ...impLabels].join(',')) }; });
     const bodies = nieuw.map(r => {
       const actie = canonAction(r.c.actie) || globalActie;
-      return { body: toBody({ bedrijf: r.c.bedrijf, klantnummer: r.c.klantnummer, prioriteit: r.c.prioriteit, contact: r.c.contact, email: r.c.email, telefoon: r.c.telefoon, adres: r.c.adres, plaats: canonPlaats(r.c.plaats),
-        branche: canonBranche(r.c.branche), website: r.c.website, status: r.c.status || status,
+      return { body: toBody({ bedrijf: r.c.bedrijf, klantnummer: r.c.klantnummer, functie: r.c.functie, prioriteit: r.c.prioriteit, contact: r.c.contact, email: r.c.email, telefoon: r.c.telefoon, adres: r.c.adres, plaats: canonPlaats(r.c.plaats),
+        branche: canonBranche(r.c.branche), website: r.c.website, status: r.c.status || status, labels: r.c.labels,
         actie, datum: actie ? datum : '', notitie: r.c.notitie, geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '', aangemaakt: now, gewijzigd: now }) };
     });
     // Aanvullen: alle rijen van hetzelfde bedrijf eerst samenvoegen, dan één keer opslaan. Niets veranderd: niet opslaan.
@@ -4831,7 +5112,10 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const log = [...a.log, ...b.log].sort((x, y) => y.d.localeCompare(x.d)).filter(x => { const k = JSON.stringify(x); return !seen.has(k) && seen.add(k); });
     const verslagen = [...a.verslagen, ...b.verslagen.filter(v => !a.verslagen.some(w => w.id === v.id))].sort(byVerslag).slice(0, 200);
     const act = a.actie ? a : b.actie ? b : a;
-    return { ...a, klantnummer: pick('klantnummer'), contact: pick('contact'), email: pick('email'), telefoon: pick('telefoon'), adres: pick('adres'), plaats: pick('plaats'), website: pick('website'), branche: pick('branche'),
+    // Had het andere bedrijf een ander hoofdcontact, dan komt die bij de andere contactpersonen.
+    const extra = b.contact && a.contact && key(b.contact) !== key(a.contact) ? [{ naam: b.contact, functie: b.functie, telefoon: b.telefoon, email: b.email }] : [];
+    const personen = validPersonen([...a.personen, ...b.personen, ...extra]).filter((x, i, all) => all.findIndex(y => key(y.naam) === key(x.naam) && key(y.email) === key(x.email)) === i);
+    return { ...a, klantnummer: pick('klantnummer'), labels: validLabels([...a.labels, ...b.labels]), functie: pick('functie'), personen, bestanden: validBestanden([...a.bestanden, ...b.bestanden]), contact: pick('contact'), email: pick('email'), telefoon: pick('telefoon'), adres: pick('adres'), plaats: pick('plaats'), website: pick('website'), branche: pick('branche'),
       notitie: [...new Set([a.notitie, b.notitie].map(x => x.trim()).filter(Boolean))].join('\n\n').slice(0, 2000),
       actie: act.actie, datum: act.datum, tijd: act.tijd, herinnering: act.herinnering, outlookId: act.outlookId,
       prioriteit: prioRank(a) <= prioRank(b) ? a.prioriteit : b.prioriteit, status: rankStatus(a.status) >= rankStatus(b.status) ? a.status : b.status,
@@ -5074,6 +5358,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     else if (act === 'sess-skip') { sess.skipped++; nextInSession(); }
     else if (act === 'vcard') { const l = byId(id); if (l) saveContact(l); }
     else if (act === 'save') saveLead(id);
+    else if (act === 'p-add' || act === 'p-del' || act === 'p-hoofd') persoonActie(id, act, +el.dataset.i);
     else if (act === 'mail') openMail([id]);
     else if (act === 'agenda') {
       const d = drafts[id];
@@ -5124,6 +5409,29 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const h = suggestLine(text, act, elId + '-b');
     el.innerHTML = h; el.hidden = !h;
   }
+  // Contactpersonen in het formulier: toevoegen, weghalen of tot hoofdcontact maken (wisselt met de huidige). Opslaan met Opslaan.
+  function persoonActie(id, act, i) {
+    const d = drafts[id];
+    if (!d || state.readOnly) return;
+    d.personen = d.personen || [];
+    if (act === 'p-add') {
+      if (d.personen.length >= 20) { toast('Hooguit 20 contactpersonen per bedrijf.'); return; }
+      d.personen.push({ id: Math.random().toString(36).slice(2, 10), naam: '', functie: '', telefoon: '', email: '' });
+      renderDetail();
+      $(`p-${id}-p${d.personen.length - 1}-naam`)?.focus();
+      return;
+    }
+    const x = d.personen[i];
+    if (!x) return;
+    if (act === 'p-del') d.personen.splice(i, 1);
+    else {
+      const oud = { naam: d.contact, functie: d.functie, telefoon: d.telefoon, email: d.email };
+      Object.assign(d, { contact: x.naam, functie: x.functie, telefoon: x.telefoon, email: x.email });
+      if (oud.naam || oud.telefoon || oud.email) d.personen[i] = { id: x.id, ...oud }; else d.personen.splice(i, 1);
+      toast(`${x.naam || 'Deze persoon'} is nu het hoofdcontact. Tik op Opslaan om het te bewaren.`);
+    }
+    renderDetail();
+  }
   function onField(e) {
     const t = e.target, row = t.closest('.row, .sheet');
     if (!row) return;
@@ -5145,6 +5453,11 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       if (['vactie', 'vdatum', 'vtijd'].includes(f)) v.planTouched = true;
       if (['machines', 'interesse', 'afspraken'].includes(f)) v.touched[f] = true;
       if (e.type === 'change' && ['interesse', 'vtijd', 'soort'].includes(f)) renderRows();
+      return;
+    }
+    if (t.dataset.pf && drafts[id] && drafts[id].personen) {
+      const x = drafts[id].personen[+t.dataset.persoon];
+      if (x) x[t.dataset.pf] = t.value;
       return;
     }
     if (t.dataset.field && drafts[id]) {
@@ -5195,6 +5508,20 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     searchEl.blur();
   });
   $('statusSel').addEventListener('change', e => { state.status = e.target.value; pref.set('statusFilter', state.status); renderAll(); });
+  $('labelSel').addEventListener('change', e => { state.label = e.target.value; pref.set('labelFilter', state.label); renderAll(); });
+  $('stilSel').addEventListener('change', e => { state.stil = e.target.value; pref.set('stilFilter', state.stil); renderAll(); });
+  // Labelvoorstellen: tik om een label in het veld erboven te zetten of weg te halen.
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.labelsug [data-label]');
+    if (!b) return;
+    const input = $(b.closest('.labelsug').dataset.for);
+    if (!input || input.readOnly) return;
+    const cur = parseLabels(input.value), k = key(b.dataset.label);
+    const next = cur.some(x => key(x) === k) ? cur.filter(x => key(x) !== k) : [...cur, b.dataset.label];
+    input.value = next.join(', ');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    b.closest('.labelsug').outerHTML = labelSugHtml(input.id, input.value);
+  });
   let filterOpen = false;
   function renderFilters() {
     const panel = $('filterPanel'), btn = $('filterBtn'), chips = $('activeFilters');
@@ -5202,7 +5529,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     panel.hidden = !filterOpen || !onList;
     btn.setAttribute('aria-expanded', String(filterOpen && onList));
     $('buurtField').hidden = state.page !== 'bedrijven';
-    const act = [state.branche && ['branche', state.branche], state.status && ['status', STATUSES.find(x => x[0] === state.status)[1]],
+    const act = [state.branche && ['branche', state.branche], state.status && ['status', STATUSES.find(x => x[0] === state.status)[1]], state.label && ['label', `Label: ${state.label}`],
+      state.stil && ['stil', state.stil === 'nooit' ? 'Nog nooit gesproken' : `Laatste contact > ${state.stil === '12' ? '1 jaar' : state.stil + ' mnd'}`],
       state.buurt && state.page === 'bedrijven' && ['buurt', `In de buurt (${buurtKm()} km)`]].filter(Boolean);
     btn.innerHTML = `${ic('sliders-horizontal')}<span>Filters</span>${act.length ? `<span class="badge">${act.length}</span>` : ''}`;
     chips.hidden = !act.length || !onList;
@@ -5211,7 +5539,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   $('filterBtn').addEventListener('click', () => { filterOpen = !filterOpen; renderFilters(); });
   $('filterDone').addEventListener('click', () => { filterOpen = false; renderFilters(); });
   $('filterClear').addEventListener('click', () => {
-    state.branche = ''; pref.set('branche', ''); state.status = ''; pref.set('statusFilter', '');
+    state.branche = ''; pref.set('branche', ''); state.status = ''; pref.set('statusFilter', ''); state.label = ''; pref.set('labelFilter', ''); state.stil = ''; pref.set('stilFilter', '');
     if (state.buurt) { state.buurt = false; pref.set('buurt', ''); if (state.page !== 'kaart') stopLocating(); }
     renderAll();
   });
@@ -5220,6 +5548,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (!b) return;
     if (b.dataset.clear === 'branche') { state.branche = ''; pref.set('branche', ''); }
     else if (b.dataset.clear === 'status') { state.status = ''; pref.set('statusFilter', ''); }
+    else if (b.dataset.clear === 'label') { state.label = ''; pref.set('labelFilter', ''); }
+    else if (b.dataset.clear === 'stil') { state.stil = ''; pref.set('stilFilter', ''); }
     else { state.buurt = false; pref.set('buurt', ''); if (state.page !== 'kaart') stopLocating(); }
     renderAll();
   });
@@ -5331,6 +5661,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   });
   importPanel.addEventListener('input', e => {
     if (e.target.id === 'impActie') imp.actie = e.target.value;
+    else if (e.target.id === 'impLabel') imp.label = e.target.value;
     else if (e.target.id === 'impDatum') imp.datum = e.target.value;
   });
   importPanel.addEventListener('paste', e => {
@@ -5651,18 +5982,82 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     e.target.value = '';
     if (!f) return;
     try {
-      const data = JSON.parse(await f.text());
-      const leads = Array.isArray(data.leads) ? data.leads.filter(x => x && typeof x.bedrijf === 'string' && x.bedrijf.trim()) : [];
-      const sjablonen = Array.isArray(data.sjablonen) ? data.sjablonen.filter(x => x && (x.onderwerp || x.tekst)) : [];
-      const acties = Array.isArray(data.acties) ? data.acties.filter(x => typeof x === 'string' && x.trim()) : [];
-      const agenda = Array.isArray(data.agenda) ? data.agenda.filter(x => x && typeof x === 'object' && (x.titel || x.tekst)) : [];
-      if (!leads.length && !sjablonen.length && !agenda.length) throw new Error('leeg');
-      restoreData = { leads, sjablonen, acties, agenda };
-      renderRestore();
+      leesBackup(JSON.parse(await f.text()));
     } catch {
       restoreData = null;
       renderRestore('Dit bestand is geen back-up van deze app. Kies het .json-bestand van Back-up maken.');
     }
+    restoreEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+  function leesBackup(data) {
+    const leads = Array.isArray(data.leads) ? data.leads.filter(x => x && typeof x.bedrijf === 'string' && x.bedrijf.trim()) : [];
+    const sjablonen = Array.isArray(data.sjablonen) ? data.sjablonen.filter(x => x && (x.onderwerp || x.tekst)) : [];
+    const acties = Array.isArray(data.acties) ? data.acties.filter(x => typeof x === 'string' && x.trim()) : [];
+    const agenda = Array.isArray(data.agenda) ? data.agenda.filter(x => x && typeof x === 'object' && (x.titel || x.tekst)) : [];
+    if (!leads.length && !sjablonen.length && !agenda.length) throw new Error('leeg');
+    restoreData = { leads, sjablonen, acties, agenda };
+    renderRestore();
+  }
+
+  /* ---------- automatische back-up (elke nacht door de functie leadnex-meldingen, in Supabase Storage) ---------- */
+  const ab = { lijst: null, fout: '', bezig: false, gekozen: '' };
+  const backupDatum = naam => { const d = naam.slice(0, 10); return d === todayISO() ? 'vandaag' : longDate(d); };
+  async function checkAutoBackup() {
+    const row = $('autoBackupRow');
+    row.hidden = state.local || !sb || !state.uid;
+    if (row.hidden) return;
+    try {
+      const { data, error } = await sb.storage.from('backups').list(state.uid, { limit: 100, sortBy: { column: 'name', order: 'desc' } });
+      if (error) throw error;
+      ab.lijst = (data || []).map(x => x.name).filter(n => /^\d{4}-\d\d-\d\d\.json$/.test(n)).sort().reverse();
+      ab.fout = '';
+    } catch (e) { ab.lijst = null; ab.fout = /not found|bucket/i.test(String(e && (e.message || e))) ? 'opslag' : 'netwerk'; }
+    renderAutoBackup();
+  }
+  function renderAutoBackup() {
+    const status = $('autoBackupStatus'), nu = $('autoBackupNu'), box = $('autoBackupBox'), l = ab.lijst;
+    nu.hidden = state.readOnly || ab.fout === 'opslag';
+    nu.disabled = ab.bezig;
+    nu.textContent = ab.bezig ? 'Bezig…' : 'Nu maken';
+    status.textContent = ab.fout === 'opslag' ? 'Nog niet ingesteld: voer eenmalig supabase/opslag.sql uit in Supabase (zie de uitleg).'
+      : ab.fout ? 'Kon niet kijken of er back-ups zijn. Controleer je verbinding.'
+      : !l ? 'Kijken…'
+      : !l.length ? 'Nog geen. Elke nacht om 3 uur komt er vanzelf een, of tik op Nu maken.'
+      : `Laatste: ${backupDatum(l[0])}. Elke nacht om 3 uur, de nieuwste 30 blijven bewaard (nu ${l.length}).`;
+    box.hidden = !l || !l.length;
+    if (box.hidden) { box.innerHTML = ''; return; }
+    if (!l.includes(ab.gekozen)) ab.gekozen = l[0];
+    withFocus(box, () => {
+      box.innerHTML = `<label class="sr" for="autoBackupSel">Kies een back-up</label>
+        <select class="input" id="autoBackupSel">${l.map(n => `<option value="${esc(n)}"${n === ab.gekozen ? ' selected' : ''}>${esc(cap(backupDatum(n)))}</option>`).join('')}</select>
+        <div class="btns">${state.readOnly ? '' : '<button type="button" class="btn small" id="autoBackupTerug">Terugzetten</button>'}<button type="button" class="btn small" id="autoBackupDown">${ic('download')}Downloaden</button></div>
+        <p class="hint">Terugzetten zet de bedrijven, mailteksten en planning van die dag terug; wat sindsdien nieuw is, blijft staan. Downloaden bewaart een kopie op dit apparaat.</p>`;
+    });
+  }
+  async function haalAutoBackup(naam) {
+    const { data, error } = await sb.storage.from('backups').download(`${state.uid}/${naam}`);
+    if (error || !data) throw error || new Error('leeg');
+    return await data.text();
+  }
+  $('autoBackupNu').addEventListener('click', async () => {
+    if (ab.bezig) return;
+    ab.bezig = true; renderAutoBackup();
+    const r = await meldServer({ backup: true });
+    ab.bezig = false;
+    if (r.ok) toast(`Back-up gemaakt met ${r.bedrijven} ${plural(r.bedrijven, 'bedrijf', 'bedrijven')}.`);
+    else if (r.fout === 'geen-functie' || r.fout === 'server 400' || (!r.fout && r.telefoons !== undefined)) toast('Werk eerst de functie leadnex-meldingen bij in Supabase (zie de uitleg).', 6000);
+    else if (r.fout === 'geen-opslag') toast('Voer eerst eenmalig supabase/opslag.sql uit in Supabase (zie de uitleg).', 6000);
+    else toast('Back-up maken lukte niet. Probeer het later opnieuw.');
+    checkAutoBackup();
+  });
+  $('autoBackupRow').addEventListener('change', e => { if (e.target.id === 'autoBackupSel') ab.gekozen = e.target.value; });
+  $('autoBackupRow').addEventListener('click', async e => {
+    const b = e.target.closest('#autoBackupTerug, #autoBackupDown');
+    if (!b || !ab.gekozen) return;
+    let tekst;
+    try { tekst = await haalAutoBackup(ab.gekozen); } catch { toast('Ophalen lukte niet. Controleer je verbinding.'); return; }
+    if (b.id === 'autoBackupDown') { saveFile(`leadnex-backup-${ab.gekozen}`, tekst, 'application/json'); toast('Back-up opgeslagen in je downloads.'); return; }
+    try { leesBackup(JSON.parse(tekst)); } catch { restoreData = null; renderRestore('Deze back-up kon niet worden gelezen.'); }
     restoreEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
   });
   restoreEl.addEventListener('click', e => {
@@ -6438,6 +6833,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
 
     // Gedeeld vanuit Google of Chrome: meteen naar Nieuw, ook als de lijst nog laadt.
     if (shareIn && !shareBezig) { shareBezig = true; setTimeout(() => handleShare(shareIn).catch(e => console.error(e)), 0); }
+    if (snelIn === 'bedrijf') setTimeout(() => { setPage('nieuw'); $('addBedrijf').focus(); }, 0);
+    else if (['afspraak', 'taak', 'notitie'].includes(snelIn)) setTimeout(() => { setPage('planbord'); openAg({ soort: snelIn }); }, 0);
     col.limit(MAX_LEADS).onSnapshot(snap => {
       const first = !state.loaded;
       state.leads = snap.docs.filter(d => d.exists).map(normalize);
@@ -6446,6 +6843,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       openWachtend();
       setTimeout(maybeOfferMove, 0);
       if (first) setTimeout(() => { if (shareIn) checkAddDupes(); else afterCall(); }, 0);
+      if (first && snelIn === 'belsessie') setTimeout(() => { setPage('vandaag'); startSession(); }, 0);
       state.problem = null;
       saveAgenda();
       scheduleRender();
