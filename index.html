@@ -590,6 +590,8 @@ body.sessie .sheet-body { padding-bottom: 150px; }
 .kansgebied { display: flex; gap: 6px; align-items: flex-start; margin: 0; }
 .kansgebied .ic { flex: none; width: 16px; height: 16px; margin-top: 2px; }
 .kbronnen { display: flex; flex-wrap: wrap; gap: 6px; }
+.kanstip { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 12px 14px; border-radius: 14px; background: var(--brand-soft); font-size: 14px; }
+.kanstip .ic { flex: none; width: 18px; height: 18px; margin-top: 1px; color: var(--primary); }
 .kbron { padding: 3px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: var(--ok-soft); color: var(--ok); }
 .kbron.fout { background: var(--danger-soft); color: var(--danger); }
 .kanssectie { display: grid; gap: 8px; }
@@ -3637,8 +3639,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       <strong>Week ${+id.slice(6)}${id === huidig ? ' (deze week)' : ''}</strong><span class="faint">${esc(dagKop(ma))} – ${esc(dagKop(zo))}</span>
       <button type="button" class="iconbtn" id="kansVolgende" data-kans-naar="${esc(weken[i - 1] || '')}"${i > 0 ? '' : ' disabled'} aria-label="Volgende week">${ic('chevron-right')}</button></div>`;
     if (!d) return nav + emptyHtml('Nog geen kansen voor deze week', id === huidig ? 'Ze komen maandagochtend vanzelf. Tik op Nu zoeken om nu al te kijken.' : 'Voor deze week zijn geen kansen gezocht.');
-    const gebied = (d.gebied || []).map(g => `${g.naam} (${g.n})`).join(' · ');
-    const bron = (k, label) => { const b = (d.bronnen || {})[k]; return !b ? '' : b.fout === 'uit' ? '' : `<span class="kbron${b.ok ? '' : ' fout'}" title="${esc(b.fout || '')}">${esc(label)}: ${b.ok ? b.n : 'niet gelukt'}</span>`; };
+    const gebied = (d.gebied || []).map(g => `${g.naam} (${g.n})`).join(' · '), gb = (d.bronnen || {}).gebied || {};
+    const weinig = gb.klanten !== undefined && gb.klanten < 50;
+    const bron = (k, label) => { const b = (d.bronnen || {})[k]; return !b ? '' : b.fout === 'uit' ? '' : `<span class="kbron${b.ok ? '' : ' fout'}" title="${esc(b.fout || b.info || '')}">${esc(label)}${b.ok && b.bron && k === 'nieuws' ? ` (${esc(b.bron)})` : ''}: ${b.ok ? b.n : 'niet gelukt'}</span>`; };
     const bronnen = [bron('vergunning', 'Bekendmakingen'), bron('nieuws', 'Nieuws'), bron('bedrijf', 'Bedrijven')].filter(Boolean).join('');
     const bronNaam = { gebied: 'Gebied', vergunning: 'Bekendmakingen', nieuws: 'Nieuws', bedrijf: 'Bedrijven' };
     const fouten = Object.entries(d.bronnen || {}).filter(([, b]) => !b.ok && b.fout && b.fout !== 'uit').map(([k, b]) => `${bronNaam[k] || k}: ${b.fout}`);
@@ -3648,7 +3651,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       return `<section class="kanssectie" aria-label="${esc(label)}"><h3 class="slabel">${ic(icn)}${esc(label)} <span class="n">${lijst.length}</span></h3>
         ${lijst.length ? lijst.map(it => kansItemHtml(id, it)).join('') : '<p class="hint">Deze week niets gevonden.</p>'}</section>`;
     }).join('');
-    return nav + `${gebied ? `<p class="hint kansgebied">${ic('map-pin')}Gebied: ${esc(gebied)}</p>` : ''}
+    return nav + `${gebied ? `<p class="hint kansgebied">${ic('map-pin')}<span>Gebied: ${esc(gebied)}${gb.info ? `<br><span class="faint">${esc(gb.info)}</span>` : ''}</span></p>` : ''}
+      ${weinig ? `<p class="kanstip">${ic('info')}<span>Leadnex kijkt nu naar maar ${gb.klanten} ${plural(gb.klanten, 'bedrijf', 'bedrijven')}. Importeer je relatielijst via <strong>Meer → Importeren uit Excel</strong>, dan zoekt hij in de gemeenten waar al je klanten zitten.</span></p>` : ''}
       ${bronnen ? `<div class="kbronnen">${bronnen}</div>` : ''}
       ${fouten.length ? `<p class="warn">Niet alles lukte: ${esc(fouten.join(' · '))}</p>` : ''}
       ${secties}
@@ -3680,7 +3684,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     kans.bezig = true; renderKansen();
     const r = await meldServer({ kansen: true });
     kans.bezig = false;
-    if (r.ok) { kans.week = r.week; toast(`${r.kansen} ${plural(r.kansen, 'kans', 'kansen')} voor week ${+String(r.week).slice(6)}.`); if (appStore && appStore.ververs) await appStore.ververs('kansen').catch(() => {}); }
+    if (appStore && appStore.ververs) await appStore.ververs('kansen').catch(() => {});   // ook als het half lukte: wat gevonden is, staat er
+    if (r.ok) { kans.week = r.week; toast(`${r.kansen} ${plural(r.kansen, 'kans', 'kansen')} voor week ${+String(r.week).slice(6)}.`); }
     else if (r.fout === 'geen-functie' || (!r.fout && r.telefoons !== undefined)) toast('Werk eerst de functie leadnex-meldingen bij in Supabase (zie de uitleg).', 6000);
     else if (r.fout === 'niet-ingelogd') toast('Log opnieuw in en probeer het nog eens.');
     else toast('Zoeken lukte niet. Probeer het later opnieuw.');
