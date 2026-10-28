@@ -597,9 +597,12 @@ body.sessie .sheet-body { padding-bottom: 150px; }
 .kanstip .ic { flex: none; width: 18px; height: 18px; margin-top: 1px; color: var(--primary); }
 .kbron { padding: 3px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: var(--ok-soft); color: var(--ok); }
 .kbron.fout { background: var(--danger-soft); color: var(--danger); }
-.kanssectie { display: grid; gap: 8px; }
-.kanssectie .slabel { display: flex; align-items: center; gap: 8px; margin: 6px 0 0; }
-.kanssectie .slabel .ic { width: 16px; height: 16px; }
+.kanskop { display: flex; align-items: center; gap: 8px; margin: 4px 0 0; }
+.kanskop .ic { width: 16px; height: 16px; }
+.kanslijst { display: grid; gap: 8px; }
+.kplaats .input { max-width: 340px; }
+.kans-tekst .kwaarom { color: var(--ink); }
+.stag.sterk { background: var(--primary); color: var(--primary-ink); }
 .kans { display: grid; gap: 10px; padding: 14px 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); }
 .kans.weg { opacity: .6; }
 .kans-tekst { display: grid; gap: 3px; min-width: 0; overflow-wrap: anywhere; }
@@ -1043,7 +1046,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
 
   <!-- Kansen -->
   <div class="page-head" data-show="kansen">
-    <div><h2>Kansen</h2><p class="sub" id="kansSub">Nieuwbouw, nieuws en bedrijven die passen bij jouw klanten. Elke maandag nieuw.</p></div>
+    <div><h2>Kansen</h2><p class="sub" id="kansSub">Bedrijven die bij je passen en nieuwbouw in het gebied van je klanten. Elke week bijgewerkt.</p></div>
     <div class="btns" id="kansKnoppen"><button type="button" class="btn primary" id="kansNu"><i data-ic="search"></i>Nu zoeken</button><button type="button" class="btn" id="kansInstel" aria-expanded="false"><i data-ic="sliders-horizontal"></i>Instellen</button></div>
   </div>
   <section class="kansen" id="kansenPage" data-show="kansen" aria-label="Kansen"></section>
@@ -3572,9 +3575,13 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   }
   // Op Vandaag: de eigen afspraken en taken van vandaag, boven de acties.
   /* ---------- kansen uit de markt ---------- */
-  // De functie leadnex-meldingen zoekt elke maandag (of meteen met Nu zoeken) kansen in de gemeenten waar jouw klanten zitten:
-  // nieuwbouw en vergunningen (officiële bekendmakingen), nieuws (Google Nieuws) en bedrijven in jouw branches (OpenStreetMap).
-  // Iedereen kiest zelf zijn branches en provincies (instellingen/kansen); per week één document in de collectie kansen.
+  // Twee soorten kansen, in het gebied waar jouw klanten zitten:
+  //  - Bedrijven die bij je passen: de app zoekt zelf in OpenStreetMap (vanaf een server weigeren de openbare servers dat vaak)
+  //    naar bedrijven met een bedrijfshal, magazijn of werkplaats en bedrijven in jouw branches, rond je klanten. Daar rijdt
+  //    waarschijnlijk een heftruck of reachtruck of staat een reinigingsmachine. Op volgorde van hoe goed ze op je klanten
+  //    lijken (branche, klanten in de buurt, afstand). Eén document kansen/bedrijven; elke week opnieuw of met Nu zoeken.
+  //  - Nieuwbouw en vergunningen: de functie leadnex-meldingen zoekt elke maandag in de officiële bekendmakingen (per week één document).
+  // Iedereen kiest zelf zijn branches en provincies (instellingen/kansen).
   const KANS_BRANCHES = [
     ['transport', 'Transport en logistiek', /transport|logisti|expeditie|koerier|distributie|verhuis|cargo|freight/],
     ['bouw', 'Bouw en aannemerij', /bouw(?!maat)|aannem|beton|infra|grondverzet|sloop|fundering|bestrating|straatwerk/],
@@ -3589,53 +3596,334 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     ['productie', 'Productie en food', /food|voeding|bakkerij|vlees|zuivel|productie|fabriek|industrie|kunststof|verpakking|products|manufactur/],
     ['recycling', 'Recycling en afval', /recycl|afval|container|milieu/],
     ['verhuur', 'Verhuur', /verhuur|rental/],
+    ['schoonmaak', 'Schoonmaak en reiniging', /schoonmaak|reiniging|cleaning|glazenwas/],
   ];
-  const KANS_SOORTEN = [['vergunning', 'Nieuwbouw en vergunningen', 'house'], ['nieuws', 'In het nieuws', 'globe'], ['bedrijf', 'Bedrijven die bij je klanten passen', 'building-2']];
+  // Per branche: kenmerken in OpenStreetMap, en waarvoor zo'n bedrijf waarschijnlijk een machine gebruikt.
+  const KANS_OSM = {
+    transport: { osm: ['["office"="logistics"]', '["industrial"~"^(warehouse|logistics|distribution)$"]', '["building"="warehouse"]'], machine: 'heftruck en reachtruck (laden, lossen en magazijn)' },
+    bouw: { osm: ['["craft"~"^(builder|roofer|scaffolder)$"]', '["office"="construction_company"]'], machine: 'heftruck (bouwmaterialen op de werf)' },
+    afbouw: { osm: ['["craft"~"^(painter|carpenter|plasterer|tiler|floorer|insulation|glaziery)$"]'], machine: 'heftruck of stapelaar (materiaal in de werkplaats)' },
+    installatie: { osm: ['["craft"~"^(electrician|plumber|hvac|heating_engineer|solar_installer)$"]'], machine: 'stapelaar of heftruck (magazijn)' },
+    metaal: { osm: ['["craft"~"^(metal_construction|welder|blacksmith|machinist)$"]', '["industrial"~"^(metal|metal_processing|machinery|steel)"]'], machine: 'heftruck en reinigingsmachine (werkplaats)' },
+    hout: { osm: ['["craft"~"^(sawmill|cabinet_maker|joiner)$"]', '["industrial"="sawmill"]'], machine: 'heftruck (hout en platen)' },
+    handel: { osm: ['["shop"~"^(wholesale|trade)$"]'], machine: 'reachtruck en heftruck (magazijn)' },
+    agrarisch: { osm: ['["craft"="agricultural_engines"]', '["shop"="agrarian"]'], machine: 'heftruck (voer, kisten en pallets)' },
+    groen: { osm: ['["craft"="gardener"]', '["shop"="garden_centre"]'], machine: 'heftruck (planten en materiaal)' },
+    auto: { osm: ['["shop"~"^(car_repair|car|truck|trailer|tyres)$"]'], machine: 'heftruck en reinigingsmachine (werkplaats)' },
+    productie: { osm: ['["man_made"="works"]', '["industrial"~"^(factory|food_industry|brewery|bakery|plastic|chemical|printing)"]'], machine: 'heftruck, reachtruck en reinigingsmachine (productiehal)' },
+    recycling: { osm: ['["industrial"~"^(scrap_yard|recycling|waste_handling)$"]'], machine: 'heftruck en veegmachine' },
+    verhuur: { osm: ['["shop"~"^(rental|tool_hire)$"]'], machine: 'heftruck (verhuurmaterieel)' },
+    schoonmaak: { osm: ['["craft"="cleaning"]'], machine: 'reinigingsmachines' },
+  };
+  // Altijd mee: bedrijven met een bedrijfshal, fabriek, magazijn of werkplaats.
+  const KANS_PAND = ['["industrial"]', '["building"~"^(industrial|warehouse|manufacture)$"]', '["man_made"="works"]', '["office"="logistics"]',
+    '["shop"~"^(wholesale|trade|building_materials|agrarian|tool_hire|truck|trailer)$"]',
+    '["craft"~"^(metal_construction|welder|blacksmith|machinist|sawmill|cabinet_maker|joiner|carpenter|builder|scaffolder|stonemason|agricultural_engines|brewery|distillery|printer|boatbuilder|window_construction|cleaning)$"]'];
+  const KANS_GEEN = /\b(gemeente|stichting|school|basisschool|kerk|vereniging|parochie|politie|brandweer|ziekenhuis|huisarts|tandarts|fysio|apotheek|kinderopvang|bibliotheek|sporthal|zwembad|camping|hotel|restaurant|cafe|snackbar|kapsalon|kapper|museum|theater|bedrijventerrein|industrieterrein|industriegebied|bedrijvenpark|rwzi|rioolwaterzuivering|gemaal|onderstation|transformatorstation|windpark|zonnepark|parkeerterrein|milieustraat)\b/;
+  const KANS_ALGEMEEN = /^(hal|loods|schuur|garage|werkplaats|magazijn|opslag|gebouw|fabriek|bedrijfshal|bedrijfspand|kantoor)( \w{1,3})?$/;
+  const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
+  const KANS_STRAAL = 12, KANS_MAX = 300, KANS_STAP = 25;
+  const KANS_SOORTEN = [['bedrijf', 'Bedrijven die bij je passen', 'building-2'], ['vergunning', 'Nieuwbouw en vergunningen', 'house']];
   // Versie van de functie leadnex-meldingen die bij deze app hoort (zie VERSIE in supabase/functions/leadnex-meldingen/index.ts).
   const FUNCTIE_VERSIE = '2026-10-28c';
   const PROVINCIES = ['Drenthe', 'Flevoland', 'Friesland', 'Gelderland', 'Groningen', 'Limburg', 'Noord-Brabant', 'Noord-Holland', 'Overijssel', 'Utrecht', 'Zeeland', 'Zuid-Holland'];
-  let kansCol = null, kansProfielDoc = null;
-  const kans = { profiel: null, geladen: false, week: '', instellen: false, bezig: false, draft: null, toon: false, pending: null };
+  let kansCol = null, kansProfielDoc = null, kansGebiedDoc = null;
+  const kans = { profiel: null, geladen: false, week: '', instellen: false, bezig: false, draft: null, toon: false, pending: null,
+    tab: pref.get('kansTab') === 'week' ? 'week' : 'bedrijven', bedrijven: null, bGeladen: false, bZoekt: false, bBelofte: null, bStap: '', bFilter: '', bPlaats: '', bAantal: KANS_STAP };
   const weekId = iso => { const d = parseISO(mondayOf(iso)); d.setDate(d.getDate() + 3); return `${d.getFullYear()}-W${pad(isoWeek(iso))}`; };
   const weekMaandag = id => { const m = /^(\d{4})-W(\d{2})$/.exec(id); return m ? isoOf(weekMonday(+m[1], +m[2])) : todayISO(); };
-  // Aantal klanten per branche, op naam en branche (voor de standaardkeuze en als hulp bij het kiezen).
-  function brancheTelling() {
+  const brancheVan = k => KANS_BRANCHES.find(b => b[0] === k);
+  // Zelfde sleutel als de functie (plaatsen in instellingen/kansgebied).
+  const kansKey = t => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\b(b\.?\s?v\.?|v\.?o\.?f\.?|holding|groep|group|gmbh|bv|vof)\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+  const osmPast = (o, t) => { const m = /\["([^"]+)"(?:(=|~)"([^"]+)")?\]/.exec(o); return !!m && t[m[1]] !== undefined && (!m[2] || (m[2] === '=' ? t[m[1]] === m[3] : new RegExp(m[3]).test(t[m[1]]))); };
+  // Je klanten (of, met nog weinig klanten, alle bedrijven in je lijst) waarmee vergeleken wordt.
+  function kansBasis() {
     const klanten = state.leads.filter(l => !l.gearchiveerd && l.status === 'klant');
-    const basis = klanten.length >= 20 ? klanten : state.leads.filter(l => !l.gearchiveerd);
+    return klanten.length >= 20 ? { lijst: klanten, soort: 'klanten' } : { lijst: state.leads.filter(l => !l.gearchiveerd), soort: 'bedrijven' };
+  }
+  const kansBranchesVan = l => { const t = key(`${l.bedrijf} ${l.branche}`); return KANS_BRANCHES.filter(([, , re]) => re.test(t)).map(([k]) => k); };
+  // Aantal klanten per branche, op naam en branche (voor de standaardkeuze, als hulp bij het kiezen en om te vergelijken).
+  function brancheTelling() {
     const n = Object.fromEntries(KANS_BRANCHES.map(([k]) => [k, 0]));
-    basis.forEach(l => { const t = key(`${l.bedrijf} ${l.branche}`); KANS_BRANCHES.forEach(([k, , re]) => { if (re.test(t)) n[k]++; }); });
+    kansBasis().lijst.forEach(l => kansBranchesVan(l).forEach(k => { n[k]++; }));
     return n;
   }
   function standaardProfiel() {
     const n = brancheTelling();
     const branches = KANS_BRANCHES.map(([k]) => k).filter(k => n[k] > 0).sort((a, b) => n[b] - n[a]).slice(0, 5);
-    return { branches, provincies: ['Overijssel', 'Gelderland', 'Drenthe'], soorten: ['vergunning', 'nieuws', 'bedrijf'], woorden: '' };
+    return { branches, provincies: ['Overijssel', 'Gelderland', 'Drenthe'], soorten: ['bedrijf', 'vergunning'], woorden: '' };
   }
+  const kansSoorten = p => (p ? p.soorten : []).filter(k => KANS_SOORTEN.some(([s]) => s === k));
   function kansProfielHtml() {
     const d = kans.draft, n = brancheTelling();
     const chip = (attr, v, label, aan, extra = '') => `<button type="button" class="chip small" ${attr}="${esc(v)}" aria-pressed="${aan}">${esc(label)}${extra}</button>`;
     return `<section class="card kansprofiel" aria-label="Kansen instellen">
       <h3>Waar zoek je kansen?</h3>
-      <p class="hint">Kies de branches waarin jij werkt. Leadnex zoekt in de gemeenten waar de meeste van jouw klanten zitten, binnen de provincies die je kiest. Iedereen stelt dit voor zichzelf in.</p>
+      <p class="hint">Kies de branches waarin jij werkt. Leadnex zoekt rond de plaatsen waar jouw klanten zitten, binnen de provincies die je kiest. Iedereen stelt dit voor zichzelf in.</p>
       <div class="field"><span class="flabel">Branches</span><div class="chips">${KANS_BRANCHES.map(([k, label]) => chip('data-kb', k, label, d.branches.includes(k), n[k] ? ` <span class="n">${n[k]}</span>` : '')).join('')}</div>
         <p class="hint">Het getal is het aantal van jouw klanten in die branche (herkend aan naam of branche).</p></div>
       <div class="field"><span class="flabel">Provincies</span><div class="chips">${PROVINCIES.map(p => chip('data-kp', p, p, d.provincies.includes(p))).join('')}</div></div>
       <div class="field"><span class="flabel">Soort kansen</span><div class="chips">${KANS_SOORTEN.map(([k, label]) => chip('data-ks', k, label, d.soorten.includes(k))).join('')}</div></div>
       <div class="field"><label for="kansWoorden">Eigen zoekwoorden<span class="opt">optioneel, scheid met komma's</span></label><input class="input" id="kansWoorden" maxlength="200" value="${esc(d.woorden)}" placeholder="Bijv. magazijn, stellingen, heftruck"></div>
-      <div class="pactions"><button type="button" class="btn primary" id="kansBewaar"${d.provincies.length && d.soorten.length ? '' : ' disabled'}>${kans.profiel ? 'Opslaan' : 'Opslaan en kansen zoeken'}</button>${kans.profiel ? '<button type="button" class="btn" id="kansAnnuleer">Annuleren</button>' : ''}</div>
+      <div class="pactions"><button type="button" class="btn primary" id="kansBewaar"${d.provincies.length && kansSoorten(d).length ? '' : ' disabled'}>${kans.profiel ? 'Opslaan' : 'Opslaan en kansen zoeken'}</button>${kans.profiel ? '<button type="button" class="btn" id="kansAnnuleer">Annuleren</button>' : ''}</div>
     </section>`;
   }
-  const kansMeta = it => [it.plaats || it.gemeente, it.soort === 'bedrijf' ? '' : it.bron, it.datum ? shortDate(it.datum) : ''].filter(Boolean).join(' · ');
+
+  /* bedrijven die bij je passen: zoeken in de app */
+  async function haalMetTijd(url, init, ms) {
+    const ac = new AbortController(), tm = setTimeout(() => ac.abort(), ms);
+    try { const r = await fetch(url, { ...init, signal: ac.signal }); return { ok: r.ok, status: r.status, tekst: await r.text() }; }
+    finally { clearTimeout(tm); }
+  }
+  // Waar je klanten zitten: het adres op de kaart als dat er al is, anders het midden van hun plaats (PDOK). De plaatsen
+  // (met gemeente en provincie) bewaart de app in instellingen/kansgebied, net als de functie.
+  async function kansKlanten() {
+    const { lijst, soort } = kansBasis(), basis = lijst.filter(l => l.plaats || onMap(l));
+    const per = new Map();
+    basis.forEach(l => {
+      const k = kansKey(l.plaats);
+      if (!k) return;
+      const pc = (/\b(\d{4}) ?([A-Z]{2})\b/.exec(l.adres || '') || []).slice(1).join(''), x = per.get(k) || { k, naam: String(l.plaats).trim(), n: 0, pc: '' };
+      x.n++; if (!x.pc && pc) x.pc = pc;
+      per.set(k, x);
+    });
+    const snap = kansGebiedDoc ? await kansGebiedDoc.get() : null, oud = snap && snap.exists ? snap.data() || {} : {};
+    const cache = { ...(oud.plaatsen && typeof oud.plaatsen === 'object' ? oud.plaatsen : {}) };
+    const open = [...per.values()].sort((a, b) => b.n - a.n).slice(0, 150).filter(x => !cache[x.k] || cache[x.k].lat === undefined);
+    let erbij = 0;
+    for (let i = 0; i < open.length; i += 8) {
+      await Promise.all(open.slice(i, i + 8).map(async x => {
+        const q = x.pc ? `q=${x.pc}&fq=type:postcode` : `q=${encodeURIComponent(x.naam)}&fq=type:woonplaats`;
+        try {
+          const r = await haalMetTijd(`${PDOK_ZOEK}?${q}&fl=woonplaatsnaam,gemeentenaam,provincienaam,centroide_ll&rows=1`, {}, 10000);
+          const d = r.ok ? ((JSON.parse(r.tekst).response || {}).docs || [])[0] : null, pt = /POINT\(([\d.-]+) ([\d.-]+)\)/.exec((d && d.centroide_ll) || '');
+          if (d && d.gemeentenaam) { cache[x.k] = { g: d.gemeentenaam, p: d.provincienaam || '', w: d.woonplaatsnaam || x.naam, ...(pt ? { lon: +pt[1], lat: +pt[2] } : {}) }; erbij++; }
+        } catch { /* volgende keer opnieuw */ }
+      }));
+    }
+    if (erbij && kansGebiedDoc && !state.readOnly) kansGebiedDoc.set({ ...oud, plaatsen: cache, gewijzigd: nowISO() }).catch(() => {});
+    const prov = kans.profiel ? kans.profiel.provincies : [], punten = [];
+    basis.forEach(l => {
+      const c = cache[kansKey(l.plaats)];
+      if (c && c.p && prov.length && !prov.includes(c.p)) return;   // buiten de provincies die je kiest
+      const pos = onMap(l) ? l.geo : c && c.lat !== undefined ? c : null;
+      if (pos) punten.push({ naam: l.bedrijf, plaats: String(l.plaats || (c && c.w) || '').trim(), lat: +pos.lat, lon: +pos.lon, br: kansBranchesVan(l) });
+    });
+    return { punten, soort, basis: basis.length, plaatsen: per.size };
+  }
+  // Zoekgebied: vakjes van ongeveer 11 bij 10 km met klanten. De drukste die samen 90% van je klanten hebben, met een
+  // vakje rand eromheen; zo valt een losse klant ver weg af en zoek je ook net buiten de plaatsen van je klanten.
+  function kansVakken(punten) {
+    const H = 0.1, B = 0.15, tel = new Map();
+    punten.forEach(p => { const c = `${Math.floor(p.lat / H)},${Math.floor(p.lon / B)}`; tel.set(c, (tel.get(c) || 0) + 1); });
+    let som = 0;
+    const kern = [...tel].sort((a, b) => b[1] - a[1]).filter(([, n], i) => { const neem = i < 8 || som < punten.length * 0.9; som += n; return neem; }).slice(0, 40);
+    const rijen = new Map();
+    kern.forEach(([c]) => { const [i, j] = c.split(',').map(Number); for (let a = i - 1; a <= i + 1; a++) for (let b = j - 1; b <= j + 1; b++) { if (!rijen.has(a)) rijen.set(a, new Set()); rijen.get(a).add(b); } });
+    // Per rij aaneengesloten vakjes samen, en gelijke stukken in de rij erboven ook.
+    const stukken = [];
+    [...rijen.keys()].sort((a, b) => a - b).forEach(i => {
+      const js = [...rijen.get(i)].sort((a, b) => a - b);
+      js.forEach((j, x) => {
+        if (js[x - 1] === j - 1) return;
+        let e = j; while (js.includes(e + 1)) e++;
+        const boven = stukken.find(s => s.i1 === i - 1 && s.j0 === j && s.j1 === e);
+        if (boven) boven.i1 = i; else stukken.push({ i0: i, i1: i, j0: j, j1: e });
+      });
+    });
+    const vak = s => [s.i0 * H, s.j0 * B, (s.i1 + 1) * H, (s.j1 + 1) * B];
+    if (stukken.length <= 16) return stukken.map(vak);
+    const z = Math.min(...stukken.map(s => s.i0)), n = Math.max(...stukken.map(s => s.i1)), w = Math.min(...stukken.map(s => s.j0)), o = Math.max(...stukken.map(s => s.j1));
+    return [vak({ i0: z, i1: n, j0: w, j1: o })];
+  }
+  function kansVraag(profiel, vakken) {
+    const sel = [...new Set([...KANS_PAND, ...profiel.branches.flatMap(b => (KANS_OSM[b] || { osm: [] }).osm)])];
+    // Kantoren alleen als de naam bij een van je branches past (anders ook administratiekantoren en ICT).
+    const namen = profiel.branches.map(b => (brancheVan(b) || [])[2]).filter(Boolean).map(re => re.source.replace(/\(\?![^)]*\)/g, '')).join('|');
+    const filters = [...sel.map(x => `["name"]${x}`), ...(namen ? [`["office"~"^(company|construction_company)$"]["name"~"${namen}",i]`] : [])];
+    const bb = v => `(${v.map(x => x.toFixed(3)).join(',')})`;
+    return `[out:json][timeout:90];(${vakken.flatMap(v => filters.map(f => `nwr${f}${bb(v)};`)).join('')});out tags center;`;
+  }
+  // De openbare OpenStreetMap-servers zijn soms druk of breken een vraag af (dan staat dat in "remark"): de volgende proberen.
+  async function overpassVraag(ql) {
+    const fouten = [];
+    for (const u of OVERPASS) {
+      const host = new URL(u).hostname;
+      try {
+        const r = await haalMetTijd(u, { method: 'POST', body: new URLSearchParams({ data: ql }) }, 100000);
+        if (!r.ok) { fouten.push(`${host} ${r.status}`); continue; }
+        const j = JSON.parse(r.tekst);
+        if (/runtime error|timed out|out of memory|too busy|rate.?limit/i.test(String(j.remark || ''))) { fouten.push(`${host}: ${String(j.remark).replace(/runtime error: /, '').slice(0, 60)}`); continue; }
+        return { els: Array.isArray(j.elements) ? j.elements : [], bron: host };
+      } catch (e) { fouten.push(`${host}: ${e && e.name === 'AbortError' ? 'geen antwoord (te traag)' : 'niet bereikbaar'}`); }
+    }
+    throw new Error(`OpenStreetMap gaf geen antwoord (${fouten.join(', ')}). Probeer het later nog eens.`);
+  }
+  // Elk gevonden bedrijf vergelijken met je klanten: branche, klanten in dezelfde branche in de buurt, bedrijfshal, afstand.
+  function kansBeoordeel(els, punten) {
+    const profiel = kans.profiel, n = brancheTelling(), maxN = Math.max(1, ...Object.values(n));
+    const bekend = new Set(state.leads.map(l => kansKey(l.bedrijf)).filter(Boolean));
+    const tweeWoorden = k => { const w = k.split(' '); return w.length >= 2 && k.length >= 8 ? w.slice(0, 2).join(' ') : ''; };
+    const bekendBegin = new Set([...bekend].map(tweeWoorden).filter(Boolean));
+    const telSleutel = t => String(t || '').replace(/\D/g, '').slice(-9);
+    const bekendTel = new Set(state.leads.flatMap(l => [l.telefoon, l.mobiel]).map(telSleutel).filter(t => t.length === 9));
+    const site = w => String(w || '').toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+    const bekendWeb = new Set(state.leads.map(l => site(l.website)).filter(Boolean));
+    // Klanten in vakjes van ca. 17 km: alleen de vakjes eromheen hoeven bekeken te worden.
+    const vakVan = (lat, lon) => [Math.floor(lat / 0.15), Math.floor(lon / 0.25)], rooster = new Map();
+    punten.forEach(p => { const c = vakVan(p.lat, p.lon).join(','); if (!rooster.has(c)) rooster.set(c, []); rooster.get(c).push(p); });
+    const dichtbij = pos => { const [i, j] = vakVan(pos.lat, pos.lon), uit = []; for (let a = i - 1; a <= i + 1; a++) for (let b = j - 1; b <= j + 1; b++) uit.push(...(rooster.get(`${a},${b}`) || [])); return uit; };
+    const beste = new Map();
+    let inLijst = 0;
+    for (const e of els) {
+      const t = e.tags || {}, naam = String(t.name || '').trim(), k = kansKey(naam);
+      const pos = e.center || (e.lat !== undefined ? { lat: e.lat, lon: e.lon } : null);
+      if (!naam || k.length < 3 || !pos || KANS_GEEN.test(k) || KANS_ALGEMEEN.test(k) || t.disused === 'yes' || (t.amenity && !t.craft && !t.industrial && !t.office && !t.shop)) continue;
+      const tel = String(t.phone || t['contact:phone'] || t['contact:mobile'] || '').split(';')[0].trim(), web = String(t.website || t['contact:website'] || t.url || '').split(';')[0].trim();
+      if (bekend.has(k) || (tweeWoorden(k) && bekendBegin.has(tweeWoorden(k))) || (tel && bekendTel.has(telSleutel(tel))) || (web && bekendWeb.has(site(web)))) { inLijst++; continue; }
+      // Branche: eerst je eigen branches (op kenmerk of naam), dan de naam (zegt meer dan een algemeen kenmerk), dan het kenmerk.
+      const opNaam = KANS_BRANCHES.find(([, , re]) => re.test(k)), opTag = Object.keys(KANS_OSM).find(b => KANS_OSM[b].osm.some(o => osmPast(o, t)));
+      const branche = profiel.branches.find(b => (KANS_OSM[b] || { osm: [] }).osm.some(o => osmPast(o, t)) || ((brancheVan(b) || [])[2] || /$^/).test(k)) || (opNaam && opNaam[0]) || opTag || '';
+      // Dichtstbijzijnde klant, en klanten in dezelfde branche binnen 10 km (vlakke benadering: op deze afstanden nauwkeurig genoeg).
+      const kx = 111.32 * Math.cos(pos.lat * Math.PI / 180), buren = [];
+      let km = Infinity, naast = null;
+      for (const p of dichtbij(pos)) {
+        const x = (p.lon - pos.lon) * kx, y = (p.lat - pos.lat) * 110.57, afst = Math.sqrt(x * x + y * y);
+        if (afst < km) { km = afst; naast = p; }
+        if (branche && afst <= 10 && p.br.includes(branche)) buren.push({ p, d: afst });
+      }
+      if (!naast || km > KANS_STRAAL) continue;
+      buren.sort((a, b) => a.d - b.d);
+      const hal = !!(t.industrial || t.man_made === 'works' || /^(industrial|warehouse|manufacture)$/.test(t.building || '') || t.office === 'logistics' || /^(wholesale|trade|building_materials)$/.test(t.shop || ''));
+      const score = (branche ? (profiel.branches.includes(branche) ? 4 : 1) + Math.round(3 * (n[branche] || 0) / maxN) : 0) + (buren.length >= 3 ? 3 : buren.length ? 2 : 0)
+        + (hal ? 2 : 0) + (km <= 2 ? 2 : km <= 6 ? 1 : 0) + (tel ? 1 : 0) + (web ? 1 : 0);
+      const it = { id: (e.type || 'n')[0] + e.id, titel: naam.slice(0, 120), branche, hal: hal ? 1 : 0, plaats: String(t['addr:city'] || naast.plaats || '').slice(0, 60),
+        adres: [[t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' '), t['addr:postcode']].filter(Boolean).join(', ').slice(0, 120),
+        telefoon: tel.slice(0, 40), website: web.slice(0, 200), km: Math.round(km * 10) / 10, bij: naast.plaats.slice(0, 60),
+        buren: buren.length, lijkt: [...new Set(buren.map(x => x.p.naam))].slice(0, 2).map(x => String(x).slice(0, 60)), score };
+      const was = beste.get(k);   // zelfde bedrijf als punt én als gebouw: de beste houden
+      if (!was || was.score < it.score || (was.score === it.score && !was.adres && it.adres)) beste.set(k, it);
+    }
+    return { items: [...beste.values()].sort((a, b) => b.score - a.score || a.km - b.km), inLijst };
+  }
+  // Loopt er al een zoekronde (bijvoorbeeld vanzelf bij het openen), dan wacht je daarop.
+  function zoekBedrijven() {
+    if (!kans.bBelofte) kans.bBelofte = zoekBedrijvenNu().finally(() => { kans.bBelofte = null; });
+    return kans.bBelofte;
+  }
+  async function zoekBedrijvenNu() {
+    if (!kans.profiel || !kansCol || state.readOnly) return null;
+    kans.bZoekt = true; kans.bStap = 'De plaatsen van je klanten opzoeken…'; renderKansen();
+    pref.set('kansBedrijfPoging', String(Date.now()));
+    const vorig = kans.bedrijven && Array.isArray(kans.bedrijven.items) ? kans.bedrijven : null;
+    let uit;
+    try {
+      const k = await kansKlanten();
+      if (!k.punten.length) throw new Error(k.basis ? 'De plaatsen van je klanten konden niet worden opgezocht (PDOK). Probeer het later nog eens.' : 'Nog geen klanten met een plaats. Importeer eerst je relaties (Meer → Importeren uit Excel).');
+      const vakken = kansVakken(k.punten);
+      kans.bStap = `Bedrijven zoeken rond je ${k.punten.length} ${k.soort === 'klanten' ? plural(k.punten.length, 'klant', 'klanten') : plural(k.punten.length, 'bedrijf', 'bedrijven')}… dit kan een minuut duren.`; renderKansen();
+      const { els, bron } = await overpassVraag(kansVraag(kans.profiel, vakken));
+      const r = kansBeoordeel(els, k.punten);
+      const weg = new Set([...(vorig && Array.isArray(vorig.weg) ? vorig.weg : []), ...(vorig ? vorig.items.filter(x => x.status === 'verborgen').map(x => x.id) : [])]);
+      const eerder = new Map(vorig ? vorig.items.map(x => [x.id, x]) : []), vandaag = todayISO();
+      const telPlaats = new Map();
+      k.punten.forEach(p => { if (p.plaats) telPlaats.set(p.plaats, (telPlaats.get(p.plaats) || 0) + 1); });
+      uit = { gezocht: nowISO(), soort: k.soort, klanten: k.punten.length, plaatsen: telPlaats.size, plaatsNamen: [...telPlaats].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([p]) => p),
+        gevonden: els.length, inLijst: r.inLijst, totaal: r.items.length, bron, profiel: kans.profiel.branches.join(','),
+        items: r.items.slice(0, KANS_MAX).map(x => {
+          const was = eerder.get(x.id), sinds = was ? was.sinds || '' : vorig && vorig.items.length ? vandaag : '';
+          return { ...x, ...(sinds ? { sinds } : {}), ...(weg.has(x.id) ? { status: 'verborgen' } : {}) };
+        }),
+        weg: [...weg].slice(-2000) };
+    } catch (e) {
+      console.error('[kansen]', e);
+      uit = { ...(vorig || { items: [] }), fout: String((e && e.message) || e).slice(0, 220), foutOp: nowISO() };
+    }
+    try { await kansCol.doc('bedrijven').set(uit); } catch (e) { console.error(e); }
+    kans.bedrijven = uit;
+    kans.bZoekt = false; kans.bStap = ''; kans.bAantal = KANS_STAP;
+    renderKansen();
+    return uit;
+  }
+  // Openen van Kansen: is de lijst er nog niet of ouder dan een week, dan meteen zoeken (hooguit eens per half uur proberen).
+  function kansAutoBedrijven() {
+    if (kans.bZoekt || kans.bezig || !kans.bGeladen || !state.loaded || !kans.profiel || !kansSoorten(kans.profiel).includes('bedrijf') || state.readOnly || !navigator.onLine) return;
+    const b = kans.bedrijven, oud = !b || !b.gezocht || Date.now() - Date.parse(b.gezocht) > 7 * 86400000 || b.profiel !== kans.profiel.branches.join(',');
+    if (oud && Date.now() - (+pref.get('kansBedrijfPoging') || 0) > 30 * 60000) setTimeout(zoekBedrijven, 0);
+  }
+  const kansNieuw = it => !!it.sinds && it.sinds >= isoOf(new Date(Date.now() - 7 * 86400000));
+  function kansBedrijfHtml(it) {
+    const id = esc(it.id), weg = it.status === 'verborgen', b = brancheVan(it.branche);
+    const label = b ? b[1] : it.hal ? 'Bedrijf met bedrijfshal' : 'Bedrijf';
+    const machine = (KANS_OSM[it.branche] || {}).machine || (it.hal ? 'heftruck (bedrijfshal of magazijn)' : '');
+    const wie = kans.bedrijven && kans.bedrijven.soort === 'bedrijven' ? 'bedrijven uit je lijst' : 'klanten';
+    const lijkt = it.lijkt && it.lijkt.length ? `Net als je ${wie} ${it.lijkt.join(' en ')}${it.buren > it.lijkt.length ? ` (${it.buren} in de buurt)` : ''}.` : '';
+    const waar = it.km < 1 ? `vlak bij je ${wie} in ${it.bij}` : `${Math.round(it.km)} km van je ${wie} in ${it.bij}`;
+    const adres = it.adres ? `${it.adres}${it.plaats ? (/\d{4} ?[A-Z]{2}$/.test(it.adres) ? ' ' : ', ') + it.plaats : ''}` : it.plaats;
+    const kaart = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([it.titel, it.adres, it.plaats].filter(Boolean).join(' '))}`;
+    return `<article class="kans${weg ? ' weg' : ''}" data-kans="${id}">
+      <div class="kans-tekst"><strong>${esc(it.titel)}${it.score >= 11 ? '<span class="stag sterk">Sterke kans</span>' : ''}${kansNieuw(it) ? '<span class="stag prospect">Nieuw</span>' : ''}</strong>
+        <span class="meta">${esc([label, waar].join(' · '))}</span>${adres ? `<span>${esc(adres)}</span>` : ''}
+        ${machine || lijkt ? `<span class="kwaarom">${esc([machine && `Waarschijnlijk ${machine}.`, lijkt].filter(Boolean).join(' '))}</span>` : ''}</div>
+      <div class="btns">${it.status === 'toegevoegd' ? '<span class="stag klant">In je lijst</span>'
+        : state.readOnly ? '' : `<button type="button" class="btn small primary" id="kansAdd-${id}" data-kans-add="${id}" data-kans-week="bedrijven">${ic('plus')}Toevoegen</button>`}
+        ${it.telefoon ? `<a class="btn small" href="${esc(telHref(it.telefoon))}">${ic('phone')}Bellen</a>` : ''}
+        ${it.website ? `<a class="btn small" href="${esc(webHref(it.website))}" target="_blank" rel="noopener">${ic('globe')}Website</a>` : ''}
+        <a class="btn small" href="${esc(kaart)}" target="_blank" rel="noopener">${ic('map-pin')}Kaart</a>
+        ${state.readOnly || it.status === 'toegevoegd' ? '' : `<button type="button" class="btn small ghost" id="kansWeg-${id}" data-kans-weg="${id}" data-kans-week="bedrijven">${weg ? 'Toch tonen' : 'Niet interessant'}</button>`}</div>
+    </article>`;
+  }
+  function kansBedrijvenHtml() {
+    const b = kans.bedrijven, items = b && Array.isArray(b.items) ? b.items : [];
+    const zichtbaar = items.filter(x => x.status !== 'verborgen');
+    const kop = `<h3 class="slabel kanskop">${ic('building-2')}Bedrijven die bij je passen${items.length ? ` <span class="n">${zichtbaar.length}</span>` : ''}</h3>`;
+    const status = kans.bZoekt ? `<p class="kanstip" role="status">${ic('search')}<span>${esc(kans.bStap || 'Zoeken…')}</span></p>` : '';
+    const wanneer = iso => `${shortDate(iso.slice(0, 10))} ${new Date(iso).toTimeString().slice(0, 5)}`;
+    const fout = b && b.fout ? `<p class="warn">Zoeken lukte niet: ${esc(b.fout)}${items.length && b.gezocht ? ` Je ziet de lijst van ${esc(wanneer(b.gezocht))}.` : ''}</p>` : '';
+    if (!items.length) {
+      const leeg = kans.bZoekt ? '' : b && b.gezocht ? emptyHtml('Geen nieuwe bedrijven gevonden', 'Rond je klanten staan geen bedrijven in OpenStreetMap die nog niet in je lijst staan. Kies eventueel meer branches bij Instellen.')
+        : b && b.fout ? '' : emptyHtml('Nog niet gezocht', 'Tik op Nu zoeken. Leadnex zoekt dan bedrijven rond de plaatsen waar je klanten zitten.');
+      return kop + status + fout + leeg;
+    }
+    const lijst0 = items.filter(x => kans.toon || x.status !== 'verborgen');
+    const perBranche = new Map(), perPlaats = new Map();
+    lijst0.forEach(x => { const k = x.branche || 'overig'; perBranche.set(k, (perBranche.get(k) || 0) + 1); if (x.bij) perPlaats.set(x.bij, (perPlaats.get(x.bij) || 0) + 1); });
+    const f = perBranche.has(kans.bFilter) ? kans.bFilter : '', pl = perPlaats.has(kans.bPlaats) ? kans.bPlaats : '';
+    // Wat je toevoegt, blijft op zijn plek staan (met In je lijst); bij de volgende zoekronde valt het weg.
+    const lijst = lijst0.filter(x => (!f || (x.branche || 'overig') === f) && (!pl || x.bij === pl)).sort((a, c) => c.score - a.score || a.km - c.km);
+    const chip = (k, label, n) => `<button type="button" class="chip small" data-kbf="${esc(k)}" aria-pressed="${f === k}">${esc(label)} <span class="n">${n}</span></button>`;
+    const chips = [chip('', 'Alle', lijst0.length), ...[...perBranche].sort((a, c) => c[1] - a[1]).map(([k, n]) => chip(k, k === 'overig' ? 'Overig' : (brancheVan(k) || [, k])[1], n))].join('');
+    const plaatsen = [...perPlaats].sort((a, c) => c[1] - a[1] || a[0].localeCompare(c[0]));
+    const wie = b.soort === 'bedrijven' ? 'de bedrijven in je lijst' : 'je klanten';
+    const verborgen = items.length - zichtbaar.length;
+    return kop + `<p class="hint">Bedrijven rond ${wie} die waarschijnlijk een heftruck, reachtruck of reinigingsmachine gebruiken en nog niet in je lijst staan. Bovenaan wat het meest lijkt op ${wie}: zelfde branche, met ${wie} in de buurt, met een bedrijfshal.</p>
+      ${status}${fout}
+      ${b.gezocht ? `<details class="kdetails"><summary>Wat is er gezocht?</summary><ul>
+        <li><strong>Gebied:</strong> tot ${KANS_STRAAL} km rond ${b.klanten} ${b.soort === 'klanten' ? 'klanten' : 'bedrijven'} in ${b.plaatsen} ${plural(b.plaatsen, 'plaats', 'plaatsen')}${b.plaatsNamen && b.plaatsNamen.length ? ` (vooral ${esc(b.plaatsNamen.join(', '))})` : ''}</li>
+        <li><strong>Gevonden:</strong> ${b.gevonden} bedrijven in OpenStreetMap${b.bron ? ` (${esc(b.bron)})` : ''}; ${b.inLijst} staan al in je lijst${b.totaal > items.length ? `; de beste ${items.length} van ${b.totaal} staan hieronder` : ''}</li>
+        <li><strong>Bijgewerkt:</strong> ${esc(wanneer(b.gezocht))}. Elke week opnieuw; nieuwe bedrijven krijgen het label Nieuw.</li></ul></details>` : ''}
+      <div class="chips kfilter" role="group" aria-label="Branche">${chips}</div>
+      ${plaatsen.length > 1 ? `<div class="kplaats"><select class="input" id="kansPlaats" aria-label="Plaats"><option value="">Alle plaatsen</option>${plaatsen.map(([p, n]) => `<option value="${esc(p)}"${p === pl ? ' selected' : ''}>Bij ${esc(p)} (${n})</option>`).join('')}</select></div>` : ''}
+      <div class="kanslijst">${lijst.slice(0, kans.bAantal).map(kansBedrijfHtml).join('') || '<p class="hint">Niets in deze keuze.</p>'}</div>
+      ${lijst.length > kans.bAantal ? `<button type="button" class="btn" id="kansMeer">Toon meer (nog ${lijst.length - kans.bAantal})</button>` : ''}
+      ${verborgen ? `<button type="button" class="linkbtn" id="kansToon">${kans.toon ? 'Verborgen bedrijven verbergen' : `${verborgen} verborgen ${plural(verborgen, 'bedrijf', 'bedrijven')} tonen`}</button>` : ''}
+      <p class="hint kansvoet">Bron: © OpenStreetMap-bijdragers en PDOK. Niet elk bedrijf staat in OpenStreetMap, en niet alles klopt: bel of kijk even op de website voordat je langsgaat.</p>`;
+  }
+
+  /* nieuwbouw en vergunningen: per week, van de functie */
+  const kansMeta = it => [it.plaats || it.gemeente, it.bron, it.datum ? shortDate(it.datum) : ''].filter(Boolean).join(' · ');
   function kansItemHtml(w, it) {
     const id = esc(it.id), weg = it.status === 'verborgen';
     return `<article class="kans${weg ? ' weg' : ''}" data-kans="${id}">
       <div class="kans-tekst"><strong>${esc(it.titel)}</strong><span class="meta">${esc(kansMeta(it))}</span>${it.tekst && it.tekst !== it.bron ? `<span>${esc(it.tekst)}</span>` : ''}</div>
       <div class="btns">${it.status === 'toegevoegd' ? `<span class="stag klant">In je lijst</span>`
-        : state.readOnly ? '' : `<button type="button" class="btn small primary" id="kansAdd-${id}" data-kans-add="${id}" data-kans-week="${esc(w)}">${ic('plus')}${it.soort === 'bedrijf' ? 'Toevoegen' : 'Als lead'}</button>`}
+        : state.readOnly ? '' : `<button type="button" class="btn small primary" id="kansAdd-${id}" data-kans-add="${id}" data-kans-week="${esc(w)}">${ic('plus')}Als lead</button>`}
         ${it.url ? `<a class="btn small" href="${esc(it.url)}" target="_blank" rel="noopener">${ic('link')}Bron</a>` : ''}
         ${state.readOnly || it.status === 'toegevoegd' ? '' : `<button type="button" class="btn small ghost" id="kansWeg-${id}" data-kans-weg="${id}" data-kans-week="${esc(w)}">${weg ? 'Toch tonen' : 'Niet interessant'}</button>`}</div>
     </article>`;
   }
+  // Oudere versies van de functie zetten ook nieuws en bedrijven in het weekdocument: die worden niet meer getoond.
+  const weekItems = d => (d && Array.isArray(d.items) ? d.items : []).filter(x => x.soort === 'vergunning');
   function kansWeekHtml() {
     const huidig = weekId(todayISO()), id = kans.week || huidig, d = state.kansen.find(x => x.id === id);
     const weken = [...new Set([huidig, ...state.kansen.map(x => x.id)])].sort().reverse(), i = weken.indexOf(id);
@@ -3643,80 +3931,92 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const nav = `<div class="kansnav"><button type="button" class="iconbtn" id="kansVorige" data-kans-naar="${esc(weken[i + 1] || '')}"${weken[i + 1] ? '' : ' disabled'} aria-label="Vorige week">${ic('chevron-left')}</button>
       <strong>Week ${+id.slice(6)}${id === huidig ? ' (deze week)' : ''}</strong><span class="faint">${esc(dagKop(ma))} – ${esc(dagKop(zo))}</span>
       <button type="button" class="iconbtn" id="kansVolgende" data-kans-naar="${esc(weken[i - 1] || '')}"${i > 0 ? '' : ' disabled'} aria-label="Volgende week">${ic('chevron-right')}</button></div>`;
-    if (!d) return nav + emptyHtml('Nog geen kansen voor deze week', id === huidig ? 'Ze komen maandagochtend vanzelf. Tik op Nu zoeken om nu al te kijken.' : 'Voor deze week zijn geen kansen gezocht.');
+    const kop = `<h3 class="slabel kanskop">${ic('house')}Nieuwbouw en vergunningen</h3>`;
+    if (!d) return kop + nav + emptyHtml('Nog geen nieuwbouw voor deze week', id === huidig ? 'Die komt maandagochtend vanzelf. Tik op Nu zoeken om nu al te kijken.' : 'Voor deze week is niet gezocht.');
     const gebied = (d.gebied || []).map(g => `${g.naam} (${g.n})`).join(' · '), gb = (d.bronnen || {}).gebied || {};
     const weinig = gb.klanten !== undefined && gb.klanten < 50;
-    const bron = (k, label) => { const b = (d.bronnen || {})[k]; return !b ? '' : b.fout === 'uit' ? '' : `<span class="kbron${b.ok ? '' : ' fout'}" title="${esc(b.fout || b.info || '')}">${esc(label)}${b.ok && b.bron && k === 'nieuws' ? ` (${esc(b.bron)})` : ''}: ${b.ok ? b.n : 'niet gelukt'}</span>`; };
-    const bronnen = [bron('vergunning', 'Bekendmakingen'), bron('nieuws', 'Nieuws'), bron('bedrijf', 'Bedrijven')].filter(Boolean).join('');
-    const bronNaam = { gebied: 'Gebied', vergunning: 'Bekendmakingen', nieuws: 'Nieuws', bedrijf: 'Bedrijven' };
-    const fouten = Object.entries(d.bronnen || {}).filter(([, b]) => !b.ok && b.fout && b.fout !== 'uit').map(([k, b]) => `${bronNaam[k] || k}: ${b.fout}`);
-    const items = d.items || [], verborgen = items.filter(x => x.status === 'verborgen').length;
+    const bronNaam = { gebied: 'Gebied', vergunning: 'Bekendmakingen' };
+    const vg = (d.bronnen || {}).vergunning;
+    const fouten = Object.entries(d.bronnen || {}).filter(([k, b]) => bronNaam[k] && !b.ok && b.fout && b.fout !== 'uit').map(([k, b]) => `${bronNaam[k]}: ${b.fout}`);
+    const items = weekItems(d), verborgen = items.filter(x => x.status === 'verborgen').length;
     const oud = id === huidig && !(d.versie >= FUNCTIE_VERSIE);
-    const secties = KANS_SOORTEN.filter(([k]) => !kans.profiel || kans.profiel.soorten.includes(k)).map(([k, label, icn]) => {
-      const lijst = items.filter(x => x.soort === k && (kans.toon || x.status !== 'verborgen')).sort((a, b) => (a.status === 'toegevoegd') - (b.status === 'toegevoegd') || b.score - a.score);
-      return `<section class="kanssectie" aria-label="${esc(label)}"><h3 class="slabel">${ic(icn)}${esc(label)} <span class="n">${lijst.length}</span></h3>
-        ${lijst.length ? lijst.map(it => kansItemHtml(id, it)).join('') : '<p class="hint">Deze week niets gevonden.</p>'}</section>`;
+    const lijst = items.filter(x => kans.toon || x.status !== 'verborgen').sort((a, b) => (a.status === 'toegevoegd') - (b.status === 'toegevoegd') || b.score - a.score);
+    const regels = Object.entries(bronNaam).map(([k, label]) => {
+      const b = (d.bronnen || {})[k];
+      return !b || b.fout === 'uit' ? '' : `<li><strong>${label}:</strong> ${esc(b.ok ? b.info || `${b.n} gevonden` : b.fout || 'niet gelukt')}</li>`;
     }).join('');
-    return nav + `${gebied ? `<p class="hint kansgebied">${ic('map-pin')}<span>Gebied: ${esc(gebied)}${gb.info ? `<br><span class="faint">${esc(gb.info)}</span>` : ''}</span></p>` : ''}
+    return kop + nav + `<p class="hint">Nieuwe en grotere bedrijfspanden in de gemeenten waar je klanten zitten (officiële bekendmakingen van de laatste drie weken). Waar gebouwd wordt, komen heftrucks, stellingen en reinigingsmachines.</p>
+      ${gebied ? `<p class="hint kansgebied">${ic('map-pin')}<span>Gebied: ${esc(gebied)}${gb.info ? `<br><span class="faint">${esc(gb.info)}</span>` : ''}</span></p>` : ''}
       ${weinig ? `<p class="kanstip">${ic('info')}<span>Leadnex kijkt nu naar maar ${gb.klanten} ${plural(gb.klanten, 'bedrijf', 'bedrijven')}. Importeer je relatielijst via <strong>Meer → Importeren uit Excel</strong>, dan zoekt hij in de gemeenten waar al je klanten zitten.</span></p>` : ''}
-      ${bronnen ? `<div class="kbronnen">${bronnen}</div>` : ''}
-      ${(() => {   // per bron wat er gezocht en gevonden is (op de telefoon is er geen muis om over een label te gaan)
-        const regels = [['gebied', 'Gebied'], ['vergunning', 'Bekendmakingen'], ['nieuws', 'Nieuws'], ['bedrijf', 'Bedrijven']].map(([k, label]) => {
-          const b = (d.bronnen || {})[k];
-          return !b || b.fout === 'uit' ? '' : `<li><strong>${label}:</strong> ${esc(b.ok ? b.info || `${b.n} gevonden` : b.fout || 'niet gelukt')}</li>`;
-        }).join('');
-        return regels ? `<details class="kdetails"><summary>Wat is er gezocht?</summary><ul>${regels}<li><strong>Functie:</strong> versie ${esc(d.versie || 'onbekend (oud)')}${d.gemaakt ? `, gezocht ${esc(shortDate(d.gemaakt.slice(0, 10)))} ${esc(new Date(d.gemaakt).toTimeString().slice(0, 5))}` : ''}</li></ul></details>` : '';
-      })()}
+      ${vg && vg.fout !== 'uit' ? `<div class="kbronnen"><span class="kbron${vg.ok ? '' : ' fout'}" title="${esc(vg.fout || vg.info || '')}">Bekendmakingen: ${vg.ok ? vg.n : 'niet gelukt'}</span></div>` : ''}
+      ${regels ? `<details class="kdetails"><summary>Wat is er gezocht?</summary><ul>${regels}<li><strong>Functie:</strong> versie ${esc(d.versie || 'onbekend (oud)')}${d.gemaakt ? `, gezocht ${esc(shortDate(d.gemaakt.slice(0, 10)))} ${esc(new Date(d.gemaakt).toTimeString().slice(0, 5))}` : ''}</li></ul></details>` : ''}
       ${oud ? `<div class="warn kansoud"><strong>De functie in Supabase is nog een oudere versie${d.versie ? ` (${esc(d.versie)})` : ''}.</strong> Daardoor zoekt Leadnex nog op de oude manier. Werk de functie bij: Supabase → Edge Functions → leadnex-meldingen → Code → alles vervangen door de nieuwste code → Deploy. Tik daarna op Nu zoeken.</div>` : ''}
       ${fouten.length ? `<p class="warn">Niet alles lukte: ${esc(fouten.join(' · '))}</p>` : ''}
-      ${secties}
+      <div class="kanslijst">${lijst.length ? lijst.map(it => kansItemHtml(id, it)).join('') : '<p class="hint">Deze week niets gevonden.</p>'}</div>
       ${verborgen ? `<button type="button" class="linkbtn" id="kansToon">${kans.toon ? 'Verborgen kansen verbergen' : `${verborgen} verborgen ${plural(verborgen, 'kans', 'kansen')} tonen`}</button>` : ''}
-      <p class="hint kansvoet">Bronnen: officiële bekendmakingen van gemeenten (overheid.nl), Google Nieuws of Bing Nieuws, © OpenStreetMap-bijdragers en PDOK. Controleer een kans altijd even in de bron.</p>`;
+      <p class="hint kansvoet">Bron: officiële bekendmakingen van gemeenten (overheid.nl) en PDOK. Controleer een kans altijd even in de bron.</p>`;
   }
+  const kansTab = () => { const s = kansSoorten(kans.profiel); return !s.includes('vergunning') ? 'bedrijven' : !s.includes('bedrijf') ? 'week' : kans.tab; };
   function renderKansen() {
     const el = $('kansenPage'), knoppen = $('kansKnoppen');
     const vk = $('kansVandaag'), d = state.kansen.find(x => x.id === weekId(todayISO()));
-    const open = d ? (d.items || []).filter(x => !x.status).length : 0;
-    vk.hidden = state.page !== 'vandaag' || !open;
-    vk.innerHTML = open ? `${ic('sparkles')}<span><strong>${open} ${plural(open, 'kans', 'kansen')} deze week</strong><span>Nieuwbouw, nieuws en bedrijven die bij je klanten passen</span></span>${ic('chevron-right')}` : '';
+    const open = weekItems(d).filter(x => !x.status).length, nieuweB = kans.bedrijven && Array.isArray(kans.bedrijven.items) ? kans.bedrijven.items.filter(x => !x.status && kansNieuw(x)).length : 0;
+    vk.hidden = state.page !== 'vandaag' || !(open + nieuweB);
+    vk.innerHTML = open + nieuweB ? `${ic('sparkles')}<span><strong>${open + nieuweB} ${plural(open + nieuweB, 'kans', 'kansen')} deze week</strong><span>${esc([open && `${open} nieuwbouw`, nieuweB && `${nieuweB} ${plural(nieuweB, 'nieuw bedrijf', 'nieuwe bedrijven')} die bij je ${plural(nieuweB, 'past', 'passen')}`].filter(Boolean).join(' en '))}</span></span>${ic('chevron-right')}` : '';
     if (state.page !== 'kansen') return;
     const online = !state.local && !!getConfig();
     knoppen.hidden = !online || !kans.profiel || state.readOnly;
-    $('kansNu').disabled = kans.bezig;
-    $('kansNu').innerHTML = kans.bezig ? `${ic('search')}Zoeken…` : `${ic('search')}Nu zoeken`;
+    $('kansNu').disabled = kans.bezig || kans.bZoekt;
+    $('kansNu').innerHTML = kans.bezig || kans.bZoekt ? `${ic('search')}Zoeken…` : `${ic('search')}Nu zoeken`;
     $('kansInstel').setAttribute('aria-expanded', String(kans.instellen));
     if (!online) { el.innerHTML = emptyHtml('Kansen werken met online opslag', 'Koppel de online opslag (Supabase) om kansen uit de markt te krijgen.'); return; }
     if (!kans.geladen) { el.innerHTML = '<div class="empty"><p>Laden…</p></div>'; return; }
-    if ((!kans.profiel || kans.instellen) && !kans.draft) kans.draft = kans.profiel ? { ...kans.profiel, woorden: kans.profiel.woorden.join(', ') } : standaardProfiel();
+    if ((!kans.profiel || kans.instellen) && !kans.draft) kans.draft = kans.profiel ? { ...kans.profiel, soorten: kansSoorten(kans.profiel), woorden: kans.profiel.woorden.join(', ') } : standaardProfiel();
+    kansAutoBedrijven();
+    const s = kansSoorten(kans.profiel), tab = kansTab();
+    const nb = kans.bedrijven && Array.isArray(kans.bedrijven.items) ? kans.bedrijven.items.filter(x => x.status !== 'verborgen').length : 0;
+    const tabs = s.length > 1 ? `<div class="tabs kanstabs" role="group" aria-label="Soort kansen">
+      <button type="button" class="tab" data-kans-tab="bedrijven" aria-pressed="${tab === 'bedrijven'}">${ic('building-2')}Bedrijven${nb ? ` <span class="n">${nb}</span>` : ''}</button>
+      <button type="button" class="tab" data-kans-tab="week" aria-pressed="${tab === 'week'}">${ic('house')}Nieuwbouw${open ? ` <span class="n">${open}</span>` : ''}</button></div>` : '';
     withFocus(el, () => {
-      el.innerHTML = (!kans.profiel || kans.instellen ? kansProfielHtml() : '') + (kans.profiel ? kansWeekHtml() : '') +
-        (kans.bezig ? '<p class="hint" role="status">Kansen zoeken in de bekendmakingen, het nieuws en OpenStreetMap… dit duurt een halve minuut.</p>' : '');
+      el.innerHTML = (!kans.profiel || kans.instellen ? kansProfielHtml() : '') + (kans.profiel ? tabs + (tab === 'bedrijven' ? kansBedrijvenHtml() : kansWeekHtml()) : '') +
+        (kans.bezig && tab === 'week' ? '<p class="hint" role="status">Nieuwbouw zoeken in de bekendmakingen… dit duurt een halve minuut.</p>' : '');
     });
   }
   async function kansZoeken() {
     if (kans.bezig) return;
     kans.bezig = true; renderKansen();
-    const r = await meldServer({ kansen: true });
+    const metBedrijven = kansSoorten(kans.profiel).includes('bedrijf');
+    const [r, b] = await Promise.all([meldServer({ kansen: true }), metBedrijven ? zoekBedrijven() : null]);
     kans.bezig = false;
     if (appStore && appStore.ververs) await appStore.ververs('kansen').catch(() => {});   // ook als het half lukte: wat gevonden is, staat er
-    if (r.ok && !(r.versie >= FUNCTIE_VERSIE)) { kans.week = r.week; toast('Zoeken is gedaan met een oude versie van de functie in Supabase. Werk die eerst bij (zie de melding).', 7000); }
-    else if (r.ok) { kans.week = r.week; toast(`${r.kansen} ${plural(r.kansen, 'kans', 'kansen')} voor week ${+String(r.week).slice(6)}.`); }
-    else if (r.fout === 'geen-functie' || (!r.fout && r.telefoons !== undefined)) toast('Werk eerst de functie leadnex-meldingen bij in Supabase (zie de uitleg).', 6000);
+    const bTekst = !b ? '' : b.fout ? 'Bedrijven zoeken lukte niet (zie de melding).' : `${b.items.length} ${plural(b.items.length, 'bedrijf', 'bedrijven')} die bij je ${plural(b.items.length, 'past', 'passen')}.`;
+    const nieuwbouw = n => `${n} ${plural(n, 'nieuwbouwkans', 'nieuwbouwkansen')} voor week ${+String(r.week).slice(6)}.`;
+    if (r.ok && !(r.versie >= FUNCTIE_VERSIE)) { kans.week = r.week; toast(`${bTekst} Nieuwbouw is gezocht met een oude versie van de functie in Supabase. Werk die eerst bij (zie de melding).`.trim(), 7000); }
+    else if (r.ok) { kans.week = r.week; toast(`${bTekst} ${nieuwbouw(weekItems(state.kansen.find(x => x.id === r.week)).length)}`.trim(), 5000); }
+    else if (r.fout === 'geen-functie' || (!r.fout && r.telefoons !== undefined)) toast(`${bTekst} Voor nieuwbouw: werk eerst de functie leadnex-meldingen bij in Supabase (zie de uitleg).`.trim(), 6000);
     else if (r.fout === 'niet-ingelogd') toast('Log opnieuw in en probeer het nog eens.');
-    else toast('Zoeken lukte niet. Probeer het later opnieuw.');
+    else toast(`${bTekst} Nieuwbouw zoeken lukte niet. Probeer het later opnieuw.`.trim(), 5000);
     renderKansen();
   }
+  const kansDocVan = w => w === 'bedrijven' ? (kans.bedrijven ? { id: w, ...kans.bedrijven } : null) : state.kansen.find(x => x.id === w);
   async function kansZet(w, itemId, patch) {
-    const d = state.kansen.find(x => x.id === w);
+    const d = kansDocVan(w);
     if (!d || !kansCol) return false;
-    return write(() => kansCol.doc(w).update({ items: (d.items || []).map(x => x.id === itemId ? { ...x, ...patch } : x) }));
+    const items = (d.items || []).map(x => x.id === itemId ? { ...x, ...patch } : x);
+    if (w !== 'bedrijven') return write(() => kansCol.doc(w).update({ items }));
+    // Niet interessant onthouden, ook als het bedrijf bij een volgende zoekronde even niet gevonden wordt.
+    const weg = (d.weg || []).filter(x => x !== itemId).concat(patch.status === 'verborgen' ? [itemId] : []).slice(-2000);
+    const { id, ...rest } = d;
+    kans.bedrijven = { ...rest, items, weg };
+    return write(() => kansCol.doc(w).set(kans.bedrijven));
   }
   async function kansToevoegen(w, itemId) {
-    const d = state.kansen.find(x => x.id === w), it = d && (d.items || []).find(x => x.id === itemId);
+    const d = kansDocVan(w), it = d && (d.items || []).find(x => x.id === itemId);
     if (!it || state.readOnly) return;
-    const notitie = `Kans uit ${it.bron} (week ${+w.slice(6)}): ${it.titel}${it.url ? '\n' + it.url : ''}`;
-    if (it.soort !== 'bedrijf') {
-      // Bij een bekendmaking of nieuwsbericht staat de bedrijfsnaam er vaak niet netjes in: invullen op Nieuw.
+    if (w !== 'bedrijven') {
+      // Bij een bekendmaking staat de bedrijfsnaam er vaak niet netjes in: invullen op Nieuw.
+      const notitie = `Kans uit ${it.bron} (week ${+w.slice(6)}): ${it.titel}${it.url ? '\n' + it.url : ''}`;
       kans.pending = { w, id: itemId, notitie, titel: it.titel, url: it.url };
       setPage('nieuw');
       $('addPlaats').value = it.plaats && it.plaats !== it.gemeente ? it.plaats : it.gemeente || it.plaats || '';
@@ -3726,8 +4026,11 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       $('addBedrijf').focus();
       return;
     }
-    const now = nowISO(), ref = col.doc(), branche = (KANS_BRANCHES.find(b => b[0] === it.branche) || [])[1] || '';
-    const lead = { bedrijf: it.titel, contact: '', email: '', telefoon: it.telefoon || '', adres: it.adres || '', plaats: canonPlaats(it.plaats || it.gemeente || ''), website: cleanWebsite(it.website || ''),
+    const now = nowISO(), ref = col.doc(), branche = (brancheVan(it.branche) || [])[1] || '';
+    const machine = (KANS_OSM[it.branche] || {}).machine || (it.hal ? 'heftruck (bedrijfshal of magazijn)' : '');
+    const notitie = [`Kans uit OpenStreetMap (bedrijven die bij je passen, ${shortDate(todayISO())}).`, machine && `Waarschijnlijk ${machine}.`,
+      it.lijkt && it.lijkt.length ? `Lijkt op: ${it.lijkt.join(', ')}.` : ''].filter(Boolean).join(' ');
+    const lead = { bedrijf: it.titel, contact: '', email: '', telefoon: it.telefoon || '', adres: it.adres || '', plaats: canonPlaats(it.plaats || it.bij || ''), website: cleanWebsite(it.website || ''),
       branche: canonBranche(branche), actie: canonAction('Bellen'), datum: '', tijd: '', prioriteit: 'normaal', notitie, geenMail: false, log: [], gearchiveerd: false, gearchiveerdOp: '',
       aangemaakt: now, gewijzigd: now, status: 'lead', labels: ['Kans'] };
     if (!(await write(() => ref.set(toBody(lead))))) return;
@@ -3743,28 +4046,34 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   $('kansNu').addEventListener('click', kansZoeken);
   $('kansInstel').addEventListener('click', () => { kans.instellen = !kans.instellen; kans.draft = null; renderKansen(); });
   $('kansenPage').addEventListener('input', e => { if (e.target.id === 'kansWoorden' && kans.draft) kans.draft.woorden = e.target.value; });
+  $('kansenPage').addEventListener('change', e => { if (e.target.id === 'kansPlaats') { kans.bPlaats = e.target.value; kans.bAantal = KANS_STAP; renderKansen(); } });
   $('kansenPage').addEventListener('click', async e => {
     const b = e.target.closest('button');
     if (!b) return;
     const d = kans.draft, wissel = (lijst, v) => lijst.includes(v) ? lijst.filter(x => x !== v) : [...lijst, v];
     if (d && b.dataset.kb) { d.branches = wissel(d.branches, b.dataset.kb); renderKansen(); }
     else if (d && b.dataset.kp) { d.provincies = wissel(d.provincies, b.dataset.kp); renderKansen(); }
-    else if (d && b.dataset.ks) { d.soorten = wissel(d.soorten, b.dataset.ks); renderKansen(); }
+    else if (d && b.dataset.ks) { d.soorten = wissel(kansSoorten(d), b.dataset.ks); renderKansen(); }
     else if (b.id === 'kansBewaar' && d) {
-      const eerste = !kans.profiel;
-      const profiel = { branches: d.branches, provincies: d.provincies, soorten: d.soorten, woorden: String(d.woorden || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 8), gewijzigd: nowISO() };
+      const eerste = !kans.profiel, branchesWas = kans.profiel ? kans.profiel.branches.join(',') : '';
+      const profiel = { branches: d.branches, provincies: d.provincies, soorten: kansSoorten(d), woorden: String(d.woorden || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 8), gewijzigd: nowISO() };
       if (!(await write(() => kansProfielDoc.set(profiel)))) return;
       kans.profiel = profiel; kans.instellen = false; kans.draft = null;
       renderKansen();
-      if (eerste) kansZoeken(); else toast('Opgeslagen. Je nieuwe keuzes gelden vanaf de volgende zoekronde; tik op Nu zoeken om het meteen te zien.', 6000);
+      if (eerste) kansZoeken();
+      else if (profiel.soorten.includes('bedrijf') && profiel.branches.join(',') !== branchesWas) { toast('Opgeslagen. Leadnex zoekt nu bedrijven bij je nieuwe branches.', 5000); zoekBedrijven(); }
+      else toast('Opgeslagen. Je nieuwe keuzes gelden vanaf de volgende zoekronde; tik op Nu zoeken om het meteen te zien.', 6000);
     }
     else if (b.id === 'kansAnnuleer') { kans.instellen = false; kans.draft = null; renderKansen(); }
+    else if (b.dataset.kansTab) { kans.tab = b.dataset.kansTab; pref.set('kansTab', kans.tab); kans.toon = false; renderKansen(); }
+    else if (b.dataset.kbf !== undefined) { kans.bFilter = b.dataset.kbf; kans.bAantal = KANS_STAP; renderKansen(); }
+    else if (b.id === 'kansMeer') { kans.bAantal += KANS_STAP; renderKansen(); }
     else if (b.dataset.kansNaar !== undefined && b.dataset.kansNaar) { kans.week = b.dataset.kansNaar; renderKansen(); }
     else if (b.id === 'kansToon') { kans.toon = !kans.toon; renderKansen(); }
     else if (b.dataset.kansAdd) kansToevoegen(b.dataset.kansWeek, b.dataset.kansAdd);
     else if (b.dataset.kansWeg) {
-      const dd = state.kansen.find(x => x.id === b.dataset.kansWeek), it = dd && dd.items.find(x => x.id === b.dataset.kansWeg);
-      if (it) kansZet(b.dataset.kansWeek, it.id, { status: it.status === 'verborgen' ? '' : 'verborgen' });
+      const dd = kansDocVan(b.dataset.kansWeek), it = dd && (dd.items || []).find(x => x.id === b.dataset.kansWeg);
+      if (it) { await kansZet(b.dataset.kansWeek, it.id, { status: it.status === 'verborgen' ? '' : 'verborgen' }); renderKansen(); }
     }
   });
 
@@ -7182,9 +7491,13 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     kansCol = store.collection('kansen');
     kansCol.limit(60).onSnapshot(snap => {
       state.kansen = snap.docs.filter(d => d.exists).map(d => ({ id: d.id, ...(d.data() || {}) })).filter(d => /^\d{4}-W\d{2}$/.test(d.id)).sort((a, b) => b.id.localeCompare(a.id));
+      const bd = snap.docs.find(d => d.exists && d.id === 'bedrijven');
+      kans.bedrijven = bd ? bd.data() || null : null;
+      kans.bGeladen = true;
       scheduleRender();
     });
     kansProfielDoc = store.doc('instellingen/kansen');
+    kansGebiedDoc = store.doc('instellingen/kansgebied');
     kansProfielDoc.onSnapshot(snap => {
       const d = snap.exists ? snap.data() || {} : null;
       kans.profiel = d ? { branches: Array.isArray(d.branches) ? d.branches : [], provincies: Array.isArray(d.provincies) ? d.provincies : [], soorten: Array.isArray(d.soorten) ? d.soorten : [], woorden: Array.isArray(d.woorden) ? d.woorden : [] } : null;
