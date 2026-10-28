@@ -18,6 +18,8 @@
 // De functie gebruikt geen externe bibliotheken: versleutelen en ondertekenen gaat met WebCrypto.
 
 const APP_URL = 'https://silvan-hevotec.github.io/koude-acquisitie/';
+// Versie van deze functie: de app ziet zo of de functie in Supabase is bijgewerkt.
+const VERSIE = '2026-10-28c';
 const VAPID_PUBLIC = 'BDz5_askKTOerYW4HV6sHD4GET_pLPTGSah3yEDccDjpEZTWyK0-lRdvAnYPSresTw1bs1VKjXSdPqmMHwFmGM8';
 const TZ = 'Europe/Amsterdam';
 const STANDAARD = { ochtend: '08:00', herinnering: 15 };   // zelfde standaard als in de app
@@ -465,7 +467,7 @@ async function vanApp(req: Request, body: { test?: boolean; status?: boolean; li
   }
   const subs = await abonnementen(user.id);
   const hartslag = ((await db('meldlog?sleutel=eq.hartslag&select=verstuurd')) || [])[0]?.verstuurd || null;
-  if (body.status) return json({ ok: true, telefoons: subs.length, hartslag });
+  if (body.status) return json({ ok: true, telefoons: subs.length, hartslag, versie: VERSIE });
   if (!subs.length) return json({ ok: false, fout: 'geen-telefoon', uitleg: 'Er is nog geen telefoon gekoppeld. Zet de meldingen aan op je telefoon.' });
   const cfg = (await instellingen([user.id]))(user.id);
   const h = cfg.herinnering, wanneer = h <= 0 ? 'geen herinnering bij acties met een tijd' : h === 1 ? 'een herinnering op het tijdstip van een actie' : h === 1440 ? 'een herinnering een dag voor een actie met een tijd' : `een herinnering ${h} minuten voor een actie met een tijd`;
@@ -528,7 +530,7 @@ type Kans = { id: string; soort: 'vergunning' | 'nieuws' | 'bedrijf'; titel: str
   url?: string; bron: string; adres?: string; telefoon?: string; website?: string; branche?: string; score: number; status?: string; leadId?: string };
 type BronStatus = { ok: boolean; n: number; fout?: string; bron?: string; info?: string; klanten?: number };
 type Gemeente = { naam: string; provincie: string; n: number; plaatsen: string[]; lat?: number; lon?: number };
-type KansDoc = { week: string; gemaakt?: string; gebied?: Gemeente[]; bronnen: Record<string, BronStatus>; stappen: string[]; items: Kans[] };
+type KansDoc = { week: string; gemaakt?: string; versie?: string; gebied?: Gemeente[]; bronnen: Record<string, BronStatus>; stappen: string[]; items: Kans[] };
 const KANS_STAPPEN = ['gebied', 'vergunning', 'nieuws', 'bedrijf'] as const;
 const PROVINCIES = ['Drenthe', 'Flevoland', 'Friesland', 'Gelderland', 'Groningen', 'Limburg', 'Noord-Brabant', 'Noord-Holland', 'Overijssel', 'Utrecht', 'Zeeland', 'Zuid-Holland'];
 // Branches: zoekwoorden voor het nieuws en kenmerken in OpenStreetMap. Zelfde sleutels als in de app.
@@ -569,7 +571,7 @@ const afstandKm = (a: { lat: number; lon: number }, b: { lat: number; lon: numbe
 const BOUW_WOORDEN: [string, number][] = [['distributiecentrum', 5], ['bedrijfshal', 4], ['productiehal', 4], ['opslaghal', 4], ['bedrijfspand', 3], ['bedrijfsgebouw', 3], ['magazijn', 3], ['bedrijfsruimte', 2], ['loods', 2], ['werkplaats', 2]];
 const NIEUWS_WOORDEN = /nieuwbouw|bouwt|bouw van|nieuw pand|nieuwe hal|bedrijfspand|bedrijfshal|distributiecentrum|magazijn|uitbrei|verhuis|vestiging|fabriek|opent|overname|neemt .* over|investeert|groeit|bedrijventerrein|loods|eerste paal|productie/i;
 const NIEUWS_NIET = /ongeluk|aanrijding|brand |brandweer|politie|overleden|rechtbank|rechter|voetbal|wedstrijd|concert|festival|woningen|appartement|huurwoning|school|zorg/i;
-const KANS_UA = 'Leadnex/1.0 (kansen voor eigen relaties)';
+const KANS_UA = `Leadnex/1.0 (+${APP_URL}; kansen voor eigen relaties)`;
 const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
 const kansKey = (t: string) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\b(b\.?\s?v\.?|v\.?o\.?f\.?|holding|groep|group|gmbh|bv|vof)\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
 const ontsnapXml = (t: string) => t.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&amp;/g, '&');
@@ -780,8 +782,8 @@ async function kansBedrijven(gebied: Gemeente[], profiel: KansProfiel, leads: Ka
   for (const u of OVERPASS) {
     const host = new URL(u).hostname;
     try {
-      const r = await haalKans(u, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(ql) }, 35000);
-      if (!r.ok) { fouten.push(`${host} ${r.status}`); continue; }
+      const r = await haalKans(u, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json', Referer: APP_URL }, body: 'data=' + encodeURIComponent(ql) }, 35000);
+      if (!r.ok) { fouten.push(`${host} ${r.status}${(await r.text().catch(() => '')).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 50).replace(/^(.+)$/, ' ($1)')}`); continue; }
       const j = await r.json();
       if (/runtime error|timed out|out of memory|too busy/i.test(String(j?.remark || ''))) { fouten.push(`${host}: ${String(j.remark).replace(/runtime error: /, '').slice(0, 60)}`); continue; }
       els = j?.elements || []; bron = host; break;
@@ -866,6 +868,7 @@ async function kansStap(uid: string, week: string, stap: typeof KANS_STAPPEN[num
   } catch (e) { d.bronnen[stap] = { ok: false, n: 0, fout: String((e as Error).message || e).slice(0, 160) }; }
   if (!d.stappen.includes(stap)) d.stappen.push(stap);
   d.gemaakt = new Date(Date.now()).toISOString();
+  d.versie = VERSIE;
   await bewaarKansDoc(uid, d);
   return d;
 }
@@ -889,7 +892,7 @@ async function kansenNu(uid: string) {
   const vandaag = nl(Date.now()).datum, week = isoWeek(vandaag), cache = {};
   let d: KansDoc | null = null;
   for (const stap of KANS_STAPPEN) d = await kansStap(uid, week, stap, vandaag, cache);
-  return { week, kansen: d!.items.length, bronnen: d!.bronnen };
+  return { week, kansen: d!.items.length, bronnen: d!.bronnen, versie: VERSIE };
 }
 
 /* ---------- agenda voor Outlook ---------- */

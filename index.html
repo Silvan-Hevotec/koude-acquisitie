@@ -3591,6 +3591,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     ['verhuur', 'Verhuur', /verhuur|rental/],
   ];
   const KANS_SOORTEN = [['vergunning', 'Nieuwbouw en vergunningen', 'house'], ['nieuws', 'In het nieuws', 'globe'], ['bedrijf', 'Bedrijven die bij je klanten passen', 'building-2']];
+  // Versie van de functie leadnex-meldingen die bij deze app hoort (zie VERSIE in supabase/functions/leadnex-meldingen/index.ts).
+  const FUNCTIE_VERSIE = '2026-10-28c';
   const PROVINCIES = ['Drenthe', 'Flevoland', 'Friesland', 'Gelderland', 'Groningen', 'Limburg', 'Noord-Brabant', 'Noord-Holland', 'Overijssel', 'Utrecht', 'Zeeland', 'Zuid-Holland'];
   let kansCol = null, kansProfielDoc = null;
   const kans = { profiel: null, geladen: false, week: '', instellen: false, bezig: false, draft: null, toon: false, pending: null };
@@ -3649,6 +3651,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const bronNaam = { gebied: 'Gebied', vergunning: 'Bekendmakingen', nieuws: 'Nieuws', bedrijf: 'Bedrijven' };
     const fouten = Object.entries(d.bronnen || {}).filter(([, b]) => !b.ok && b.fout && b.fout !== 'uit').map(([k, b]) => `${bronNaam[k] || k}: ${b.fout}`);
     const items = d.items || [], verborgen = items.filter(x => x.status === 'verborgen').length;
+    const oud = id === huidig && !(d.versie >= FUNCTIE_VERSIE);
     const secties = KANS_SOORTEN.filter(([k]) => !kans.profiel || kans.profiel.soorten.includes(k)).map(([k, label, icn]) => {
       const lijst = items.filter(x => x.soort === k && (kans.toon || x.status !== 'verborgen')).sort((a, b) => (a.status === 'toegevoegd') - (b.status === 'toegevoegd') || b.score - a.score);
       return `<section class="kanssectie" aria-label="${esc(label)}"><h3 class="slabel">${ic(icn)}${esc(label)} <span class="n">${lijst.length}</span></h3>
@@ -3662,8 +3665,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
           const b = (d.bronnen || {})[k];
           return !b || b.fout === 'uit' ? '' : `<li><strong>${label}:</strong> ${esc(b.ok ? b.info || `${b.n} gevonden` : b.fout || 'niet gelukt')}</li>`;
         }).join('');
-        return regels ? `<details class="kdetails"><summary>Wat is er gezocht?</summary><ul>${regels}</ul></details>` : '';
+        return regels ? `<details class="kdetails"><summary>Wat is er gezocht?</summary><ul>${regels}<li><strong>Functie:</strong> versie ${esc(d.versie || 'onbekend (oud)')}${d.gemaakt ? `, gezocht ${esc(shortDate(d.gemaakt.slice(0, 10)))} ${esc(new Date(d.gemaakt).toTimeString().slice(0, 5))}` : ''}</li></ul></details>` : '';
       })()}
+      ${oud ? `<div class="warn kansoud"><strong>De functie in Supabase is nog een oudere versie${d.versie ? ` (${esc(d.versie)})` : ''}.</strong> Daardoor zoekt Leadnex nog op de oude manier. Werk de functie bij: Supabase → Edge Functions → leadnex-meldingen → Code → alles vervangen door de nieuwste code → Deploy. Tik daarna op Nu zoeken.</div>` : ''}
       ${fouten.length ? `<p class="warn">Niet alles lukte: ${esc(fouten.join(' · '))}</p>` : ''}
       ${secties}
       ${verborgen ? `<button type="button" class="linkbtn" id="kansToon">${kans.toon ? 'Verborgen kansen verbergen' : `${verborgen} verborgen ${plural(verborgen, 'kans', 'kansen')} tonen`}</button>` : ''}
@@ -3695,7 +3699,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const r = await meldServer({ kansen: true });
     kans.bezig = false;
     if (appStore && appStore.ververs) await appStore.ververs('kansen').catch(() => {});   // ook als het half lukte: wat gevonden is, staat er
-    if (r.ok) { kans.week = r.week; toast(`${r.kansen} ${plural(r.kansen, 'kans', 'kansen')} voor week ${+String(r.week).slice(6)}.`); }
+    if (r.ok && !(r.versie >= FUNCTIE_VERSIE)) { kans.week = r.week; toast('Zoeken is gedaan met een oude versie van de functie in Supabase. Werk die eerst bij (zie de melding).', 7000); }
+    else if (r.ok) { kans.week = r.week; toast(`${r.kansen} ${plural(r.kansen, 'kans', 'kansen')} voor week ${+String(r.week).slice(6)}.`); }
     else if (r.fout === 'geen-functie' || (!r.fout && r.telefoons !== undefined)) toast('Werk eerst de functie leadnex-meldingen bij in Supabase (zie de uitleg).', 6000);
     else if (r.fout === 'niet-ingelogd') toast('Log opnieuw in en probeer het nog eens.');
     else toast('Zoeken lukte niet. Probeer het later opnieuw.');
