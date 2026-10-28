@@ -527,12 +527,12 @@ type KansProfiel = { branches: string[]; provincies: string[]; soorten: string[]
 type Kans = { id: string; soort: 'vergunning' | 'nieuws' | 'bedrijf'; titel: string; tekst?: string; plaats?: string; gemeente?: string; datum?: string;
   url?: string; bron: string; adres?: string; telefoon?: string; website?: string; branche?: string; score: number; status?: string; leadId?: string };
 type BronStatus = { ok: boolean; n: number; fout?: string; bron?: string; info?: string; klanten?: number };
-type Gemeente = { naam: string; provincie: string; n: number; plaatsen: string[] };
+type Gemeente = { naam: string; provincie: string; n: number; plaatsen: string[]; lat?: number; lon?: number };
 type KansDoc = { week: string; gemaakt?: string; gebied?: Gemeente[]; bronnen: Record<string, BronStatus>; stappen: string[]; items: Kans[] };
 const KANS_STAPPEN = ['gebied', 'vergunning', 'nieuws', 'bedrijf'] as const;
 const PROVINCIES = ['Drenthe', 'Flevoland', 'Friesland', 'Gelderland', 'Groningen', 'Limburg', 'Noord-Brabant', 'Noord-Holland', 'Overijssel', 'Utrecht', 'Zeeland', 'Zuid-Holland'];
 // Branches: zoekwoorden voor het nieuws en kenmerken in OpenStreetMap. Zelfde sleutels als in de app.
-const KANS_BRANCHES: Record<string, { label: string; nieuws: string; osm: string[] }> = {
+const KANS_BRANCHES: Record<string, { label: string; nieuws: string; osm: string[]; naam?: RegExp }> = {
   transport: { label: 'Transport en logistiek', nieuws: 'transportbedrijf OR logistiek OR distributiecentrum', osm: ['["office"="logistics"]', '["industrial"~"^(warehouse|logistics|distribution)$"]', '["building"="warehouse"]'] },
   bouw: { label: 'Bouw en aannemerij', nieuws: 'bouwbedrijf OR aannemer', osm: ['["craft"~"^(builder|roofer|scaffolder)$"]', '["office"="construction_company"]'] },
   afbouw: { label: 'Afbouw (schilder, timmer, isolatie)', nieuws: 'schildersbedrijf OR timmerbedrijf', osm: ['["craft"~"^(painter|carpenter|plasterer|tiler|floorer|insulation|glaziery)$"]'] },
@@ -547,12 +547,30 @@ const KANS_BRANCHES: Record<string, { label: string; nieuws: string; osm: string
   recycling: { label: 'Recycling en afval', nieuws: 'recyclingbedrijf OR afvalverwerker', osm: ['["industrial"~"^(scrap_yard|recycling|waste_handling)$"]'] },
   verhuur: { label: 'Verhuur', nieuws: 'verhuurbedrijf OR machineverhuur', osm: ['["shop"~"^(rental|tool_hire)$"]'] },
 };
+// De branche van een bedrijf ook herkennen aan de naam, net als bij je klanten in de app.
+const BRANCHE_NAAM: Record<string, RegExp> = {
+  transport: /transport|logisti|expeditie|koerier|distributie|verhuis|cargo|freight/, bouw: /bouw(?!maat)|aannem|beton|infra|grondverzet|sloop|fundering|bestrating|straatwerk/,
+  afbouw: /schilder|timmer|isolatie|stukadoor|tegel|vloer|dakdek|glas|keuken|interieur|klussen|afbouw|gevel/, installatie: /install|elektro|loodgiet|klimaat|warmte|zonne|solar|koeltechniek/,
+  metaal: /metaal|staal|lasbedrijf|lastechniek|machine|constructie|cnc|plaatwerk|rvs|steel/, hout: /hout|meubel|zagerij|kozijn|trappen/,
+  handel: /handel|groothandel|trading|import|export|wholesale|supplies/, agrarisch: /agrar|loonbedrijf|loonwerk|veehouderij|melkvee|akkerbouw|boerderij|maatschap|mechanisatie|tuinbouw|veevoer/,
+  groen: /hovenier|groen|boomverzorging|tuin|kwekerij/, auto: /auto|garage|truck|bedrijfswagen|aanhangwagen|carrosserie|banden/,
+  productie: /food|voeding|bakkerij|vlees|zuivel|productie|fabriek|industrie|kunststof|verpakking|products|manufactur/, recycling: /recycl|afval|container|milieu/, verhuur: /verhuur|rental/,
+};
+for (const [k, re] of Object.entries(BRANCHE_NAAM)) KANS_BRANCHES[k].naam = re;
+// Naast je branches: elk bedrijf met een bedrijfspand, werkplaats, magazijn of fabriek (daar rijden heftrucks).
+const BEDRIJFSPAND = ['["industrial"]', '["building"~"^(industrial|warehouse|manufacture)$"]', '["man_made"="works"]', '["craft"]', '["office"~"^(company|logistics|construction_company)$"]',
+  '["shop"~"^(wholesale|trade|car_repair|truck|trailer|agrarian|tool_hire|rental|building_materials)$"]'];
+const GEEN_PROSPECT = /\b(gemeente|stichting|school|basisschool|kerk|vereniging|parochie|politie|brandweer|ziekenhuis|huisarts|tandarts|fysio|apotheek|kinderopvang|bibliotheek|sporthal|zwembad|camping|hotel|restaurant|cafe|snackbar|kapsalon|kapper|museum|theater)\b/;
+const afstandKm = (a: { lat: number; lon: number }, b: { lat: number; lon: number }) => {
+  const r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLon = (b.lon - a.lon) * r;
+  return 12742 * Math.asin(Math.sqrt(Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLon / 2) ** 2));
+};
 // Nieuwbouw en uitbreiding van bedrijfspanden: daar komen heftrucks, stellingen en intern transport bij kijken.
 const BOUW_WOORDEN: [string, number][] = [['distributiecentrum', 5], ['bedrijfshal', 4], ['productiehal', 4], ['opslaghal', 4], ['bedrijfspand', 3], ['bedrijfsgebouw', 3], ['magazijn', 3], ['bedrijfsruimte', 2], ['loods', 2], ['werkplaats', 2]];
 const NIEUWS_WOORDEN = /nieuwbouw|bouwt|bouw van|nieuw pand|nieuwe hal|bedrijfspand|bedrijfshal|distributiecentrum|magazijn|uitbrei|verhuis|vestiging|fabriek|opent|overname|neemt .* over|investeert|groeit|bedrijventerrein|loods|eerste paal|productie/i;
 const NIEUWS_NIET = /ongeluk|aanrijding|brand |brandweer|politie|overleden|rechtbank|rechter|voetbal|wedstrijd|concert|festival|woningen|appartement|huurwoning|school|zorg/i;
 const KANS_UA = 'Leadnex/1.0 (kansen voor eigen relaties)';
-const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
 const kansKey = (t: string) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\b(b\.?\s?v\.?|v\.?o\.?f\.?|holding|groep|group|gmbh|bv|vof)\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
 const ontsnapXml = (t: string) => t.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&amp;/g, '&');
 const xmlVeld = (xml: string, naam: string) => { const m = new RegExp(`<(?:[\\w-]+:)?${naam}\\b[^>]*>([\\s\\S]*?)</(?:[\\w-]+:)?${naam}>`).exec(xml); return m ? ontsnapXml(m[1]).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : ''; };
@@ -596,16 +614,17 @@ async function kansGebied(uid: string, profiel: KansProfiel, leads: KansLead[]) 
     perPlaats.set(k, x);
   }
   const cacheRij = ((await db(`docs?user_id=eq.${encodeURIComponent(uid)}&collection=eq.instellingen&id=eq.kansgebied&select=data`)) || [])[0];
-  const cache: Record<string, { g: string; p: string; w: string }> = cacheRij?.data?.plaatsen || {};
+  const cache: Record<string, { g: string; p: string; w: string; lat?: number; lon?: number }> = cacheRij?.data?.plaatsen || {};
   const top = [...perPlaats.entries()].sort((a, b) => b[1].n - a[1].n).slice(0, 80);
-  const open = top.filter(([k]) => !cache[k]);
+  const open = top.filter(([k]) => !cache[k] || cache[k].lat === undefined);   // ook oudere zonder coördinaten
   for (let i = 0; i < open.length; i += 10) {
     await Promise.all(open.slice(i, i + 10).map(async ([k, x]) => {
       const q = x.pc ? `q=${x.pc}&fq=type:postcode` : `q=${encodeURIComponent(x.naam)}&fq=type:woonplaats`;
       try {
-        const r = await haalKans(`https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?${q}&fl=woonplaatsnaam,gemeentenaam,provincienaam&rows=1`, {}, 8000);
+        const r = await haalKans(`https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?${q}&fl=woonplaatsnaam,gemeentenaam,provincienaam,centroide_ll&rows=1`, {}, 8000);
         const d = (await r.json())?.response?.docs?.[0];
-        if (d && d.gemeentenaam) cache[k] = { g: d.gemeentenaam, p: d.provincienaam || '', w: d.woonplaatsnaam || x.naam };
+        const pt = /POINT\(([\d.-]+) ([\d.-]+)\)/.exec(d?.centroide_ll || '');
+        if (d && d.gemeentenaam) cache[k] = { g: d.gemeentenaam, p: d.provincienaam || '', w: d.woonplaatsnaam || x.naam, ...(pt ? { lon: +pt[1], lat: +pt[2] } : {}) };
       } catch { /* volgende keer opnieuw */ }
     }));
   }
@@ -616,6 +635,8 @@ async function kansGebied(uid: string, profiel: KansProfiel, leads: KansLead[]) 
     const c = cache[k];
     if (!c || !profiel.provincies.includes(c.p)) continue;
     const g = perGemeente.get(c.g) || { naam: c.g, provincie: c.p, n: 0, plaatsen: [] };
+    // Midden van de gemeente, gewogen naar waar de klanten zitten.
+    if (c.lat !== undefined && c.lon !== undefined) { const m = g.lat === undefined ? 0 : g.n; g.lat = ((g.lat || 0) * m + c.lat * x.n) / (m + x.n); g.lon = ((g.lon || 0) * m + c.lon! * x.n) / (m + x.n); }
     g.n += x.n; if (g.plaatsen.length < 6) g.plaatsen.push(c.w);
     perGemeente.set(c.g, g);
   }
@@ -705,7 +726,8 @@ async function kansNieuws(gebied: Gemeente[], profiel: KansProfiel, vandaag: str
   const vragen = [`(nieuwbouw OR distributiecentrum OR bedrijfspand OR bedrijfshal OR uitbreiding OR verhuist OR "nieuwe vestiging") ${waar}`,
     ...profiel.branches.slice(0, 3).map(b => `(${KANS_BRANCHES[b].nieuws}) ${waar}`), ...(profiel.woorden.length ? [`(${profiel.woorden.map(w => `"${w}"`).join(' OR ')}) ${waar}`] : [])];
   const extra = profielWoorden(profiel), gezien = new Set<string>(), items: Kans[] = [], bronnen = new Set<string>(), fouten: string[] = [];
-  const grens = Date.parse(plusDagen(vandaag, -9) + 'T00:00:00Z');
+  const grens = Date.parse(plusDagen(vandaag, -14) + 'T00:00:00Z');
+  let gelezen = 0;
   // Eerste vraag bepaalt de bron (weigert Google, dan de rest meteen via Bing); de rest tegelijk.
   const eerste = await nieuwsFeed(vragen[0]);
   const zonderGoogle = !('bron' in eerste) || eerste.bron !== 'Google Nieuws';
@@ -714,6 +736,7 @@ async function kansNieuws(gebied: Gemeente[], profiel: KansProfiel, vandaag: str
     if ('fout' in f) { fouten.push(f.fout); continue; }
     bronnen.add(f.bron);
     for (const it of f.xml.split(/<item>/).slice(1)) {
+      gelezen++;
       const ruw = xmlVeld(it, 'title'), bron = xmlVeld(it, 'source') || xmlVeld(it, 'Source'), oms = xmlVeld(it, 'description');
       let link = xmlVeld(it, 'link');
       const doel = /[?&]url=([^&]+)/.exec(link);   // Bing: doorverwijzing met het echte adres erin
@@ -722,56 +745,88 @@ async function kansNieuws(gebied: Gemeente[], profiel: KansProfiel, vandaag: str
       const tekst = `${titel} ${oms}`;
       const plaats = plaatsen.find(p => new RegExp(`\\b${p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(tekst));
       const pub = Date.parse(xmlVeld(it, 'pubDate')), id = 'n-' + hash(link || titel);
-      if (!titel || !plaats || !NIEUWS_WOORDEN.test(titel) || NIEUWS_NIET.test(titel) || gezien.has(kansKey(titel)) || eerder.has(id) || (!isNaN(pub) && pub < grens)) continue;
+      // Zoekwoord in de kop of in de samenvatting; de plaats mag ook alleen in het artikel staan (dan lager).
+      if (!titel || !NIEUWS_WOORDEN.test(tekst) || NIEUWS_NIET.test(titel) || gezien.has(kansKey(titel)) || eerder.has(id) || (!isNaN(pub) && pub < grens)) continue;
       gezien.add(kansKey(titel));
-      const gemeente = gebied.find(g => g.plaatsen.includes(plaats))?.naam || '';
-      items.push({ id, soort: 'nieuws', titel, tekst: bron, plaats, gemeente, datum: isNaN(pub) ? '' : new Date(pub).toISOString().slice(0, 10), url: link, bron: bron || 'Nieuws',
-        score: 2 + (/nieuwbouw|distributiecentrum|bedrijfshal|bedrijfspand|magazijn|uitbrei/i.test(titel) ? 2 : 0) + dichtheid(gebied, gemeente) + (extra.test(tekst) ? 2 : 0) });
+      const gemeente = plaats ? gebied.find(g => g.plaatsen.includes(plaats))?.naam || '' : '';
+      items.push({ id, soort: 'nieuws', titel, tekst: bron, plaats: plaats || '', gemeente, datum: isNaN(pub) ? '' : new Date(pub).toISOString().slice(0, 10), url: link, bron: bron || 'Nieuws',
+        score: (plaats ? 2 : 0) + (NIEUWS_WOORDEN.test(titel) ? 1 : 0) + (/nieuwbouw|distributiecentrum|bedrijfshal|bedrijfspand|magazijn|uitbrei/i.test(titel) ? 2 : 0) + dichtheid(gebied, gemeente) + (extra.test(tekst) ? 2 : 0) });
     }
   }
   const ok = bronnen.size > 0;
   return { items: items.sort((a, b) => b.score - a.score || (b.datum || '').localeCompare(a.datum || '')).slice(0, 12),
-    status: { ok, n: items.length, bron: [...bronnen].join(' en '), ...(ok ? {} : { fout: `geen antwoord van de nieuwsbronnen (${[...new Set(fouten)].join('; ')})`.slice(0, 160) }) } };
+    status: { ok, n: Math.min(items.length, 12), bron: [...bronnen].join(' en '), info: `${gelezen} berichten gelezen (laatste 2 weken), ${items.length} over nieuwbouw, uitbreiding of verhuizing`, ...(ok ? {} : { fout: `geen antwoord van de nieuwsbronnen (${[...new Set(fouten)].join('; ')})`.slice(0, 160) }) } };
 }
 
-// 4. Bedrijven in jouw branches in de gemeenten waar je klanten zitten, die nog niet in je lijst staan. Elke week andere.
+// 4. Bedrijven die bij je klanten passen, in en rond het gebied waar je klanten zitten. Eerst wat in jouw branches zit (op
+//    kenmerk in OpenStreetMap of op naam, zoals bij je klanten), daarnaast elk bedrijf met een bedrijfspand, werkplaats,
+//    magazijn of fabriek. Hoe dichter bij je klanten, hoe hoger. Elke week andere, nooit wat al in je lijst staat.
+type OsmEl = { type: string; id: number; lat?: number; lon?: number; center?: { lat: number; lon: number }; tags?: Record<string, string> };
+const osmPast = (o: string, t: Record<string, string>) => { const m = /\["([^"]+)"(?:(=|~)"([^"]+)")?\]/.exec(o); return !!m && t[m[1]] !== undefined && (!m[2] || (m[2] === '=' ? t[m[1]] === m[3] : new RegExp(m[3]).test(t[m[1]]))); };
 async function kansBedrijven(gebied: Gemeente[], profiel: KansProfiel, leads: KansLead[], eerder: Set<string>, week: string): Promise<{ items: Kans[]; status: BronStatus }> {
-  if (!gebied.length) return { items: [], status: { ok: false, n: 0, fout: 'Geen gebied' } };
-  if (!profiel.branches.length) return { items: [], status: { ok: false, n: 0, fout: 'Kies eerst je branches' } };
-  const namen = gebied.map(g => g.naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-  const sel = profiel.branches.flatMap(b => KANS_BRANCHES[b].osm.map(o => `nw(area.g)["name"]${o};`)).join('');
-  const ql = `[out:json][timeout:35];area["boundary"="administrative"]["admin_level"="8"]["ref:gemeentecode"]["name"~"^(${namen})$"]->.g;(${sel});out tags center 600;`;
-  // De openbare OpenStreetMap-servers zijn soms druk: dan de volgende proberen.
-  let els: { type: string; id: number; tags?: Record<string, string> }[] | null = null, bron = '';
+  const punten = gebied.filter(g => g.lat !== undefined && g.lon !== undefined) as (Gemeente & { lat: number; lon: number })[];
+  if (!punten.length) return { items: [], status: { ok: false, n: 0, fout: gebied.length ? 'Nog geen coördinaten van je klantplaatsen (PDOK); probeer het zo nog eens.' : 'Geen gebied' } };
+  // Zoekgebied: rechthoek om de plaatsen van je klanten met ruim 15 km eromheen. Zitten je klanten door heel
+  // Nederland, dan cirkels van 20 km om de 6 drukste plaatsen.
+  const lats = punten.map(p => p.lat), lons = punten.map(p => p.lon);
+  const zu = Math.min(...lats) - 0.14, no = Math.max(...lats) + 0.14, we = Math.min(...lons) - 0.22, oo = Math.max(...lons) + 0.22;
+  const groot = no - zu > 1.4 || oo - we > 2.2;
+  const sel = [...new Set([...profiel.branches.flatMap(b => KANS_BRANCHES[b].osm), ...BEDRIJFSPAND])];
+  const stukken = groot ? punten.slice(0, 6).flatMap(p => sel.map(x => `nw(around:20000,${p.lat.toFixed(4)},${p.lon.toFixed(4)})["name"]${x};`)) : sel.map(x => `nw["name"]${x};`);
+  const ql = `[out:json][timeout:30]${groot ? '' : `[bbox:${zu.toFixed(4)},${we.toFixed(4)},${no.toFixed(4)},${oo.toFixed(4)}]`};(${stukken.join('')});out tags center 4000;`;
+  // De openbare OpenStreetMap-servers zijn soms druk of breken een vraag af (dan staat dat in "remark"): de volgende proberen.
+  let els: OsmEl[] | null = null, bron = '';
   const fouten: string[] = [];
   for (const u of OVERPASS) {
+    const host = new URL(u).hostname;
     try {
-      const r = await haalKans(u, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(ql) }, 40000);
-      if (!r.ok) { fouten.push(`${new URL(u).hostname} ${r.status}`); continue; }
-      els = (await r.json())?.elements || []; bron = new URL(u).hostname; break;
-    } catch (e) { fouten.push(`${new URL(u).hostname}: ${foutTekst(e)}`); }
+      const r = await haalKans(u, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'data=' + encodeURIComponent(ql) }, 35000);
+      if (!r.ok) { fouten.push(`${host} ${r.status}`); continue; }
+      const j = await r.json();
+      if (/runtime error|timed out|out of memory|too busy/i.test(String(j?.remark || ''))) { fouten.push(`${host}: ${String(j.remark).replace(/runtime error: /, '').slice(0, 60)}`); continue; }
+      els = j?.elements || []; bron = host; break;
+    } catch (e) { fouten.push(`${host}: ${foutTekst(e)}`); }
   }
-  if (!els) return { items: [], status: { ok: false, n: 0, fout: `OpenStreetMap: ${fouten.join(', ')}`.slice(0, 160) } };
+  if (!els) return { items: [], status: { ok: false, n: 0, fout: `OpenStreetMap: ${fouten.join(', ')}`.slice(0, 200) } };
+  // Al in je lijst: zelfde naam (of dezelfde eerste twee woorden), telefoon of website.
   const bekend = new Set(leads.map(l => kansKey(l.bedrijf || '')).filter(Boolean));
+  const tweeWoorden = (k: string) => { const w = k.split(' '); return w.length >= 2 && k.length >= 8 ? w.slice(0, 2).join(' ') : ''; };
+  const bekendBegin = new Set([...bekend].map(tweeWoorden).filter(Boolean));
   const bekendTel = new Set(leads.map(l => String(l.telefoon || '').replace(/\D/g, '').slice(-9)).filter(t => t.length === 9));
   const site = (w: string) => w.toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
   const bekendWeb = new Set(leads.map(l => site(l.website || '')).filter(Boolean));
-  const items: Kans[] = [];
+  const beste = new Map<string, Kans>();
+  let inBranche = 0, alInLijst = 0;
   for (const e of els) {
-    const t = e.tags || {}, naam = (t.name || '').trim(), k = kansKey(naam);
-    if (!naam || !k || bekend.has(k) || eerder.has(`b-${e.type}${e.id}`)) continue;
-    const tel = t.phone || t['contact:phone'] || '', web = t.website || t['contact:website'] || '';
-    if ((tel && bekendTel.has(tel.replace(/\D/g, '').slice(-9))) || (web && bekendWeb.has(site(web)))) continue;
-    const branche = profiel.branches.find(b => KANS_BRANCHES[b].osm.some(o => { const m = /\["([^"]+)"(=|~)"([^"]+)"\]/.exec(o); return m && t[m[1]] !== undefined && (m[2] === '=' ? t[m[1]] === m[3] : new RegExp(m[3]).test(t[m[1]])); })) || profiel.branches[0];
-    const plaats = t['addr:city'] || '', gemeente = gebied.find(g => g.plaatsen.some(p => kansKey(p) === kansKey(plaats)))?.naam || '';
+    const t = e.tags || {}, naam = (t.name || '').trim(), k = kansKey(naam), pos = e.center || (e.lat !== undefined ? { lat: e.lat, lon: e.lon! } : null);
+    if (!naam || !k || !pos || GEEN_PROSPECT.test(k) || (t.amenity && !t.craft && !t.industrial && !t.office && !t.shop)) continue;
+    const tel = t.phone || t['contact:phone'] || t['contact:mobile'] || '', web = t.website || t['contact:website'] || '';
+    if (bekend.has(k) || (tweeWoorden(k) && bekendBegin.has(tweeWoorden(k))) || (tel && bekendTel.has(tel.replace(/\D/g, '').slice(-9))) || (web && bekendWeb.has(site(web)))) { alInLijst++; continue; }
+    if (eerder.has(`b-${e.type}${e.id}`)) continue;
+    const naast = punten.map(p => ({ p, d: afstandKm(pos, p) })).sort((a, b) => a.d - b.d)[0];
+    if (naast.d > 35) continue;
+    const opTag = Object.keys(KANS_BRANCHES).find(b => KANS_BRANCHES[b].osm.some(o => osmPast(o, t)));
+    const opNaam = Object.keys(KANS_BRANCHES).find(b => KANS_BRANCHES[b].naam!.test(k));
+    const branche = profiel.branches.find(b => KANS_BRANCHES[b].osm.some(o => osmPast(o, t)) || KANS_BRANCHES[b].naam!.test(k)) || opNaam || opTag || '';   // de naam zegt meer dan een algemeen kenmerk
+    const past = !!branche && profiel.branches.includes(branche);
+    if (past) inBranche++;
+    const pand = !!(t.industrial || t.man_made === 'works' || /^(industrial|warehouse|manufacture)$/.test(t.building || ''));
+    const plaats = t['addr:city'] || naast.p.plaatsen[0] || '';
     const adres = [[t['addr:street'], t['addr:housenumber']].filter(Boolean).join(' '), t['addr:postcode']].filter(Boolean).join(', ');
-    items.push({ id: `b-${e.type}${e.id}`, soort: 'bedrijf', titel: naam, tekst: [KANS_BRANCHES[branche].label, adres && plaats ? `${adres}, ${plaats}` : plaats].filter(Boolean).join(' · '),
-      plaats, gemeente, url: web || `https://www.openstreetmap.org/${e.type}/${e.id}`, bron: 'OpenStreetMap', adres, telefoon: tel, website: web, branche,
-      score: 1 + (tel ? 1 : 0) + (web ? 1 : 0) + (adres ? 1 : 0) + dichtheid(gebied, gemeente) });
+    const rang = punten.indexOf(naast.p);
+    const kans: Kans = { id: `b-${e.type}${e.id}`, soort: 'bedrijf', titel: naam,
+      tekst: [branche ? KANS_BRANCHES[branche].label : pand ? 'Bedrijf met bedrijfspand' : 'Bedrijf', adres && plaats ? `${adres}, ${plaats}` : plaats,
+        naast.d < 1 ? `vlak bij je klanten in ${naast.p.naam}` : `${Math.round(naast.d)} km van je klanten in ${naast.p.naam}`].filter(Boolean).join(' · '),
+      plaats, gemeente: naast.p.naam, url: web || `https://www.openstreetmap.org/${e.type}/${e.id}`, bron: 'OpenStreetMap', adres, telefoon: tel, website: web, branche,
+      score: (past ? 5 : branche ? 1 : 0) + (naast.d <= 5 ? 3 : naast.d <= 12 ? 2 : naast.d <= 25 ? 1 : 0) + (rang < 3 ? 1 : 0) + (tel ? 1 : 0) + (web ? 1 : 0) + (adres ? 1 : 0) + (pand ? 1 : 0) };
+    const was = beste.get(k);   // zelfde bedrijf als punt én als gebouw: de beste houden
+    if (!was || was.score < kans.score) beste.set(k, kans);
   }
+  const items = [...beste.values()];
   // Elke week een andere greep uit de beste: op score, daarbinnen per week anders gesorteerd.
   items.sort((a, b) => b.score - a.score || hash(week + a.id).localeCompare(hash(week + b.id)));
-  return { items: items.slice(0, 12), status: { ok: true, n: items.length, bron, info: `${els.length} bedrijven gevonden, ${items.length} nieuw voor jou` } };
+  return { items: items.slice(0, 25), status: { ok: true, n: Math.min(items.length, 25), bron,
+    info: `${els.length} bedrijven in het zoekgebied (${groot ? '20 km rond je 6 drukste plaatsen' : 'rond al je klantplaatsen, 15 km ruim'}): ${inBranche} in jouw branches, ${alInLijst} staan al in je lijst, ${items.length} nieuwe kansen` } };
 }
 
 async function kansDoc(uid: string, week: string): Promise<KansDoc | null> {

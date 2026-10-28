@@ -590,6 +590,9 @@ body.sessie .sheet-body { padding-bottom: 150px; }
 .kansgebied { display: flex; gap: 6px; align-items: flex-start; margin: 0; }
 .kansgebied .ic { flex: none; width: 16px; height: 16px; margin-top: 2px; }
 .kbronnen { display: flex; flex-wrap: wrap; gap: 6px; }
+.kdetails { font-size: 13.5px; color: var(--muted); }
+.kdetails summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+.kdetails ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 4px; }
 .kanstip { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 12px 14px; border-radius: 14px; background: var(--brand-soft); font-size: 14px; }
 .kanstip .ic { flex: none; width: 18px; height: 18px; margin-top: 1px; color: var(--primary); }
 .kbron { padding: 3px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; background: var(--ok-soft); color: var(--ok); }
@@ -3654,10 +3657,17 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     return nav + `${gebied ? `<p class="hint kansgebied">${ic('map-pin')}<span>Gebied: ${esc(gebied)}${gb.info ? `<br><span class="faint">${esc(gb.info)}</span>` : ''}</span></p>` : ''}
       ${weinig ? `<p class="kanstip">${ic('info')}<span>Leadnex kijkt nu naar maar ${gb.klanten} ${plural(gb.klanten, 'bedrijf', 'bedrijven')}. Importeer je relatielijst via <strong>Meer → Importeren uit Excel</strong>, dan zoekt hij in de gemeenten waar al je klanten zitten.</span></p>` : ''}
       ${bronnen ? `<div class="kbronnen">${bronnen}</div>` : ''}
+      ${(() => {   // per bron wat er gezocht en gevonden is (op de telefoon is er geen muis om over een label te gaan)
+        const regels = [['gebied', 'Gebied'], ['vergunning', 'Bekendmakingen'], ['nieuws', 'Nieuws'], ['bedrijf', 'Bedrijven']].map(([k, label]) => {
+          const b = (d.bronnen || {})[k];
+          return !b || b.fout === 'uit' ? '' : `<li><strong>${label}:</strong> ${esc(b.ok ? b.info || `${b.n} gevonden` : b.fout || 'niet gelukt')}</li>`;
+        }).join('');
+        return regels ? `<details class="kdetails"><summary>Wat is er gezocht?</summary><ul>${regels}</ul></details>` : '';
+      })()}
       ${fouten.length ? `<p class="warn">Niet alles lukte: ${esc(fouten.join(' · '))}</p>` : ''}
       ${secties}
       ${verborgen ? `<button type="button" class="linkbtn" id="kansToon">${kans.toon ? 'Verborgen kansen verbergen' : `${verborgen} verborgen ${plural(verborgen, 'kans', 'kansen')} tonen`}</button>` : ''}
-      <p class="hint kansvoet">Bronnen: officiële bekendmakingen van gemeenten (overheid.nl), Google Nieuws en © OpenStreetMap-bijdragers. Controleer een kans altijd even in de bron.</p>`;
+      <p class="hint kansvoet">Bronnen: officiële bekendmakingen van gemeenten (overheid.nl), Google Nieuws of Bing Nieuws, © OpenStreetMap-bijdragers en PDOK. Controleer een kans altijd even in de bron.</p>`;
   }
   function renderKansen() {
     const el = $('kansenPage'), knoppen = $('kansKnoppen');
