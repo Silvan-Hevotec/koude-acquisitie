@@ -3622,7 +3622,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     '["craft"~"^(metal_construction|welder|blacksmith|machinist|sawmill|cabinet_maker|joiner|carpenter|builder|scaffolder|stonemason|agricultural_engines|brewery|distillery|printer|boatbuilder|window_construction|cleaning)$"]'];
   const KANS_GEEN = /\b(gemeente|stichting|school|basisschool|kerk|vereniging|parochie|politie|brandweer|ziekenhuis|huisarts|tandarts|fysio|apotheek|kinderopvang|bibliotheek|sporthal|zwembad|camping|hotel|restaurant|cafe|snackbar|kapsalon|kapper|museum|theater|bedrijventerrein|industrieterrein|industriegebied|bedrijvenpark|rwzi|rioolwaterzuivering|gemaal|onderstation|transformatorstation|windpark|zonnepark|parkeerterrein|milieustraat)\b/;
   const KANS_ALGEMEEN = /^(hal|loods|schuur|garage|werkplaats|magazijn|opslag|gebouw|fabriek|bedrijfshal|bedrijfspand|kantoor)( \w{1,3})?$/;
-  const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+  const OVERPASS = 'https://overpass-api.de/api/interpreter';
+  const OVERPASS_RESERVE = ['https://overpass.private.coffee/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
   const KANS_STRAAL = 12, KANS_MAX = 300, KANS_STAP = 25;
   const KANS_SOORTEN = [['bedrijf', 'Bedrijven die bij je passen', 'building-2'], ['vergunning', 'Nieuwbouw en vergunningen', 'house']];
   // Versie van de functie leadnex-meldingen die bij deze app hoort (zie VERSIE in supabase/functions/leadnex-meldingen/index.ts).
@@ -3736,40 +3737,70 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const bb = `(${tegel.map(x => x.toFixed(3)).join(',')})`;
     return `[out:json][timeout:25];(${filters.map(f => `nwr${f}${bb};`).join('')});out tags center;`;
   }
-  // Eén tegel opvragen. De openbare OpenStreetMap-servers zijn soms druk, weigeren even of breken een vraag af (dan staat
-  // dat in "remark"): dan de volgende server. De server die werkt, komt voor de volgende tegels vooraan; een server die
-  // twee keer niets gaf en nog nooit werkte, wordt deze ronde overgeslagen.
-  async function overpassTegel(ql, st) {
-    const volgorde = [...OVERPASS.slice(st.voorkeur), ...OVERPASS.slice(0, st.voorkeur)];
-    for (const u of volgorde) {
+  // Over hoeveel seconden overpass-api.de weer plek voor je heeft (dat staat in /api/status); null als dat niet te lezen is.
+  async function overpassWacht() {
+    try {
+      const r = await haalMetTijd(OVERPASS.replace(/interpreter$/, 'status'), {}, 8000);
+      if (!r.ok) return null;
+      if (/slots? available now/i.test(r.tekst)) return 0;
+      const sec = [...r.tekst.matchAll(/in (\d+) seconds?/g)].map(m => +m[1]);
+      return sec.length ? Math.min(...sec) : null;
+    } catch { return null; }
+  }
+  async function aftellen(sec, melding) { for (let i = Math.round(sec); i > 0; i--) { melding(`OpenStreetMap is even vol: nog ${i} ${plural(i, 'seconde', 'seconden')} wachten.`); await sleep(1000); } melding(''); }
+  // Eén tegel opvragen. overpass-api.de laat per gebruiker maar een paar vragen tegelijk toe en zegt anders "te druk"
+  // (429): dan wachten tot er weer plek is en opnieuw. Is hij echt kapot of te traag, dan een reserve-server. Een server
+  // die het steeds niet doet, slaat de app de rest van de ronde over.
+  async function overpassTegel(ql, st, melding) {
+    const vraag = () => ({ method: 'POST', body: new URLSearchParams({ data: ql }) }), H = 'overpass-api.de';
+    for (let poging = 0, storing = 0; poging < 8 && st.hoofdMis < 3 && Date.now() < st.tot; poging++) {
+      let r;
+      try { r = await haalMetTijd(OVERPASS, vraag(), 60000); }
+      catch (e) {
+        if (e && e.name === 'AbortError') { st.fouten.set(H, 'geen antwoord (te traag)'); st.hoofdMis++; break; }
+        st.fouten.set(H, 'niet bereikbaar');
+        if (storing++) { st.hoofdMis++; break; }
+        await aftellen(5, melding); continue;
+      }
+      if (r.status === 429) { st.fouten.set(H, 'te druk (429)'); const w = await overpassWacht(); await aftellen(Math.max(3, Math.min(60, w !== null ? w + 1 : 5 + poging * 5)), melding); continue; }
+      if (r.status === 503 || r.status === 504) { st.fouten.set(H, `druk (${r.status})`); if (storing++) { st.hoofdMis++; break; } await aftellen(5, melding); continue; }
+      if (!r.ok) { st.fouten.set(H, String(r.status)); st.hoofdMis++; break; }
+      let j;
+      try { j = JSON.parse(r.tekst); } catch { st.fouten.set(H, 'onleesbaar antwoord'); st.hoofdMis++; break; }
+      const opm = String(j.remark || '');
+      if (/rate.?limit|too busy|dispatcher/i.test(opm)) { st.fouten.set(H, 'te druk'); await aftellen(10, melding); continue; }
+      if (/runtime error|timed out|out of memory/i.test(opm)) { st.fouten.set(H, opm.replace(/runtime error: /, '').slice(0, 60)); st.hoofdMis++; break; }
+      st.hoofdMis = 0; st.ok.add(H);
+      return Array.isArray(j.elements) ? j.elements : [];
+    }
+    for (const u of OVERPASS_RESERVE) {
       const host = new URL(u).hostname;
       if ((st.mis.get(host) || 0) >= 2 && !st.ok.has(host)) continue;
       const fout = tekst => { st.mis.set(host, (st.mis.get(host) || 0) + 1); st.fouten.set(host, tekst); };
       try {
-        const r = await haalMetTijd(u, { method: 'POST', body: new URLSearchParams({ data: ql }) }, 40000);
-        if (!r.ok) { fout(r.status === 429 ? 'te druk (429)' : String(r.status)); if (r.status === 429) await sleep(1500); continue; }
+        const r = await haalMetTijd(u, vraag(), 60000);
+        if (!r.ok) { fout(r.status === 429 ? 'te druk (429)' : String(r.status)); continue; }
         const j = JSON.parse(r.tekst);
         if (/runtime error|timed out|out of memory|too busy|rate.?limit/i.test(String(j.remark || ''))) { fout(String(j.remark).replace(/runtime error: /, '').slice(0, 60)); continue; }
-        st.ok.add(host); st.voorkeur = OVERPASS.indexOf(u);
+        st.ok.add(host);
         return Array.isArray(j.elements) ? j.elements : [];
       } catch (e) { fout(e && e.name === 'AbortError' ? 'geen antwoord (te traag)' : 'niet bereikbaar'); }
     }
     return null;
   }
+  // De tegels één voor één (zo blijft er bij de server plek), hooguit drie minuten per ronde. Wat niet lukte of niet aan
+  // de beurt kwam, gaat terug als "open": de volgende ronde gaat daar verder.
   async function overpassTegels(tegels, profiel, stap) {
-    const st = { voorkeur: 0, mis: new Map(), ok: new Set(), fouten: new Map() }, els = new Map(), mislukt = [];
-    let volgende = 0, klaar = 0;
-    const werker = async () => {
-      while (volgende < tegels.length) {
-        const tegel = tegels[volgende++], r = await overpassTegel(kansVraag(profiel, tegel), st);
-        if (r) r.forEach(e => els.set(`${e.type}${e.id}`, e)); else mislukt.push(tegel);   // aan de rand van twee tegels: één keer
-        stap(++klaar, tegels.length);
-      }
-    };
-    await Promise.all([werker(), werker()]);   // twee tegelijk: zo veel staan de servers per gebruiker toe
+    const st = { hoofdMis: 0, mis: new Map(), ok: new Set(), fouten: new Map(), tot: Date.now() + 180000 }, els = new Map(), open = [];
+    let klaar = 0;
+    for (const tegel of tegels) {
+      const r = Date.now() < st.tot ? await overpassTegel(kansVraag(profiel, tegel), st, tekst => stap(klaar, tekst)) : null;
+      if (r) { r.forEach(e => els.set(`${e.type}${e.id}`, e)); klaar++; } else open.push(tegel);   // aan de rand van twee tegels: één keer
+      stap(klaar, '');
+    }
     const fouten = [...st.fouten].map(([h, t]) => `${h}: ${t}`).join(', ');
-    if (mislukt.length === tegels.length) throw new Error(`OpenStreetMap gaf geen antwoord (${fouten}). Probeer het over een kwartier nog eens.`);
-    return { els: [...els.values()], mislukt, bron: [...st.ok].join(', '), fouten };
+    if (!klaar) throw new Error(`OpenStreetMap is nu te druk of niet bereikbaar (${fouten || 'geen tijd meer'}). Leadnex probeert het vanzelf opnieuw als je over een kwartier Kansen opent.`);
+    return { els: [...els.values()], open, bron: [...st.ok].join(', '), fouten };
   }
   // Elk gevonden bedrijf vergelijken met je klanten: branche, klanten in dezelfde branche in de buurt, bedrijfshal, afstand.
   function kansBeoordeel(els, punten) {
@@ -3827,36 +3858,46 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     if (!kans.profiel || !kansCol || state.readOnly) return null;
     kans.bZoekt = true; kans.bStap = 'De plaatsen van je klanten opzoeken…'; renderKansen();
     pref.set('kansBedrijfPoging', String(Date.now()));
-    const vorig = kans.bedrijven && Array.isArray(kans.bedrijven.items) ? kans.bedrijven : null;
+    const vorig = kans.bedrijven && Array.isArray(kans.bedrijven.items) ? kans.bedrijven : null, profielKey = kans.profiel.branches.join(',');
+    // Bleven er vorige keer gebieden open (OpenStreetMap was druk), dan daar verder; anders het hele gebied opnieuw.
+    const vervolg = !!(vorig && Array.isArray(vorig.open) && vorig.open.length && vorig.profiel === profielKey && vorig.gezocht && Date.now() - Date.parse(vorig.gezocht) < 7 * 86400000);
     let uit;
     try {
       const k = await kansKlanten();
       if (!k.punten.length) throw new Error(k.basis ? 'De plaatsen van je klanten konden niet worden opgezocht (PDOK). Probeer het later nog eens.' : 'Nog geen klanten met een plaats. Importeer eerst je relaties (Meer → Importeren uit Excel).');
-      const tegels = kansTegels(k.punten), wie = k.soort === 'klanten' ? plural(k.punten.length, 'klant', 'klanten') : plural(k.punten.length, 'bedrijf', 'bedrijven');
-      const stap = (n, van) => { kans.bStap = `Bedrijven zoeken rond je ${k.punten.length} ${wie}: gebied ${n} van ${van} klaar…`; renderKansen(); };
-      stap(0, tegels.length);
-      const { els, mislukt, bron, fouten } = await overpassTegels(tegels, kans.profiel, stap);
+      const tegels = vervolg ? vorig.open : kansTegels(k.punten), totaal = vervolg ? Math.max(vorig.gebieden || 0, tegels.length) : tegels.length, eerst = totaal - tegels.length;
+      const wie = k.soort === 'klanten' ? plural(k.punten.length, 'klant', 'klanten') : plural(k.punten.length, 'bedrijf', 'bedrijven');
+      const stap = (n, extra) => { kans.bStap = `Bedrijven zoeken rond je ${k.punten.length} ${wie}: gebied ${eerst + n} van ${totaal} klaar.${extra ? ' ' + extra : ''}`; renderKansen(); };
+      stap(0, '');
+      const { els, open, bron, fouten } = await overpassTegels(tegels, kans.profiel, stap);
       const r = kansBeoordeel(els, k.punten);
-      // Gaf een gebied geen antwoord, dan blijven de bedrijven die daar vorige keer gevonden waren staan.
-      const inMislukt = x => x.lat !== undefined && mislukt.some(([z, w, n, o]) => x.lat >= z && x.lat <= n && x.lon >= w && x.lon <= o);
-      const nu = new Set(r.items.map(x => x.id));
-      if (vorig) r.items.push(...vorig.items.filter(x => inMislukt(x) && x.status !== 'toegevoegd' && !nu.has(x.id)).map(({ status, sinds, ...x }) => x));
-      r.items.sort((a, b) => b.score - a.score || a.km - b.km);
+      let items;
+      if (vervolg) {
+        const al = new Set(vorig.items.map(x => x.id)), alNaam = new Set(vorig.items.map(x => kansKey(x.titel)));
+        items = [...vorig.items, ...r.items.filter(x => !al.has(x.id) && !alNaam.has(kansKey(x.titel)))];
+      } else {
+        // Gebieden zonder antwoord: wat daar vorige keer stond, blijft staan.
+        const inOpen = x => x.lat !== undefined && open.some(([z, w, n, o]) => x.lat >= z && x.lat <= n && x.lon >= w && x.lon <= o);
+        const nu = new Set(r.items.map(x => x.id));
+        items = [...r.items, ...(vorig ? vorig.items.filter(x => inOpen(x) && x.status !== 'toegevoegd' && !nu.has(x.id)).map(({ status, sinds, ...x }) => x) : [])];
+      }
+      items.sort((a, b) => b.score - a.score || a.km - b.km);
       const weg = new Set([...(vorig && Array.isArray(vorig.weg) ? vorig.weg : []), ...(vorig ? vorig.items.filter(x => x.status === 'verborgen').map(x => x.id) : [])]);
-      const eerder = new Map(vorig ? vorig.items.map(x => [x.id, x]) : []), vandaag = todayISO();
+      // "Nieuw" alleen als er eerder al eens helemaal gezocht is; anders is alles nieuw.
+      const eerder = new Map(vorig ? vorig.items.map(x => [x.id, x]) : []), vandaag = todayISO(), nieuwMag = !!(vorig && vorig.volledig);
       const telPlaats = new Map();
       k.punten.forEach(p => { if (p.plaats) telPlaats.set(p.plaats, (telPlaats.get(p.plaats) || 0) + 1); });
       uit = { gezocht: nowISO(), soort: k.soort, klanten: k.punten.length, plaatsen: telPlaats.size, plaatsNamen: [...telPlaats].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([p]) => p),
-        gevonden: els.length, inLijst: r.inLijst, totaal: r.items.length, bron, profiel: kans.profiel.branches.join(','), gebieden: tegels.length,
-        ...(mislukt.length ? { mislukt: mislukt.length, deels: fouten.slice(0, 200) } : {}),
-        items: r.items.slice(0, KANS_MAX).map(x => {
-          const was = eerder.get(x.id), sinds = was ? was.sinds || '' : vorig && vorig.items.length ? vandaag : '';
+        gevonden: (vervolg ? vorig.gevonden || 0 : 0) + els.length, inLijst: (vervolg ? vorig.inLijst || 0 : 0) + r.inLijst, totaal: items.length, bron: [...new Set([...(vervolg && vorig.bron ? vorig.bron.split(', ') : []), ...bron.split(', ')].filter(Boolean))].join(', '),
+        profiel: profielKey, gebieden: totaal, open, volledig: !open.length || nieuwMag, ...(open.length ? { deels: fouten.slice(0, 200) } : {}),
+        items: items.slice(0, KANS_MAX).map(x => {
+          const was = eerder.get(x.id), sinds = was ? was.sinds || '' : nieuwMag ? vandaag : '';
           return { ...x, ...(sinds ? { sinds } : {}), ...(weg.has(x.id) ? { status: 'verborgen' } : {}) };
         }),
         weg: [...weg].slice(-2000) };
     } catch (e) {
       console.error('[kansen]', e);
-      uit = { ...(vorig || { items: [] }), fout: String((e && e.message) || e).slice(0, 220), foutOp: nowISO() };
+      uit = { ...(vorig || { items: [] }), fout: String((e && e.message) || e).slice(0, 260), foutOp: nowISO() };
     }
     try { await kansCol.doc('bedrijven').set(uit); } catch (e) { console.error(e); }
     kans.bedrijven = uit;
@@ -3864,12 +3905,13 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     renderKansen();
     return uit;
   }
-  // Openen van Kansen: is de lijst er nog niet of ouder dan een week, dan meteen zoeken (hooguit eens per half uur proberen).
+  // Openen van Kansen: is de lijst er nog niet of ouder dan een week, dan meteen zoeken (lukte het niet, dan hooguit eens per kwartier).
   function kansAutoBedrijven() {
     if (kans.bZoekt || kans.bezig || !kans.bGeladen || !state.loaded || !kans.profiel || !kansSoorten(kans.profiel).includes('bedrijf') || state.readOnly || !navigator.onLine) return;
-    // Ook als een deel van het gebied vorige keer geen antwoord gaf: dan vult de lijst zich vanzelf verder aan.
-    const b = kans.bedrijven, oud = !b || !b.gezocht || Date.now() - Date.parse(b.gezocht) > 7 * 86400000 || b.profiel !== kans.profiel.branches.join(',') || b.mislukt > 0;
-    if (oud && Date.now() - (+pref.get('kansBedrijfPoging') || 0) > 30 * 60000) setTimeout(zoekBedrijven, 0);
+    // Ook als er vorige keer gebieden open bleven: dan gaat hij na een paar minuten verder, zodat de lijst zich vanzelf aanvult.
+    const b = kans.bedrijven, open = !!(b && Array.isArray(b.open) && b.open.length);
+    const oud = !b || !b.gezocht || Date.now() - Date.parse(b.gezocht) > 7 * 86400000 || b.profiel !== kans.profiel.branches.join(',') || open;
+    if (oud && Date.now() - (+pref.get('kansBedrijfPoging') || 0) > (open && !b.fout ? 3 : 15) * 60000) setTimeout(zoekBedrijven, 0);
   }
   const kansNieuw = it => !!it.sinds && it.sinds >= isoOf(new Date(Date.now() - 7 * 86400000));
   function kansBedrijfHtml(it) {
@@ -3900,9 +3942,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const status = kans.bZoekt ? `<p class="kanstip" role="status">${ic('search')}<span>${esc(kans.bStap || 'Zoeken…')}</span></p>` : '';
     const wanneer = iso => `${shortDate(iso.slice(0, 10))} ${new Date(iso).toTimeString().slice(0, 5)}`;
     const fout = b && b.fout ? `<p class="warn">Zoeken lukte niet: ${esc(b.fout)}${items.length && b.gezocht ? ` Je ziet de lijst van ${esc(wanneer(b.gezocht))}.` : ''}</p>`
-      : b && b.mislukt ? `<p class="warn">Van ${b.mislukt} van de ${b.gebieden} gebieden kwam nog geen antwoord van OpenStreetMap${b.deels ? ` (${esc(b.deels)})` : ''}. Die bedrijven ontbreken nog; Leadnex probeert het over een half uur vanzelf opnieuw als je Kansen opent, of tik op Nu zoeken.</p>` : '';
+      : b && Array.isArray(b.open) && b.open.length && !kans.bZoekt ? `<p class="warn">Nog ${b.open.length} van de ${b.gebieden} gebieden te doen: OpenStreetMap was druk${b.deels ? ` (${esc(b.deels)})` : ''}. Leadnex gaat vanzelf verder als je over een paar minuten Kansen opent, of tik op Nu zoeken.</p>` : '';
     if (!items.length) {
-      const leeg = kans.bZoekt ? '' : b && b.gezocht ? emptyHtml('Geen nieuwe bedrijven gevonden', 'Rond je klanten staan geen bedrijven in OpenStreetMap die nog niet in je lijst staan. Kies eventueel meer branches bij Instellen.')
+      const leeg = kans.bZoekt || (b && Array.isArray(b.open) && b.open.length) ? '' : b && b.gezocht ? emptyHtml('Geen nieuwe bedrijven gevonden', 'Rond je klanten staan geen bedrijven in OpenStreetMap die nog niet in je lijst staan. Kies eventueel meer branches bij Instellen.')
         : b && b.fout ? '' : emptyHtml('Nog niet gezocht', 'Tik op Nu zoeken. Leadnex zoekt dan bedrijven rond de plaatsen waar je klanten zitten.');
       return kop + status + fout + leeg;
     }
@@ -4011,7 +4053,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const [r, b] = await Promise.all([meldServer({ kansen: true }), metBedrijven ? zoekBedrijven() : null]);
     kans.bezig = false;
     if (appStore && appStore.ververs) await appStore.ververs('kansen').catch(() => {});   // ook als het half lukte: wat gevonden is, staat er
-    const bTekst = !b ? '' : b.fout ? 'Bedrijven zoeken lukte niet (zie de melding).' : `${b.items.length} ${plural(b.items.length, 'bedrijf', 'bedrijven')} die bij je ${plural(b.items.length, 'past', 'passen')}.`;
+    const bTekst = !b ? '' : b.fout ? 'Bedrijven zoeken lukte nog niet (zie de melding).' : `${b.items.length} ${plural(b.items.length, 'bedrijf', 'bedrijven')} die bij je ${plural(b.items.length, 'past', 'passen')}${b.open && b.open.length ? `, nog ${b.open.length} ${plural(b.open.length, 'gebied', 'gebieden')} te gaan` : ''}.`;
     const nieuwbouw = n => `${n} ${plural(n, 'nieuwbouwkans', 'nieuwbouwkansen')} voor week ${+String(r.week).slice(6)}.`;
     if (r.ok && !(r.versie >= FUNCTIE_VERSIE)) { kans.week = r.week; toast(`${bTekst} Nieuwbouw is gezocht met een oude versie van de functie in Supabase. Werk die eerst bij (zie de melding).`.trim(), 7000); }
     else if (r.ok) { kans.week = r.week; toast(`${bTekst} ${nieuwbouw(weekItems(state.kansen.find(x => x.id === r.week)).length)}`.trim(), 5000); }
