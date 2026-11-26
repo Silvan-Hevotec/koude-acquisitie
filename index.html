@@ -426,6 +426,13 @@ body.cam-open { overflow: hidden; }
 .callbox { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 16px; border-radius: 16px; background: var(--brand-soft); }
 .callbox .pick { flex-basis: 100%; font: 600 24px/1.25 var(--f-mono); font-variant-numeric: tabular-nums; }
 .touch-only { display: none; }
+/* Eenvoudige app (Meer → Voorkeuren): minder knoppen en tabbladen. */
+body:not(.eenvoudig) .alleen-eenvoudig { display: none !important; }
+body.eenvoudig #kansVandaag { display: none !important; }
+.vlak-stats { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; padding: 14px 18px; border-radius: 16px; background: var(--brand-soft); font-size: 15px; }
+.vlak-stats b { font-size: 22px; margin-right: 4px; }
+.vlak-stats .late { color: var(--danger); }
+.oc-tip { margin: 8px 0 0; font-size: 13px; color: var(--faint); }
 @media (pointer: coarse) { .touch-only { display: inline; } .notice.touch-only { display: flex; } .mouse-only { display: none; } }
 .due { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; white-space: nowrap; font-size: 12.5px; font-weight: 600; color: var(--muted); background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); }
 .due.late { background: var(--danger-soft); color: var(--danger); box-shadow: none; }
@@ -1188,6 +1195,13 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   <section class="card" id="importPanel" aria-label="Importeren uit Excel" hidden></section>
   <section class="card" id="dupPanel" aria-label="Dubbele bedrijven" hidden></section>
   <div class="settings" data-show="meer">
+    <section class="card set-group alleen-eenvoudig" aria-label="Ook in Leadnex">
+      <h3>Ook in Leadnex</h3>
+      <div class="set-row"><i data-ic="calendar"></i><div class="set-text"><strong>Planbord</strong><span>Je week met afspraken, taken en notities.</span></div>
+        <button type="button" class="btn small" data-page="planbord">Openen</button></div>
+      <div class="set-row"><i data-ic="sparkles"></i><div class="set-text"><strong>Kansen</strong><span>Nieuwe bedrijven in de buurt van je klanten.</span></div>
+        <button type="button" class="btn small" data-page="kansen">Openen</button></div>
+    </section>
     <section class="card set-group" aria-label="Account">
       <h3>Account</h3>
       <div class="set-row"><i data-ic="user"></i><div class="set-text"><strong>Opslag</strong><span id="who"></span></div>
@@ -1218,6 +1232,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     </section>
     <section class="card set-group" aria-label="Voorkeuren">
       <h3>Voorkeuren</h3>
+      <div class="set-row"><i data-ic="smartphone"></i><div class="set-text"><strong>Eenvoudige app</strong><span>Alleen Vandaag, Bedrijven en Nieuw onderin. Planbord en Kansen staan dan hier bij Meer.</span></div>
+        <select class="input set-sel" id="eenvoudigSel" aria-label="Eenvoudige app"><option value="1">Aan</option><option value="0">Uit (alles)</option></select></div>
       <div class="set-row"><i data-ic="sun"></i><div class="set-text"><strong>Weergave</strong><span>Licht (standaard), donker of zoals je telefoon is ingesteld.</span></div>
         <select class="input set-sel" id="themaSel" aria-label="Weergave"><option value="licht">Licht</option><option value="systeem">Zoals je telefoon</option><option value="donker">Donker</option></select></div>
       <div class="set-row"><i data-ic="alarm-clock"></i><div class="set-text"><strong>Bouwvak</strong><span>Voor slimme datums zoals "belt na de bouwvak terug".</span></div>
@@ -1355,6 +1371,9 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     get(k) { try { return localStorage.getItem('koude-acq.' + k); } catch { return null; } },
     set(k, v) { try { localStorage.setItem('koude-acq.' + k, v); } catch {} },
   };
+  // Eenvoudige app: minder tabbladen en knoppen (standaard aan; uit te zetten in Meer → Voorkeuren).
+  const eenvoudig = () => pref.get('eenvoudig') !== '0';
+  document.body.classList.toggle('eenvoudig', eenvoudig());
   // Weergave: zoals de telefoon, of altijd licht of donker. De meta-tag voorkomt dat Chrome de app zelf donker maakt.
   // Standaard licht; donker of 'zoals je telefoon' alleen als je dat kiest in Meer → Voorkeuren.
   const themaKeuze = () => ['donker', 'systeem'].includes(pref.get('thema')) ? pref.get('thema') : 'licht';
@@ -2597,8 +2616,10 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const due = state.leads.filter(l => isDue(l, todayISO())).length;
     const item = (p, actief) => `<a href="#" class="nav-item${p === 'nieuw' ? ' new' : ''}" data-page="${p}"${actief ? ' aria-current="page"' : ''}>
       <span class="pill">${ic(NAV[p][0])}</span><span>${NAV[p][1]}</span>${p === 'vandaag' && due ? `<span class="badge">${due > 99 ? '99+' : due}</span>` : ''}</a>`;
-    $('topNav').innerHTML = ['vandaag', 'planbord', 'bedrijven', 'kaart', 'kansen', 'nieuw', 'meer'].map(p => item(p, state.page === p)).join('');
-    $('bottomNav').innerHTML = ['vandaag', 'planbord', 'nieuw', 'bedrijven', 'kansen', 'meer'].map(p => item(p, state.page === p || (p === 'bedrijven' && state.page === 'kaart'))).join('');
+    // Eenvoudige app: Planbord en Kansen staan onder Meer (en Meer licht dan op).
+    const simpel = eenvoudig(), onderMeer = p => p === 'meer' && simpel && ['planbord', 'kansen'].includes(state.page);
+    $('topNav').innerHTML = (simpel ? ['vandaag', 'bedrijven', 'kaart', 'nieuw', 'meer'] : ['vandaag', 'planbord', 'bedrijven', 'kaart', 'kansen', 'nieuw', 'meer']).map(p => item(p, state.page === p || onderMeer(p))).join('');
+    $('bottomNav').innerHTML = (simpel ? ['vandaag', 'bedrijven', 'nieuw', 'meer'] : ['vandaag', 'planbord', 'nieuw', 'bedrijven', 'kansen', 'meer']).map(p => item(p, state.page === p || (p === 'bedrijven' && state.page === 'kaart') || onderMeer(p))).join('');
   }
   function renderPage() {
     document.querySelectorAll('[data-show]').forEach(el => { el.hidden = !el.dataset.show.split(' ').includes(state.page); });
@@ -2849,6 +2870,7 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
         ${l.telefoon ? `<div class="callbox"><span class="pick" role="button" tabindex="0" id="cb-${id}" data-act="copy" data-copy="${esc(l.telefoon)}" data-label="Telefoonnummer">${esc(l.telefoon)}</span>${callLink(l, `Bel ${esc(l.telefoon)}`, 'call big')}${waLink(l, 'wa big')}</div>` : ''}
         <div class="outcomes">${OUTCOMES.map((o, i) =>
           `<button type="button" class="oc" id="oc-${id}-${i}" data-act="outcome" data-outcome="${o}" aria-pressed="${f.uitkomst === o}">${o}</button>`).join('')}</div>
+        ${eenvoudig() && !state.readOnly ? '<p class="oc-tip">Geen gehoor? Eén tik: de app legt het vast en zet opnieuw bellen klaar.</p>' : ''}
         ${f.hint ? `<p class="suggest" role="status">${esc(f.hint)}</p>` : ''}
         <div class="field">
           <label for="f-${id}-tekst">Eigen uitkomst of toelichting<span class="opt">optioneel</span></label>
@@ -3048,7 +3070,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
     const max = Math.max(4, ...dagen.map(x => x.n));
     const balken = dagen.map(x => `<div class="hb${x.iso === today ? ' nu' : ''}${x.iso > today ? ' later' : ''}"><span class="hb-track"><span class="hb-fill" style="height:${x.n ? Math.max(10, Math.round(x.n / max * 100)) : 0}%">` +
       `${x.neg ? `<span class="hb-neg" style="height:${Math.round(x.neg / x.n * 100)}%"></span>` : ''}</span></span><span class="hb-l">${x.naam}</span></div>`).join('');
-    $('stats').innerHTML = `<section class="hero" aria-label="Vandaag in cijfers">
+    $('stats').innerHTML = eenvoudig() ? `<section class="vlak-stats" aria-label="Vandaag in cijfers"><span><b>${due}</b>${due === 1 ? 'actie' : 'acties'} vandaag</span>${late ? `<span class="late"><b>${late}</b>te laat</span>` : ''}<span><b>${gedaan}</b>gedaan</span></section>`
+      : `<section class="hero" aria-label="Vandaag in cijfers">
       <div class="hero-main"><span class="gem" aria-hidden="true"><img src="icons/logo-mark.png" alt=""></span>
         <div class="hero-num"><b>${due}</b><span>${due === 1 ? 'actie' : 'acties'} vandaag</span></div></div>
       <div class="hero-stats">
@@ -5985,7 +6008,12 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
       openRow(id, 'toggle');
     }
     else if (act === 'afronden') openRow(id, 'finish');
-    else if (act === 'outcome') applyOutcome(id, el.dataset.outcome);
+    else if (act === 'outcome') {
+      applyOutcome(id, el.dataset.outcome);
+      // Eenvoudige app: geen gehoor meteen vastleggen met de vaste opvolgstap (niet als de app voorstelt te archiveren).
+      const f = finishes[id];
+      if (eenvoudig() && f && f.uitkomst === 'Geen gehoor' && !f.archief && !f.tekst.trim()) finishLead(id);
+    }
     else if (act === 'finish') finishLead(id);
     else if (act === 'cancel') { if (finishes[id] && finishes[id].vanuitScherm) openRow(id, 'edit'); else { closeRow(); $(`af-${id}`)?.focus(); } }
     else if (act === 'sess-skip') { sess.skipped++; nextInSession(); }
@@ -6197,6 +6225,8 @@ select.input.set-sel { border-radius: 999px; padding-left: 16px; }
   $('buurtSel').innerHTML = BUURT_KM.map(km => `<option value="${km}"${km === buurtKm() ? ' selected' : ''}>${km} km</option>`).join('');
   $('bouwvakSel').addEventListener('change', e => { pref.set('bouwvak', e.target.value); renderAll(); });
   $('buurtSel').addEventListener('change', e => { pref.set('buurtKm', e.target.value); renderAll(); });
+  $('eenvoudigSel').value = eenvoudig() ? '1' : '0';
+  $('eenvoudigSel').addEventListener('change', e => { pref.set('eenvoudig', e.target.value); document.body.classList.toggle('eenvoudig', eenvoudig()); renderAll(); toast(eenvoudig() ? 'Eenvoudige app staat aan. Planbord en Kansen vind je hier bij Meer.' : 'Alle tabbladen staan weer onderin.'); });
   $('themaSel').value = themaKeuze();
   $('themaSel').addEventListener('change', e => { pref.set('thema', e.target.value); applyThema(); });
   $('dupBtn').addEventListener('click', () => { dupPanel.open = !dupPanel.open; renderDup(); if (dupPanel.open) $('dupPanel').scrollIntoView({ block: 'start', behavior: 'smooth' }); });
